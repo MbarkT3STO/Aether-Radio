@@ -18,6 +18,12 @@
   -webkit-app-region: drag;
 }
 
+/* macOS: push header down to clear the traffic light buttons
+   hiddenInset places them at ~8px top, ~12px left, ~52px wide */
+.platform-darwin .sidebar-header {
+  padding-top: 44px;
+}
+
 /* Logo icon must be no-drag so clicks work */
 .sidebar-logo-icon {
   -webkit-app-region: no-drag;
@@ -306,6 +312,11 @@
   display: flex;
   justify-content: center;
   padding: 20px 0 14px;
+}
+
+/* macOS: keep the traffic-light offset when collapsed too */
+.platform-darwin .sidebar.collapsed .sidebar-header {
+  padding-top: 44px;
 }
 
 .sidebar.collapsed .sidebar-logo {

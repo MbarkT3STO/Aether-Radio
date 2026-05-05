@@ -21,6 +21,13 @@ import { initLogoErrorHandling } from './utils/stationLogo'
 // Install global logo error handler before anything renders
 initLogoErrorHandling()
 
+// Tag the root element with the current platform so CSS can target it.
+// On macOS with titleBarStyle:'hiddenInset' the traffic lights overlap the
+// top-left corner, so we need extra top padding in the sidebar header.
+if (navigator.userAgent.includes('Macintosh')) {
+  document.documentElement.classList.add('platform-darwin')
+}
+
 class App {
   private router: Router
   private eventBus: EventBus
