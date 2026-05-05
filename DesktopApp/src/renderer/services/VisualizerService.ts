@@ -74,16 +74,17 @@ export class VisualizerService {
    */
   startAmbientVisualization(
     canvas: HTMLCanvasElement,
-    source: VisualizerService
+    source: VisualizerService,
+    large = false
   ): void {
     this.analyser  = source.sharedAnalyser
     this.dataArray = source.sharedDataArray
     this.stopVisualization()
     this.activeCanvas = canvas
-    this.ambientLoop(canvas)
+    this.ambientLoop(canvas, large)
   }
 
-  private ambientLoop(canvas: HTMLCanvasElement): void {
+  private ambientLoop(canvas: HTMLCanvasElement, large = false): void {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -135,13 +136,13 @@ export class VisualizerService {
         const phase  = blob.phase + t * blob.speed
         const cx     = (blob.x + Math.sin(phase * 1.3) * 0.12) * w
         const cy     = (blob.y + Math.cos(phase * 0.9) * 0.10) * hh
-        const baseR  = Math.min(w, hh) * 0.45
+        const baseR  = Math.min(w, hh) * (large ? 1.8 : 0.45)
         const radius = baseR * (0.7 + energy * 0.6 + Math.sin(phase * 2) * 0.08)
 
         const blobHue = (h + blob.hueOff + 360) % 360
         const alpha   = isDark
-          ? 0.22 + energy * 0.28
-          : 0.12 + energy * 0.16
+          ? (large ? 0.30 + energy * 0.35 : 0.22 + energy * 0.28)
+          : (large ? 0.18 + energy * 0.22 : 0.12 + energy * 0.16)
 
         // Use shadowBlur for the soft glow — no CSS filter needed
         ctx.save()
