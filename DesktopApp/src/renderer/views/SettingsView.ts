@@ -16,7 +16,7 @@ export class SettingsView extends BaseComponent {
     const result = await this.bridge.settings.get()
     if (result.success) {
       this.settings = result.data
-      this.renderContent()
+      await this.renderContent()
     }
   }
 
@@ -51,7 +51,7 @@ export class SettingsView extends BaseComponent {
     `
   }
 
-  private renderContent(): void {
+  private async renderContent(): Promise<void> {
     const content = this.querySelector('#settings-content')
     if (!content || !this.settings) return
 
@@ -107,6 +107,37 @@ export class SettingsView extends BaseComponent {
           </div>
         </div>
 
+        <!-- ── Keyboard Shortcuts ── -->
+        ${this.renderShortcutsCard()}
+
+        <!-- ── Data ── -->
+        <div class="stg-card">
+          <div class="stg-card-header">
+            <div class="stg-card-icon">${this.iconDatabase()}</div>
+            <div>
+              <div class="stg-card-title">Data</div>
+              <div class="stg-card-sub">Import and export your data</div>
+            </div>
+          </div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Favorites</div>
+              <div class="stg-row-desc">Back up or restore your saved stations</div>
+            </div>
+            <div class="stg-btn-group">
+              <button class="stg-action-btn" id="stg-export-fav">Export</button>
+              <button class="stg-action-btn" id="stg-import-fav">Import</button>
+            </div>
+          </div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Play History</div>
+              <div class="stg-row-desc">Clear all recently played stations</div>
+            </div>
+            <button class="stg-action-btn stg-action-btn--danger" id="stg-clear-history">Clear History</button>
+          </div>
+        </div>
+
         <!-- ── About ── -->
         <div class="stg-card">
           <div class="stg-card-header">
@@ -141,6 +172,33 @@ export class SettingsView extends BaseComponent {
     this.attachListeners()
   }
 
+  private renderShortcutsCard(): string {
+    const shortcuts: Array<{ keys: string[]; action: string }> = [
+      { keys: ['Media Play/Pause'], action: 'Play / Pause' },
+      { keys: ['Space'],            action: 'Play / Pause' },
+      { keys: ['Media Stop'],       action: 'Stop playback' },
+      { keys: ['Media Next'],       action: 'Next station (future)' },
+    ]
+    return `<div class="stg-card">
+      <div class="stg-card-header">
+        <div class="stg-card-icon">${this.iconKeyboard()}</div>
+        <div>
+          <div class="stg-card-title">Keyboard Shortcuts</div>
+          <div class="stg-card-sub">Global hotkeys — work even when window is hidden</div>
+        </div>
+      </div>
+      ${shortcuts.map(({ keys, action }) => `
+        <div class="stg-row stg-row--kbd">
+          <div class="stg-row-info">
+            <div class="stg-row-label">${action}</div>
+          </div>
+          <div class="stg-kbd-group">
+            ${keys.map(k => `<kbd class="stg-kbd">${k}</kbd>`).join('<span class="stg-kbd-plus">+</span>')}
+          </div>
+        </div>`).join('')}
+    </div>`
+  }
+
   private attachListeners(): void {
     // Theme buttons
     this.querySelectorAll('.stg-toggle-btn[data-theme]').forEach(btn => {
@@ -160,14 +218,52 @@ export class SettingsView extends BaseComponent {
         this.eventBus.emit('settings:buffer-changed', { bufferSize })
       })
     })
+
+    // Export favorites
+    const exportBtn = this.querySelector<HTMLElement>('#stg-export-fav')
+    if (exportBtn) {
+      this.on(exportBtn, 'click', async () => {
+        const result = await this.bridge.favorites.export()
+        if (result.success) {
+          this.showToast(`Exported ${result.data} favorite${result.data !== 1 ? 's' : ''}`, 'success')
+        }
+      })
+    }
+
+    // Import favorites
+    const importBtn = this.querySelector<HTMLElement>('#stg-import-fav')
+    if (importBtn) {
+      this.on(importBtn, 'click', async () => {
+        const result = await this.bridge.favorites.import()
+        if (result.success) {
+          this.showToast(`Imported ${result.data} favorite${result.data !== 1 ? 's' : ''}`, 'success')
+        }
+      })
+    }
+
+    // Clear history
+    const clearHistoryBtn = this.querySelector<HTMLElement>('#stg-clear-history')
+    if (clearHistoryBtn) {
+      this.on(clearHistoryBtn, 'click', async () => {
+        const result = await this.bridge.history.clear()
+        if (result.success) {
+          this.showToast('Play history cleared', 'success')
+        }
+      })
+    }
   }
 
   private async applyUpdate(update: Partial<AppSettings>): Promise<void> {
     const result = await this.bridge.settings.update(update)
     if (result.success) {
       this.settings = result.data
-      this.renderContent()
+      await this.renderContent()
     }
+  }
+
+  private showToast(message: string, type: 'success' | 'error' | 'info'): void {
+    const event = new CustomEvent('show-toast', { detail: { message, type } })
+    window.dispatchEvent(event)
   }
 
   // ── Icons ─────────────────────────────────────────────────
@@ -190,5 +286,13 @@ export class SettingsView extends BaseComponent {
 
   private iconInfo(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+  }
+
+  private iconKeyboard(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h.01M12 14h.01M16 14h.01M6 14h.01M18 14h.01"/></svg>`
+  }
+
+  private iconDatabase(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`
   }
 }

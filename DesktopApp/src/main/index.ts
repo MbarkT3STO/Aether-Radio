@@ -81,14 +81,14 @@ app.whenReady().then(() => {
   globalShortcut.register('MediaPlayPause', () => {
     mainWindow?.webContents.send('shortcut:toggle-playback')
   })
+  globalShortcut.register('Space', () => {
+    mainWindow?.webContents.send('shortcut:toggle-playback')
+  })
   globalShortcut.register('MediaStop', () => {
     mainWindow?.webContents.send('shortcut:stop')
   })
   globalShortcut.register('MediaNextTrack', () => {
     mainWindow?.webContents.send('shortcut:next-station')
-  })
-  globalShortcut.register('CommandOrControl+Shift+Space', () => {
-    mainWindow?.webContents.send('shortcut:toggle-playback')
   })
 
   app.on('activate', () => {

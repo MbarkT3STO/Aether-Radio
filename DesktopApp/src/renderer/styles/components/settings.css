@@ -216,3 +216,82 @@
 
 /* ── Dark theme overrides (from theme-fixes) ── */
 [data-theme="dark"] .stg-card-sub              { color: var(--text-tertiary); }
+
+/* ── Keyboard Shortcuts ── */
+.stg-row--kbd {
+  padding: 10px 20px;
+}
+
+.stg-kbd-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.stg-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.stg-kbd-plus {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  padding: 0 1px;
+}
+
+/* ── Data Card Buttons ── */
+.stg-btn-group {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stg-action-btn {
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  color: var(--accent-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border: none;
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  white-space: nowrap;
+}
+
+.stg-action-btn:hover {
+  box-shadow: var(--neu-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.stg-action-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+.stg-action-btn--danger {
+  color: #ff453a;
+}
+
+/* ── Light theme overrides for new elements ── */
+:root:not([data-theme="dark"]) .stg-kbd {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .stg-action-btn {
+  background: var(--bg-primary);
+}

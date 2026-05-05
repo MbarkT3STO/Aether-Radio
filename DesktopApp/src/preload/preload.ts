@@ -24,6 +24,8 @@ export interface ElectronAPI {
   getFavorites: () => Promise<Result<Favorite[]>>
   addFavorite: (station: RadioStation) => Promise<Result<Favorite>>
   removeFavorite: (stationId: string) => Promise<Result<void>>
+  exportFavorites: () => Promise<Result<number>>
+  importFavorites: () => Promise<Result<number>>
 
   // History
   getHistory: () => Promise<Result<PlayHistory[]>>
@@ -50,9 +52,6 @@ export interface ElectronAPI {
 
   // Power save / playback state (Feature 4)
   playerStateChanged: (playing: boolean) => void
-
-  // OS notification (Feature 6)
-  nowPlaying: (payload: { name: string; favicon?: string }) => void
 }
 
 const electronAPI: ElectronAPI = {
@@ -69,6 +68,8 @@ const electronAPI: ElectronAPI = {
   getFavorites: () => ipcRenderer.invoke('favorites:get'),
   addFavorite: (station) => ipcRenderer.invoke('favorites:add', station),
   removeFavorite: (stationId) => ipcRenderer.invoke('favorites:remove', stationId),
+  exportFavorites: () => ipcRenderer.invoke('favorites:export'),
+  importFavorites: () => ipcRenderer.invoke('favorites:import'),
 
   // History
   getHistory: () => ipcRenderer.invoke('history:get'),
@@ -108,9 +109,6 @@ const electronAPI: ElectronAPI = {
 
   // Power save (Feature 4)
   playerStateChanged: (playing) => ipcRenderer.send('player:state-changed', playing),
-
-  // OS notification (Feature 6)
-  nowPlaying: (payload) => ipcRenderer.send('player:now-playing', payload),
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

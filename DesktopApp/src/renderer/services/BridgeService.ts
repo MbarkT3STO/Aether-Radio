@@ -37,7 +37,9 @@ export class BridgeService {
     return {
       getAll: this.api.getFavorites.bind(this.api),
       add: this.api.addFavorite.bind(this.api),
-      remove: this.api.removeFavorite.bind(this.api)
+      remove: this.api.removeFavorite.bind(this.api),
+      export: this.api.exportFavorites.bind(this.api),
+      import: this.api.importFavorites.bind(this.api),
     }
   }
 

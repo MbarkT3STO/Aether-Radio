@@ -27,6 +27,7 @@ export enum IpcChannel {
   // Playback state (power save blocker)
   PLAYER_STATE_CHANGED = 'player:state-changed',
 
-  // OS Notification
-  NOW_PLAYING = 'player:now-playing',
+  // Favorites import/export
+  EXPORT_FAVORITES = 'favorites:export',
+  IMPORT_FAVORITES = 'favorites:import',
 }

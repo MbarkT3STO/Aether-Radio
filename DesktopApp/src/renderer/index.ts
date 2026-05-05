@@ -119,7 +119,6 @@ class App {
       await this.bridge.radio.reportClick(station.id)
       window.electronAPI.trayUpdate({ name: station.name, playing: true })
       window.electronAPI.playerStateChanged(true)
-      window.electronAPI.nowPlaying({ name: station.name, favicon: station.favicon })
     })
 
     this.eventBus.on('player:pause', () => {

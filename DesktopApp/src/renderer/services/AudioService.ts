@@ -93,9 +93,9 @@ export class AudioService {
   private async handlePlaybackError(station: RadioStation): Promise<void> {
     if (this.retryCount < MAX_RETRIES) {
       this.retryCount++
-      
+
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS))
-      
+
       if (this.currentStationId === station.id) {
         await this.play(station)
       }
@@ -107,7 +107,6 @@ export class AudioService {
   }
 
   private showToast(message: string, type: 'error' | 'success' | 'info'): void {
-    // This will be implemented by Toast component
     const event = new CustomEvent('show-toast', { detail: { message, type } })
     window.dispatchEvent(event)
   }

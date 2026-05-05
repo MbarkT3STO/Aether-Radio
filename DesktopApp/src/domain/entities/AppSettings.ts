@@ -14,5 +14,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   volume: 0.8,
   bufferSize: 'balanced',
   apiMirror: 'https://de1.api.radio-browser.info',
-  audioOutputDeviceId: null
+  audioOutputDeviceId: null,
 }
