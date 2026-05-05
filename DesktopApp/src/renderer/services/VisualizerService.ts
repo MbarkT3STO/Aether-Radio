@@ -68,6 +68,99 @@ export class VisualizerService {
     this.drawLoop(canvas)
   }
 
+  /**
+   * Ambient gradient visualizer — full-bleed canvas behind the expanded player.
+   * Draws slow-moving radial blobs that pulse with audio frequency data.
+   */
+  startAmbientVisualization(
+    canvas: HTMLCanvasElement,
+    source: VisualizerService
+  ): void {
+    this.analyser  = source.sharedAnalyser
+    this.dataArray = source.sharedDataArray
+    this.stopVisualization()
+    this.activeCanvas = canvas
+    this.ambientLoop(canvas)
+  }
+
+  private ambientLoop(canvas: HTMLCanvasElement): void {
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // CSS accent hue/sat
+    const style   = getComputedStyle(document.documentElement)
+    const h       = parseFloat(style.getPropertyValue('--h').trim()) || 258
+    const s       = style.getPropertyValue('--s').trim() || '85%'
+    const isDark  = document.documentElement.getAttribute('data-theme') === 'dark'
+
+    // Three blobs with different hue offsets, positions, and phase speeds
+    const blobs = [
+      { hueOff: 0,   x: 0.25, y: 0.40, phase: 0,    speed: 0.0007, freqBin: 2  },
+      { hueOff: 40,  x: 0.72, y: 0.35, phase: 2.1,  speed: 0.0011, freqBin: 8  },
+      { hueOff: -20, x: 0.50, y: 0.70, phase: 4.3,  speed: 0.0009, freqBin: 14 },
+    ]
+
+    let t = 0
+
+    const draw = (): void => {
+      this.animationId = requestAnimationFrame(draw)
+      t++
+
+      const W = canvas.width
+      const H = canvas.height
+
+      // Resize canvas to match element size every frame (handles window resize)
+      const el = canvas as HTMLCanvasElement
+      const dpr = window.devicePixelRatio || 1
+      const rect = el.getBoundingClientRect()
+      if (el.width !== Math.round(rect.width * dpr) || el.height !== Math.round(rect.height * dpr)) {
+        el.width  = Math.round(rect.width  * dpr)
+        el.height = Math.round(rect.height * dpr)
+        ctx.scale(dpr, dpr)
+      }
+
+      const w = rect.width
+      const hh = rect.height
+
+      ctx.clearRect(0, 0, w, hh)
+
+      // Get frequency energy for each blob
+      const freqData = this.dataArray
+      const getEnergy = (bin: number): number => {
+        if (!freqData) return 0.3
+        return (freqData[bin] ?? 0) / 255
+      }
+
+      for (const blob of blobs) {
+        const energy  = getEnergy(blob.freqBin)
+        const phase   = blob.phase + t * blob.speed
+        // Blob center drifts slowly
+        const cx = (blob.x + Math.sin(phase * 1.3) * 0.12) * w
+        const cy = (blob.y + Math.cos(phase * 0.9) * 0.10) * hh
+        // Radius pulses with audio energy
+        const baseR  = Math.min(w, hh) * 0.45
+        const radius = baseR * (0.7 + energy * 0.6 + Math.sin(phase * 2) * 0.08)
+
+        const blobHue = (h + blob.hueOff + 360) % 360
+        const alpha   = isDark
+          ? 0.18 + energy * 0.22
+          : 0.10 + energy * 0.14
+
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius)
+        grad.addColorStop(0,   `hsla(${blobHue}, ${s}, ${isDark ? '65%' : '55%'}, ${alpha})`)
+        grad.addColorStop(0.5, `hsla(${blobHue}, ${s}, ${isDark ? '55%' : '50%'}, ${alpha * 0.5})`)
+        grad.addColorStop(1,   `hsla(${blobHue}, ${s}, ${isDark ? '45%' : '45%'}, 0)`)
+
+        ctx.fillStyle = grad
+        ctx.beginPath()
+        ctx.ellipse(cx, cy, radius, radius * 0.85, phase * 0.3, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+
+    draw()
+  }
+
   private drawLoop(canvas: HTMLCanvasElement): void {
     if (!this.analyser || !this.dataArray) return
 

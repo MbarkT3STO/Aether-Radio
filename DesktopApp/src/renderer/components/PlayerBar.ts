@@ -26,8 +26,8 @@ export class PlayerBar extends BaseComponent {
   private _renderedStationId: string | null = null
   // Expanded player state
   private _isExpanded = false
-  // Expanded visualizer (separate instance for the large canvas)
-  private _expandedVisualizer = new VisualizerService()
+  // Ambient background visualizer
+  private _ambientVisualizer  = new VisualizerService()
   // Expanded volume drag listeners
   private _pexOnMouseMove: ((e: Event) => void) | null = null
   private _pexOnMouseUp: (() => void) | null = null
@@ -199,7 +199,7 @@ export class PlayerBar extends BaseComponent {
 
   protected beforeUnmount(): void {
     this.visualizer.stopVisualization()
-    this._expandedVisualizer.stopVisualization()
+    this._ambientVisualizer.stopVisualization()
     this.removeDragListeners()
     this.removePexDragListeners()
     this.sleepTimer.unmount()
@@ -327,7 +327,6 @@ export class PlayerBar extends BaseComponent {
   private fullRender(): void {
     if (this.element && this.element.parentNode) {
       this.visualizer.stopVisualization()
-      this._expandedVisualizer.stopVisualization()
       this.removeDragListeners()
       this.removePexDragListeners()
       this.sleepTimer.unmount()
@@ -483,6 +482,7 @@ export class PlayerBar extends BaseComponent {
     overlay.id = 'player-expanded-overlay'
 
     overlay.innerHTML = `
+      <canvas class="pex-ambient-canvas" id="pex-ambient-canvas"></canvas>
       <div class="player-expanded-body">
 
         <div class="pex-artwork-col">
@@ -540,19 +540,6 @@ export class PlayerBar extends BaseComponent {
           </div>
         </div>
 
-        <div class="pex-viz-col">
-          <div class="pex-visualizer-wrap">
-            ${isPlaying
-              ? `<canvas id="pex-visualizer-canvas" width="140" height="80"></canvas>`
-              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${this.idleBars()}</div>`
-            }
-          </div>
-          <div class="pex-sleep-timer-wrap">
-            <span class="pex-sleep-label">Sleep Timer</span>
-            <div id="pex-sleep-timer"></div>
-          </div>
-        </div>
-
       </div>
     `
 
@@ -563,16 +550,11 @@ export class PlayerBar extends BaseComponent {
     this.attachPexListeners(overlay)
 
     if (isPlaying) {
-      const canvas = overlay.querySelector<HTMLCanvasElement>('#pex-visualizer-canvas')
-      if (canvas) {
-        // Share the analyser from the mini bar's visualizer
-        this._expandedVisualizer.startVisualizationShared(canvas, this.visualizer)
+      // Ambient background
+      const ambientCanvas = overlay.querySelector<HTMLCanvasElement>('#pex-ambient-canvas')
+      if (ambientCanvas) {
+        this._ambientVisualizer.startAmbientVisualization(ambientCanvas, this.visualizer)
       }
-    }
-
-    const pexSleepWrap = overlay.querySelector<HTMLElement>('#pex-sleep-timer')
-    if (pexSleepWrap) {
-      void this.sleepTimer.mount(pexSleepWrap)
     }
   }
 
@@ -669,14 +651,13 @@ export class PlayerBar extends BaseComponent {
 
     const vizWrap = overlay.querySelector<HTMLElement>('.pex-visualizer-wrap')
     if (isPlaying) {
-      if (!q('#pex-visualizer-canvas') && vizWrap) {
-        this._expandedVisualizer.stopVisualization()
-        vizWrap.innerHTML = `<canvas id="pex-visualizer-canvas" width="140" height="80"></canvas>`
-        const c = vizWrap.querySelector<HTMLCanvasElement>('#pex-visualizer-canvas')
-        if (c) this._expandedVisualizer.startVisualizationShared(c, this.visualizer)
+      const ambientCanvas = overlay.querySelector<HTMLCanvasElement>('#pex-ambient-canvas')
+      if (ambientCanvas) {
+        this._ambientVisualizer.stopVisualization()
+        this._ambientVisualizer.startAmbientVisualization(ambientCanvas, this.visualizer)
       }
     } else {
-      this._expandedVisualizer.stopVisualization()
+      this._ambientVisualizer.stopVisualization()
       if (vizWrap) vizWrap.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${this.idleBars()}</div>`
     }
   }
@@ -714,7 +695,7 @@ export class PlayerBar extends BaseComponent {
   }
 
   private destroyExpandedOverlay(): void {
-    this._expandedVisualizer.stopVisualization()
+    this._ambientVisualizer.stopVisualization()
     this.removePexDragListeners()
     const overlay = document.getElementById('player-expanded-overlay')
     if (overlay) overlay.remove()
