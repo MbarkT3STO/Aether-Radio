@@ -352,6 +352,40 @@
   box-shadow: var(--nm-raised), 0 8px 40px rgba(0,0,0,0.5);
 }
 
+/* ── Collapse button (top-left of expanded player) ── */
+.pex-collapse-btn {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--text-secondary);
+  transition: color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.pex-collapse-btn svg {
+  transform: rotate(180deg);
+}
+
+.pex-collapse-btn:hover {
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.pex-collapse-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
 /* ── Ambient visualizer canvas — full-bleed background layer ── */
 .pex-ambient-canvas {
   position: absolute;
