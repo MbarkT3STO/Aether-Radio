@@ -13,7 +13,8 @@
   position: relative;
   z-index: 100;
   box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.07);
-  overflow: hidden;
+  /* No overflow:hidden — it clips the sleep timer popover.
+     The ambient canvas is clipped via clip-path instead. */
 }
 
 /* ── Mini bar ambient canvas ── */
@@ -27,6 +28,8 @@
   opacity: 0;
   transition: opacity 1s ease;
   filter: blur(28px) saturate(1.3);
+  /* Clip blurred overflow to the bar bounds without overflow:hidden */
+  clip-path: inset(0);
 }
 
 .player-bar-ambient.active {
