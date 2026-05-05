@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap');
-
 /* ═══════════════════════════════════════════════════════════════════
    RADIOSPHERE — KEYRA DESIGN SYSTEM
    Exact colors & neumorphic system from keyraauth.netlify.app
@@ -39,7 +37,7 @@
   --nm-inner-bottom: var(--nm-light-inner-bottom);
 
   /* ── Fonts ── */
-  --font-display: 'Syne', system-ui, sans-serif;
+  --font-display: 'DM Sans', system-ui, sans-serif;
   --font-body:    'DM Sans', system-ui, sans-serif;
 
   /* ── Keyra Spacing ── */
