@@ -9,6 +9,7 @@ export type EventMap = {
   'player:volume': { volume: number }
   'player:error': { message: string }
   'player:loading': { loading: boolean }
+  'player:sleep-timer': { minutesLeft: number | null; active: boolean }
   'stations:loaded': { stations: RadioStation[]; total: number }
   'favorites:changed': { favorites: Favorite[] }
   'history:changed': { history: PlayHistory[] }

@@ -39,6 +39,20 @@ export interface ElectronAPI {
   addCustomStation: (station: Omit<CustomStation, 'addedAt' | 'source'>) => Promise<Result<CustomStation>>
   removeCustomStation: (stationId: string) => Promise<Result<void>>
   updateCustomStation: (stationId: string, updates: Partial<CustomStation>) => Promise<Result<CustomStation>>
+
+  // Tray (Feature 1)
+  trayUpdate: (payload: { name: string; playing: boolean }) => void
+  onTrayToggle: (handler: () => void) => () => void
+  onTrayStop: (handler: () => void) => () => void
+
+  // Global shortcuts (Feature 2)
+  onShortcut: (type: 'toggle-playback' | 'stop' | 'next-station', handler: () => void) => () => void
+
+  // Power save / playback state (Feature 4)
+  playerStateChanged: (playing: boolean) => void
+
+  // OS notification (Feature 6)
+  nowPlaying: (payload: { name: string; favicon?: string }) => void
 }
 
 const electronAPI: ElectronAPI = {
@@ -69,7 +83,34 @@ const electronAPI: ElectronAPI = {
   getCustomStations: () => ipcRenderer.invoke('custom:get'),
   addCustomStation: (station) => ipcRenderer.invoke('custom:add', station),
   removeCustomStation: (stationId) => ipcRenderer.invoke('custom:remove', stationId),
-  updateCustomStation: (stationId, updates) => ipcRenderer.invoke('custom:update', stationId, updates)
+  updateCustomStation: (stationId, updates) => ipcRenderer.invoke('custom:update', stationId, updates),
+
+  // Tray (Feature 1)
+  trayUpdate: (payload) => ipcRenderer.send('tray:update', payload),
+  onTrayToggle: (handler) => {
+    const listener = (): void => handler()
+    ipcRenderer.on('tray:toggle-playback', listener)
+    return () => ipcRenderer.removeListener('tray:toggle-playback', listener)
+  },
+  onTrayStop: (handler) => {
+    const listener = (): void => handler()
+    ipcRenderer.on('tray:stop', listener)
+    return () => ipcRenderer.removeListener('tray:stop', listener)
+  },
+
+  // Global shortcuts (Feature 2)
+  onShortcut: (type, handler) => {
+    const channel = `shortcut:${type}`
+    const listener = (): void => handler()
+    ipcRenderer.on(channel, listener)
+    return () => ipcRenderer.removeListener(channel, listener)
+  },
+
+  // Power save (Feature 4)
+  playerStateChanged: (playing) => ipcRenderer.send('player:state-changed', playing),
+
+  // OS notification (Feature 6)
+  nowPlaying: (payload) => ipcRenderer.send('player:now-playing', payload),
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

@@ -5,6 +5,7 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
 import { VisualizerService } from '../services/VisualizerService'
 import { AudioService } from '../services/AudioService'
+import { SleepTimer } from './SleepTimer'
 import { FALLBACK_HTML } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
@@ -15,6 +16,7 @@ export class PlayerBar extends BaseComponent {
   private bridge         = BridgeService.getInstance()
   private visualizer     = new VisualizerService()
   private audioService   = AudioService.getInstance()
+  private sleepTimer     = new SleepTimer()
 
   // Document-level drag listeners — kept so we can remove them on unmount
   private _onMouseMove: ((e: Event) => void) | null = null
@@ -70,6 +72,7 @@ export class PlayerBar extends BaseComponent {
               </div>
             </div>
             <div class="player-visualizer-container">${this.idleBars()}</div>
+            <div id="player-sleep-timer"></div>
           </div>
 
         </div>
@@ -152,6 +155,8 @@ export class PlayerBar extends BaseComponent {
             }
           </div>
 
+          <div id="player-sleep-timer"></div>
+
         </div>
 
       </div>
@@ -161,11 +166,17 @@ export class PlayerBar extends BaseComponent {
   protected afterMount(): void {
     this.attachEventListeners()
     this.initializeVisualizer()
+    // Mount sleep timer into its placeholder
+    const sleepTimerContainer = this.querySelector<HTMLElement>('#player-sleep-timer')
+    if (sleepTimerContainer) {
+      void this.sleepTimer.mount(sleepTimerContainer)
+    }
   }
 
   protected beforeUnmount(): void {
     this.visualizer.stopVisualization()
     this.removeDragListeners()
+    this.sleepTimer.unmount()
   }
 
   // ── Surgical DOM update methods ───────────────────────────────────────────
@@ -290,6 +301,7 @@ export class PlayerBar extends BaseComponent {
     if (this.element && this.element.parentNode) {
       this.visualizer.stopVisualization()
       this.removeDragListeners()
+      this.sleepTimer.unmount()
       const parent = this.element.parentNode as HTMLElement
       parent.innerHTML = this.render()
       this.element = parent.firstElementChild as HTMLElement

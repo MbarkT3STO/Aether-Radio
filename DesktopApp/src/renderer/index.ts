@@ -116,19 +116,61 @@ class App {
       await this.audioService.play(station)
       await this.bridge.history.add(station)
       await this.bridge.radio.reportClick(station.id)
+      window.electronAPI.trayUpdate({ name: station.name, playing: true })
+      window.electronAPI.playerStateChanged(true)
+      window.electronAPI.nowPlaying({ name: station.name, favicon: station.favicon })
     })
 
     this.eventBus.on('player:pause', () => {
       this.audioService.pause()
+      // Capture name before any state change
+      const name = this.playerStore.currentStation?.name ?? ''
+      window.electronAPI.trayUpdate({ name, playing: false })
+      window.electronAPI.playerStateChanged(false)
     })
 
     this.eventBus.on('player:stop', () => {
+      // Capture name before stop clears the station
+      const name = this.playerStore.currentStation?.name ?? ''
       this.audioService.stop()
+      window.electronAPI.trayUpdate({ name: name || 'No station playing', playing: false })
+      window.electronAPI.playerStateChanged(false)
     })
 
     this.eventBus.on('player:volume', ({ volume }) => {
       this.audioService.setVolume(volume)
       this.bridge.settings.update({ volume })
+    })
+
+    // Feature 1 — tray controls → player
+    window.electronAPI.onTrayToggle(() => {
+      if (this.playerStore.isPlaying) {
+        this.playerStore.pause()
+      } else if (this.playerStore.currentStation) {
+        this.playerStore.play(this.playerStore.currentStation)
+      }
+    })
+
+    window.electronAPI.onTrayStop(() => {
+      this.playerStore.stop()
+    })
+
+    // Feature 2 — global keyboard shortcuts
+    window.electronAPI.onShortcut('toggle-playback', () => {
+      if (this.playerStore.isPlaying) {
+        this.playerStore.pause()
+      } else if (this.playerStore.currentStation) {
+        this.playerStore.play(this.playerStore.currentStation)
+      }
+    })
+
+    window.electronAPI.onShortcut('stop', () => {
+      this.playerStore.stop()
+    })
+
+    // next-station: no-op for now — can be wired to a playlist in the future
+    window.electronAPI.onShortcut('next-station', () => {
+      // placeholder for future playlist navigation
     })
   }
 }

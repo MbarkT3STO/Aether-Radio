@@ -1,11 +1,23 @@
-import { app, BrowserWindow, session } from 'electron'
+import { app, BrowserWindow, session, globalShortcut } from 'electron'
 import { join } from 'path'
 import { IpcHandlerRegistry } from './ipc/IpcHandlerRegistry'
+import { WindowIpcHandler } from './ipc/handlers/WindowIpcHandler'
+import { TrayManager } from './tray/TrayManager'
+import { WindowStateManager } from './window/WindowStateManager'
+
+const trayManager = new TrayManager()
+const windowStateManager = new WindowStateManager()
+
+let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
-  const mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
+  const state = windowStateManager.getState()
+
+  mainWindow = new BrowserWindow({
+    width: state.width,
+    height: state.height,
+    x: state.x,
+    y: state.y,
     minWidth: 1024,
     minHeight: 768,
     backgroundColor: '#0A0A0F',
@@ -15,8 +27,22 @@ function createWindow(): void {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
-    }
+    },
   })
+
+  // Restore maximized state
+  if (state.maximized) {
+    mainWindow.maximize()
+  }
+
+  // Intercept close → hide instead of quit (tray keeps app alive)
+  mainWindow.on('close', (e) => {
+    e.preventDefault()
+    mainWindow?.hide()
+  })
+
+  // Track window size/position for next launch
+  windowStateManager.track(mainWindow)
 
   // Load the app
   if (process.env['ELECTRON_RENDERER_URL']) {
@@ -32,9 +58,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  // Allow radio stream CORS: inject permissive Access-Control-Allow-Origin headers
-  // so the renderer can fetch audio streams and station metadata from external origins
-  // without disabling webSecurity entirely.
+  // Allow radio stream CORS
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
@@ -44,20 +68,57 @@ app.whenReady().then(() => {
     })
   })
 
-  // Register all IPC handlers
+  // Register all domain IPC handlers
   IpcHandlerRegistry.registerAll()
 
   createWindow()
 
+  if (!mainWindow) return
+
+  // System tray (Feature 1)
+  trayManager.create(mainWindow)
+
+  // Window + tray + power-save + notification IPC (Features 1, 4, 6)
+  WindowIpcHandler.register(mainWindow, trayManager)
+
+  // Global keyboard shortcuts (Feature 2)
+  globalShortcut.register('MediaPlayPause', () => {
+    mainWindow?.webContents.send('shortcut:toggle-playback')
+  })
+  globalShortcut.register('MediaStop', () => {
+    mainWindow?.webContents.send('shortcut:stop')
+  })
+  globalShortcut.register('MediaNextTrack', () => {
+    mainWindow?.webContents.send('shortcut:next-station')
+  })
+  globalShortcut.register('CommandOrControl+Shift+Space', () => {
+    mainWindow?.webContents.send('shortcut:toggle-playback')
+  })
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
+    } else {
+      mainWindow?.show()
+      mainWindow?.focus()
     }
   })
 })
 
+// Keep app alive when all windows are closed — tray handles quit
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+  // Do not quit; the tray icon provides the quit action
+})
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
+  trayManager.destroy()
+})
+
+// Allow force-quit via Cmd+Q on macOS (app menu)
+app.on('before-quit', () => {
+  // Remove the close interceptor so the window actually closes
+  if (mainWindow) {
+    mainWindow.removeAllListeners('close')
   }
 })

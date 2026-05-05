@@ -17,5 +17,16 @@ export enum IpcChannel {
   GET_CUSTOM_STATIONS = 'custom:get',
   ADD_CUSTOM_STATION = 'custom:add',
   REMOVE_CUSTOM_STATION = 'custom:remove',
-  UPDATE_CUSTOM_STATION = 'custom:update'
+  UPDATE_CUSTOM_STATION = 'custom:update',
+
+  // Tray / Window
+  TRAY_UPDATE = 'tray:update',
+  WINDOW_MINIMIZE = 'window:minimize',
+  WINDOW_CLOSE = 'window:close',
+
+  // Playback state (power save blocker)
+  PLAYER_STATE_CHANGED = 'player:state-changed',
+
+  // OS Notification
+  NOW_PLAYING = 'player:now-playing',
 }
