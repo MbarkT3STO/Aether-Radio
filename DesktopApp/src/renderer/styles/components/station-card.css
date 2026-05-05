@@ -178,6 +178,23 @@
   animation: heartBeat 0.4s ease;
 }
 
+/* ── Country flags (flag-icons) ── */
+.fi.country-flag {
+  width: 16px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.country-flag-unknown {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  vertical-align: middle;
+}
+
 /* ── Country Card (Explore) ── */
 .country-card {
   background: var(--bg-primary);
@@ -236,3 +253,19 @@
   color: var(--text-tertiary);
   font-weight: 600;
 }
+
+/* ── Light theme overrides ── */
+:root:not([data-theme="dark"]) .station-card              { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .station-card-tag          { background: var(--bg-secondary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .station-card-footer       { border-top-color: rgba(163, 177, 198, 0.5); }
+:root:not([data-theme="dark"]) .station-card-meta         { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .country-card              { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .country-card-name         { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .country-card-count        { color: var(--text-secondary); }
+
+/* ── Dark theme overrides ── */
+[data-theme="dark"] .station-card.playing {
+  box-shadow: var(--nm-raised), 0 0 0 2px var(--accent-primary), 0 0 20px rgba(124, 111, 255, 0.12);
+}
+[data-theme="dark"] .station-card-meta         { color: var(--text-tertiary); }
+[data-theme="dark"] .country-card-count        { color: var(--text-secondary); }

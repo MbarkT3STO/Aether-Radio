@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, session } from 'electron'
 import { join } from 'path'
 import { IpcHandlerRegistry } from './ipc/IpcHandlerRegistry'
 
@@ -15,7 +15,6 @@ function createWindow(): void {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
-      webSecurity: false // Disable for CORS and certificate issues
     }
   })
 
@@ -33,6 +32,18 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // Allow radio stream CORS: inject permissive Access-Control-Allow-Origin headers
+  // so the renderer can fetch audio streams and station metadata from external origins
+  // without disabling webSecurity entirely.
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Access-Control-Allow-Origin': ['*'],
+      },
+    })
+  })
+
   // Register all IPC handlers
   IpcHandlerRegistry.registerAll()
 

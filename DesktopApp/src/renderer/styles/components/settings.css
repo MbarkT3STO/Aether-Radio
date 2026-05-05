@@ -206,3 +206,13 @@
   background: var(--bg-primary);
   box-shadow: var(--nm-raised);
 }
+
+/* ── Light theme overrides (from theme-fixes) ── */
+:root:not([data-theme="dark"]) .stg-row-label             { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .stg-row-desc              { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .stg-card-title            { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .stg-card-sub              { color: var(--text-tertiary); }
+:root:not([data-theme="dark"]) .stg-about-logo            { background: var(--bg-primary); }
+
+/* ── Dark theme overrides (from theme-fixes) ── */
+[data-theme="dark"] .stg-card-sub              { color: var(--text-tertiary); }

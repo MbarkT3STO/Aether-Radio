@@ -390,3 +390,15 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* ── Light theme overrides ── */
+:root:not([data-theme="dark"]) .sidebar-nav-item          { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .sidebar-nav-item:hover    { color: var(--accent-primary); background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .sidebar-nav-item.active   { color: var(--accent-primary); background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .sidebar-logo-icon         { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .sidebar-version-badge     { background: var(--bg-secondary); }
+
+/* ── Dark theme overrides ── */
+[data-theme="dark"] .sidebar-nav-item          { color: var(--text-secondary); }
+[data-theme="dark"] .sidebar-nav-item:hover    { color: var(--accent-primary); }
+[data-theme="dark"] .sidebar-nav-item.active   { color: var(--accent-primary); }

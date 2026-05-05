@@ -59,3 +59,7 @@
   line-height: 1.5;
   color: var(--text-primary);
 }
+
+/* ── Light theme overrides ── */
+:root:not([data-theme="dark"]) .toast                     { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .toast-message             { color: var(--text-primary); }

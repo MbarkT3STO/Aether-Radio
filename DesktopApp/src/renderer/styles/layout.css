@@ -110,6 +110,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 4px;
 }
 
 .view-header-row h1 {
@@ -125,10 +126,10 @@
 
 /* ── View header icon (neumorphic square) ── */
 .view-header-icon {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: var(--radius-md);
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: var(--radius-sm);
   background: var(--bg-primary);
   box-shadow: var(--nm-raised);
   display: flex;
@@ -322,3 +323,99 @@
   .view-header { margin-bottom: var(--space-sm); }
   h1 { font-size: 1.5rem; }
 }
+
+/* ── Results count label ── */
+.results-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-md);
+  letter-spacing: 0.03em;
+}
+
+/* ── Meta separators ── */
+.meta-dot { color: var(--text-tertiary); opacity: 0.6; }
+.meta-sep { color: var(--text-tertiary); opacity: 0.5; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SMOOTH THEME TRANSITIONS — only color/bg, not layout
+   ═══════════════════════════════════════════════════════════════════ */
+
+body,
+.sidebar,
+.sidebar-nav-item,
+.sidebar-logo-icon,
+.station-card,
+.station-card-name,
+.station-card-country,
+.station-card-meta,
+.station-card-tag,
+.player-bar,
+.player-btn,
+.player-station-name,
+.player-station-meta,
+.player-bitrate-badge,
+.player-visualizer-container,
+.search-bar-input,
+.volume-slider,
+.toast,
+.toast-message,
+.loading-spinner,
+.loading-text,
+.empty-state-title,
+.empty-state-message,
+.empty-state-icon,
+.view-header-icon,
+.station-logo-fallback,
+.country-card,
+.country-card-name,
+.country-card-count,
+.genre-card,
+.genre-card-name,
+.genre-card-count,
+.genre-show-more,
+.cs-card,
+.cs-card-name,
+.cs-card-meta,
+.cs-card-url,
+.cs-form-card,
+.stg-card,
+.stg-card-title,
+.stg-card-sub,
+.stg-row-label,
+.stg-row-desc,
+.stg-toggle-btn,
+.stg-about-name,
+.stg-about-version,
+.stg-data-source-link,
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-icon,
+.cs-btn-submit,
+.cs-btn-cancel,
+.cs-add-btn,
+.cs-play-btn,
+.cs-delete-btn,
+h1, h2, h3, h4 {
+  transition:
+    background-color 0.3s ease,
+    color            0.3s ease,
+    border-color     0.3s ease,
+    box-shadow       0.3s ease;
+}
+
+/* ── Light theme: scrollbar ── */
+:root:not([data-theme="dark"]) ::-webkit-scrollbar-thumb  { background: var(--bg-tertiary); }
+:root:not([data-theme="dark"]) ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+/* ── Light theme: buttons ── */
+:root:not([data-theme="dark"]) .btn-primary               { background: var(--bg-primary); color: var(--accent-primary); }
+:root:not([data-theme="dark"]) .btn-secondary             { background: var(--bg-primary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .btn-icon                  { background: var(--bg-primary); color: var(--text-secondary); }
+
+/* ── Light theme: view header ── */
+:root:not([data-theme="dark"]) .view-header-icon          { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .view-subtitle             { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .results-count             { color: var(--text-tertiary); }
+:root:not([data-theme="dark"]) .section-title             { color: var(--text-tertiary); }

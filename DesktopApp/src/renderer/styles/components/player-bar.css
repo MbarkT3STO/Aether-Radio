@@ -329,3 +329,19 @@
 :root:not([data-theme="dark"]) .player-visualizer-container {
   background: var(--bg-secondary);
 }
+
+/* ── Light theme overrides (from theme-fixes) ── */
+:root:not([data-theme="dark"]) .player-bar                { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .player-btn                { background: var(--bg-primary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-btn:hover          { color: var(--accent-primary); }
+:root:not([data-theme="dark"]) .player-bitrate-badge      { background: var(--bg-secondary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-station-name       { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .player-station-meta       { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-empty-name         { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-empty-hint         { color: var(--text-tertiary); }
+
+/* ── Dark theme overrides (from theme-fixes) ── */
+[data-theme="dark"] .player-bar::before {
+  opacity: 0.7;
+}
+[data-theme="dark"] .player-station-meta       { color: var(--text-secondary); }

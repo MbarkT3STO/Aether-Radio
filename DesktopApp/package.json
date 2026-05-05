@@ -6,7 +6,7 @@
   "author": "Aether Radio",
   "license": "MIT",
   "scripts": {
-    "dev": "clear && npm run build && electron-vite dev",
+    "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit"

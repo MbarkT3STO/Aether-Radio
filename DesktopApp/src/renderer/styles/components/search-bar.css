@@ -79,3 +79,8 @@
   box-shadow: var(--nm-pressed);
   transform: translateY(-50%) scale(1);
 }
+
+/* ── Light theme overrides ── */
+:root:not([data-theme="dark"]) .search-bar-input          { background: var(--bg-secondary); color: var(--text-primary); }
+:root:not([data-theme="dark"]) .search-bar-input::placeholder { color: var(--text-tertiary); }
+:root:not([data-theme="dark"]) .volume-slider             { background: var(--bg-secondary); }

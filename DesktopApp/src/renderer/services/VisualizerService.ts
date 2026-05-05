@@ -1,12 +1,22 @@
+import { EventBus } from '../store/EventBus'
+
 export class VisualizerService {
   private audioContext: AudioContext | null = null
   private analyser: AnalyserNode | null = null
   private dataArray: Uint8Array | null = null
   private source: MediaElementAudioSourceNode | null = null
   private animationId: number | null = null
+  private activeCanvas: HTMLCanvasElement | null = null
+  private themeUnsubscribe: (() => void) | null = null
 
   async initialize(audioElement: HTMLAudioElement): Promise<void> {
-    if (this.audioContext) return
+    if (this.audioContext) {
+      // Resume if suspended (e.g. browser blocked autoplay before user gesture)
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume()
+      }
+      return
+    }
 
     this.audioContext = new AudioContext()
     this.analyser = this.audioContext.createAnalyser()
@@ -19,6 +29,15 @@ export class VisualizerService {
     this.source = this.audioContext.createMediaElementSource(audioElement)
     this.source.connect(this.analyser)
     this.analyser.connect(this.audioContext.destination)
+
+    // Listen for theme changes and re-draw the gradient with the new accent color
+    const eventBus = EventBus.getInstance()
+    this.themeUnsubscribe = eventBus.on('theme:changed', () => {
+      if (this.activeCanvas) {
+        this.stopVisualization()
+        this.startVisualization(this.activeCanvas)
+      }
+    })
   }
 
   startVisualization(canvas: HTMLCanvasElement): void {
@@ -27,14 +46,17 @@ export class VisualizerService {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Read accent color from CSS variable (Keyra hsl(258, 85%, 65%) in dark)
+    // Store canvas reference so the theme listener can restart visualization
+    this.activeCanvas = canvas
+
+    // Read accent color from CSS variables so it always matches the current theme
+    const style = getComputedStyle(document.documentElement)
+    const h = style.getPropertyValue('--h').trim()
+    const s = style.getPropertyValue('--s').trim()
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-    const accentColor = isDark
-      ? 'hsl(258, 85%, 65%)'   // Keyra dark accent
-      : 'hsl(258, 85%, 55%)'   // Keyra light accent
-    const accentColorFaded = isDark
-      ? 'hsla(258, 85%, 65%, 0.4)'
-      : 'hsla(258, 85%, 55%, 0.4)'
+    const l = isDark ? '65%' : '55%'
+    const accentColor = `hsl(${h}, ${s}, ${l})`
+    const accentColorFaded = `hsla(${h}, ${s}, ${l}, 0.4)`
 
     const width    = canvas.width
     const height   = canvas.height
@@ -77,6 +99,11 @@ export class VisualizerService {
 
   destroy(): void {
     this.stopVisualization()
+    this.activeCanvas = null
+    if (this.themeUnsubscribe) {
+      this.themeUnsubscribe()
+      this.themeUnsubscribe = null
+    }
     if (this.audioContext) {
       this.audioContext.close()
       this.audioContext = null

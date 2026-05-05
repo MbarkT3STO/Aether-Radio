@@ -63,8 +63,8 @@ class App {
     await this.loadFavorites()
 
     // Mount sidebar and player bar
-    this.sidebar.mount('#sidebar')
-    this.playerBar.mount('#player-bar')
+    await this.sidebar.mount('#sidebar')
+    await this.playerBar.mount('#player-bar')
 
     // Register routes
     this.registerRoutes()
@@ -90,24 +90,24 @@ class App {
   }
 
   private registerRoutes(): void {
-    this.router.register('/', () => this.renderView(new HomeView({})))
-    this.router.register('/featured', () => this.renderView(new FeaturedView({})))
-    this.router.register('/explore', () => this.renderView(new ExploreView({})))
-    this.router.register('/search', () => this.renderView(new SearchView({})))
-    this.router.register('/favorites', () => this.renderView(new FavoritesView({})))
-    this.router.register('/history', () => this.renderView(new HistoryView({})))
-    this.router.register('/custom', () => this.renderView(new CustomStationsView({})))
-    this.router.register('/settings', () => this.renderView(new SettingsView({})))
+    this.router.register('/', async () => { await this.renderView(new HomeView({})) })
+    this.router.register('/featured', async () => { await this.renderView(new FeaturedView({})) })
+    this.router.register('/explore', async () => { await this.renderView(new ExploreView({})) })
+    this.router.register('/search', async () => { await this.renderView(new SearchView({})) })
+    this.router.register('/favorites', async () => { await this.renderView(new FavoritesView({})) })
+    this.router.register('/history', async () => { await this.renderView(new HistoryView({})) })
+    this.router.register('/custom', async () => { await this.renderView(new CustomStationsView({})) })
+    this.router.register('/settings', async () => { await this.renderView(new SettingsView({})) })
 
     // Start routing after all routes are registered
     this.router.start()
   }
 
-  private renderView(view: { mount: (container: string) => void; unmount: () => void }): void {
+  private async renderView(view: { mount: (container: string) => Promise<void>; unmount: () => void }): Promise<void> {
     if (this.currentView) {
       this.currentView.unmount()
     }
-    view.mount('#content')
+    await view.mount('#content')
     this.currentView = view
   }
 

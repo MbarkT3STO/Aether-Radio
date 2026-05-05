@@ -33,3 +33,11 @@
   max-width: 360px;
   line-height: 1.6;
 }
+
+/* ── Light theme overrides ── */
+:root:not([data-theme="dark"]) .empty-state-title         { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .empty-state-message       { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .empty-state-icon          { color: var(--text-tertiary); opacity: 0.45; }
+
+/* ── Dark theme overrides ── */
+[data-theme="dark"] .empty-state-message       { color: var(--text-secondary); }

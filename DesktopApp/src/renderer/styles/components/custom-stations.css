@@ -644,3 +644,13 @@
   transform: scale(1.08);
   box-shadow: var(--neu-shadow-hover);
 }
+
+/* ── Light theme overrides (from theme-fixes) ── */
+:root:not([data-theme="dark"]) .cs-card-url               { background: var(--bg-secondary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .cs-form-group input       { background: var(--bg-secondary); color: var(--text-primary); }
+:root:not([data-theme="dark"]) .cs-form-group textarea    { background: var(--bg-secondary); color: var(--text-primary); }
+:root:not([data-theme="dark"]) .cs-form-group input::placeholder   { color: var(--text-tertiary); }
+:root:not([data-theme="dark"]) .cs-form-group textarea::placeholder { color: var(--text-tertiary); }
+
+/* ── Dark theme overrides (from theme-fixes) ── */
+[data-theme="dark"] .cs-card-meta              { color: var(--text-secondary); }

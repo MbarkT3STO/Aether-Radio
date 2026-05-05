@@ -13,7 +13,7 @@ export abstract class BaseComponent<T = Record<string, never>> {
 
   abstract render(): string
 
-  mount(container: HTMLElement | string): void {
+  async mount(container: HTMLElement | string): Promise<void> {
     const targetContainer = typeof container === 'string' 
       ? document.querySelector(container) 
       : container
@@ -27,10 +27,10 @@ export abstract class BaseComponent<T = Record<string, never>> {
 
     this.element = targetContainer.firstElementChild as HTMLElement
     this.setupImageErrorHandlers()
-    this.afterMount()
+    await this.afterMount()
   }
 
-  protected afterMount(): void {
+  protected afterMount(): void | Promise<void> {
     // Override in subclasses for post-mount logic
   }
 
@@ -57,7 +57,7 @@ export abstract class BaseComponent<T = Record<string, never>> {
     if (this.element && this.element.parentNode) {
       const parent = this.element.parentNode as HTMLElement
       this.unmount()
-      this.mount(parent)
+      void this.mount(parent)
     }
   }
 

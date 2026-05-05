@@ -56,3 +56,10 @@
   animation: shimmer 1.6s ease-in-out infinite;
   border-radius: var(--radius-sm);
 }
+
+/* ── Light theme overrides ── */
+:root:not([data-theme="dark"]) .loading-spinner           { border-color: var(--bg-tertiary); border-top-color: var(--accent-primary); }
+:root:not([data-theme="dark"]) .loading-text              { color: var(--text-tertiary); }
+
+/* ── Dark theme overrides ── */
+[data-theme="dark"] .loading-text              { color: var(--text-tertiary); }
