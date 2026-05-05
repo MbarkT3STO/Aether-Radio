@@ -269,3 +269,44 @@
 }
 [data-theme="dark"] .station-card-meta         { color: var(--text-tertiary); }
 [data-theme="dark"] .country-card-count        { color: var(--text-secondary); }
+
+/* ── Light mode: station card refinements ── */
+:root:not([data-theme="dark"]) .station-card {
+  background: var(--bg-primary);
+}
+
+:root:not([data-theme="dark"]) .station-card:hover {
+  box-shadow: var(--neu-shadow-hover);
+}
+
+:root:not([data-theme="dark"]) .station-card-name {
+  color: var(--text-primary);
+}
+
+:root:not([data-theme="dark"]) .station-card-country {
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .station-card-tag {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  box-shadow: var(--nm-pressed);
+}
+
+:root:not([data-theme="dark"]) .station-card-tag:hover {
+  color: var(--accent-primary);
+  box-shadow: var(--nm-raised);
+}
+
+:root:not([data-theme="dark"]) .station-card-footer {
+  border-top-color: var(--border-medium);
+}
+
+:root:not([data-theme="dark"]) .station-card-favorite {
+  background: var(--bg-primary);
+}
+
+/* Playing state — visible accent ring in light */
+:root:not([data-theme="dark"]) .station-card.playing {
+  box-shadow: var(--nm-raised), 0 0 0 2px var(--accent-primary);
+}

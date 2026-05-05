@@ -205,3 +205,27 @@
   --neu-bg-raised: var(--bg-secondary);
   --neu-bg-float:  var(--bg-tertiary);
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE REFINEMENTS
+   Stronger contrast, clearer depth, modern feel matching dark mode.
+   ═══════════════════════════════════════════════════════════════════ */
+:root:not([data-theme="dark"]) {
+  /* Slightly stronger border tokens for light mode */
+  --border-subtle: rgba(163, 177, 198, 0.5);
+  --border-medium: rgba(163, 177, 198, 0.75);
+  --border-strong: rgba(163, 177, 198, 1);
+
+  /* Stronger neumorphic shadows for more depth */
+  --nm-raised:
+    -7px -7px 14px rgba(255, 255, 255, 1),
+     7px  7px 14px rgba(163, 177, 198, 0.65);
+  --nm-pressed:
+    inset -4px -4px 10px rgba(255, 255, 255, 1),
+    inset  4px  4px 10px rgba(163, 177, 198, 0.65);
+
+  /* Hover shadow — more pronounced lift */
+  --neu-shadow-hover:
+    -10px -10px 20px rgba(255, 255, 255, 1),
+     10px  10px 20px rgba(163, 177, 198, 0.7);
+}

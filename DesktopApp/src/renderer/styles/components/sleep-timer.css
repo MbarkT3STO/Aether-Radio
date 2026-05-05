@@ -215,3 +215,30 @@
 [data-theme="dark"] .sleep-timer-popover { border-color: var(--border-medium); }
 [data-theme="dark"] .sleep-timer-input   { background: var(--bg-tertiary); }
 [data-theme="dark"] .sleep-timer-preset:hover { color: var(--bg-primary); }
+
+/* ── Light mode: sleep timer ── */
+:root:not([data-theme="dark"]) .sleep-timer-popover {
+  background: var(--bg-primary);
+  border-color: var(--border-medium);
+  box-shadow: var(--nm-raised);
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-input {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-preset {
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-preset:hover {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-active-row {
+  border-top-color: var(--border-medium);
+}

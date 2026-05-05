@@ -222,3 +222,31 @@
     transform: scale(0.92) translateY(8px);
   }
 }
+
+/* ── Light mode: confirm modal ── */
+:root:not([data-theme="dark"]) .cm-dialog {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 24px 64px rgba(163, 177, 198, 0.6);
+}
+
+:root:not([data-theme="dark"]) .cm-backdrop {
+  background: rgba(30, 35, 40, 0.3);
+}
+
+:root:not([data-theme="dark"]) .cm-icon {
+  background: var(--bg-secondary);
+}
+
+:root:not([data-theme="dark"]) .cm-title {
+  color: var(--text-primary);
+}
+
+:root:not([data-theme="dark"]) .cm-message {
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .cm-btn--cancel,
+:root:not([data-theme="dark"]) .cm-btn--confirm,
+:root:not([data-theme="dark"]) .cm-btn--danger {
+  background: var(--bg-primary);
+}

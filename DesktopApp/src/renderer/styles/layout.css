@@ -419,3 +419,44 @@ h1, h2, h3, h4 {
 :root:not([data-theme="dark"]) .view-subtitle             { color: var(--text-secondary); }
 :root:not([data-theme="dark"]) .results-count             { color: var(--text-tertiary); }
 :root:not([data-theme="dark"]) .section-title             { color: var(--text-tertiary); }
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — Layout & Global Refinements
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Section title divider line — more visible */
+:root:not([data-theme="dark"]) .section-title::after {
+  background: var(--border-medium);
+}
+
+/* App background — slightly warmer */
+:root:not([data-theme="dark"]) #app {
+  background: var(--bg-primary);
+}
+
+/* Sidebar border — more defined */
+:root:not([data-theme="dark"]) .app-sidebar {
+  border-right-color: var(--border-medium);
+}
+
+/* Scrollbar — more visible in light */
+:root:not([data-theme="dark"]) ::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+}
+
+/* View header icon — proper depth */
+:root:not([data-theme="dark"]) .view-header-icon {
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+}
+
+/* h1 headings */
+:root:not([data-theme="dark"]) h1,
+:root:not([data-theme="dark"]) .view-header-row h1 {
+  color: var(--text-primary);
+}
+
+/* Results count */
+:root:not([data-theme="dark"]) .results-count {
+  color: var(--text-secondary);
+}

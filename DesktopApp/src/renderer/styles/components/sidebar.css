@@ -407,3 +407,33 @@
 [data-theme="dark"] .sidebar-nav-item          { color: var(--text-secondary); }
 [data-theme="dark"] .sidebar-nav-item:hover    { color: var(--accent-primary); }
 [data-theme="dark"] .sidebar-nav-item.active   { color: var(--accent-primary); }
+
+/* ── Light mode: sidebar refinements ── */
+:root:not([data-theme="dark"]) .sidebar {
+  border-right-color: var(--border-medium);
+}
+
+/* Tooltip — stronger contrast in light mode */
+:root:not([data-theme="dark"]) .sidebar-nav-item::after {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  box-shadow: var(--nm-raised);
+}
+
+/* Active nav item — stronger pressed look */
+:root:not([data-theme="dark"]) .sidebar-nav-item.active {
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+  color: var(--accent-primary);
+}
+
+/* Section label — more visible */
+:root:not([data-theme="dark"]) .sidebar-nav-section-label {
+  color: var(--text-secondary);
+}
+
+/* Divider — more visible */
+:root:not([data-theme="dark"]) .sidebar-divider,
+:root:not([data-theme="dark"]) .sidebar-footer-divider {
+  background: var(--border-medium);
+}

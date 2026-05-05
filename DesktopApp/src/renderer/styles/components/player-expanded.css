@@ -411,3 +411,80 @@
 [data-theme="dark"] .pex-artwork {
   box-shadow: var(--nm-raised), 0 8px 40px rgba(0,0,0,0.5);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME — Expanded Player
+   ═══════════════════════════════════════════════════════════════ */
+:root:not([data-theme="dark"]) .player-expanded-overlay {
+  background: var(--bg-primary);
+  box-shadow: 0 -4px 32px rgba(163, 177, 198, 0.4);
+}
+
+/* Stronger accent line in light mode */
+:root:not([data-theme="dark"]) .player-expanded-overlay::before {
+  opacity: 0.8;
+}
+
+/* Softer ambient in light mode — too strong washes out content */
+:root:not([data-theme="dark"]) .pex-ambient-canvas {
+  opacity: 0;
+  filter: blur(60px) saturate(1.2);
+}
+:root:not([data-theme="dark"]) .player-expanded-overlay.is-expanded .pex-ambient-canvas {
+  opacity: 0.55;
+}
+
+/* Content area background — slight contrast from overlay */
+:root:not([data-theme="dark"]) .player-expanded-body {
+  background: transparent;
+}
+
+/* Station name — ensure full contrast */
+:root:not([data-theme="dark"]) .pex-station-name {
+  color: var(--text-primary);
+}
+
+:root:not([data-theme="dark"]) .pex-station-meta {
+  color: var(--text-secondary);
+}
+
+/* Artwork shadow — lighter in light mode */
+:root:not([data-theme="dark"]) .pex-artwork {
+  box-shadow: var(--nm-raised), 0 8px 32px rgba(163, 177, 198, 0.5);
+}
+
+/* Buttons — use bg-primary for proper neumorphic depth */
+:root:not([data-theme="dark"]) .pex-btn {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .pex-btn:hover {
+  color: var(--accent-primary);
+}
+
+:root:not([data-theme="dark"]) .pex-collapse-btn {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+/* Volume slider track */
+:root:not([data-theme="dark"]) .pex-volume-slider {
+  background: var(--bg-secondary);
+}
+
+:root:not([data-theme="dark"]) .pex-volume-thumb {
+  background: var(--bg-primary);
+}
+
+/* Tags */
+:root:not([data-theme="dark"]) .pex-tag {
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
+
+/* Live badge */
+:root:not([data-theme="dark"]) .pex-live-badge {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}

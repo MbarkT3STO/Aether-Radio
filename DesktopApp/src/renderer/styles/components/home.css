@@ -319,3 +319,42 @@
 [data-theme="dark"] .home-empty-section {
   background: var(--bg-secondary);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME — Home View
+   ═══════════════════════════════════════════════════════════════ */
+:root:not([data-theme="dark"]) .home-now-playing-card {
+  background: var(--bg-secondary);
+  border-left-color: var(--accent-primary);
+}
+
+:root:not([data-theme="dark"]) .home-stat-card,
+:root:not([data-theme="dark"]) .home-quick-link {
+  background: var(--bg-primary);
+}
+
+:root:not([data-theme="dark"]) .home-stat-icon,
+:root:not([data-theme="dark"]) .home-quick-link-icon {
+  background: var(--bg-secondary);
+}
+
+:root:not([data-theme="dark"]) .home-stat-value {
+  color: var(--text-primary);
+}
+
+:root:not([data-theme="dark"]) .home-stat-label {
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .home-quick-link-label {
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .home-empty-section {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .home-greeting h1 {
+  color: var(--text-primary);
+}

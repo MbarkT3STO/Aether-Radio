@@ -357,3 +357,27 @@
   opacity: 0.7;
 }
 [data-theme="dark"] .player-station-meta       { color: var(--text-secondary); }
+
+/* ── Light mode: ambient canvas — softer ── */
+:root:not([data-theme="dark"]) .player-bar-ambient {
+  filter: blur(32px) saturate(1.1);
+}
+:root:not([data-theme="dark"]) .player-bar-ambient.active {
+  opacity: 0.5;
+}
+
+/* ── Light mode: stronger accent line ── */
+:root:not([data-theme="dark"]) .player-bar::before {
+  opacity: 0.75;
+}
+
+/* ── Light mode: volume slider fill visible ── */
+:root:not([data-theme="dark"]) .volume-slider {
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+}
+
+/* ── Light mode: player bar shadow ── */
+:root:not([data-theme="dark"]) .player-bar {
+  box-shadow: 0 -2px 20px rgba(163, 177, 198, 0.5);
+}
