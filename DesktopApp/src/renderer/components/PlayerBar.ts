@@ -208,6 +208,9 @@ export class PlayerBar extends BaseComponent {
       }
     }
 
+    // Sync favorite button in case it changed while paused
+    this.updateFavoriteUI()
+
     // Visualizer
     this.syncVisualizer(isPlaying)
   }
@@ -272,7 +275,7 @@ export class PlayerBar extends BaseComponent {
 
   /**
    * Full re-render — only used when the station changes (play new station,
-   * stop). Keeps the visualizer alive if possible.
+   * stop). After re-render, sync the favorite button to the new station.
    */
   private fullRender(): void {
     if (this.element && this.element.parentNode) {
@@ -283,6 +286,8 @@ export class PlayerBar extends BaseComponent {
       this.element = parent.firstElementChild as HTMLElement
       this.setupImageErrorHandlers()
       this.afterMount()
+      // Sync favorite state for the newly rendered station
+      this.updateFavoriteUI()
     }
   }
 

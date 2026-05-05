@@ -1,6 +1,7 @@
 import { BaseComponent } from '../components/base/BaseComponent'
 import type { CustomStation } from '../../domain/entities/CustomStation'
 import { Toast } from '../components/Toast'
+import { ConfirmModal } from '../components/ConfirmModal'
 import { PlayerStore } from '../store/PlayerStore'
 import { EventBus } from '../store/EventBus'
 import { stationLogoHtml } from '../utils/stationLogo'
@@ -523,7 +524,24 @@ export class CustomStationsView extends BaseComponent {
   private async handleDeleteStation(id: string): Promise<void> {
     const station = this.stations.find(s => s.id === id)
     if (!station) return
-    if (!confirm(`Delete "${station.name}"?`)) return
+
+    const confirmed = await ConfirmModal.show({
+      title: 'Delete Station',
+      message: `"${station.name}" will be permanently removed from your stations.`,
+      confirmLabel: 'Delete',
+      cancelLabel: 'Keep it',
+      danger: true,
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.75"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        <line x1="10" y1="11" x2="10" y2="17"/>
+        <line x1="14" y1="11" x2="14" y2="17"/>
+      </svg>`
+    })
+
+    if (!confirmed) return
 
     try {
       const result = await window.electronAPI.removeCustomStation(id)
