@@ -81,9 +81,6 @@ app.whenReady().then(() => {
   globalShortcut.register('MediaPlayPause', () => {
     mainWindow?.webContents.send('shortcut:toggle-playback')
   })
-  globalShortcut.register('Space', () => {
-    mainWindow?.webContents.send('shortcut:toggle-playback')
-  })
   globalShortcut.register('MediaStop', () => {
     mainWindow?.webContents.send('shortcut:stop')
   })

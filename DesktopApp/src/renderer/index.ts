@@ -146,6 +146,20 @@ class App {
       this.audioService.setBufferSize(bufferSize)
     })
 
+    // Space — window-scoped play/pause (only fires when no text input is focused)
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.code !== 'Space') return
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      if ((e.target as HTMLElement).isContentEditable) return
+      e.preventDefault()
+      if (this.playerStore.isPlaying) {
+        this.playerStore.pause()
+      } else if (this.playerStore.currentStation) {
+        this.playerStore.play(this.playerStore.currentStation)
+      }
+    })
+
     // Feature 1 — tray controls → player
     window.electronAPI.onTrayToggle(() => {
       if (this.playerStore.isPlaying) {

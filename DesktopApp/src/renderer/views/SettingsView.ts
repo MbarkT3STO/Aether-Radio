@@ -174,9 +174,9 @@ export class SettingsView extends BaseComponent {
 
   private renderShortcutsCard(): string {
     const shortcuts: Array<{ keys: string[]; action: string }> = [
-      { keys: ['Media Play/Pause'], action: 'Play / Pause' },
       { keys: ['Space'],            action: 'Play / Pause' },
-      { keys: ['Media Stop'],       action: 'Stop playback' },
+      { keys: ['Media Play/Pause'], action: 'Play / Pause (global)' },
+      { keys: ['Media Stop'],       action: 'Stop playback (global)' },
       { keys: ['Media Next'],       action: 'Next station (future)' },
     ]
     return `<div class="stg-card">
