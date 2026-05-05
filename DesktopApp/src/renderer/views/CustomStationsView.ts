@@ -7,6 +7,7 @@ import { stationLogoHtml } from '../utils/stationLogo'
 export class CustomStationsView extends BaseComponent {
   private stations: CustomStation[] = []
   private showAddForm = false
+  private editingId: string | null = null
   private playerStore = PlayerStore.getInstance()
 
   // ── Data ──────────────────────────────────────────────────
@@ -98,30 +99,45 @@ export class CustomStationsView extends BaseComponent {
 
   private openForm(): void {
     this.showAddForm = true
+    this.editingId = null
     this.renderHeaderBtn()
     this.renderForm()
   }
 
   private closeForm(): void {
     this.showAddForm = false
+    this.editingId = null
     this.renderHeaderBtn()
     const slot = this.querySelector('#form-slot')
     if (slot) slot.innerHTML = ''
   }
 
-  private renderForm(): void {
+  private openEditForm(station: CustomStation): void {
+    this.showAddForm = true
+    this.editingId = station.id
+    this.renderHeaderBtn()
+    this.renderForm(station)
+  }
+
+  private renderForm(prefill?: CustomStation): void {
     const slot = this.querySelector('#form-slot')
     if (!slot) return
+
+    const isEdit = !!prefill
 
     slot.innerHTML = `
       <div class="cs-form-card">
         <div class="cs-form-title">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+            ${isEdit
+              ? `<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>`
+              : `<line x1="12" y1="5" x2="12" y2="19"/>
+                 <line x1="5" y1="12" x2="19" y2="12"/>`
+            }
           </svg>
-          Add New Station
+          ${isEdit ? `Edit "${this.esc(prefill!.name)}"` : 'Add New Station'}
         </div>
 
         <form id="add-station-form" class="cs-form" autocomplete="off">
@@ -129,38 +145,45 @@ export class CustomStationsView extends BaseComponent {
           <div class="cs-form-row">
             <div class="cs-form-group">
               <label for="cs-name">Station Name <span class="cs-required">*</span></label>
-              <input type="text" id="cs-name" name="name" required placeholder="e.g., My Radio Station">
+              <input type="text" id="cs-name" name="name" required placeholder="e.g., My Radio Station"
+                value="${prefill ? this.esc(prefill.name) : ''}">
             </div>
             <div class="cs-form-group">
               <label for="cs-genre">Genre <span class="cs-required">*</span></label>
-              <input type="text" id="cs-genre" name="genre" required placeholder="e.g., Pop, Rock, News">
+              <input type="text" id="cs-genre" name="genre" required placeholder="e.g., Pop, Rock, News"
+                value="${prefill ? this.esc(prefill.genre) : ''}">
             </div>
           </div>
 
           <div class="cs-form-group">
             <label for="cs-url">Stream URL <span class="cs-required">*</span></label>
-            <input type="url" id="cs-url" name="url" required placeholder="https://example.com/stream">
+            <input type="url" id="cs-url" name="url" required placeholder="https://example.com/stream"
+              value="${prefill ? this.esc(prefill.url) : ''}">
           </div>
 
           <div class="cs-form-row">
             <div class="cs-form-group">
               <label for="cs-country">Country <span class="cs-required">*</span></label>
-              <input type="text" id="cs-country" name="country" required placeholder="e.g., Morocco">
+              <input type="text" id="cs-country" name="country" required placeholder="e.g., Morocco"
+                value="${prefill ? this.esc(prefill.country) : ''}">
             </div>
             <div class="cs-form-group">
               <label for="cs-code">Country Code <span class="cs-required">*</span></label>
-              <input type="text" id="cs-code" name="countryCode" required placeholder="MA" maxlength="2" style="text-transform:uppercase">
+              <input type="text" id="cs-code" name="countryCode" required placeholder="MA" maxlength="2"
+                style="text-transform:uppercase"
+                value="${prefill ? this.esc(prefill.countryCode) : ''}">
             </div>
           </div>
 
           <div class="cs-form-group">
             <label for="cs-favicon">Logo URL <span class="cs-optional">(optional)</span></label>
-            <input type="url" id="cs-favicon" name="favicon" placeholder="https://example.com/logo.png">
+            <input type="url" id="cs-favicon" name="favicon" placeholder="https://example.com/logo.png"
+              value="${prefill?.favicon ? this.esc(prefill.favicon) : ''}">
           </div>
 
           <div class="cs-form-group">
             <label for="cs-desc">Description <span class="cs-optional">(optional)</span></label>
-            <textarea id="cs-desc" name="description" rows="2" placeholder="Short description…"></textarea>
+            <textarea id="cs-desc" name="description" rows="2" placeholder="Short description…">${prefill?.description ? this.esc(prefill.description) : ''}</textarea>
           </div>
 
           <div class="cs-form-actions">
@@ -169,7 +192,7 @@ export class CustomStationsView extends BaseComponent {
                 fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
-              Add Station
+              ${isEdit ? 'Save Changes' : 'Add Station'}
             </button>
             <button type="button" id="cs-cancel-btn" class="cs-btn-cancel">Cancel</button>
           </div>
@@ -184,7 +207,11 @@ export class CustomStationsView extends BaseComponent {
     if (form) {
       this.on(form, 'submit', async (e) => {
         e.preventDefault()
-        await this.handleAddStation(form)
+        if (isEdit && this.editingId) {
+          await this.handleEditStation(form, this.editingId)
+        } else {
+          await this.handleAddStation(form)
+        }
       })
     }
     if (cancelBtn) {
@@ -200,10 +227,10 @@ export class CustomStationsView extends BaseComponent {
 
     if (this.stations.length === 0) {
       listEl.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="1.5">
+        <div class="cs-empty">
+          <div class="cs-empty-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="2"/>
               <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
               <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
@@ -211,10 +238,21 @@ export class CustomStationsView extends BaseComponent {
               <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
             </svg>
           </div>
-          <div class="empty-state-title">No custom stations yet</div>
-          <div class="empty-state-message">Add your own radio streams to listen alongside stations from Radio Browser</div>
+          <div class="cs-empty-title">No custom stations yet</div>
+          <div class="cs-empty-subtitle">Add your own radio streams to listen alongside stations from Radio Browser</div>
+          <button class="cs-empty-cta" id="cs-empty-add-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add Your First Station
+          </button>
         </div>
       `
+      // Wire up empty state CTA
+      const emptyBtn = this.querySelector('#cs-empty-add-btn')
+      if (emptyBtn) this.on(emptyBtn, 'click', () => this.openForm())
       return
     }
 
@@ -235,6 +273,15 @@ export class CustomStationsView extends BaseComponent {
       })
     })
 
+    this.querySelectorAll('.cs-edit-btn').forEach(btn => {
+      this.on(btn, 'click', (e) => {
+        e.stopPropagation()
+        const id = (btn as HTMLElement).getAttribute('data-id')
+        const station = this.stations.find(s => s.id === id)
+        if (station) this.openEditForm(station)
+      })
+    })
+
     this.querySelectorAll('.cs-delete-btn').forEach(btn => {
       this.on(btn, 'click', async (e) => {
         e.stopPropagation()
@@ -247,7 +294,7 @@ export class CustomStationsView extends BaseComponent {
     this.querySelectorAll('.cs-card').forEach(card => {
       this.on(card, 'click', (e) => {
         const target = e.target as HTMLElement
-        if (target.closest('.cs-play-btn') || target.closest('.cs-delete-btn')) return
+        if (target.closest('.cs-play-btn') || target.closest('.cs-edit-btn') || target.closest('.cs-delete-btn')) return
         const id = (card as HTMLElement).getAttribute('data-id')
         const station = this.stations.find(s => s.id === id)
         if (station) this.playStation(station)
@@ -290,8 +337,16 @@ export class CustomStationsView extends BaseComponent {
               : `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Play`
             }
           </button>
+          <button class="cs-edit-btn" data-id="${station.id}" title="Edit station">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
           <button class="cs-delete-btn" data-id="${station.id}" title="Delete station">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"/>
@@ -366,6 +421,43 @@ export class CustomStationsView extends BaseComponent {
       }
     } catch {
       Toast.show('Failed to add station', 'error')
+      if (submitBtn) { submitBtn.disabled = false }
+    }
+  }
+
+  private async handleEditStation(form: HTMLFormElement, stationId: string): Promise<void> {
+    const data = new FormData(form)
+    const updates: Partial<CustomStation> = {
+      name:        (data.get('name') as string).trim(),
+      url:         (data.get('url') as string).trim(),
+      country:     (data.get('country') as string).trim(),
+      countryCode: (data.get('countryCode') as string).trim().toUpperCase(),
+      genre:       (data.get('genre') as string).trim(),
+      description: (data.get('description') as string)?.trim() || undefined,
+      favicon:     (data.get('favicon') as string)?.trim() || undefined
+    }
+
+    // Basic validation
+    if (!updates.name || !updates.url || !updates.country || !updates.countryCode || !updates.genre) {
+      Toast.show('Please fill in all required fields', 'error')
+      return
+    }
+
+    const submitBtn = this.querySelector<HTMLButtonElement>('.cs-btn-submit')
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Saving…' }
+
+    try {
+      const result = await window.electronAPI.updateCustomStation(stationId, updates)
+      if (result.success) {
+        Toast.show(`"${updates.name}" updated successfully`, 'success')
+        this.closeForm()
+        await this.loadStations()
+      } else {
+        Toast.show(result.error?.message || 'Failed to update station', 'error')
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Save Changes` }
+      }
+    } catch {
+      Toast.show('Failed to update station', 'error')
       if (submitBtn) { submitBtn.disabled = false }
     }
   }

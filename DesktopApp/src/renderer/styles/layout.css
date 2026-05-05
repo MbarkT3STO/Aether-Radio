@@ -105,9 +105,41 @@
   margin-top: 4px;
 }
 
-/* ── View header row variants ── */
+/* ── View header row ── */
+.view-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-header-row h1 {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
 .view-header-row--spaced {
   margin-bottom: var(--space-md);
+}
+
+/* ── View header icon (neumorphic square) ── */
+.view-header-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .view-header-icon {
+  background: var(--bg-secondary);
 }
 
 /* ── Section ── */

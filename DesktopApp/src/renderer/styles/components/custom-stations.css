@@ -45,11 +45,33 @@
 
 /* ── Count label ── */
 .cs-count {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   color: var(--text-tertiary);
   margin-bottom: var(--space-md);
-  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-count::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px var(--accent-glow);
+  flex-shrink: 0;
+}
+
+.cs-count::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
 }
 
 /* ── Grid ── */
@@ -86,7 +108,6 @@
 
 .cs-card--playing {
   border-color: var(--accent-primary);
-  box-shadow: var(--nm-raised), 0 0 0 0 transparent;
 }
 
 /* ── Card Header ── */
@@ -117,6 +138,9 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Playing badge ── */
@@ -166,7 +190,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 6px 10px;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   box-shadow: var(--nm-pressed);
   border-radius: var(--radius-sm);
 }
@@ -211,6 +235,35 @@
   transform: translateY(0);
 }
 
+/* Edit button */
+.cs-edit-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.cs-edit-btn:hover {
+  color: var(--accent-primary);
+  transform: scale(1.08);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.cs-edit-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(1);
+}
+
+/* Delete button */
 .cs-delete-btn {
   width: 34px;
   height: 34px;
@@ -239,7 +292,90 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ADD STATION FORM
+   EMPTY STATE — My Stations specific
+   ═══════════════════════════════════════════════════════════════ */
+
+.cs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  animation: fadeIn var(--transition-medium);
+}
+
+.cs-empty-icon-wrap {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-lg);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cs-empty-icon-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: calc(var(--radius-xl) + 4px);
+  border: 2px solid var(--accent-soft);
+  pointer-events: none;
+}
+
+.cs-empty-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+}
+
+.cs-empty-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 340px;
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+}
+
+.cs-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--accent-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.cs-empty-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.cs-empty-cta:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ADD / EDIT STATION FORM
    ═══════════════════════════════════════════════════════════════ */
 
 .cs-form-card {
@@ -314,7 +450,7 @@
   padding: 10px 14px;
   border: none;
   border-radius: var(--radius-md);
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   box-shadow: var(--nm-pressed);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -404,29 +540,41 @@
   transform: translateY(0);
 }
 
-/* ── Light theme adjustments ── */
-:root:not([data-theme="dark"]) .cs-card {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-}
+/* ═══════════════════════════════════════════════════════════════
+   DARK THEME
+   ═══════════════════════════════════════════════════════════════ */
 
-:root:not([data-theme="dark"]) .cs-form-card {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-}
-
-:root:not([data-theme="dark"]) .cs-card-url {
+[data-theme="dark"] .cs-card,
+[data-theme="dark"] .cs-form-card {
   background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
 }
 
-:root:not([data-theme="dark"]) .cs-form-group input,
-:root:not([data-theme="dark"]) .cs-form-group textarea {
+[data-theme="dark"] .cs-card-url {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .cs-empty-icon-wrap {
   background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
 }
 
-/* ── Legacy button classes (used by other views) ── */
+[data-theme="dark"] .cs-play-btn,
+[data-theme="dark"] .cs-edit-btn,
+[data-theme="dark"] .cs-delete-btn,
+[data-theme="dark"] .cs-add-btn,
+[data-theme="dark"] .cs-btn-submit,
+[data-theme="dark"] .cs-btn-cancel,
+[data-theme="dark"] .cs-empty-cta {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .cs-playing-badge {
+  background: var(--bg-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LEGACY BUTTON CLASSES (used by other views)
+   ═══════════════════════════════════════════════════════════════ */
+
 .btn {
   display: inline-flex;
   align-items: center;

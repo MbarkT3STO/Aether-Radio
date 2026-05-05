@@ -1,0 +1,221 @@
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH VIEW — Keyra neumorphic
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── View wrapper ── */
+.search-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* ── Results count badge ── */
+.results-count {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.results-count::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px var(--accent-glow);
+  flex-shrink: 0;
+}
+
+.results-count::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* ── Search results area ── */
+#search-results {
+  flex: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INITIAL EMPTY STATE — shown before any search
+   ═══════════════════════════════════════════════════════════════ */
+
+.search-idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  animation: fadeIn var(--transition-medium);
+  gap: 0;
+}
+
+/* Large neumorphic icon container */
+.search-idle-icon-wrap {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-lg);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Subtle accent ring */
+.search-idle-icon-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: calc(var(--radius-xl) + 4px);
+  border: 2px solid var(--accent-soft);
+  pointer-events: none;
+}
+
+.search-idle-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+}
+
+.search-idle-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 340px;
+  line-height: 1.6;
+  margin-bottom: var(--space-xl);
+}
+
+/* Suggestion chips */
+.search-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 480px;
+}
+
+.search-suggestion-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.search-chip {
+  padding: 6px 16px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-body);
+  transition:
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.search-chip:hover {
+  color: var(--accent-primary);
+  box-shadow: var(--neu-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.search-chip:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NO RESULTS EMPTY STATE
+   ═══════════════════════════════════════════════════════════════ */
+
+.search-no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  animation: fadeIn var(--transition-medium);
+}
+
+.search-no-results-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-md);
+  opacity: 0.7;
+}
+
+.search-no-results-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  margin-bottom: 8px;
+}
+
+.search-no-results-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 320px;
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+}
+
+/* "Try searching for" chips in no-results */
+.search-no-results-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 400px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK THEME OVERRIDES
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .search-idle-icon-wrap {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .search-no-results-icon {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .search-chip {
+  background: var(--bg-secondary);
+}
