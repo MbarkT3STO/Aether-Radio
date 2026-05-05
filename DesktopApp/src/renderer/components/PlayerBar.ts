@@ -40,10 +40,9 @@ export class PlayerBar extends BaseComponent {
     this.eventBus.on('player:volume',     ({ volume }) => this.updateVolumeUI(volume))
     this.eventBus.on('player:loading',    ({ loading }) => this.updateLoadingUI(loading))
     this.eventBus.on('favorites:changed', () => this.updateFavoriteUI())
-    this.eventBus.on('route:changed',     () => {
+    this.eventBus.on('route:changed', () => {
       if (this._isExpanded) {
-        this._isExpanded = false
-        this.collapseExpandedOverlay()
+        this.destroyExpandedOverlay()
       }
     })
   }
@@ -191,10 +190,6 @@ export class PlayerBar extends BaseComponent {
       void this.sleepTimer.mount(sleepTimerContainer)
     }
     this.attachExpandListener()
-    // If already expanded (e.g. after fullRender), re-open the overlay
-    if (this._isExpanded) {
-      this.mountExpandedOverlay()
-    }
   }
 
   protected beforeUnmount(): void {
@@ -451,15 +446,44 @@ export class PlayerBar extends BaseComponent {
     const btn = this.querySelector<HTMLElement>('#player-expand-btn')
     if (!btn) return
     this.on(btn, 'click', () => {
-      this._isExpanded = !this._isExpanded
-      btn.classList.toggle('expanded', this._isExpanded)
-      btn.title = this._isExpanded ? 'Collapse player' : 'Expand player'
       if (this._isExpanded) {
-        this.mountExpandedOverlay()
+        // Update state and button immediately
+        this._isExpanded = false
+        btn.classList.remove('expanded')
+        btn.title = 'Expand player'
+        btn.setAttribute('aria-label', 'Expand player')
+        // Animate out, then destroy
+        this.animateCollapseAndDestroy()
       } else {
-        this.collapseExpandedOverlay()
+        this._isExpanded = true
+        btn.classList.add('expanded')
+        btn.title = 'Collapse player'
+        btn.setAttribute('aria-label', 'Collapse player')
+        this.mountExpandedOverlay()
       }
     })
+  }
+
+  private animateCollapseAndDestroy(): void {
+    const overlay = document.getElementById('player-expanded-overlay')
+    if (!overlay) return
+    // Trigger the CSS collapse (height → player-bar-height)
+    overlay.classList.remove('is-expanded')
+    // Stop ambient immediately so it doesn't keep running during animation
+    this._ambientVisualizer.stopVisualization()
+    this.removePexDragListeners()
+    // Wait for height transition to finish, then remove
+    let done = false
+    const finish = (): void => {
+      if (done) return
+      done = true
+      overlay.remove()
+    }
+    overlay.addEventListener('transitionend', (e: TransitionEvent) => {
+      if (e.propertyName === 'height') finish()
+    })
+    // Fallback in case transitionend doesn't fire
+    setTimeout(finish, 500)
   }
 
   private getAppMain(): HTMLElement | null {
@@ -469,7 +493,11 @@ export class PlayerBar extends BaseComponent {
   private mountExpandedOverlay(): void {
     const appMain = this.getAppMain()
     if (!appMain) return
-    this.destroyExpandedOverlay()
+    // Remove any stale overlay without touching _isExpanded
+    this._ambientVisualizer.stopVisualization()
+    this.removePexDragListeners()
+    const stale = document.getElementById('player-expanded-overlay')
+    if (stale) stale.remove()
 
     const station    = this.playerStore.currentStation
     const isPlaying  = this.playerStore.isPlaying
@@ -687,23 +715,17 @@ export class PlayerBar extends BaseComponent {
     if (muteBtn) { muteBtn.title = volume === 0 ? 'Unmute' : 'Mute'; muteBtn.innerHTML = this.volumeIcon(volume) }
   }
 
-  private collapseExpandedOverlay(): void {
-    const overlay = document.getElementById('player-expanded-overlay')
-    if (!overlay) return
-    overlay.classList.remove('is-expanded')
-    overlay.addEventListener('transitionend', () => this.destroyExpandedOverlay(), { once: true })
-  }
-
   private destroyExpandedOverlay(): void {
+    this._isExpanded = false
     this._ambientVisualizer.stopVisualization()
     this.removePexDragListeners()
     const overlay = document.getElementById('player-expanded-overlay')
     if (overlay) overlay.remove()
-    // Reset expand button state
     const btn = this.querySelector<HTMLElement>('#player-expand-btn')
     if (btn) {
       btn.classList.remove('expanded')
       btn.title = 'Expand player'
+      btn.setAttribute('aria-label', 'Expand player')
     }
   }
 
