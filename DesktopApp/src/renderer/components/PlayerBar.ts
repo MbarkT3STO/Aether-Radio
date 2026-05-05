@@ -5,8 +5,8 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
 import { VisualizerService } from '../services/VisualizerService'
 import { AudioService } from '../services/AudioService'
-import { countryFlagEmoji } from '../../domain/value-objects/Country'
 import { FALLBACK_HTML } from '../utils/stationLogo'
+import { countryFlag } from '../utils/countryFlag'
 
 export class PlayerBar extends BaseComponent {
   private eventBus       = EventBus.getInstance()
@@ -71,7 +71,6 @@ export class PlayerBar extends BaseComponent {
 
     // ── Active state ─────────────────────────────────────────
     const isFavorite = this.favoritesStore.isFavorite(station.id)
-    const flag       = countryFlagEmoji(station.countryCode)
     const volPct     = Math.round(volume * 100)
 
     return `
@@ -86,7 +85,7 @@ export class PlayerBar extends BaseComponent {
           <div class="player-station-details">
             <div class="player-station-name">${this.esc(station.name)}</div>
             <div class="player-station-meta">
-              <span>${flag} ${this.esc(station.country)}</span>
+              <span>${countryFlag(station.countryCode)} ${this.esc(station.country)}</span>
               ${station.tags.length > 0
                 ? `<span class="meta-sep">·</span><span>${this.esc(station.tags[0] ?? '')}</span>`
                 : ''

@@ -7,7 +7,7 @@ import { EventBus } from '../store/EventBus'
 import type { RadioStation } from '../../domain/entities/RadioStation'
 import type { PlayHistory } from '../../domain/entities/PlayHistory'
 import { renderStationCard } from '../utils/renderCard'
-import { countryFlagEmoji } from '../../domain/value-objects/Country'
+import { countryFlag } from '../utils/countryFlag'
 
 export class HomeView extends BaseComponent {
   private bridge         = BridgeService.getInstance()
@@ -64,7 +64,7 @@ export class HomeView extends BaseComponent {
       <!-- ── Greeting ── -->
       <div class="home-greeting">
         <div class="home-greeting-text">
-          <h1>${greeting} 👋</h1>
+          <h1>${greeting}</h1>
           <p class="view-subtitle">What would you like to listen to today?</p>
         </div>
       </div>
@@ -225,7 +225,7 @@ export class HomeView extends BaseComponent {
       return
     }
 
-    const flag = countryFlagEmoji(station.countryCode)
+    const flag = countryFlag(station.countryCode)
 
     container.innerHTML = `
       <div class="home-now-playing">

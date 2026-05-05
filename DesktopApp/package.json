@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "electron-store": "^8.2.0"
+    "electron-store": "^8.2.0",
+    "flag-icons": "7.5.0"
   },
   "devDependencies": {
     "@electron-toolkit/preload": "^3.0.1",

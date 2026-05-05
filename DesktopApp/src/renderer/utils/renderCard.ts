@@ -2,8 +2,8 @@
  * Shared station card renderer used by all views.
  */
 import type { RadioStation } from '../../domain/entities/RadioStation'
-import { countryFlagEmoji } from '../../domain/value-objects/Country'
 import { stationLogoHtml } from './stationLogo'
+import { countryFlag } from './countryFlag'
 
 interface CardOptions {
   station: RadioStation
@@ -17,12 +17,9 @@ interface CardOptions {
 
 export function renderStationCard(opts: CardOptions): string {
   const { station, isPlaying, isFavorite, metaOverride, alwaysActive } = opts
-  const flag = countryFlagEmoji(station.countryCode)
   const meta = metaOverride ?? buildMeta(station)
   const favActive = alwaysActive ? true : isFavorite
   const action = alwaysActive ? 'remove' : 'favorite'
-
-  // station.id is a UUID — safe to use directly as a data attribute
   const stationId = station.id
 
   return `<div class="station-card${isPlaying ? ' playing' : ''}" data-station-id="${stationId}">
@@ -30,7 +27,10 @@ export function renderStationCard(opts: CardOptions): string {
     ${stationLogoHtml(station.favicon, station.name, 'card')}
     <div class="station-card-info">
       <div class="station-card-name">${esc(station.name)}</div>
-      <div class="station-card-country">${flag} ${esc(station.country)}</div>
+      <div class="station-card-country">
+        ${countryFlag(station.countryCode)}
+        ${esc(station.country)}
+      </div>
     </div>
   </div>
   ${station.tags.length > 0 ? `<div class="station-card-tags">${station.tags.slice(0, 3).map(t => `<span class="station-card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
@@ -47,7 +47,7 @@ function buildMeta(station: RadioStation): string {
   const parts: string[] = []
   if (station.bitrate) parts.push(`<span>${station.bitrate} kbps</span>`)
   if (station.codec)   parts.push(`<span>${station.codec.toUpperCase()}</span>`)
-  if (station.votes)   parts.push(`<span>👍 ${station.votes}</span>`)
+  if (station.votes)   parts.push(`<span class="meta-votes"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg> ${station.votes.toLocaleString()}</span>`)
   return parts.join('<span class="meta-dot">·</span>')
 }
 

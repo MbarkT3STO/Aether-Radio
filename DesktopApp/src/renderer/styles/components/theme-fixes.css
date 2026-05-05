@@ -3,6 +3,23 @@
    Uses flat selectors (no CSS nesting) for maximum compatibility
    ═══════════════════════════════════════════════════════════════════ */
 
+/* ── Country flags (flag-icons) ── */
+.fi.country-flag {
+  width: 16px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.country-flag-unknown {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  vertical-align: middle;
+}
+
 /* ── Shared layout helpers ── */
 .view-header-row {
   display: flex;

@@ -3,7 +3,7 @@ import { BridgeService } from '../services/BridgeService'
 import { Router } from '../router/Router'
 import type { Country } from '../../domain/value-objects/Country'
 import type { Genre } from '../../domain/value-objects/Genre'
-import { countryFlagEmoji } from '../../domain/value-objects/Country'
+import { countryFlag } from '../utils/countryFlag'
 
 const GENRES_INITIAL = 24   // show first N genres
 const GENRES_MAX     = 200  // load up to this many
@@ -97,7 +97,7 @@ export class ExploreView extends BaseComponent {
         <div class="grid grid-cols-country">
           ${this.countries.map(c => `
             <div class="country-card" data-country="${c.code}">
-              <div class="country-card-flag">${countryFlagEmoji(c.code)}</div>
+              <div class="country-card-flag">${countryFlag(c.code)}</div>
               <div class="country-card-name">${this.esc(c.name)}</div>
               <div class="country-card-count">${c.stationCount.toLocaleString()} stations</div>
             </div>
