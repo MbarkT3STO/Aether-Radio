@@ -479,6 +479,9 @@ export class PlayerBar extends BaseComponent {
       if (done) return
       done = true
       overlay.remove()
+      // Restore the mini player bar
+      const appPlayerBar = document.querySelector<HTMLElement>('.app-player-bar')
+      if (appPlayerBar) appPlayerBar.style.visibility = ''
     }
     overlay.addEventListener('transitionend', (e: TransitionEvent) => {
       if (e.propertyName === 'height') finish()
@@ -583,6 +586,9 @@ export class PlayerBar extends BaseComponent {
 
     appMain.style.position = 'relative'
     appMain.appendChild(overlay)
+    // Hide the mini player bar wrapper while expanded
+    const appPlayerBar = document.querySelector<HTMLElement>('.app-player-bar')
+    if (appPlayerBar) appPlayerBar.style.visibility = 'hidden'
     requestAnimationFrame(() => overlay.classList.add('is-expanded'))
 
     this.attachPexListeners(overlay)
@@ -743,6 +749,9 @@ export class PlayerBar extends BaseComponent {
     this.removePexDragListeners()
     const overlay = document.getElementById('player-expanded-overlay')
     if (overlay) overlay.remove()
+    // Restore the mini player bar
+    const appPlayerBar = document.querySelector<HTMLElement>('.app-player-bar')
+    if (appPlayerBar) appPlayerBar.style.visibility = ''
     const btn = this.querySelector<HTMLElement>('#player-expand-btn')
     if (btn) {
       btn.classList.remove('expanded')
