@@ -157,6 +157,7 @@ export class SettingsView extends BaseComponent {
       this.on(btn, 'click', async () => {
         const bufferSize = btn.getAttribute('data-buffer') as 'low' | 'balanced' | 'high'
         await this.applyUpdate({ bufferSize })
+        this.eventBus.emit('settings:buffer-changed', { bufferSize })
       })
     })
   }

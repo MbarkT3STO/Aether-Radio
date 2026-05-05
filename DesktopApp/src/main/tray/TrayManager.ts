@@ -13,6 +13,9 @@ export class TrayManager {
       : path.join(__dirname, '../../renderer/assets/tray-icon.png')
 
     const icon = nativeImage.createFromPath(iconPath)
+    if (process.platform === 'darwin') {
+      icon.setTemplateImage(true)
+    }
     const resized = icon.resize({ width: 16, height: 16 })
 
     this.tray = new Tray(resized)

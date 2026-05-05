@@ -181,6 +181,14 @@ export class PlayerBar extends BaseComponent {
   protected afterMount(): void {
     this.attachEventListeners()
     this.initializeVisualizer()
+    this.audioService.setOnPlayStarted(async (audioEl) => {
+      await this.visualizer.initialize(audioEl)
+      const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+      if (barCanvas) {
+        this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
+        requestAnimationFrame(() => barCanvas.classList.add('active'))
+      }
+    })
     const sleepTimerContainer = this.querySelector<HTMLElement>('#player-sleep-timer')
     if (sleepTimerContainer) {
       void this.sleepTimer.mount(sleepTimerContainer)
@@ -257,6 +265,9 @@ export class PlayerBar extends BaseComponent {
    * switch to the empty state template.
    */
   private onStopChange(): void {
+    this._barAmbientVisualizer.stopVisualization()
+    const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+    if (barCanvas) barCanvas.classList.remove('active')
     this._renderedStationId = null
     this.fullRender()
   }
@@ -776,11 +787,11 @@ export class PlayerBar extends BaseComponent {
   private async initializeVisualizer(): Promise<void> {
     if (this.playerStore.isPlaying) {
       await this.visualizer.initialize(this.audioService.getAudioElement())
-    }
-    const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
-    if (barCanvas && this.playerStore.isPlaying) {
-      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
-      requestAnimationFrame(() => barCanvas.classList.add('active'))
+      const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+      if (barCanvas) {
+        this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
+        requestAnimationFrame(() => barCanvas.classList.add('active'))
+      }
     }
   }
 

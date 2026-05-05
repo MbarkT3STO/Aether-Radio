@@ -76,9 +76,10 @@ class App {
   private async loadSettings(): Promise<void> {
     const result = await this.bridge.settings.get()
     if (result.success) {
-      const { theme, volume } = result.data
+      const { theme, volume, bufferSize } = result.data
       document.documentElement.setAttribute('data-theme', theme)
       this.playerStore.setVolume(volume)
+      this.audioService.setBufferSize(bufferSize)
     }
   }
 
@@ -140,6 +141,10 @@ class App {
     this.eventBus.on('player:volume', ({ volume }) => {
       this.audioService.setVolume(volume)
       this.bridge.settings.update({ volume })
+    })
+
+    this.eventBus.on('settings:buffer-changed', ({ bufferSize }) => {
+      this.audioService.setBufferSize(bufferSize)
     })
 
     // Feature 1 — tray controls → player

@@ -1,7 +1,6 @@
 import { app, BrowserWindow, session, globalShortcut } from 'electron'
 import { join } from 'path'
 import { IpcHandlerRegistry } from './ipc/IpcHandlerRegistry'
-import { WindowIpcHandler } from './ipc/handlers/WindowIpcHandler'
 import { TrayManager } from './tray/TrayManager'
 import { WindowStateManager } from './window/WindowStateManager'
 
@@ -68,9 +67,6 @@ app.whenReady().then(() => {
     })
   })
 
-  // Register all domain IPC handlers
-  IpcHandlerRegistry.registerAll()
-
   createWindow()
 
   if (!mainWindow) return
@@ -78,8 +74,8 @@ app.whenReady().then(() => {
   // System tray (Feature 1)
   trayManager.create(mainWindow)
 
-  // Window + tray + power-save + notification IPC (Features 1, 4, 6)
-  WindowIpcHandler.register(mainWindow, trayManager)
+  // Register all domain IPC handlers (includes WindowIpcHandler)
+  IpcHandlerRegistry.registerAll(mainWindow, trayManager)
 
   // Global keyboard shortcuts (Feature 2)
   globalShortcut.register('MediaPlayPause', () => {

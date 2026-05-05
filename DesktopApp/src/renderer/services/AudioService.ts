@@ -12,6 +12,7 @@ export class AudioService {
   private playerStore = PlayerStore.getInstance()
   private retryCount = 0
   private currentStationId: string | null = null
+  private _onPlayStarted: ((audio: HTMLAudioElement) => Promise<void>) | null = null
 
   private constructor() {
     this.audio = new Audio()
@@ -30,6 +31,10 @@ export class AudioService {
     return this.audio
   }
 
+  setOnPlayStarted(cb: (audio: HTMLAudioElement) => Promise<void>): void {
+    this._onPlayStarted = cb
+  }
+
   async play(station: RadioStation): Promise<void> {
     this.currentStationId = station.id
     this.retryCount = 0
@@ -39,6 +44,9 @@ export class AudioService {
       this.audio.src = station.urlResolved || station.url
       this.audio.volume = this.playerStore.volume
       await this.audio.play()
+      if (this._onPlayStarted) {
+        await this._onPlayStarted(this.audio)
+      }
       this.playerStore.setLoading(false)
     } catch (error) {
       console.error('Playback error:', error)
@@ -85,7 +93,6 @@ export class AudioService {
   private async handlePlaybackError(station: RadioStation): Promise<void> {
     if (this.retryCount < MAX_RETRIES) {
       this.retryCount++
-      console.log(`Retry attempt ${this.retryCount}/${MAX_RETRIES}`)
       
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS))
       
@@ -103,5 +110,19 @@ export class AudioService {
     // This will be implemented by Toast component
     const event = new CustomEvent('show-toast', { detail: { message, type } })
     window.dispatchEvent(event)
+  }
+
+  setBufferSize(size: 'low' | 'balanced' | 'high'): void {
+    switch (size) {
+      case 'low':
+        this.audio.preload = 'none'
+        break
+      case 'balanced':
+        this.audio.preload = 'metadata'
+        break
+      case 'high':
+        this.audio.preload = 'auto'
+        break
+    }
   }
 }
