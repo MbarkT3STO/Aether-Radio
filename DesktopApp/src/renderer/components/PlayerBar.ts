@@ -26,8 +26,10 @@ export class PlayerBar extends BaseComponent {
   private _renderedStationId: string | null = null
   // Expanded player state
   private _isExpanded = false
-  // Ambient background visualizer
+  // Ambient background visualizer (expanded player)
   private _ambientVisualizer  = new VisualizerService()
+  // Ambient background visualizer (mini player bar)
+  private _barAmbientVisualizer = new VisualizerService()
   // Expanded volume drag listeners
   private _pexOnMouseMove: ((e: Event) => void) | null = null
   private _pexOnMouseUp: (() => void) | null = null
@@ -83,7 +85,6 @@ export class PlayerBar extends BaseComponent {
                 </div>
               </div>
             </div>
-            <div class="player-visualizer-container">${this.idleBars()}</div>
             <div id="player-sleep-timer"></div>
           </div>
 
@@ -97,6 +98,8 @@ export class PlayerBar extends BaseComponent {
 
     return `
       <div class="player-bar">
+
+        <canvas class="player-bar-ambient" id="player-bar-ambient"></canvas>
 
         <!-- LEFT: Station info -->
         <div class="player-station-info">
@@ -160,13 +163,6 @@ export class PlayerBar extends BaseComponent {
             </div>
           </div>
 
-          <div class="player-visualizer-container" id="player-visualizer-container">
-            ${isPlaying
-              ? `<canvas id="visualizer-canvas" width="68" height="28"></canvas>`
-              : this.idleBars()
-            }
-          </div>
-
           <div id="player-sleep-timer"></div>
 
           <button class="player-btn player-expand-btn ${this._isExpanded ? 'expanded' : ''}"
@@ -195,6 +191,7 @@ export class PlayerBar extends BaseComponent {
   protected beforeUnmount(): void {
     this.visualizer.stopVisualization()
     this._ambientVisualizer.stopVisualization()
+    this._barAmbientVisualizer.stopVisualization()
     this.removeDragListeners()
     this.removePexDragListeners()
     this.sleepTimer.unmount()
@@ -322,6 +319,7 @@ export class PlayerBar extends BaseComponent {
   private fullRender(): void {
     if (this.element && this.element.parentNode) {
       this.visualizer.stopVisualization()
+      this._barAmbientVisualizer.stopVisualization()
       this.removeDragListeners()
       this.removePexDragListeners()
       this.sleepTimer.unmount()
@@ -337,19 +335,14 @@ export class PlayerBar extends BaseComponent {
   }
 
   private syncVisualizer(isPlaying: boolean): void {
-    const container = this.querySelector<HTMLElement>('#player-visualizer-container')
-    if (!container) return
-
-    if (isPlaying) {
-      const existingCanvas = container.querySelector('#visualizer-canvas')
-      if (!existingCanvas) {
-        this.visualizer.stopVisualization()
-        container.innerHTML = `<canvas id="visualizer-canvas" width="68" height="28"></canvas>`
-        this.initializeVisualizer()
-      }
-    } else {
+    const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+    if (!isPlaying) {
       this.visualizer.stopVisualization()
-      container.innerHTML = this.idleBars()
+      this._barAmbientVisualizer.stopVisualization()
+      if (barCanvas) barCanvas.classList.remove('active')
+    } else if (barCanvas && !barCanvas.classList.contains('active')) {
+      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer)
+      requestAnimationFrame(() => barCanvas.classList.add('active'))
     }
   }
 
@@ -730,10 +723,13 @@ export class PlayerBar extends BaseComponent {
   }
 
   private async initializeVisualizer(): Promise<void> {
-    const canvas = this.querySelector<HTMLCanvasElement>('#visualizer-canvas')
-    if (canvas && this.playerStore.isPlaying) {
+    if (this.playerStore.isPlaying) {
       await this.visualizer.initialize(this.audioService.getAudioElement())
-      this.visualizer.startVisualization(canvas)
+    }
+    const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+    if (barCanvas && this.playerStore.isPlaying) {
+      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer)
+      requestAnimationFrame(() => barCanvas.classList.add('active'))
     }
   }
 

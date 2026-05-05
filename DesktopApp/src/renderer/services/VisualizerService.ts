@@ -121,6 +121,11 @@ export class VisualizerService {
       // Apply blur via shadowBlur on each blob instead of CSS filter
       ctx.clearRect(0, 0, w, hh)
 
+      // Pull fresh frequency data every frame
+      if (this.analyser && this.dataArray) {
+        this.analyser.getByteFrequencyData(this.dataArray)
+      }
+
       const freqData = this.dataArray
       const getEnergy = (bin: number): number =>
         freqData ? (freqData[bin] ?? 0) / 255 : 0.3
