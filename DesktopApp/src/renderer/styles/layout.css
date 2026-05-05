@@ -19,7 +19,7 @@
   flex-direction: column;
   flex-shrink: 0;
   position: relative;
-  z-index: 10;
+  z-index: 200;
   transition: width var(--transition-medium);
 }
 

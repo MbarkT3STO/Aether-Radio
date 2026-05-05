@@ -22,12 +22,14 @@
 .player-expanded-overlay {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  /* starts collapsed at player bar height */
   height: var(--player-bar-height);
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-subtle);
   z-index: 90;
-  overflow: hidden;
+  /* No overflow:hidden here — it would clip position:fixed tooltips
+     from the sidebar that render over this area.
+     Content clipping is handled by the inner wrapper instead. */
+  overflow: visible;
   transition: height 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
@@ -76,17 +78,17 @@
   align-items: stretch;
   padding: 32px 40px 24px;
   gap: 48px;
+  /* Use opacity only — NO transform, transform creates a containing block
+     for position:fixed elements and breaks sidebar tooltips */
   opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.28s ease 0.08s,
-    transform 0.28s ease 0.08s;
+  transition: opacity 0.28s ease 0.08s;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .player-expanded-overlay.is-expanded .player-expanded-body {
   opacity: 1;
-  transform: translateY(0);
 }
 
 /* ── LEFT: large artwork + live badge ── */
@@ -341,6 +343,15 @@
   letter-spacing: 0.08em;
 }
 
+/* ── Dark theme ── */
+[data-theme="dark"] .player-expanded-overlay {
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .pex-artwork {
+  box-shadow: var(--nm-raised), 0 8px 40px rgba(0,0,0,0.5);
+}
+
 /* ── Ambient visualizer canvas — full-bleed background layer ── */
 .pex-ambient-canvas {
   position: absolute;
@@ -349,26 +360,13 @@
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  /* Slight blur so blobs are soft, not sharp */
-  filter: blur(40px) saturate(1.4);
   opacity: 0;
   transition: opacity 0.6s ease;
+  filter: blur(48px) saturate(1.5);
 }
 
 .player-expanded-overlay.is-expanded .pex-ambient-canvas {
   opacity: 1;
-}
-
-/* All content must sit above the ambient canvas */
-.player-expanded-body {
-  position: relative;
-  z-index: 1;
-}
-  box-shadow: 0 -4px 32px rgba(0,0,0,0.5);
-}
-
-[data-theme="dark"] .pex-artwork {
-  box-shadow: var(--nm-raised), 0 8px 40px rgba(0,0,0,0.5);
 }
 
 /* ── Dark theme ── */

@@ -106,45 +106,42 @@ export class VisualizerService {
       this.animationId = requestAnimationFrame(draw)
       t++
 
-      const W = canvas.width
-      const H = canvas.height
-
-      // Resize canvas to match element size every frame (handles window resize)
-      const el = canvas as HTMLCanvasElement
-      const dpr = window.devicePixelRatio || 1
-      const rect = el.getBoundingClientRect()
-      if (el.width !== Math.round(rect.width * dpr) || el.height !== Math.round(rect.height * dpr)) {
-        el.width  = Math.round(rect.width  * dpr)
-        el.height = Math.round(rect.height * dpr)
-        ctx.scale(dpr, dpr)
+      const dpr  = window.devicePixelRatio || 1
+      const rect = canvas.getBoundingClientRect()
+      const pw   = Math.round(rect.width  * dpr)
+      const ph   = Math.round(rect.height * dpr)
+      if (canvas.width !== pw || canvas.height !== ph) {
+        canvas.width  = pw
+        canvas.height = ph
       }
 
-      const w = rect.width
-      const hh = rect.height
+      const w  = canvas.width
+      const hh = canvas.height
 
+      // Apply blur via shadowBlur on each blob instead of CSS filter
       ctx.clearRect(0, 0, w, hh)
 
-      // Get frequency energy for each blob
       const freqData = this.dataArray
-      const getEnergy = (bin: number): number => {
-        if (!freqData) return 0.3
-        return (freqData[bin] ?? 0) / 255
-      }
+      const getEnergy = (bin: number): number =>
+        freqData ? (freqData[bin] ?? 0) / 255 : 0.3
 
       for (const blob of blobs) {
-        const energy  = getEnergy(blob.freqBin)
-        const phase   = blob.phase + t * blob.speed
-        // Blob center drifts slowly
-        const cx = (blob.x + Math.sin(phase * 1.3) * 0.12) * w
-        const cy = (blob.y + Math.cos(phase * 0.9) * 0.10) * hh
-        // Radius pulses with audio energy
+        const energy = getEnergy(blob.freqBin)
+        const phase  = blob.phase + t * blob.speed
+        const cx     = (blob.x + Math.sin(phase * 1.3) * 0.12) * w
+        const cy     = (blob.y + Math.cos(phase * 0.9) * 0.10) * hh
         const baseR  = Math.min(w, hh) * 0.45
         const radius = baseR * (0.7 + energy * 0.6 + Math.sin(phase * 2) * 0.08)
 
         const blobHue = (h + blob.hueOff + 360) % 360
         const alpha   = isDark
-          ? 0.18 + energy * 0.22
-          : 0.10 + energy * 0.14
+          ? 0.22 + energy * 0.28
+          : 0.12 + energy * 0.16
+
+        // Use shadowBlur for the soft glow — no CSS filter needed
+        ctx.save()
+        ctx.shadowColor = `hsla(${blobHue}, ${s}, ${isDark ? '65%' : '55%'}, ${alpha})`
+        ctx.shadowBlur  = Math.min(w, hh) * 0.35
 
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius)
         grad.addColorStop(0,   `hsla(${blobHue}, ${s}, ${isDark ? '65%' : '55%'}, ${alpha})`)
@@ -155,6 +152,7 @@ export class VisualizerService {
         ctx.beginPath()
         ctx.ellipse(cx, cy, radius, radius * 0.85, phase * 0.3, 0, Math.PI * 2)
         ctx.fill()
+        ctx.restore()
       }
     }
 
