@@ -2,7 +2,7 @@ import { BaseComponent } from './base/BaseComponent'
 import { PlayerStore } from '../store/PlayerStore'
 import { EventBus } from '../store/EventBus'
 
-const PRESETS = [15, 30, 45, 60] as const
+const QUICK_PRESETS = [15, 30, 45, 60] as const
 
 export class SleepTimer extends BaseComponent {
   private playerStore = PlayerStore.getInstance()
@@ -10,7 +10,6 @@ export class SleepTimer extends BaseComponent {
   private isOpen = false
   private tickInterval: ReturnType<typeof setInterval> | null = null
   private unsubscribeSleepTimer: (() => void) | null = null
-  // Single stable outside-click handler so we can remove it precisely
   private outsideClickHandler: ((e: Event) => void) | null = null
 
   constructor() {
@@ -37,7 +36,6 @@ export class SleepTimer extends BaseComponent {
             : ''
           }
         </button>
-
         ${this.isOpen ? this.renderPopover(active) : ''}
       </div>
     `
@@ -47,16 +45,40 @@ export class SleepTimer extends BaseComponent {
     return `
       <div class="sleep-timer-popover" role="dialog" aria-label="Sleep timer options">
         <div class="sleep-timer-popover-header">Sleep Timer</div>
+
+        <!-- Custom input -->
+        <div class="sleep-timer-custom">
+          <input
+            id="sleep-timer-input"
+            class="sleep-timer-input"
+            type="number"
+            min="1"
+            max="480"
+            placeholder="min"
+            aria-label="Custom minutes"
+          />
+          <button class="sleep-timer-set-btn" id="sleep-timer-set" aria-label="Start timer">
+            Start
+          </button>
+        </div>
+
+        <!-- Quick presets -->
+        <div class="sleep-timer-presets-label">Quick pick</div>
         <div class="sleep-timer-presets">
-          ${PRESETS.map((min) => `
+          ${QUICK_PRESETS.map((min) => `
             <button class="sleep-timer-preset" data-minutes="${min}"
-              aria-label="Set sleep timer for ${min} minutes">${min} min</button>
+              aria-label="Set sleep timer for ${min} minutes">${min}m</button>
           `).join('')}
         </div>
-        ${active
-          ? `<button class="sleep-timer-cancel" id="sleep-timer-cancel">Cancel Timer</button>`
-          : ''
-        }
+
+        ${active ? `
+          <div class="sleep-timer-active-row">
+            <span class="sleep-timer-active-label">
+              ${this.timerIcon()} Stops in ${this.playerStore.sleepTimerMinutesLeft ?? 0}m
+            </span>
+            <button class="sleep-timer-cancel" id="sleep-timer-cancel">Cancel</button>
+          </div>
+        ` : ''}
       </div>
     `
   }
@@ -64,7 +86,6 @@ export class SleepTimer extends BaseComponent {
   protected afterMount(): void {
     this.attachListeners()
     this.startTick()
-    // Only subscribe once — guard against double-mount
     if (!this.unsubscribeSleepTimer) {
       this.unsubscribeSleepTimer = this.eventBus.on('player:sleep-timer', () => {
         this.rerender()
@@ -82,6 +103,7 @@ export class SleepTimer extends BaseComponent {
   }
 
   private attachListeners(): void {
+    // Toggle button
     const toggleBtn = this.querySelector<HTMLElement>('#sleep-timer-toggle')
     if (toggleBtn) {
       this.on(toggleBtn, 'click', (e) => {
@@ -91,6 +113,34 @@ export class SleepTimer extends BaseComponent {
       })
     }
 
+    // Custom input — focus it immediately when popover opens
+    const input = this.querySelector<HTMLInputElement>('#sleep-timer-input')
+    if (input) {
+      setTimeout(() => input.focus(), 0)
+
+      // Enter key submits
+      this.on(input, 'keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter') {
+          e.stopPropagation()
+          this.startCustomTimer(input.value)
+        }
+      })
+
+      // Prevent popover close on input click
+      this.on(input, 'click', (e) => e.stopPropagation())
+    }
+
+    // Start button
+    const setBtn = this.querySelector<HTMLElement>('#sleep-timer-set')
+    if (setBtn) {
+      this.on(setBtn, 'click', (e) => {
+        e.stopPropagation()
+        const inp = this.querySelector<HTMLInputElement>('#sleep-timer-input')
+        this.startCustomTimer(inp?.value ?? '')
+      })
+    }
+
+    // Quick presets
     this.querySelectorAll<HTMLElement>('.sleep-timer-preset').forEach((btn) => {
       this.on(btn, 'click', (e) => {
         e.stopPropagation()
@@ -103,6 +153,7 @@ export class SleepTimer extends BaseComponent {
       })
     })
 
+    // Cancel
     const cancelBtn = this.querySelector<HTMLElement>('#sleep-timer-cancel')
     if (cancelBtn) {
       this.on(cancelBtn, 'click', (e) => {
@@ -113,7 +164,7 @@ export class SleepTimer extends BaseComponent {
       })
     }
 
-    // Register outside-click handler only when popover is open
+    // Outside click closes popover
     this.removeOutsideClickHandler()
     if (this.isOpen) {
       this.outsideClickHandler = (e: Event): void => {
@@ -122,13 +173,27 @@ export class SleepTimer extends BaseComponent {
           this.rerender()
         }
       }
-      // Use capture:false, setTimeout so the current click that opened the
-      // popover doesn't immediately close it
       setTimeout(() => {
         if (this.outsideClickHandler) {
           document.addEventListener('click', this.outsideClickHandler)
         }
       }, 0)
+    }
+  }
+
+  private startCustomTimer(raw: string): void {
+    const minutes = parseInt(raw, 10)
+    if (!isNaN(minutes) && minutes >= 1 && minutes <= 480) {
+      this.playerStore.setSleepTimer(minutes)
+      this.isOpen = false
+      this.rerender()
+    } else {
+      // Shake the input to signal invalid value
+      const input = this.querySelector<HTMLInputElement>('#sleep-timer-input')
+      if (input) {
+        input.classList.add('sleep-timer-input--error')
+        setTimeout(() => input.classList.remove('sleep-timer-input--error'), 600)
+      }
     }
   }
 
@@ -157,27 +222,23 @@ export class SleepTimer extends BaseComponent {
 
   private rerender(): void {
     if (!this.element || !this.element.parentNode) return
-    // Clean up before DOM replacement — but keep the EventBus subscription
     this.stopTick()
     this.removeOutsideClickHandler()
     const parent = this.element.parentNode as HTMLElement
     parent.innerHTML = this.render()
     this.element = parent.firstElementChild as HTMLElement
-    // Re-attach DOM listeners and tick; do NOT re-subscribe EventBus
     this.attachListeners()
     this.startTick()
   }
 
   private timerIcon(): string {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" stroke-width="2"
       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="12" cy="13" r="8"/>
       <path d="M12 9v4l2 2"/>
       <path d="M5 3 2 6"/>
       <path d="m22 6-3-3"/>
-      <path d="M6.38 18.7 4 21"/>
-      <path d="M17.64 18.67 20 21"/>
     </svg>`
   }
 }
