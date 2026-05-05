@@ -37,37 +37,31 @@ export class PlayerBar extends BaseComponent {
       return `
         <div class="player-bar">
 
-          <!-- Left: empty info -->
           <div class="player-station-info">
-            <div class="player-empty-icon">
-              ${this.radioIcon()}
-            </div>
+            <div class="player-empty-icon">${this.radioIcon()}</div>
             <div class="player-station-details">
               <div class="player-empty-name">No station playing</div>
               <div class="player-empty-hint">Select a station to start listening</div>
             </div>
           </div>
 
-          <!-- Center: disabled controls -->
           <div class="player-controls">
             <button class="player-btn player-btn-play player-btn-disabled" disabled>
               ${this.playIcon()}
             </button>
-            <div class="player-controls-divider"></div>
+          </div>
+
+          <div class="player-extras">
             <div class="player-volume">
               <button class="player-btn player-btn-mute" disabled>
                 ${this.volumeIcon(this.playerStore.volume)}
               </button>
               <div class="volume-slider">
-                <div class="volume-slider-fill">
+                <div class="volume-slider-fill" style="width:${Math.round(this.playerStore.volume * 100)}%">
                   <div class="volume-slider-thumb"></div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Right: idle visualizer -->
-          <div class="player-extras">
             <div class="player-visualizer-container">${this.idleBars()}</div>
           </div>
 
@@ -83,16 +77,12 @@ export class PlayerBar extends BaseComponent {
     return `
       <div class="player-bar">
 
-        <!-- ── LEFT: Station Info ── -->
+        <!-- LEFT: Station info -->
         <div class="player-station-info">
-
-          <!-- Logo with live dot -->
           <div class="player-station-logo-wrap">
             ${this.logoInnerHtml(station.favicon, station.name)}
             ${isPlaying ? `<span class="player-live-dot"></span>` : ''}
           </div>
-
-          <!-- Station details -->
           <div class="player-station-details">
             <div class="player-station-name">${this.esc(station.name)}</div>
             <div class="player-station-meta">
@@ -115,21 +105,17 @@ export class PlayerBar extends BaseComponent {
               }
             </div>
           </div>
-
         </div>
 
-        <!-- ── CENTER: Controls — single row ── -->
+        <!-- CENTER: Controls -->
         <div class="player-controls">
 
-          <!-- Stop -->
           <button class="player-btn player-btn-stop" data-action="stop" title="Stop">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-              viewBox="0 0 24 24" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
               <rect x="5" y="5" width="14" height="14" rx="2"/>
             </svg>
           </button>
 
-          <!-- Play / Pause -->
           <button class="player-btn player-btn-play ${isPlaying ? 'playing' : ''}"
             data-action="${isPlaying ? 'pause' : 'play'}"
             title="${isPlaying ? 'Pause' : 'Play'}">
@@ -139,10 +125,22 @@ export class PlayerBar extends BaseComponent {
             }
           </button>
 
-          <!-- Divider -->
-          <div class="player-controls-divider"></div>
+          <button class="player-btn player-card-favorite ${isFavorite ? 'active' : ''}"
+            data-action="favorite"
+            title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="${isFavorite ? 'currentColor' : 'none'}"
+              stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            </svg>
+          </button>
 
-          <!-- Volume -->
+        </div>
+
+        <!-- RIGHT: Volume + Visualizer -->
+        <div class="player-extras">
+
           <div class="player-volume">
             <button class="player-btn player-btn-mute" data-action="mute"
               title="${volume === 0 ? 'Unmute' : 'Mute'}">
@@ -155,31 +153,12 @@ export class PlayerBar extends BaseComponent {
             </div>
           </div>
 
-        </div>
-
-        <!-- ── RIGHT: Extras ── -->
-        <div class="player-extras">
-
-          <!-- Visualizer -->
           <div class="player-visualizer-container">
             ${isPlaying
-              ? `<canvas id="visualizer-canvas" width="72" height="28"></canvas>`
+              ? `<canvas id="visualizer-canvas" width="68" height="28"></canvas>`
               : this.idleBars()
             }
           </div>
-
-          <!-- Favorite -->
-          <button class="player-btn player-card-favorite ${isFavorite ? 'active' : ''}"
-            data-action="favorite"
-            title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-              viewBox="0 0 24 24"
-              fill="${isFavorite ? 'currentColor' : 'none'}"
-              stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-            </svg>
-          </button>
 
         </div>
 
