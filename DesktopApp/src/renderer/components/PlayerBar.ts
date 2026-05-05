@@ -193,7 +193,13 @@ export class PlayerBar extends BaseComponent {
 
     if (muteBtn) {
       this.on(muteBtn, 'click', () => {
-        this.playerStore.setVolume(this.playerStore.volume > 0 ? 0 : 0.8)
+        if (this.playerStore.volume > 0) {
+          this.playerStore.setVolume(0)
+        } else {
+          // Restore to pre-mute level, fall back to 0.8 if somehow zero
+          const restore = this.playerStore.volumeBeforeMute || 0.8
+          this.playerStore.setVolume(restore)
+        }
       })
     }
 

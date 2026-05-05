@@ -8,6 +8,7 @@ export class PlayerStore {
   private _currentStation: RadioStation | null = null
   private _isPlaying = false
   private _volume = 0.8
+  private _volumeBeforeMute = 0.8
   private _isLoading = false
 
   private constructor() {}
@@ -29,6 +30,10 @@ export class PlayerStore {
 
   get volume(): number {
     return this._volume
+  }
+
+  get volumeBeforeMute(): number {
+    return this._volumeBeforeMute
   }
 
   get isLoading(): boolean {
@@ -53,7 +58,12 @@ export class PlayerStore {
   }
 
   setVolume(volume: number): void {
-    this._volume = Math.max(0, Math.min(1, volume))
+    const newVolume = Math.max(0, Math.min(1, volume))
+    // Store previous volume before muting (only if not already muted)
+    if (this._volume > 0 && newVolume === 0) {
+      this._volumeBeforeMute = this._volume
+    }
+    this._volume = newVolume
     this.eventBus.emit('player:volume', { volume: this._volume })
   }
 
