@@ -681,18 +681,22 @@ export class PlayerBar extends BaseComponent {
     })
     this.eventBus.on('player:volume',     ({ volume }) => this.syncPexVolumeUI(overlay, volume))
     this.eventBus.on('favorites:changed', () => this.syncPexFavState(overlay))
+    this.eventBus.on('player:loading',    ({ loading }) => this.syncPexLoadingUI(overlay, loading))
   }
 
   private syncPexPlayState(overlay: HTMLElement): void {
     const q = <E extends Element>(sel: string) => overlay.querySelector<E>(sel)
     const isPlaying = this.playerStore.isPlaying
+    const isLoading = this.playerStore.isLoading
 
     const playBtn = q<HTMLElement>('#pex-play')
     if (playBtn) {
       playBtn.classList.toggle('playing', isPlaying)
       playBtn.setAttribute('data-action', isPlaying ? 'pause' : 'play')
       playBtn.title = isPlaying ? 'Pause' : 'Play'
-      playBtn.innerHTML = isPlaying ? this.pauseIconLg() : this.playIconLg()
+      if (!isLoading) {
+        playBtn.innerHTML = isPlaying ? this.pauseIconLg() : this.playIconLg()
+      }
     }
 
     const artworkCol = overlay.querySelector<HTMLElement>('.pex-artwork-col')
@@ -716,6 +720,15 @@ export class PlayerBar extends BaseComponent {
       this._ambientVisualizer.stopVisualization()
       if (vizWrap) vizWrap.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${this.idleBars()}</div>`
     }
+  }
+
+  private syncPexLoadingUI(overlay: HTMLElement, loading: boolean): void {
+    const playBtn = overlay.querySelector<HTMLElement>('#pex-play')
+    if (!playBtn) return
+    const isPlaying = this.playerStore.isPlaying
+    playBtn.innerHTML = loading
+      ? `<span class="loading-spinner loading-spinner--md"></span>`
+      : (isPlaying ? this.pauseIconLg() : this.playIconLg())
   }
 
   private syncPexFavState(overlay: HTMLElement): void {
