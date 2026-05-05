@@ -12,6 +12,7 @@ import { FavoritesView } from './views/FavoritesView'
 import { HistoryView } from './views/HistoryView'
 import { SettingsView } from './views/SettingsView'
 import { CustomStationsView } from './views/CustomStationsView'
+import { FeaturedView } from './views/FeaturedView'
 import { Sidebar } from './components/Sidebar'
 import { PlayerBar } from './components/PlayerBar'
 import { initLogoErrorHandling } from './utils/stationLogo'
@@ -82,12 +83,16 @@ class App {
 
   private registerRoutes(): void {
     this.router.register('/', () => this.renderView(new HomeView({})))
+    this.router.register('/featured', () => this.renderView(new FeaturedView({})))
     this.router.register('/explore', () => this.renderView(new ExploreView({})))
     this.router.register('/search', () => this.renderView(new SearchView({})))
     this.router.register('/favorites', () => this.renderView(new FavoritesView({})))
     this.router.register('/history', () => this.renderView(new HistoryView({})))
     this.router.register('/custom', () => this.renderView(new CustomStationsView({})))
     this.router.register('/settings', () => this.renderView(new SettingsView({})))
+
+    // Start routing after all routes are registered
+    this.router.start()
   }
 
   private renderView(view: { mount: (container: string) => void; unmount: () => void }): void {

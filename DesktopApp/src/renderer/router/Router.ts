@@ -10,7 +10,6 @@ export class Router {
 
   private constructor() {
     window.addEventListener('hashchange', () => this.handleRouteChange())
-    this.handleRouteChange()
   }
 
   static getInstance(): Router {
@@ -24,13 +23,17 @@ export class Router {
     this.routes.set(path, handler)
   }
 
+  /** Call once after all routes are registered to trigger the initial render. */
+  start(): void {
+    this.handleRouteChange()
+  }
+
   navigate(path: string): void {
     window.location.hash = path
   }
 
   private handleRouteChange(): void {
     const fullHash = window.location.hash.slice(1) || '/'
-    // Extract base path without query parameters
     const basePath = fullHash.split('?')[0] || '/'
     this.currentRoute = fullHash
 
@@ -39,7 +42,7 @@ export class Router {
       handler()
       this.eventBus.emit('route:changed', { route: fullHash })
     } else {
-      // Default to home
+      // Unknown route — go home
       this.navigate('/')
     }
   }
