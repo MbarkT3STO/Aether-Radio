@@ -6,7 +6,7 @@ import { BridgeService } from '../services/BridgeService'
 import { VisualizerService } from '../services/VisualizerService'
 import { AudioService } from '../services/AudioService'
 import { countryFlagEmoji } from '../../domain/value-objects/Country'
-import { stationLogoHtml } from '../utils/stationLogo'
+import { FALLBACK_HTML } from '../utils/stationLogo'
 
 export class PlayerBar extends BaseComponent {
   private eventBus       = EventBus.getInstance()
@@ -48,12 +48,22 @@ export class PlayerBar extends BaseComponent {
             </div>
           </div>
 
-          <!-- Center: disabled play -->
+          <!-- Center: disabled controls -->
           <div class="player-controls">
-            <button class="player-btn player-btn-play player-btn-disabled"
-              disabled>
+            <button class="player-btn player-btn-play player-btn-disabled" disabled>
               ${this.playIcon()}
             </button>
+            <div class="player-controls-divider"></div>
+            <div class="player-volume">
+              <button class="player-btn player-btn-mute" disabled>
+                ${this.volumeIcon(this.playerStore.volume)}
+              </button>
+              <div class="volume-slider">
+                <div class="volume-slider-fill">
+                  <div class="volume-slider-thumb"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Right: idle visualizer -->
@@ -73,15 +83,26 @@ export class PlayerBar extends BaseComponent {
     return `
       <div class="player-bar">
 
-        <!-- ── Left: Station Info ── -->
+        <!-- ── LEFT: Station Info ── -->
         <div class="player-station-info">
-          ${stationLogoHtml(station.favicon, station.name, 'player')}
+
+          <!-- Logo with live dot -->
+          <div class="player-station-logo-wrap">
+            ${this.logoInnerHtml(station.favicon, station.name)}
+            ${isPlaying ? `<span class="player-live-dot"></span>` : ''}
+          </div>
+
+          <!-- Station details -->
           <div class="player-station-details">
             <div class="player-station-name">${this.esc(station.name)}</div>
             <div class="player-station-meta">
               <span>${flag} ${this.esc(station.country)}</span>
               ${station.tags.length > 0
                 ? `<span class="meta-sep">·</span><span>${this.esc(station.tags[0] ?? '')}</span>`
+                : ''
+              }
+              ${station.bitrate
+                ? `<span class="meta-sep">·</span><span class="player-bitrate-badge">${station.bitrate} kbps</span>`
                 : ''
               }
               ${isLoading
@@ -94,14 +115,15 @@ export class PlayerBar extends BaseComponent {
               }
             </div>
           </div>
+
         </div>
 
-        <!-- ── Center: Controls ── -->
+        <!-- ── CENTER: Controls — single row ── -->
         <div class="player-controls">
 
           <!-- Stop -->
           <button class="player-btn player-btn-stop" data-action="stop" title="Stop">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
               viewBox="0 0 24 24" fill="currentColor">
               <rect x="5" y="5" width="14" height="14" rx="2"/>
             </svg>
@@ -117,9 +139,12 @@ export class PlayerBar extends BaseComponent {
             }
           </button>
 
+          <!-- Divider -->
+          <div class="player-controls-divider"></div>
+
           <!-- Volume -->
           <div class="player-volume">
-            <button class="player-btn" data-action="mute"
+            <button class="player-btn player-btn-mute" data-action="mute"
               title="${volume === 0 ? 'Unmute' : 'Mute'}">
               ${this.volumeIcon(volume)}
             </button>
@@ -132,28 +157,22 @@ export class PlayerBar extends BaseComponent {
 
         </div>
 
-        <!-- ── Right: Extras ── -->
+        <!-- ── RIGHT: Extras ── -->
         <div class="player-extras">
 
           <!-- Visualizer -->
           <div class="player-visualizer-container">
             ${isPlaying
-              ? `<canvas id="visualizer-canvas" width="80" height="30"></canvas>`
+              ? `<canvas id="visualizer-canvas" width="72" height="28"></canvas>`
               : this.idleBars()
             }
           </div>
-
-          <!-- Bitrate -->
-          ${station.bitrate
-            ? `<div class="player-bitrate-badge">${station.bitrate} kbps</div>`
-            : ''
-          }
 
           <!-- Favorite -->
           <button class="player-btn player-card-favorite ${isFavorite ? 'active' : ''}"
             data-action="favorite"
             title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
               viewBox="0 0 24 24"
               fill="${isFavorite ? 'currentColor' : 'none'}"
               stroke="currentColor" stroke-width="2"
@@ -251,21 +270,15 @@ export class PlayerBar extends BaseComponent {
   }
 
   private updateVolumeUI(volume: number): void {
-    // Update only the volume-related DOM nodes — no full re-render
-    const fill = this.querySelector<HTMLElement>('.volume-slider-fill')
-    const slider = this.querySelector<HTMLElement>('.volume-slider')
+    const fill    = this.querySelector<HTMLElement>('.volume-slider-fill')
+    const slider  = this.querySelector<HTMLElement>('.volume-slider')
     const muteBtn = this.querySelector<HTMLElement>('[data-action="mute"]')
+    const volPct  = Math.round(volume * 100)
 
-    const volPct = Math.round(volume * 100)
-
-    if (fill) {
-      fill.style.width = `${volPct}%`
-    }
-    if (slider) {
-      slider.title = `${volPct}%`
-    }
+    if (fill)    fill.style.width = `${volPct}%`
+    if (slider)  slider.title = `${volPct}%`
     if (muteBtn) {
-      muteBtn.title = volume === 0 ? 'Unmute' : 'Mute'
+      muteBtn.title     = volume === 0 ? 'Unmute' : 'Mute'
       muteBtn.innerHTML = this.volumeIcon(volume)
     }
   }
@@ -335,6 +348,17 @@ export class PlayerBar extends BaseComponent {
       <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
     </svg>`
+  }
+
+  private logoInnerHtml(favicon: string | undefined | null, name: string): string {
+    if (!favicon || favicon.trim() === '') return FALLBACK_HTML
+    const trimmed = favicon.trim()
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('data:image/')) {
+      return FALLBACK_HTML
+    }
+    const encodedSrc = trimmed.replace(/"/g, '%22')
+    const encodedAlt = name.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    return `<img src="${encodedSrc}" alt="${encodedAlt}" data-logo>`
   }
 
   private idleBars(): string {
