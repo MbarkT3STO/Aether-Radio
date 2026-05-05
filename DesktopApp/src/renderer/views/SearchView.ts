@@ -29,17 +29,11 @@ export class SearchView extends BaseComponent {
   render(): string {
     return `
       <div class="search-view animate-fade-in">
-        <div class="view-header">
-          <div class="view-header-row view-header-row--spaced">
-            <div class="view-header-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-              </svg>
-            </div>
-            <h1 id="search-title">Search</h1>
-          </div>
-          <div class="search-bar">
-            <svg class="search-bar-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="search-hero">
+          <h1 class="search-hero-title" id="search-title">Search</h1>
+          <p class="search-hero-sub">Find stations by name, country, or genre</p>
+          <div class="search-bar search-bar--hero">
+            <svg class="search-bar-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
             </svg>
             <input type="text" class="search-bar-input" placeholder="Search by name, country, or genre…" id="search-input" autocomplete="off">
@@ -110,6 +104,11 @@ export class SearchView extends BaseComponent {
   private updateTitle(title: string): void {
     const el = this.querySelector('#search-title')
     if (el) el.textContent = title
+    // Compact the hero when showing results
+    const hero = this.querySelector<HTMLElement>('.search-hero')
+    const sub  = this.querySelector<HTMLElement>('.search-hero-sub')
+    if (hero) hero.classList.toggle('search-hero--compact', title !== 'Search')
+    if (sub)  sub.style.display = title === 'Search' ? '' : 'none'
   }
 
   private showLoading(): void {
