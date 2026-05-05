@@ -1,0 +1,194 @@
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS VIEW — Keyra neumorphic design
+   ═══════════════════════════════════════════════════════════════ */
+
+.settings-view {
+  /* no max-width here — controlled by the inner wrapper div */
+}
+
+/* ── Section Card ── */
+.stg-card {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+  /* ensure card doesn't stretch beyond its container */
+  width: 100%;
+}
+
+/* ── Card Header ── */
+.stg-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.stg-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.stg-card-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+}
+
+.stg-card-sub {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+/* ── Row inside card ── */
+.stg-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 20px;
+}
+
+.stg-row + .stg-row {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.stg-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stg-row-label {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.stg-row-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Toggle Group ── */
+.stg-toggle-group {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.stg-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+.stg-toggle-btn:hover {
+  color: var(--text-primary);
+}
+
+.stg-toggle-btn.active {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--accent-primary);
+}
+
+/* ── About section ── */
+.stg-about {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.stg-about-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.stg-about-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  margin-bottom: 3px;
+}
+
+.stg-about-version {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+/* ── Divider inside card ── */
+.stg-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0 20px;
+}
+
+/* ── Light theme ── */
+:root:not([data-theme="dark"]) .stg-card {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}
+
+:root:not([data-theme="dark"]) .stg-card-icon {
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+}
+
+:root:not([data-theme="dark"]) .stg-toggle-group {
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+}
+
+:root:not([data-theme="dark"]) .stg-toggle-btn.active {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}
+
+:root:not([data-theme="dark"]) .stg-about-logo {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}

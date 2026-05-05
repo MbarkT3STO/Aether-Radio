@@ -1,0 +1,224 @@
+/* ── Station Card (Keyra neumorphic) ── */
+
+.station-card {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--nm-raised);
+  transition: all var(--transition-medium);
+  cursor: pointer;
+  position: relative;
+  border: none;
+}
+
+.station-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.station-card:active {
+  transform: scale(0.99);
+  box-shadow: var(--nm-pressed);
+}
+
+/* Playing state */
+.station-card.playing {
+  box-shadow: var(--nm-raised), 0 0 0 2px var(--accent-primary);
+}
+
+.station-card.playing::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  background: #34c759;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #34c759;
+  animation: dotPulse 2s infinite;
+  z-index: 2;
+}
+
+/* ── Header ── */
+.station-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+/* Logo wrapper — handled by station-logo.css */
+.station-card-logo-wrap {
+  flex-shrink: 0;
+}
+
+/* Legacy img class — kept for backward compat */
+.station-card-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: var(--nm-raised);
+}
+
+.station-card-info { flex: 1; min-width: 0; }
+
+.station-card-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.station-card-country {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Tags ── */
+.station-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-xs);
+}
+
+.station-card-tag {
+  padding: 3px 10px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  font-family: var(--font-body);
+}
+
+.station-card-tag:hover {
+  color: var(--accent-primary);
+  box-shadow: var(--nm-raised);
+}
+
+/* ── Footer ── */
+.station-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
+}
+
+.station-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.meta-dot {
+  color: var(--text-tertiary);
+  opacity: 0.5;
+  font-size: 0.65rem;
+}
+
+/* ── Favorite Button ── */
+.station-card-favorite {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  color: var(--text-tertiary);
+  box-shadow: var(--nm-raised);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.station-card-favorite:hover {
+  color: var(--accent-secondary);
+  transform: scale(1.12);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.station-card-favorite:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(1);
+}
+
+.station-card-favorite.active {
+  color: var(--accent-secondary);
+  box-shadow: var(--nm-pressed);
+  animation: heartBeat 0.4s ease;
+}
+
+/* ── Country Card (Explore) ── */
+.country-card {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-sm);
+  box-shadow: var(--nm-raised);
+  transition: all var(--transition-medium);
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.country-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.country-card:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+.country-card-flag {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.country-card-name {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  /* Clamp to 2 lines max */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+  max-height: 2.6em;
+}
+
+.country-card-count {
+  font-size: 0.68rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}

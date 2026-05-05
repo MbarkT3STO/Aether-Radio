@@ -1,0 +1,25 @@
+{
+  "name": "aether-radio",
+  "version": "1.1.0",
+  "description": "Aether Radio — World Radio Desktop Application",
+  "main": "./out/main/index.js",
+  "author": "Aether Radio",
+  "license": "MIT",
+  "scripts": {
+    "dev": "clear && npm run build && electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^3.0.0",
+    "electron": "^31.0.0",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1"
+  }
+}

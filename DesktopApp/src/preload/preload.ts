@@ -1,0 +1,75 @@
+import { contextBridge, ipcRenderer } from 'electron'
+import type { RadioStation } from '../domain/entities/RadioStation'
+import type { Favorite } from '../domain/entities/Favorite'
+import type { PlayHistory } from '../domain/entities/PlayHistory'
+import type { AppSettings } from '../domain/entities/AppSettings'
+import type { CustomStation } from '../domain/entities/CustomStation'
+import type { SearchQueryDto } from '../application/dtos/SearchQueryDto'
+import type { PaginationDto } from '../application/dtos/PaginationDto'
+import type { Result } from '../application/Result'
+import type { Country } from '../domain/value-objects/Country'
+import type { Genre } from '../domain/value-objects/Genre'
+
+export interface ElectronAPI {
+  // Radio
+  searchStations: (query: SearchQueryDto, pagination: PaginationDto) => Promise<Result<RadioStation[]>>
+  getTopStations: (count: number) => Promise<Result<RadioStation[]>>
+  getByCountry: (countryCode: string, pagination: PaginationDto) => Promise<Result<RadioStation[]>>
+  getByGenre: (tag: string, pagination: PaginationDto) => Promise<Result<RadioStation[]>>
+  getCountries: () => Promise<Result<Country[]>>
+  getGenres: () => Promise<Result<Genre[]>>
+  reportClick: (stationId: string) => Promise<void>
+
+  // Favorites
+  getFavorites: () => Promise<Result<Favorite[]>>
+  addFavorite: (station: RadioStation) => Promise<Result<Favorite>>
+  removeFavorite: (stationId: string) => Promise<Result<void>>
+
+  // History
+  getHistory: () => Promise<Result<PlayHistory[]>>
+  addHistory: (station: RadioStation) => Promise<Result<PlayHistory>>
+  clearHistory: () => Promise<Result<void>>
+
+  // Settings
+  getSettings: () => Promise<Result<AppSettings>>
+  updateSettings: (settings: Partial<AppSettings>) => Promise<Result<AppSettings>>
+
+  // Custom Stations
+  getCustomStations: () => Promise<Result<CustomStation[]>>
+  addCustomStation: (station: Omit<CustomStation, 'addedAt' | 'source'>) => Promise<Result<CustomStation>>
+  removeCustomStation: (stationId: string) => Promise<Result<void>>
+  updateCustomStation: (stationId: string, updates: Partial<CustomStation>) => Promise<Result<CustomStation>>
+}
+
+const electronAPI: ElectronAPI = {
+  // Radio
+  searchStations: (query, pagination) => ipcRenderer.invoke('radio:search', query, pagination),
+  getTopStations: (count) => ipcRenderer.invoke('radio:top', count),
+  getByCountry: (countryCode, pagination) => ipcRenderer.invoke('radio:byCountry', countryCode, pagination),
+  getByGenre: (tag, pagination) => ipcRenderer.invoke('radio:byGenre', tag, pagination),
+  getCountries: () => ipcRenderer.invoke('radio:countries'),
+  getGenres: () => ipcRenderer.invoke('radio:genres'),
+  reportClick: (stationId) => ipcRenderer.invoke('radio:reportClick', stationId),
+
+  // Favorites
+  getFavorites: () => ipcRenderer.invoke('favorites:get'),
+  addFavorite: (station) => ipcRenderer.invoke('favorites:add', station),
+  removeFavorite: (stationId) => ipcRenderer.invoke('favorites:remove', stationId),
+
+  // History
+  getHistory: () => ipcRenderer.invoke('history:get'),
+  addHistory: (station) => ipcRenderer.invoke('history:add', station),
+  clearHistory: () => ipcRenderer.invoke('history:clear'),
+
+  // Settings
+  getSettings: () => ipcRenderer.invoke('settings:get'),
+  updateSettings: (settings) => ipcRenderer.invoke('settings:update', settings),
+
+  // Custom Stations
+  getCustomStations: () => ipcRenderer.invoke('custom:get'),
+  addCustomStation: (station) => ipcRenderer.invoke('custom:add', station),
+  removeCustomStation: (stationId) => ipcRenderer.invoke('custom:remove', stationId),
+  updateCustomStation: (stationId, updates) => ipcRenderer.invoke('custom:update', stationId, updates)
+}
+
+contextBridge.exposeInMainWorld('electronAPI', electronAPI)

@@ -1,0 +1,81 @@
+/* ── Search Bar (Keyra nm-inset style) ── */
+
+.search-bar {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-bar-input {
+  width: 100%;
+  padding: 10px var(--space-md) 10px 44px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.search-bar-input:focus {
+  outline: none;
+  box-shadow: var(--nm-pressed), 0 0 0 2px var(--accent-soft);
+}
+
+.search-bar-input::placeholder {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.search-bar-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  transition: color var(--transition-fast);
+}
+
+.search-bar:focus-within .search-bar-icon {
+  color: var(--accent-primary);
+}
+
+.search-bar-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  transition: all var(--transition-fast);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.search-bar-clear.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.search-bar-clear:hover {
+  color: var(--text-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.search-bar-clear:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(-50%) scale(1);
+}

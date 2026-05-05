@@ -1,0 +1,360 @@
+import { BaseComponent } from './base/BaseComponent'
+import { EventBus } from '../store/EventBus'
+import { PlayerStore } from '../store/PlayerStore'
+import { FavoritesStore } from '../store/FavoritesStore'
+import { BridgeService } from '../services/BridgeService'
+import { VisualizerService } from '../services/VisualizerService'
+import { AudioService } from '../services/AudioService'
+import { countryFlagEmoji } from '../../domain/value-objects/Country'
+import { stationLogoHtml } from '../utils/stationLogo'
+
+export class PlayerBar extends BaseComponent {
+  private eventBus       = EventBus.getInstance()
+  private playerStore    = PlayerStore.getInstance()
+  private favoritesStore = FavoritesStore.getInstance()
+  private bridge         = BridgeService.getInstance()
+  private visualizer     = new VisualizerService()
+  private audioService   = AudioService.getInstance()
+
+  constructor(props: Record<string, never>) {
+    super(props)
+    this.eventBus.on('player:play',       () => this.updateUI())
+    this.eventBus.on('player:pause',      () => this.updateUI())
+    this.eventBus.on('player:stop',       () => this.updateUI())
+    this.eventBus.on('player:volume',     ({ volume }) => this.updateVolumeUI(volume))
+    this.eventBus.on('player:loading',    () => this.updateUI())
+    this.eventBus.on('favorites:changed', () => this.updateUI())
+  }
+
+  render(): string {
+    const station   = this.playerStore.currentStation
+    const isPlaying = this.playerStore.isPlaying
+    const isLoading = this.playerStore.isLoading
+    const volume    = this.playerStore.volume
+
+    // ── Empty state ──────────────────────────────────────────
+    if (!station) {
+      return `
+        <div class="player-bar">
+
+          <!-- Left: empty info -->
+          <div class="player-station-info">
+            <div class="player-empty-icon">
+              ${this.radioIcon()}
+            </div>
+            <div class="player-station-details">
+              <div class="player-empty-name">No station playing</div>
+              <div class="player-empty-hint">Select a station to start listening</div>
+            </div>
+          </div>
+
+          <!-- Center: disabled play -->
+          <div class="player-controls">
+            <button class="player-btn player-btn-play player-btn-disabled"
+              disabled>
+              ${this.playIcon()}
+            </button>
+          </div>
+
+          <!-- Right: idle visualizer -->
+          <div class="player-extras">
+            <div class="player-visualizer-container">${this.idleBars()}</div>
+          </div>
+
+        </div>
+      `
+    }
+
+    // ── Active state ─────────────────────────────────────────
+    const isFavorite = this.favoritesStore.isFavorite(station.id)
+    const flag       = countryFlagEmoji(station.countryCode)
+    const volPct     = Math.round(volume * 100)
+
+    return `
+      <div class="player-bar">
+
+        <!-- ── Left: Station Info ── -->
+        <div class="player-station-info">
+          ${stationLogoHtml(station.favicon, station.name, 'player')}
+          <div class="player-station-details">
+            <div class="player-station-name">${this.esc(station.name)}</div>
+            <div class="player-station-meta">
+              <span>${flag} ${this.esc(station.country)}</span>
+              ${station.tags.length > 0
+                ? `<span class="meta-sep">·</span><span>${this.esc(station.tags[0] ?? '')}</span>`
+                : ''
+              }
+              ${isLoading
+                ? `<span class="meta-sep">·</span>
+                   <span class="player-connecting">
+                     <span class="loading-spinner loading-spinner--sm"></span>
+                     Connecting…
+                   </span>`
+                : ''
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Center: Controls ── -->
+        <div class="player-controls">
+
+          <!-- Stop -->
+          <button class="player-btn player-btn-stop" data-action="stop" title="Stop">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+              viewBox="0 0 24 24" fill="currentColor">
+              <rect x="5" y="5" width="14" height="14" rx="2"/>
+            </svg>
+          </button>
+
+          <!-- Play / Pause -->
+          <button class="player-btn player-btn-play ${isPlaying ? 'playing' : ''}"
+            data-action="${isPlaying ? 'pause' : 'play'}"
+            title="${isPlaying ? 'Pause' : 'Play'}">
+            ${isLoading
+              ? `<span class="loading-spinner loading-spinner--md"></span>`
+              : (isPlaying ? this.pauseIcon() : this.playIcon())
+            }
+          </button>
+
+          <!-- Volume -->
+          <div class="player-volume">
+            <button class="player-btn" data-action="mute"
+              title="${volume === 0 ? 'Unmute' : 'Mute'}">
+              ${this.volumeIcon(volume)}
+            </button>
+            <div class="volume-slider" title="${volPct}%">
+              <div class="volume-slider-fill" style="width:${volPct}%">
+                <div class="volume-slider-thumb"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── Right: Extras ── -->
+        <div class="player-extras">
+
+          <!-- Visualizer -->
+          <div class="player-visualizer-container">
+            ${isPlaying
+              ? `<canvas id="visualizer-canvas" width="80" height="30"></canvas>`
+              : this.idleBars()
+            }
+          </div>
+
+          <!-- Bitrate -->
+          ${station.bitrate
+            ? `<div class="player-bitrate-badge">${station.bitrate} kbps</div>`
+            : ''
+          }
+
+          <!-- Favorite -->
+          <button class="player-btn player-card-favorite ${isFavorite ? 'active' : ''}"
+            data-action="favorite"
+            title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+              viewBox="0 0 24 24"
+              fill="${isFavorite ? 'currentColor' : 'none'}"
+              stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            </svg>
+          </button>
+
+        </div>
+
+      </div>
+    `
+  }
+
+  protected afterMount(): void {
+    this.attachEventListeners()
+    this.initializeVisualizer()
+  }
+
+  private attachEventListeners(): void {
+    const playBtn      = this.querySelector('[data-action="play"], [data-action="pause"]')
+    const stopBtn      = this.querySelector('[data-action="stop"]')
+    const muteBtn      = this.querySelector('[data-action="mute"]')
+    const favoriteBtn  = this.querySelector('[data-action="favorite"]')
+    const volumeSlider = this.querySelector('.volume-slider')
+
+    if (playBtn) {
+      this.on(playBtn, 'click', () => {
+        if (this.playerStore.isPlaying) {
+          this.playerStore.pause()
+        } else if (this.playerStore.currentStation) {
+          this.playerStore.play(this.playerStore.currentStation)
+        }
+      })
+    }
+
+    if (stopBtn) {
+      this.on(stopBtn, 'click', () => this.playerStore.stop())
+    }
+
+    if (muteBtn) {
+      this.on(muteBtn, 'click', () => {
+        this.playerStore.setVolume(this.playerStore.volume > 0 ? 0 : 0.8)
+      })
+    }
+
+    if (favoriteBtn) {
+      this.on(favoriteBtn, 'click', async () => {
+        const station = this.playerStore.currentStation
+        if (!station) return
+        if (this.favoritesStore.isFavorite(station.id)) {
+          await this.bridge.favorites.remove(station.id)
+        } else {
+          await this.bridge.favorites.add(station)
+        }
+        const result = await this.bridge.favorites.getAll()
+        if (result.success) this.favoritesStore.setFavorites(result.data)
+      })
+    }
+
+    if (volumeSlider) {
+      const updateVolume = (e: MouseEvent) => {
+        const rect = (volumeSlider as HTMLElement).getBoundingClientRect()
+        const vol  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+        this.playerStore.setVolume(vol)
+      }
+      let dragging = false
+      this.on(volumeSlider, 'mousedown', (e) => {
+        dragging = true
+        // Disable CSS transition while dragging for instant response
+        const fill = (volumeSlider as HTMLElement).querySelector('.volume-slider-fill') as HTMLElement | null
+        if (fill) fill.style.transition = 'none'
+        updateVolume(e as MouseEvent)
+      })
+      const onMove = (e: Event) => { if (dragging) updateVolume(e as MouseEvent) }
+      const onUp   = () => {
+        if (dragging) {
+          dragging = false
+          // Re-enable CSS transition after drag ends
+          const fill = (volumeSlider as HTMLElement).querySelector('.volume-slider-fill') as HTMLElement | null
+          if (fill) fill.style.transition = ''
+        }
+      }
+      document.addEventListener('mousemove', onMove)
+      document.addEventListener('mouseup', onUp)
+    }
+  }
+
+  private async initializeVisualizer(): Promise<void> {
+    const canvas = this.querySelector<HTMLCanvasElement>('#visualizer-canvas')
+    if (canvas && this.playerStore.isPlaying) {
+      await this.visualizer.initialize(this.audioService.getAudioElement())
+      this.visualizer.startVisualization(canvas)
+    }
+  }
+
+  private updateVolumeUI(volume: number): void {
+    // Update only the volume-related DOM nodes — no full re-render
+    const fill = this.querySelector<HTMLElement>('.volume-slider-fill')
+    const slider = this.querySelector<HTMLElement>('.volume-slider')
+    const muteBtn = this.querySelector<HTMLElement>('[data-action="mute"]')
+
+    const volPct = Math.round(volume * 100)
+
+    if (fill) {
+      fill.style.width = `${volPct}%`
+    }
+    if (slider) {
+      slider.title = `${volPct}%`
+    }
+    if (muteBtn) {
+      muteBtn.title = volume === 0 ? 'Unmute' : 'Mute'
+      muteBtn.innerHTML = this.volumeIcon(volume)
+    }
+  }
+
+  private updateUI(): void {
+    if (this.element && this.element.parentNode) {
+      this.visualizer.stopVisualization()
+      const parent = this.element.parentNode as HTMLElement
+      parent.innerHTML = this.render()
+      this.element = parent.firstElementChild as HTMLElement
+      this.setupImageErrorHandlers()
+      this.afterMount()
+    }
+  }
+
+  // ── Icon helpers ──────────────────────────────────────────
+
+  private radioIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="1.75"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="2"/>
+      <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
+      <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
+    </svg>`
+  }
+
+  private playIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+      viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="6 3 20 12 6 21 6 3"/>
+    </svg>`
+  }
+
+  private pauseIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+      viewBox="0 0 24 24" fill="currentColor">
+      <rect x="6" y="4" width="4" height="16" rx="1.5"/>
+      <rect x="14" y="4" width="4" height="16" rx="1.5"/>
+    </svg>`
+  }
+
+  private volumeIcon(volume: number): string {
+    if (volume === 0) {
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/>
+        <line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>`
+    }
+    if (volume < 0.5) {
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>`
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </svg>`
+  }
+
+  private idleBars(): string {
+    return `<div class="visualizer-idle">
+      <div class="visualizer-idle-bar"></div>
+      <div class="visualizer-idle-bar"></div>
+      <div class="visualizer-idle-bar"></div>
+      <div class="visualizer-idle-bar"></div>
+      <div class="visualizer-idle-bar"></div>
+      <div class="visualizer-idle-bar"></div>
+      <div class="visualizer-idle-bar"></div>
+      <div class="visualizer-idle-bar"></div>
+    </div>`
+  }
+
+  private esc(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+  }
+}

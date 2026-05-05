@@ -1,0 +1,316 @@
+/* ═══════════════════════════════════════════════════════════════════
+   THEME FIXES — Text contrast & visual clarity for both themes
+   Uses flat selectors (no CSS nesting) for maximum compatibility
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Shared layout helpers ── */
+.view-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.view-header-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.results-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-md);
+  letter-spacing: 0.03em;
+}
+
+.meta-dot { color: var(--text-tertiary); opacity: 0.6; }
+.meta-sep { color: var(--text-tertiary); opacity: 0.5; }
+
+.player-connecting {
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UNIVERSAL — CSS variables handle both themes automatically
+   ═══════════════════════════════════════════════════════════════════ */
+
+body                       { color: var(--text-primary); }
+h1, h2, h3, h4             { color: var(--text-primary); }
+.view-subtitle             { color: var(--text-secondary); }
+
+/* Station cards */
+.station-card-name         { color: var(--text-primary); }
+.station-card-country      { color: var(--text-secondary); }
+.station-card-meta         { color: var(--text-tertiary); }
+.station-card-tag          { color: var(--text-secondary); }
+
+/* Country / Explore */
+.country-card-name         { color: var(--text-primary); }
+.country-card-count        { color: var(--text-secondary); }
+.genre-card-name           { color: var(--text-primary); }
+.genre-card-count          { color: var(--text-tertiary); }
+
+/* Player */
+.player-station-name       { color: var(--text-primary); }
+.player-station-meta       { color: var(--text-secondary); }
+.player-empty-name         { color: var(--text-secondary); }
+.player-empty-hint         { color: var(--text-tertiary); }
+.player-bitrate-badge      { color: var(--text-tertiary); }
+
+/* Sidebar */
+.sidebar-logo-name         { color: var(--text-primary); }
+.sidebar-nav-item          { color: var(--text-secondary); }
+.sidebar-nav-item.active   { color: var(--accent-primary); }
+.sidebar-nav-item:hover    { color: var(--accent-primary); }
+.sidebar-nav-section-label { color: var(--text-tertiary); }
+.sidebar-version           { color: var(--text-tertiary); }
+
+/* Settings */
+.stg-card-title            { color: var(--text-primary); }
+.stg-card-sub              { color: var(--text-tertiary); }
+.stg-row-label             { color: var(--text-primary); }
+.stg-row-desc              { color: var(--text-secondary); }
+.stg-toggle-btn            { color: var(--text-tertiary); }
+.stg-toggle-btn:hover      { color: var(--text-primary); }
+.stg-toggle-btn.active     { color: var(--accent-primary); }
+.stg-about-name            { color: var(--text-primary); }
+.stg-about-version         { color: var(--text-tertiary); }
+
+/* Custom stations */
+.cs-card-name              { color: var(--text-primary); }
+.cs-card-meta              { color: var(--text-secondary); }
+.cs-card-desc              { color: var(--text-secondary); }
+.cs-card-url               { color: var(--text-tertiary); }
+.cs-count                  { color: var(--text-tertiary); }
+.cs-form-title             { color: var(--text-primary); }
+.cs-form-group label       { color: var(--text-secondary); }
+.cs-form-group input       { color: var(--text-primary); }
+.cs-form-group textarea    { color: var(--text-primary); }
+.cs-form-group input::placeholder   { color: var(--text-tertiary); }
+.cs-form-group textarea::placeholder { color: var(--text-tertiary); }
+
+/* Search */
+.search-bar-input          { color: var(--text-primary); }
+.search-bar-input::placeholder { color: var(--text-tertiary); }
+
+/* Empty states */
+.empty-state-title         { color: var(--text-primary); }
+.empty-state-message       { color: var(--text-secondary); }
+
+/* Loading */
+.loading-text              { color: var(--text-tertiary); }
+
+/* Section titles */
+.section-title             { color: var(--text-tertiary); }
+
+/* Toast */
+.toast-message             { color: var(--text-primary); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT THEME — flat selectors, no nesting
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Sidebar ── */
+:root:not([data-theme="dark"]) .sidebar-nav-item          { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .sidebar-nav-item:hover    { color: var(--accent-primary); background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .sidebar-nav-item.active   { color: var(--accent-primary); background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .sidebar-logo-icon         { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .sidebar-version-badge     { background: var(--bg-secondary); }
+
+/* ── Station cards ── */
+:root:not([data-theme="dark"]) .station-card              { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .station-card-tag          { background: var(--bg-secondary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .station-card-footer       { border-top-color: rgba(163, 177, 198, 0.5); }
+:root:not([data-theme="dark"]) .station-card-meta         { color: var(--text-secondary); }
+
+/* ── Player bar ── */
+:root:not([data-theme="dark"]) .player-bar                { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .player-btn                { background: var(--bg-primary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-btn:hover          { color: var(--accent-primary); }
+:root:not([data-theme="dark"]) .player-bitrate-badge      { background: var(--bg-secondary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-visualizer-container { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .player-empty-icon         { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .player-station-name       { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .player-station-meta       { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-empty-name         { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .player-empty-hint         { color: var(--text-tertiary); }
+
+/* ── Search ── */
+:root:not([data-theme="dark"]) .search-bar-input          { background: var(--bg-secondary); color: var(--text-primary); }
+:root:not([data-theme="dark"]) .search-bar-input::placeholder { color: var(--text-tertiary); }
+
+/* ── Volume ── */
+:root:not([data-theme="dark"]) .volume-slider             { background: var(--bg-secondary); }
+
+/* ── Settings ── */
+:root:not([data-theme="dark"]) .stg-card                  { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .stg-card-icon             { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .stg-toggle-group          { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .stg-toggle-btn.active     { background: var(--bg-primary); color: var(--accent-primary); }
+:root:not([data-theme="dark"]) .stg-about-logo            { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .stg-row-label             { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .stg-row-desc              { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .stg-card-title            { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .stg-card-sub              { color: var(--text-tertiary); }
+
+/* ── Custom stations ── */
+:root:not([data-theme="dark"]) .cs-card                   { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .cs-card-url               { background: var(--bg-secondary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .cs-form-card              { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .cs-form-group input       { background: var(--bg-secondary); color: var(--text-primary); }
+:root:not([data-theme="dark"]) .cs-form-group textarea    { background: var(--bg-secondary); color: var(--text-primary); }
+:root:not([data-theme="dark"]) .cs-form-group input::placeholder   { color: var(--text-tertiary); }
+:root:not([data-theme="dark"]) .cs-form-group textarea::placeholder { color: var(--text-tertiary); }
+:root:not([data-theme="dark"]) .cs-btn-submit             { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .cs-btn-cancel             { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .cs-add-btn                { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .cs-play-btn               { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .cs-delete-btn             { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .cs-card-name              { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .cs-card-meta              { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .cs-card-desc              { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .cs-count                  { color: var(--text-tertiary); }
+
+/* ── Explore ── */
+:root:not([data-theme="dark"]) .country-card              { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .country-card-name         { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .country-card-count        { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .genre-card                { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .genre-card-name           { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .genre-card-count          { background: var(--bg-secondary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .genre-show-more           { background: var(--bg-primary); color: var(--text-secondary); }
+
+/* ── Toast ── */
+:root:not([data-theme="dark"]) .toast                     { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .toast-message             { color: var(--text-primary); }
+
+/* ── Loading ── */
+:root:not([data-theme="dark"]) .loading-spinner           { border-color: var(--bg-tertiary); border-top-color: var(--accent-primary); }
+:root:not([data-theme="dark"]) .loading-text              { color: var(--text-tertiary); }
+
+/* ── Empty states ── */
+:root:not([data-theme="dark"]) .empty-state-title         { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .empty-state-message       { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .empty-state-icon          { color: var(--text-tertiary); opacity: 0.45; }
+
+/* ── Scrollbar ── */
+:root:not([data-theme="dark"]) ::-webkit-scrollbar-thumb  { background: var(--bg-tertiary); }
+:root:not([data-theme="dark"]) ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+/* ── Buttons ── */
+:root:not([data-theme="dark"]) .btn-primary               { background: var(--bg-primary); color: var(--accent-primary); }
+:root:not([data-theme="dark"]) .btn-secondary             { background: var(--bg-primary); color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .btn-icon                  { background: var(--bg-primary); color: var(--text-secondary); }
+
+/* ── Section titles ── */
+:root:not([data-theme="dark"]) .section-title             { color: var(--text-tertiary); }
+:root:not([data-theme="dark"]) .results-count             { color: var(--text-tertiary); }
+
+/* ── View headers ── */
+:root:not([data-theme="dark"]) .view-subtitle             { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .view-header-icon          { background: var(--bg-primary); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DARK THEME — explicit overrides
+   ═══════════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .station-card.playing {
+  box-shadow: var(--nm-raised), 0 0 0 2px var(--accent-primary), 0 0 20px rgba(124, 111, 255, 0.12);
+}
+
+[data-theme="dark"] .player-bar::before {
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .sidebar-nav-item          { color: var(--text-secondary); }
+[data-theme="dark"] .sidebar-nav-item:hover    { color: var(--accent-primary); }
+[data-theme="dark"] .sidebar-nav-item.active   { color: var(--accent-primary); }
+
+[data-theme="dark"] .station-card-meta         { color: var(--text-tertiary); }
+[data-theme="dark"] .player-station-meta       { color: var(--text-secondary); }
+[data-theme="dark"] .stg-card-sub              { color: var(--text-tertiary); }
+[data-theme="dark"] .cs-card-meta              { color: var(--text-secondary); }
+[data-theme="dark"] .country-card-count        { color: var(--text-secondary); }
+[data-theme="dark"] .genre-card-count          { color: var(--text-tertiary); }
+[data-theme="dark"] .empty-state-message       { color: var(--text-secondary); }
+[data-theme="dark"] .loading-text              { color: var(--text-tertiary); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SMOOTH THEME TRANSITIONS — only color/bg, not layout
+   ═══════════════════════════════════════════════════════════════════ */
+
+body,
+.sidebar,
+.sidebar-nav-item,
+.sidebar-logo-icon,
+.station-card,
+.station-card-name,
+.station-card-country,
+.station-card-meta,
+.station-card-tag,
+.player-bar,
+.player-btn,
+.player-station-name,
+.player-station-meta,
+.player-bitrate-badge,
+.player-visualizer-container,
+.search-bar-input,
+.volume-slider,
+.toast,
+.toast-message,
+.loading-spinner,
+.loading-text,
+.empty-state-title,
+.empty-state-message,
+.empty-state-icon,
+.view-header-icon,
+.station-logo-fallback,
+.country-card,
+.country-card-name,
+.country-card-count,
+.genre-card,
+.genre-card-name,
+.genre-card-count,
+.genre-show-more,
+.cs-card,
+.cs-card-name,
+.cs-card-meta,
+.cs-card-url,
+.cs-form-card,
+.stg-card,
+.stg-card-title,
+.stg-card-sub,
+.stg-row-label,
+.stg-row-desc,
+.stg-toggle-btn,
+.stg-about-name,
+.stg-about-version,
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-icon,
+.cs-btn-submit,
+.cs-btn-cancel,
+.cs-add-btn,
+.cs-play-btn,
+.cs-delete-btn,
+h1, h2, h3, h4 {
+  transition:
+    background-color 0.3s ease,
+    color            0.3s ease,
+    border-color     0.3s ease,
+    box-shadow       0.3s ease;
+}

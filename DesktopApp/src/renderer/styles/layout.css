@@ -1,0 +1,153 @@
+/* ── App Shell ── */
+
+:root {
+  --sidebar-width-collapsed: 64px;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.app-sidebar {
+  width: var(--sidebar-width);
+  background: var(--grad-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  transition: width var(--transition-medium);
+  /* No overflow clipping — tooltips use position:fixed and escape naturally */
+}
+
+/* Collapsed sidebar */
+.app-sidebar.sidebar-collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
+  transition: margin-left var(--transition-medium);
+}
+
+/* ── Drag bar — invisible strip at top of main area for window dragging ── */
+.app-drag-bar {
+  height: 28px;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+  background: transparent;
+  /* Ensure interactive elements inside are not draggable */
+  user-select: none;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+}
+
+.app-player-bar {
+  height: var(--player-bar-height);
+  flex-shrink: 0;
+}
+
+/* ── Scrollbar (Keyra-style: thin, subtle) ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+/* ── Grid ── */
+.grid { display: grid; gap: var(--space-md); }
+.grid-cols-auto { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+/* Tighter grid for country/explore cards */
+.grid-cols-country {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-sm);
+}
+
+/* ── Utilities ── */
+.flex           { display: flex; }
+.flex-col       { flex-direction: column; }
+.items-center   { align-items: center; }
+.justify-between{ justify-content: space-between; }
+.flex-1         { flex: 1; }
+.min-w-0        { min-width: 0; }
+.truncate       { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.w-full         { width: 100%; }
+
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* ── View Header ── */
+.view-header { margin-bottom: var(--space-lg); }
+.view-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+/* ── Section ── */
+.section { margin-bottom: var(--space-xl); }
+
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* ── Keyra Neumorphic Helpers ── */
+.nm-flat {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border-radius: var(--radius-md);
+}
+
+.nm-convex {
+  background: linear-gradient(145deg, var(--bg-secondary), var(--bg-primary));
+  box-shadow: var(--nm-raised);
+  border-radius: var(--radius-md);
+}
+
+.nm-inset {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  border-radius: var(--radius-md);
+}
+
+/* ── Glass ── */
+.glass {
+  background: rgba(var(--bg-primary), 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+}

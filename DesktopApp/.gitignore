@@ -1,0 +1,85 @@
+# ═══════════════════════════════════════════════
+#  Aether Radio — .gitignore
+# ═══════════════════════════════════════════════
+
+# ── Dependencies ────────────────────────────────
+node_modules/
+
+# ── Build output (electron-vite) ────────────────
+out/
+dist/
+
+# ── electron-builder distribution artifacts ─────
+dist-electron/
+release/
+*.dmg
+*.exe
+*.deb
+*.rpm
+*.AppImage
+*.snap
+*.pkg
+*.msi
+*.zip
+*.tar.gz
+
+# ── Vite / TypeScript cache ──────────────────────
+.vite/
+*.tsbuildinfo
+
+# ── Source maps (generated, not source) ─────────
+*.js.map
+*.css.map
+
+# ── electron-store user data ─────────────────────
+radiosphere-data.json
+aether-radio-data.json
+
+# ── Logs ─────────────────────────────────────────
+*.log
+*.log.*
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Environment variables ─────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── OS artifacts ─────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── IDE / Editor ─────────────────────────────────
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── VSCode (keep shared settings, ignore personal) ──
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# ── Testing ──────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Misc ─────────────────────────────────────────
+*.pem
+.cache/
+tmp/
+temp/

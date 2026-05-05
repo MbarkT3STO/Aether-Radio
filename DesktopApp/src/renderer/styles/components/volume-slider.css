@@ -1,0 +1,57 @@
+/* ── Volume Slider (Keyra nm-inset track) ── */
+
+.volume-slider {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  /* Larger hit area */
+  padding: 6px 0;
+  box-sizing: content-box;
+  margin: -6px 0;
+}
+
+.volume-slider-fill {
+  height: 8px;
+  background: var(--accent-primary);
+  border-radius: var(--radius-full);
+  position: relative;
+  pointer-events: none;
+}
+
+.volume-slider-thumb {
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+
+.volume-slider:hover .volume-slider-thumb {
+  opacity: 1;
+}
+
+.volume-slider:hover .volume-slider-thumb {
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Light theme */
+:root:not([data-theme="dark"]) .volume-slider {
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+}
+
+:root:not([data-theme="dark"]) .volume-slider-thumb {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}

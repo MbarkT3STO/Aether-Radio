@@ -1,0 +1,377 @@
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR — Keyra neumorphic, collapsible
+   ═══════════════════════════════════════════════════════════════ */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--grad-sidebar);
+  /* NO overflow:hidden — tooltips must escape */
+}
+
+/* ── Header ── */
+.sidebar-header {
+  padding: 20px 14px 14px;
+  flex-shrink: 0;
+  /* Sidebar header is also draggable */
+  -webkit-app-region: drag;
+}
+
+/* Logo icon must be no-drag so clicks work */
+.sidebar-logo-icon {
+  -webkit-app-region: no-drag;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 12px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: justify-content 0.3s ease;
+  -webkit-app-region: no-drag;
+}
+
+.sidebar-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+  /* hide by shrinking width + fading */
+  max-width: 200px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-width 0.3s ease, opacity 0.25s ease;
+}
+
+.sidebar-logo-name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.sidebar-logo-tagline {
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DIVIDER
+   ═══════════════════════════════════════════════════════════════ */
+.sidebar-divider {
+  height: 1px;
+  margin: 0 14px;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════════════════════════ */
+.sidebar-nav {
+  flex: 1;
+  padding: 8px 8px;
+  overflow-y: auto;
+  overflow-x: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  -webkit-app-region: no-drag;
+}
+
+/* Fix: when overflow-y is auto/scroll, overflow-x can't be visible.
+   Use a wrapper trick — the nav scrolls, items overflow via z-index */
+.sidebar-nav-section-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 12px 8px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  max-height: 40px;
+  opacity: 1;
+  transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  user-select: none;
+  background: transparent;
+  white-space: nowrap;
+  position: relative;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    padding 0.3s ease,
+    border-radius 0.3s ease,
+    width 0.3s ease,
+    height 0.3s ease,
+    justify-content 0.3s ease;
+}
+
+.sidebar-nav-item:hover {
+  color: var(--accent-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}
+
+.sidebar-nav-item:active {
+  box-shadow: var(--nm-pressed);
+}
+
+.sidebar-nav-item.active {
+  color: var(--accent-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}
+
+.sidebar-nav-icon {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 200px;
+  opacity: 1;
+  transition: max-width 0.3s ease, opacity 0.25s ease;
+}
+
+/* ── Tooltip ──
+   Uses position:fixed so it escapes ALL overflow constraints.
+   --tooltip-y is set via JS on mouseenter for accurate vertical alignment.
+   ─────────────────────────────────────────────────────────────── */
+.sidebar-nav-item::after {
+  content: attr(data-tooltip);
+  position: fixed;
+  left: 76px;
+  top: var(--tooltip-y, 50vh);
+  transform: translateY(-50%);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 9999;
+  transition: opacity 0.15s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COLLAPSE BUTTON
+   ═══════════════════════════════════════════════════════════════ */
+.sidebar-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  margin: 6px auto 10px auto;
+  flex-shrink: 0;
+  align-self: center;
+  -webkit-app-region: no-drag;
+  transition: color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.sidebar-collapse-btn:hover {
+  color: var(--accent-primary);
+  box-shadow: var(--nm-raised);
+  transform: scale(1.1);
+}
+
+:root:not([data-theme="dark"]) .sidebar-collapse-btn:hover {
+  box-shadow: var(--nm-raised);
+}
+
+.sidebar-collapse-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(1);
+}
+
+.sidebar-collapse-btn svg {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════ */
+.sidebar-footer {
+  padding: 0 14px 14px;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.sidebar-footer-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin-bottom: 8px;
+}
+
+.sidebar-version {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.sidebar-version-text {
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 120px;
+  opacity: 1;
+  transition: max-width 0.3s ease, opacity 0.25s ease;
+}
+
+.sidebar-version-badge {
+  padding: 2px 8px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  border-radius: var(--radius-full);
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COLLAPSED STATE
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1. Hide logo text */
+.sidebar.collapsed .sidebar-logo-text {
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 2. Center logo */
+.sidebar.collapsed .sidebar-header {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 14px;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  gap: 0;
+}
+
+/* 3. Collapse section label */
+.sidebar.collapsed .sidebar-nav-section-label {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* 4. Center nav column */
+.sidebar.collapsed .sidebar-nav {
+  align-items: center;
+  padding: 8px 0;
+}
+
+/* 5. Nav items → centered circles */
+.sidebar.collapsed .sidebar-nav-item {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+  gap: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* 6. Hide nav labels */
+.sidebar.collapsed .sidebar-nav-label {
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 7. Show tooltip on hover — only when collapsed */
+.sidebar.collapsed .sidebar-nav-item:hover::after {
+  opacity: 1;
+}
+
+/* 8. Flip arrow */
+.sidebar.collapsed .sidebar-collapse-btn svg {
+  transform: rotate(180deg);
+}
+
+/* 9. Center footer */
+.sidebar.collapsed .sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 14px;
+}
+
+.sidebar.collapsed .sidebar-version {
+  justify-content: center;
+}
+
+/* 10. Hide version text & badge */
+.sidebar.collapsed .sidebar-version-text {
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar.collapsed .sidebar-version-badge {
+  opacity: 0;
+  pointer-events: none;
+}
