@@ -341,7 +341,7 @@ export class PlayerBar extends BaseComponent {
       this._barAmbientVisualizer.stopVisualization()
       if (barCanvas) barCanvas.classList.remove('active')
     } else if (barCanvas && !barCanvas.classList.contains('active')) {
-      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true)
+      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
       requestAnimationFrame(() => barCanvas.classList.add('active'))
     }
   }
@@ -749,7 +749,7 @@ export class PlayerBar extends BaseComponent {
     }
     const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
     if (barCanvas && this.playerStore.isPlaying) {
-      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true)
+      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
       requestAnimationFrame(() => barCanvas.classList.add('active'))
     }
   }

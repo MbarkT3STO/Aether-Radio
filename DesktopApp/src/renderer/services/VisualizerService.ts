@@ -75,16 +75,17 @@ export class VisualizerService {
   startAmbientVisualization(
     canvas: HTMLCanvasElement,
     source: VisualizerService,
-    large = false
+    large = false,
+    centered = false
   ): void {
     this.analyser  = source.sharedAnalyser
     this.dataArray = source.sharedDataArray
     this.stopVisualization()
     this.activeCanvas = canvas
-    this.ambientLoop(canvas, large)
+    this.ambientLoop(canvas, large, centered)
   }
 
-  private ambientLoop(canvas: HTMLCanvasElement, large = false): void {
+  private ambientLoop(canvas: HTMLCanvasElement, large = false, centered = false): void {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -96,9 +97,9 @@ export class VisualizerService {
 
     // Three blobs with different hue offsets, positions, and phase speeds
     const blobs = [
-      { hueOff: 0,   x: 0.25, y: 0.40, phase: 0,    speed: 0.0007, freqBin: 2  },
-      { hueOff: 40,  x: 0.72, y: 0.35, phase: 2.1,  speed: 0.0011, freqBin: 8  },
-      { hueOff: -20, x: 0.50, y: 0.70, phase: 4.3,  speed: 0.0009, freqBin: 14 },
+      { hueOff: 0,   x: centered ? 0.40 : 0.25, y: 0.40, phase: 0,    speed: 0.0007, freqBin: 2  },
+      { hueOff: 40,  x: centered ? 0.60 : 0.72, y: 0.35, phase: 2.1,  speed: 0.0011, freqBin: 8  },
+      { hueOff: -20, x: 0.50,                   y: 0.70, phase: 4.3,  speed: 0.0009, freqBin: 14 },
     ]
 
     let t = 0
@@ -134,7 +135,7 @@ export class VisualizerService {
       for (const blob of blobs) {
         const energy = getEnergy(blob.freqBin)
         const phase  = blob.phase + t * blob.speed
-        const cx     = (blob.x + Math.sin(phase * 1.3) * 0.12) * w
+        const cx     = (blob.x + Math.sin(phase * 1.3) * (centered ? 0.05 : 0.12)) * w
         const cy     = (blob.y + Math.cos(phase * 0.9) * 0.10) * hh
         const baseR  = Math.min(w, hh) * (large ? 1.8 : 0.45)
         const radius = baseR * (0.7 + energy * 0.6 + Math.sin(phase * 2) * 0.08)
