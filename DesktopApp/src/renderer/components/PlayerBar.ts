@@ -24,6 +24,13 @@ export class PlayerBar extends BaseComponent {
 
   // Track which station is currently rendered so we can detect station changes
   private _renderedStationId: string | null = null
+  // Expanded player state
+  private _isExpanded = false
+  // Expanded visualizer (separate instance for the large canvas)
+  private _expandedVisualizer = new VisualizerService()
+  // Expanded volume drag listeners
+  private _pexOnMouseMove: ((e: Event) => void) | null = null
+  private _pexOnMouseUp: (() => void) | null = null
 
   constructor(props: Record<string, never>) {
     super(props)
@@ -33,6 +40,12 @@ export class PlayerBar extends BaseComponent {
     this.eventBus.on('player:volume',     ({ volume }) => this.updateVolumeUI(volume))
     this.eventBus.on('player:loading',    ({ loading }) => this.updateLoadingUI(loading))
     this.eventBus.on('favorites:changed', () => this.updateFavoriteUI())
+    this.eventBus.on('route:changed',     () => {
+      if (this._isExpanded) {
+        this._isExpanded = false
+        this.collapseExpandedOverlay()
+      }
+    })
   }
 
   render(): string {
@@ -157,6 +170,13 @@ export class PlayerBar extends BaseComponent {
 
           <div id="player-sleep-timer"></div>
 
+          <button class="player-btn player-expand-btn ${this._isExpanded ? 'expanded' : ''}"
+            id="player-expand-btn"
+            title="${this._isExpanded ? 'Collapse player' : 'Expand player'}"
+            aria-label="${this._isExpanded ? 'Collapse player' : 'Expand player'}">
+            ${this.chevronIcon()}
+          </button>
+
         </div>
 
       </div>
@@ -166,17 +186,24 @@ export class PlayerBar extends BaseComponent {
   protected afterMount(): void {
     this.attachEventListeners()
     this.initializeVisualizer()
-    // Mount sleep timer into its placeholder
     const sleepTimerContainer = this.querySelector<HTMLElement>('#player-sleep-timer')
     if (sleepTimerContainer) {
       void this.sleepTimer.mount(sleepTimerContainer)
+    }
+    this.attachExpandListener()
+    // If already expanded (e.g. after fullRender), re-open the overlay
+    if (this._isExpanded) {
+      this.mountExpandedOverlay()
     }
   }
 
   protected beforeUnmount(): void {
     this.visualizer.stopVisualization()
+    this._expandedVisualizer.stopVisualization()
     this.removeDragListeners()
+    this.removePexDragListeners()
     this.sleepTimer.unmount()
+    this.destroyExpandedOverlay()
   }
 
   // ── Surgical DOM update methods ───────────────────────────────────────────
@@ -300,16 +327,17 @@ export class PlayerBar extends BaseComponent {
   private fullRender(): void {
     if (this.element && this.element.parentNode) {
       this.visualizer.stopVisualization()
+      this._expandedVisualizer.stopVisualization()
       this.removeDragListeners()
+      this.removePexDragListeners()
       this.sleepTimer.unmount()
+      this.destroyExpandedOverlay()
       const parent = this.element.parentNode as HTMLElement
       parent.innerHTML = this.render()
       this.element = parent.firstElementChild as HTMLElement
-      // Record which station is now rendered
       this._renderedStationId = this.playerStore.currentStation?.id ?? null
       this.setupImageErrorHandlers()
       this.afterMount()
-      // Sync favorite state for the newly rendered station
       this.updateFavoriteUI()
     }
   }
@@ -413,6 +441,291 @@ export class PlayerBar extends BaseComponent {
     if (this._onMouseUp)   { document.removeEventListener('mouseup',   this._onMouseUp);   this._onMouseUp   = null }
   }
 
+  private removePexDragListeners(): void {
+    if (this._pexOnMouseMove) { document.removeEventListener('mousemove', this._pexOnMouseMove); this._pexOnMouseMove = null }
+    if (this._pexOnMouseUp)   { document.removeEventListener('mouseup',   this._pexOnMouseUp);   this._pexOnMouseUp   = null }
+  }
+
+  // ── Expanded player ───────────────────────────────────────────────────────
+
+  private attachExpandListener(): void {
+    const btn = this.querySelector<HTMLElement>('#player-expand-btn')
+    if (!btn) return
+    this.on(btn, 'click', () => {
+      this._isExpanded = !this._isExpanded
+      btn.classList.toggle('expanded', this._isExpanded)
+      btn.title = this._isExpanded ? 'Collapse player' : 'Expand player'
+      if (this._isExpanded) {
+        this.mountExpandedOverlay()
+      } else {
+        this.collapseExpandedOverlay()
+      }
+    })
+  }
+
+  private getAppMain(): HTMLElement | null {
+    return document.querySelector<HTMLElement>('.app-main')
+  }
+
+  private mountExpandedOverlay(): void {
+    const appMain = this.getAppMain()
+    if (!appMain) return
+    this.destroyExpandedOverlay()
+
+    const station    = this.playerStore.currentStation
+    const isPlaying  = this.playerStore.isPlaying
+    const volume     = this.playerStore.volume
+    const volPct     = Math.round(volume * 100)
+    const isFavorite = station ? this.favoritesStore.isFavorite(station.id) : false
+
+    const overlay = document.createElement('div')
+    overlay.className = 'player-expanded-overlay'
+    overlay.id = 'player-expanded-overlay'
+
+    overlay.innerHTML = `
+      <div class="player-expanded-body">
+
+        <div class="pex-artwork-col">
+          <div class="pex-artwork">
+            ${station ? this.logoInnerHtml(station.favicon, station.name) : FALLBACK_HTML}
+          </div>
+          ${isPlaying ? `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>` : ''}
+        </div>
+
+        <div class="pex-info-col">
+          <div>
+            <div class="pex-station-name">${this.esc(station?.name ?? 'No station')}</div>
+            <div class="pex-station-meta">
+              ${station ? `
+                <span>${countryFlag(station.countryCode)} ${this.esc(station.country)}</span>
+                ${station.codec ? `<span class="pex-meta-sep">·</span><span>${this.esc(station.codec)}</span>` : ''}
+                ${station.bitrate ? `<span class="pex-meta-sep">·</span><span class="pex-bitrate">${station.bitrate} kbps</span>` : ''}
+              ` : ''}
+            </div>
+            ${station?.tags?.length ? `
+              <div class="pex-tags" style="margin-top:10px">
+                ${station.tags.slice(0, 6).map(t => `<span class="pex-tag">${this.esc(t)}</span>`).join('')}
+              </div>` : ''}
+          </div>
+
+          <div class="pex-controls">
+            <button class="pex-btn pex-btn-stop" id="pex-stop" title="Stop">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="5" y="5" width="14" height="14" rx="2"/>
+              </svg>
+            </button>
+            <button class="pex-btn pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
+              data-action="${isPlaying ? 'pause' : 'play'}" title="${isPlaying ? 'Pause' : 'Play'}">
+              ${isPlaying ? this.pauseIconLg() : this.playIconLg()}
+            </button>
+            <button class="pex-btn pex-btn-fav ${isFavorite ? 'active' : ''}" id="pex-fav"
+              title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                fill="${isFavorite ? 'currentColor' : 'none'}"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="pex-volume">
+            <button class="pex-btn pex-btn-mute" id="pex-mute" title="${volume === 0 ? 'Unmute' : 'Mute'}">
+              ${this.volumeIcon(volume)}
+            </button>
+            <div class="pex-volume-slider" id="pex-volume-slider" title="${volPct}%">
+              <div class="pex-volume-fill" id="pex-volume-fill" style="width:${volPct}%">
+                <div class="pex-volume-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pex-viz-col">
+          <div class="pex-visualizer-wrap">
+            ${isPlaying
+              ? `<canvas id="pex-visualizer-canvas" width="140" height="80"></canvas>`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${this.idleBars()}</div>`
+            }
+          </div>
+          <div class="pex-sleep-timer-wrap">
+            <span class="pex-sleep-label">Sleep Timer</span>
+            <div id="pex-sleep-timer"></div>
+          </div>
+        </div>
+
+      </div>
+    `
+
+    appMain.style.position = 'relative'
+    appMain.appendChild(overlay)
+    requestAnimationFrame(() => overlay.classList.add('is-expanded'))
+
+    this.attachPexListeners(overlay)
+
+    if (isPlaying) {
+      const canvas = overlay.querySelector<HTMLCanvasElement>('#pex-visualizer-canvas')
+      if (canvas) {
+        // Share the analyser from the mini bar's visualizer
+        this._expandedVisualizer.startVisualizationShared(canvas, this.visualizer)
+      }
+    }
+
+    const pexSleepWrap = overlay.querySelector<HTMLElement>('#pex-sleep-timer')
+    if (pexSleepWrap) {
+      void this.sleepTimer.mount(pexSleepWrap)
+    }
+  }
+
+  private attachPexListeners(overlay: HTMLElement): void {
+    const q = <E extends Element>(sel: string) => overlay.querySelector<E>(sel)
+
+    q<HTMLElement>('#pex-play')?.addEventListener('click', () => {
+      if (this.playerStore.isPlaying) {
+        this.playerStore.pause()
+      } else if (this.playerStore.currentStation) {
+        this.playerStore.play(this.playerStore.currentStation)
+      }
+    })
+
+    q<HTMLElement>('#pex-stop')?.addEventListener('click', () => this.playerStore.stop())
+
+    q<HTMLElement>('#pex-fav')?.addEventListener('click', async () => {
+      const station = this.playerStore.currentStation
+      if (!station) return
+      if (this.favoritesStore.isFavorite(station.id)) {
+        await this.bridge.favorites.remove(station.id)
+      } else {
+        await this.bridge.favorites.add(station)
+      }
+      const result = await this.bridge.favorites.getAll()
+      if (result.success) this.favoritesStore.setFavorites(result.data)
+    })
+
+    q<HTMLElement>('#pex-mute')?.addEventListener('click', () => {
+      if (this.playerStore.volume > 0) {
+        this.playerStore.setVolume(0)
+      } else {
+        this.playerStore.setVolume(this.playerStore.volumeBeforeMute || 0.8)
+      }
+    })
+
+    const volSlider = q<HTMLElement>('#pex-volume-slider')
+    if (volSlider) {
+      const updateVol = (e: MouseEvent) => {
+        const rect = volSlider.getBoundingClientRect()
+        this.playerStore.setVolume(Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)))
+      }
+      let dragging = false
+      volSlider.addEventListener('mousedown', (e) => {
+        dragging = true
+        const fill = q<HTMLElement>('#pex-volume-fill')
+        if (fill) fill.style.transition = 'none'
+        updateVol(e)
+      })
+      this._pexOnMouseMove = (e: Event) => { if (dragging) updateVol(e as MouseEvent) }
+      this._pexOnMouseUp   = () => {
+        if (dragging) {
+          dragging = false
+          const fill = q<HTMLElement>('#pex-volume-fill')
+          if (fill) fill.style.transition = ''
+        }
+      }
+      document.addEventListener('mousemove', this._pexOnMouseMove)
+      document.addEventListener('mouseup',   this._pexOnMouseUp)
+    }
+
+    // Keep expanded UI in sync with EventBus
+    this.eventBus.on('player:play',  () => this.syncPexPlayState(overlay))
+    this.eventBus.on('player:pause', () => this.syncPexPlayState(overlay))
+    this.eventBus.on('player:stop',  () => {
+      this._isExpanded = false
+      this.destroyExpandedOverlay()
+    })
+    this.eventBus.on('player:volume',     ({ volume }) => this.syncPexVolumeUI(overlay, volume))
+    this.eventBus.on('favorites:changed', () => this.syncPexFavState(overlay))
+  }
+
+  private syncPexPlayState(overlay: HTMLElement): void {
+    const q = <E extends Element>(sel: string) => overlay.querySelector<E>(sel)
+    const isPlaying = this.playerStore.isPlaying
+
+    const playBtn = q<HTMLElement>('#pex-play')
+    if (playBtn) {
+      playBtn.classList.toggle('playing', isPlaying)
+      playBtn.setAttribute('data-action', isPlaying ? 'pause' : 'play')
+      playBtn.title = isPlaying ? 'Pause' : 'Play'
+      playBtn.innerHTML = isPlaying ? this.pauseIconLg() : this.playIconLg()
+    }
+
+    const artworkCol = overlay.querySelector<HTMLElement>('.pex-artwork-col')
+    if (artworkCol) {
+      const existing = artworkCol.querySelector('.pex-live-badge')
+      if (isPlaying && !existing) {
+        artworkCol.insertAdjacentHTML('beforeend', `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>`)
+      } else if (!isPlaying && existing) {
+        existing.remove()
+      }
+    }
+
+    const vizWrap = overlay.querySelector<HTMLElement>('.pex-visualizer-wrap')
+    if (isPlaying) {
+      if (!q('#pex-visualizer-canvas') && vizWrap) {
+        this._expandedVisualizer.stopVisualization()
+        vizWrap.innerHTML = `<canvas id="pex-visualizer-canvas" width="140" height="80"></canvas>`
+        const c = vizWrap.querySelector<HTMLCanvasElement>('#pex-visualizer-canvas')
+        if (c) this._expandedVisualizer.startVisualizationShared(c, this.visualizer)
+      }
+    } else {
+      this._expandedVisualizer.stopVisualization()
+      if (vizWrap) vizWrap.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${this.idleBars()}</div>`
+    }
+  }
+
+  private syncPexFavState(overlay: HTMLElement): void {
+    const station = this.playerStore.currentStation
+    if (!station) return
+    const isFav = this.favoritesStore.isFavorite(station.id)
+    const btn = overlay.querySelector<HTMLElement>('#pex-fav')
+    if (!btn) return
+    btn.classList.toggle('active', isFav)
+    btn.title = isFav ? 'Remove from favorites' : 'Add to favorites'
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+      fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+    </svg>`
+  }
+
+  private syncPexVolumeUI(overlay: HTMLElement, volume: number): void {
+    const fill    = overlay.querySelector<HTMLElement>('#pex-volume-fill')
+    const slider  = overlay.querySelector<HTMLElement>('#pex-volume-slider')
+    const muteBtn = overlay.querySelector<HTMLElement>('#pex-mute')
+    const volPct  = Math.round(volume * 100)
+    if (fill)    fill.style.width = `${volPct}%`
+    if (slider)  slider.title = `${volPct}%`
+    if (muteBtn) { muteBtn.title = volume === 0 ? 'Unmute' : 'Mute'; muteBtn.innerHTML = this.volumeIcon(volume) }
+  }
+
+  private collapseExpandedOverlay(): void {
+    const overlay = document.getElementById('player-expanded-overlay')
+    if (!overlay) return
+    overlay.classList.remove('is-expanded')
+    overlay.addEventListener('transitionend', () => this.destroyExpandedOverlay(), { once: true })
+  }
+
+  private destroyExpandedOverlay(): void {
+    this._expandedVisualizer.stopVisualization()
+    this.removePexDragListeners()
+    const overlay = document.getElementById('player-expanded-overlay')
+    if (overlay) overlay.remove()
+    // Reset expand button state
+    const btn = this.querySelector<HTMLElement>('#player-expand-btn')
+    if (btn) {
+      btn.classList.remove('expanded')
+      btn.title = 'Expand player'
+    }
+  }
+
   private async initializeVisualizer(): Promise<void> {
     const canvas = this.querySelector<HTMLCanvasElement>('#visualizer-canvas')
     if (canvas && this.playerStore.isPlaying) {
@@ -485,6 +798,29 @@ export class PlayerBar extends BaseComponent {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
       viewBox="0 0 24 24" fill="currentColor">
       <polygon points="6 3 20 12 6 21 6 3"/>
+    </svg>`
+  }
+
+  private playIconLg(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+      viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="6 3 20 12 6 21 6 3"/>
+    </svg>`
+  }
+
+  private pauseIconLg(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+      viewBox="0 0 24 24" fill="currentColor">
+      <rect x="6" y="4" width="4" height="16" rx="1.5"/>
+      <rect x="14" y="4" width="4" height="16" rx="1.5"/>
+    </svg>`
+  }
+
+  private chevronIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
     </svg>`
   }
 

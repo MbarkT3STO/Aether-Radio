@@ -1,0 +1,351 @@
+/* ═══════════════════════════════════════════════════════════════
+   EXPANDED PLAYER — Aether Radio
+   Slides up from the player bar to fill the full content area.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Expand toggle button (lives in player-extras) ── */
+.player-expand-btn {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+.player-expand-btn:hover  { color: var(--accent-primary); box-shadow: none; transform: translateY(-1px); }
+.player-expand-btn:active { box-shadow: none; transform: translateY(0); }
+.player-expand-btn svg    { transition: transform var(--transition-medium); }
+.player-expand-btn.expanded svg { transform: rotate(180deg); }
+
+/* ── Expanded overlay — covers app-main above the player bar ── */
+.player-expanded-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  /* starts collapsed at player bar height */
+  height: var(--player-bar-height);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
+  z-index: 90;
+  overflow: hidden;
+  transition: height 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* When expanded, fill the full app-main (minus drag bar) */
+.player-expanded-overlay.is-expanded {
+  height: calc(100% - 28px); /* 28px = drag bar */
+}
+
+/* Accent line at top — same as mini bar */
+.player-expanded-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-primary) 30%,
+    var(--accent-secondary) 70%,
+    transparent 100%
+  );
+  opacity: 0.6;
+  z-index: 1;
+}
+
+/* ── Mini bar row (always visible at bottom of overlay) ── */
+.player-expanded-mini {
+  height: var(--player-bar-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 0;
+  /* sits at the bottom of the overlay */
+  order: 2;
+}
+
+/* ── Full expanded content (above mini bar) ── */
+.player-expanded-body {
+  flex: 1;
+  min-height: 0;
+  order: 1;
+  display: flex;
+  align-items: stretch;
+  padding: 32px 40px 24px;
+  gap: 48px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.28s ease 0.08s,
+    transform 0.28s ease 0.08s;
+  overflow: hidden;
+}
+
+.player-expanded-overlay.is-expanded .player-expanded-body {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── LEFT: large artwork + live badge ── */
+.pex-artwork-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.pex-artwork {
+  width: 220px;
+  height: 220px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--nm-raised), 0 8px 40px rgba(0,0,0,0.18);
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.pex-artwork img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pex-artwork .station-logo-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  color: var(--accent-primary);
+}
+
+.pex-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #34c759;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pex-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34c759;
+  box-shadow: 0 0 6px rgba(52,199,89,0.7);
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+/* ── CENTER: info + controls ── */
+.pex-info-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.pex-station-name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pex-station-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.pex-meta-sep { color: var(--text-tertiary); opacity: 0.4; }
+
+.pex-bitrate {
+  padding: 2px 9px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+}
+
+.pex-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pex-tag {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* ── Controls row ── */
+.pex-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pex-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  box-shadow: var(--nm-raised);
+  transition: color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.pex-btn:hover  { color: var(--accent-primary); transform: translateY(-2px); }
+.pex-btn:active { box-shadow: var(--nm-pressed); transform: translateY(0); }
+
+.pex-btn-stop { width: 40px; height: 40px; color: var(--text-tertiary); }
+.pex-btn-stop:hover { color: var(--accent-red); }
+
+.pex-btn-play {
+  width: 68px;
+  height: 68px;
+  color: var(--accent-primary);
+  box-shadow: var(--nm-raised), 0 0 0 4px var(--accent-soft);
+}
+.pex-btn-play:hover {
+  color: var(--accent-hover);
+  box-shadow: var(--nm-raised), 0 0 0 4px var(--accent-soft);
+}
+.pex-btn-play.playing {
+  box-shadow: var(--nm-raised), 0 0 0 4px var(--accent-soft), 0 0 28px var(--accent-soft);
+}
+.pex-btn-play:active { box-shadow: var(--nm-pressed), 0 0 0 4px var(--accent-soft); }
+
+.pex-btn-fav { width: 40px; height: 40px; color: var(--text-tertiary); }
+.pex-btn-fav:hover { color: var(--accent-secondary); }
+.pex-btn-fav.active { color: var(--accent-secondary); box-shadow: var(--nm-pressed); }
+
+/* ── Volume row ── */
+.pex-volume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 280px;
+}
+
+.pex-btn-mute {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+.pex-btn-mute:hover  { color: var(--accent-primary); box-shadow: none; transform: none; }
+.pex-btn-mute:active { box-shadow: none; }
+
+.pex-volume-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  cursor: pointer;
+  position: relative;
+}
+
+.pex-volume-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  position: relative;
+  transition: width 0.05s linear;
+  pointer-events: none;
+}
+
+.pex-volume-thumb {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-raised);
+  pointer-events: none;
+}
+
+/* ── RIGHT: visualizer + sleep timer ── */
+.pex-viz-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-shrink: 0;
+  width: 160px;
+}
+
+.pex-visualizer-wrap {
+  width: 140px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  overflow: hidden;
+}
+
+.pex-sleep-timer-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.pex-sleep-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Dark theme ── */
+[data-theme="dark"] .player-expanded-overlay {
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .pex-artwork {
+  box-shadow: var(--nm-raised), 0 8px 40px rgba(0,0,0,0.5);
+}

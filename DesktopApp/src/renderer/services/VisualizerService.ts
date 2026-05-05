@@ -9,6 +9,10 @@ export class VisualizerService {
   private activeCanvas: HTMLCanvasElement | null = null
   private themeUnsubscribe: (() => void) | null = null
 
+  // Expose for shared-canvas use by a secondary VisualizerService instance
+  get sharedAnalyser(): AnalyserNode | null { return this.analyser }
+  get sharedDataArray(): Uint8Array | null  { return this.dataArray }
+
   async initialize(audioElement: HTMLAudioElement): Promise<void> {
     if (this.audioContext) {
       // Resume if suspended (e.g. browser blocked autoplay before user gesture)
@@ -42,12 +46,33 @@ export class VisualizerService {
 
   startVisualization(canvas: HTMLCanvasElement): void {
     if (!this.analyser || !this.dataArray) return
+    this.stopVisualization()
+    this.activeCanvas = canvas
+    this.drawLoop(canvas)
+  }
+
+  /**
+   * Start visualization on a second canvas by borrowing the analyser from
+   * another VisualizerService instance that already owns the AudioContext.
+   * This avoids the "HTMLMediaElement already connected" DOMException.
+   */
+  startVisualizationShared(
+    canvas: HTMLCanvasElement,
+    source: VisualizerService
+  ): void {
+    this.analyser  = source.sharedAnalyser
+    this.dataArray = source.sharedDataArray
+    if (!this.analyser || !this.dataArray) return
+    this.stopVisualization()
+    this.activeCanvas = canvas
+    this.drawLoop(canvas)
+  }
+
+  private drawLoop(canvas: HTMLCanvasElement): void {
+    if (!this.analyser || !this.dataArray) return
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-
-    // Store canvas reference so the theme listener can restart visualization
-    this.activeCanvas = canvas
 
     // Read accent color from CSS variables so it always matches the current theme
     const style = getComputedStyle(document.documentElement)
