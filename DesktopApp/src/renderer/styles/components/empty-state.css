@@ -1,4 +1,4 @@
-/* ── Empty State (Keyra style) ── */
+/* ── Empty State (Keyra neumorphic) ── */
 
 .empty-state {
   display: flex;
@@ -10,12 +10,25 @@
   animation: fadeIn var(--transition-medium);
 }
 
+/* Neumorphic icon container — recessed/inset look */
 .empty-state-icon {
-  width: 80px;
-  height: 80px;
-  color: var(--text-tertiary);
-  margin-bottom: var(--space-md);
-  opacity: 0.4;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-lg);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.empty-state-icon svg {
+  width: 40px;
+  height: 40px;
 }
 
 .empty-state-title {
@@ -34,10 +47,17 @@
   line-height: 1.6;
 }
 
-/* ── Light theme overrides ── */
-:root:not([data-theme="dark"]) .empty-state-title         { color: var(--text-primary); }
-:root:not([data-theme="dark"]) .empty-state-message       { color: var(--text-secondary); }
-:root:not([data-theme="dark"]) .empty-state-icon          { color: var(--text-tertiary); opacity: 0.45; }
+/* ── Light theme ── */
+:root:not([data-theme="dark"]) .empty-state-icon {
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+  color: var(--accent-primary);
+  opacity: 0.75;
+}
 
-/* ── Dark theme overrides ── */
-[data-theme="dark"] .empty-state-message       { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .empty-state-title   { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .empty-state-message { color: var(--text-secondary); }
+
+/* ── Dark theme ── */
+[data-theme="dark"] .empty-state-icon   { background: var(--bg-secondary); }
+[data-theme="dark"] .empty-state-message { color: var(--text-secondary); }

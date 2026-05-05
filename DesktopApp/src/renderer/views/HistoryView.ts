@@ -86,6 +86,7 @@ export class HistoryView extends BaseComponent {
     }
 
     content.innerHTML = `
+      <div class="results-count">${this.history.length.toLocaleString()} station${this.history.length !== 1 ? 's' : ''} played</div>
       <div class="grid grid-cols-auto">
         ${this.history.map(item => renderStationCard({
           station:     item.station,

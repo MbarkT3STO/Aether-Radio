@@ -70,6 +70,7 @@ export class FeaturedView extends BaseComponent {
     }
 
     grid.innerHTML = `
+      <div class="results-count">${this.stations.length.toLocaleString()} station${this.stations.length !== 1 ? 's' : ''}</div>
       <div class="grid grid-cols-auto">
         ${this.stations.map(s => renderStationCard({
           station:    s,

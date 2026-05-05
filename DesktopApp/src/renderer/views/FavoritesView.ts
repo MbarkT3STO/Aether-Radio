@@ -55,7 +55,7 @@ export class FavoritesView extends BaseComponent {
             </div>
             <h1>Favorites</h1>
           </div>
-          <p class="view-subtitle" id="fav-count">Loading…</p>
+          <p class="view-subtitle" id="fav-count"></p>
         </div>
         <div id="favorites-content"></div>
       </div>
