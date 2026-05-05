@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* ═══════════════════════════════════════════════════════════════════
    RADIOSPHERE — KEYRA DESIGN SYSTEM
@@ -38,8 +38,8 @@
   --nm-inner-top:  var(--nm-light-inner-top);
   --nm-inner-bottom: var(--nm-light-inner-bottom);
 
-  /* ── Keyra Fonts ── */
-  --font-display: 'Outfit', system-ui, sans-serif;
+  /* ── Fonts ── */
+  --font-display: 'Inter', system-ui, sans-serif;
   --font-body:    'Inter', system-ui, sans-serif;
 
   /* ── Keyra Spacing ── */
