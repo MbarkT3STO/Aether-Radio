@@ -30,4 +30,7 @@ export enum IpcChannel {
   // Favorites import/export
   EXPORT_FAVORITES = 'favorites:export',
   IMPORT_FAVORITES = 'favorites:import',
+
+  // Shell
+  OPEN_EXTERNAL = 'shell:openExternal',
 }

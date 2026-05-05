@@ -1,6 +1,7 @@
 import { BaseComponent } from './base/BaseComponent'
 import { Router } from '../router/Router'
 import { EventBus } from '../store/EventBus'
+import { AboutModal } from './AboutModal'
 
 interface NavItem { route: string; label: string; icon: string }
 
@@ -72,7 +73,7 @@ export class Sidebar extends BaseComponent {
         <!-- Logo -->
         <div class="sidebar-header">
           <div class="sidebar-logo">
-            <div class="sidebar-logo-icon">
+            <div class="sidebar-logo-icon sidebar-logo-icon--clickable" id="sidebar-logo-btn" title="About Aether Radio">
               <img src="./assets/logo.png" alt="Aether Radio" class="sidebar-logo-img">
             </div>
             <div class="sidebar-logo-text">
@@ -115,6 +116,10 @@ export class Sidebar extends BaseComponent {
   }
 
   protected afterMount(): void {
+    // Logo click → About modal
+    const logoBtn = this.querySelector('#sidebar-logo-btn')
+    if (logoBtn) this.on(logoBtn, 'click', () => AboutModal.show())
+
     // Nav item clicks
     this.querySelectorAll('.sidebar-nav-item').forEach(item => {
       this.on(item, 'click', () => {

@@ -52,6 +52,9 @@ export interface ElectronAPI {
 
   // Power save / playback state (Feature 4)
   playerStateChanged: (playing: boolean) => void
+
+  // Shell
+  openExternal: (url: string) => void
 }
 
 const electronAPI: ElectronAPI = {
@@ -109,6 +112,9 @@ const electronAPI: ElectronAPI = {
 
   // Power save (Feature 4)
   playerStateChanged: (playing) => ipcRenderer.send('player:state-changed', playing),
+
+  // Shell
+  openExternal: (url) => ipcRenderer.send('shell:openExternal', url),
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

@@ -36,6 +36,21 @@
   flex-shrink: 0;
 }
 
+.sidebar-logo-icon--clickable {
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.sidebar-logo-icon--clickable:hover {
+  box-shadow: var(--neu-shadow-hover);
+  transform: scale(1.08);
+}
+
+.sidebar-logo-icon--clickable:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(0.97);
+}
+
 .sidebar-logo-img {
   width: 100%;
   height: 100%;

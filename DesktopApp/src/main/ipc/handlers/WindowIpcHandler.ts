@@ -1,4 +1,4 @@
-import { ipcMain, powerSaveBlocker, BrowserWindow } from 'electron'
+import { ipcMain, powerSaveBlocker, shell, BrowserWindow } from 'electron'
 import { IpcChannel } from '../IpcChannel'
 import type { TrayManager } from '../../tray/TrayManager'
 
@@ -32,6 +32,14 @@ export class WindowIpcHandler {
       } else if (!playing && WindowIpcHandler.powerSaveId !== null) {
         powerSaveBlocker.stop(WindowIpcHandler.powerSaveId)
         WindowIpcHandler.powerSaveId = null
+      }
+    })
+
+    // ── Open external URL in default browser ──────────────────────────────
+    ipcMain.on(IpcChannel.OPEN_EXTERNAL, (_, url: string) => {
+      // Only allow https URLs to prevent abuse
+      if (typeof url === 'string' && url.startsWith('https://')) {
+        shell.openExternal(url)
       }
     })
   }
