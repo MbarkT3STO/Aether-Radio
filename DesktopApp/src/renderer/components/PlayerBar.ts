@@ -103,7 +103,7 @@ export class PlayerBar extends BaseComponent {
 
         <!-- LEFT: Station info -->
         <div class="player-station-info">
-          <div class="player-station-logo-wrap">
+          <div class="player-station-logo-wrap" id="player-logo-wrap" style="cursor:pointer" title="${this._isExpanded ? 'Collapse player' : 'Expand player'}">
             ${this.logoInnerHtml(station.favicon, station.name)}
             ${isPlaying ? `<span class="player-live-dot" id="player-live-dot"></span>` : ''}
           </div>
@@ -354,6 +354,14 @@ export class PlayerBar extends BaseComponent {
     const muteBtn      = this.querySelector('[data-action="mute"]')
     const favoriteBtn  = this.querySelector('[data-action="favorite"]')
     const volumeSlider = this.querySelector('#player-volume-slider')
+    const logoWrap     = this.querySelector<HTMLElement>('#player-logo-wrap')
+
+    if (logoWrap) {
+      this.on(logoWrap, 'click', () => {
+        const expandBtn = this.querySelector<HTMLElement>('#player-expand-btn')
+        if (expandBtn) expandBtn.click()
+      })
+    }
 
     if (playBtn) {
       this.on(playBtn, 'click', () => {
