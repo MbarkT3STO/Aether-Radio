@@ -20,6 +20,9 @@ export class PlayerBar extends BaseComponent {
   private _onMouseMove: ((e: Event) => void) | null = null
   private _onMouseUp:   (() => void) | null = null
 
+  // Track which station is currently rendered so we can detect station changes
+  private _renderedStationId: string | null = null
+
   constructor(props: Record<string, never>) {
     super(props)
     this.eventBus.on('player:play',       () => this.onPlayStateChange())
@@ -169,16 +172,20 @@ export class PlayerBar extends BaseComponent {
 
   /**
    * Called on player:play and player:pause.
-   * If the active-state bar is already rendered, updates only the play button,
-   * live dot, meta line, and visualizer — no full re-render.
-   * Falls back to a full render when switching from empty→active state.
+   * - Empty→active transition: full render (no #player-play-btn yet)
+   * - Station changed: full render to update name, logo, meta
+   * - Same station play/pause: surgical update only
    */
   private onPlayStateChange(): void {
     const station = this.playerStore.currentStation
 
-    // No station, or the active-state DOM isn't rendered yet (empty state has
-    // no #player-play-btn) → full render to switch templates.
-    if (!station || !this.element || !this.querySelector('#player-play-btn')) {
+    // No station, active DOM not rendered yet, or station changed → full render
+    if (
+      !station ||
+      !this.element ||
+      !this.querySelector('#player-play-btn') ||
+      station.id !== this._renderedStationId
+    ) {
       this.fullRender()
       return
     }
@@ -220,6 +227,7 @@ export class PlayerBar extends BaseComponent {
    * switch to the empty state template.
    */
   private onStopChange(): void {
+    this._renderedStationId = null
     this.fullRender()
   }
 
@@ -274,8 +282,9 @@ export class PlayerBar extends BaseComponent {
   }
 
   /**
-   * Full re-render — only used when the station changes (play new station,
-   * stop). After re-render, sync the favorite button to the new station.
+   * Full re-render — used when the station changes or on empty→active transition.
+   * Records the rendered station ID so subsequent play/pause events can take
+   * the fast surgical path.
    */
   private fullRender(): void {
     if (this.element && this.element.parentNode) {
@@ -284,6 +293,8 @@ export class PlayerBar extends BaseComponent {
       const parent = this.element.parentNode as HTMLElement
       parent.innerHTML = this.render()
       this.element = parent.firstElementChild as HTMLElement
+      // Record which station is now rendered
+      this._renderedStationId = this.playerStore.currentStation?.id ?? null
       this.setupImageErrorHandlers()
       this.afterMount()
       // Sync favorite state for the newly rendered station

@@ -219,3 +219,48 @@
 [data-theme="dark"] .search-chip {
   background: var(--bg-secondary);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LOAD MORE
+   ═══════════════════════════════════════════════════════════════ */
+
+.load-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-lg) 0 var(--space-md);
+}
+
+.load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 28px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--accent-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.load-more-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.load-more-btn:active,
+.load-more-btn:disabled {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+  opacity: 0.7;
+  cursor: default;
+}
+
+[data-theme="dark"] .load-more-btn {
+  background: var(--bg-secondary);
+}

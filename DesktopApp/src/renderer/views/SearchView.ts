@@ -10,6 +10,8 @@ const SUGGESTION_CHIPS = [
   'Hip Hop', 'Ambient', 'News', 'Talk', 'Lofi'
 ]
 
+const PAGE_SIZE = 100  // stations per page / load-more batch
+
 export class SearchView extends BaseComponent {
   private bridge         = BridgeService.getInstance()
   private playerStore    = PlayerStore.getInstance()
@@ -17,6 +19,12 @@ export class SearchView extends BaseComponent {
   private stations: RadioStation[] = []
   private searchTimeout: number | null = null
   private hasSearched = false
+  private isLoadingMore = false
+
+  // Pagination state
+  private currentOffset = 0
+  private hasMore = false
+  private lastQuery: { type: 'search' | 'country' | 'genre'; value: string } | null = null
 
   render(): string {
     return `
@@ -66,7 +74,6 @@ export class SearchView extends BaseComponent {
       await this.loadByGenre(genre)
       this.updateTitle(`${genre} Stations`)
     } else {
-      // Show idle state when no query
       this.showIdleState()
     }
 
@@ -84,13 +91,20 @@ export class SearchView extends BaseComponent {
           input.value = ''
           input.focus()
           clearBtn.classList.remove('visible')
-          this.stations = []
-          this.hasSearched = false
+          this.resetState()
           this.showIdleState()
           this.updateTitle('Search')
         }
       })
     }
+  }
+
+  private resetState(): void {
+    this.stations = []
+    this.hasSearched = false
+    this.currentOffset = 0
+    this.hasMore = false
+    this.lastQuery = null
   }
 
   private updateTitle(title: string): void {
@@ -123,7 +137,6 @@ export class SearchView extends BaseComponent {
         </div>
       </div>
     `
-    // Wire up suggestion chips
     this.querySelectorAll('.search-chip').forEach(chip => {
       this.on(chip, 'click', () => {
         const term = chip.getAttribute('data-chip') || ''
@@ -140,34 +153,74 @@ export class SearchView extends BaseComponent {
     })
   }
 
-  private async loadByCountry(code: string): Promise<void> {
+  // ── Loaders ───────────────────────────────────────────────
+
+  private async loadByCountry(code: string, append = false): Promise<void> {
     this.hasSearched = true
-    this.showLoading()
-    const result = await this.bridge.radio.getByCountry(code, { limit: 100, offset: 0 })
-    if (result.success) { this.stations = result.data; this.updateResults() }
+    this.lastQuery = { type: 'country', value: code }
+    if (!append) { this.showLoading(); this.stations = []; this.currentOffset = 0 }
+    const result = await this.bridge.radio.getByCountry(code, { limit: PAGE_SIZE, offset: this.currentOffset })
+    if (result.success) {
+      this.stations = append ? [...this.stations, ...result.data] : result.data
+      this.hasMore = result.data.length === PAGE_SIZE
+      this.currentOffset += result.data.length
+      this.updateResults()
+    }
   }
 
-  private async loadByGenre(genre: string): Promise<void> {
+  private async loadByGenre(genre: string, append = false): Promise<void> {
     this.hasSearched = true
-    this.showLoading()
-    const result = await this.bridge.radio.getByGenre(genre, { limit: 100, offset: 0 })
-    if (result.success) { this.stations = result.data; this.updateResults() }
+    this.lastQuery = { type: 'genre', value: genre }
+    if (!append) { this.showLoading(); this.stations = []; this.currentOffset = 0 }
+    const result = await this.bridge.radio.getByGenre(genre, { limit: PAGE_SIZE, offset: this.currentOffset })
+    if (result.success) {
+      this.stations = append ? [...this.stations, ...result.data] : result.data
+      this.hasMore = result.data.length === PAGE_SIZE
+      this.currentOffset += result.data.length
+      this.updateResults()
+    }
   }
 
-  private async performSearch(query: string): Promise<void> {
+  private async performSearch(query: string, append = false): Promise<void> {
     if (!query.trim()) {
-      this.stations = []
-      this.hasSearched = false
+      this.resetState()
       this.showIdleState()
       this.updateTitle('Search')
       return
     }
     this.hasSearched = true
-    this.showLoading()
+    this.lastQuery = { type: 'search', value: query }
+    if (!append) { this.showLoading(); this.stations = []; this.currentOffset = 0 }
     this.updateTitle(`Results for "${query}"`)
-    const result = await this.bridge.radio.search({ name: query }, { limit: 50, offset: 0 })
-    if (result.success) { this.stations = result.data; this.updateResults() }
+    const result = await this.bridge.radio.search({ name: query }, { limit: PAGE_SIZE, offset: this.currentOffset })
+    if (result.success) {
+      this.stations = append ? [...this.stations, ...result.data] : result.data
+      this.hasMore = result.data.length === PAGE_SIZE
+      this.currentOffset += result.data.length
+      this.updateResults()
+    }
   }
+
+  private async loadMore(): Promise<void> {
+    if (this.isLoadingMore || !this.lastQuery) return
+    this.isLoadingMore = true
+
+    // Show spinner in the load-more button
+    const btn = this.querySelector<HTMLButtonElement>('#load-more-btn')
+    if (btn) {
+      btn.disabled = true
+      btn.innerHTML = `<span class="loading-spinner loading-spinner--sm"></span> Loading…`
+    }
+
+    const { type, value } = this.lastQuery
+    if (type === 'country')  await this.loadByCountry(value, true)
+    if (type === 'genre')    await this.loadByGenre(value, true)
+    if (type === 'search')   await this.performSearch(value, true)
+
+    this.isLoadingMore = false
+  }
+
+  // ── Render results ────────────────────────────────────────
 
   private updateResults(): void {
     const results = this.querySelector('#search-results')
@@ -194,8 +247,6 @@ export class SearchView extends BaseComponent {
             `).join('')}
           </div>
         </div>`
-
-      // Wire up suggestion chips in no-results state
       this.querySelectorAll('.search-chip').forEach(chip => {
         this.on(chip, 'click', () => {
           const term = chip.getAttribute('data-chip') || ''
@@ -214,14 +265,24 @@ export class SearchView extends BaseComponent {
     }
 
     results.innerHTML = `
-      <div class="results-count">${this.stations.length} station${this.stations.length !== 1 ? 's' : ''} found</div>
+      <div class="results-count">${this.stations.length.toLocaleString()} station${this.stations.length !== 1 ? 's' : ''} found</div>
       <div class="grid grid-cols-auto">
         ${this.stations.map(s => renderStationCard({
-          station: s,
+          station:    s,
           isPlaying:  this.playerStore.currentStation?.id === s.id && this.playerStore.isPlaying,
           isFavorite: this.favoritesStore.isFavorite(s.id)
         })).join('')}
       </div>
+      ${this.hasMore ? `
+        <div class="load-more-wrap">
+          <button class="load-more-btn" id="load-more-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+            Load more stations
+          </button>
+        </div>
+      ` : ''}
     `
     this.attachListeners()
   }
@@ -240,6 +301,11 @@ export class SearchView extends BaseComponent {
         if (station) this.playerStore.play(station)
       })
     })
+
+    const loadMoreBtn = this.querySelector('#load-more-btn')
+    if (loadMoreBtn) {
+      this.on(loadMoreBtn, 'click', () => this.loadMore())
+    }
   }
 
   private async handleFavorite(btn: HTMLElement): Promise<void> {

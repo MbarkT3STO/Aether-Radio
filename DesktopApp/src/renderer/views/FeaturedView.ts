@@ -17,7 +17,7 @@ export class FeaturedView extends BaseComponent {
   }
 
   private async loadStations(): Promise<void> {
-    const result = await this.bridge.radio.getTop(50)
+    const result = await this.bridge.radio.getTop(100)
     if (result.success) {
       this.stations = result.data
       this.loading  = false
