@@ -115,9 +115,7 @@ export class ExploreView extends BaseComponent {
             <circle cx="18" cy="16" r="3"/>
           </svg>
           Genres
-          <span style="font-size:0.65rem;font-weight:600;color:var(--text-tertiary);margin-left:4px;text-transform:none;letter-spacing:0;">
-            ${this.genres.length} available
-          </span>
+          <span class="section-title-count">${this.genres.length} available</span>
         </div>
 
         <div class="genre-grid" id="genre-grid">

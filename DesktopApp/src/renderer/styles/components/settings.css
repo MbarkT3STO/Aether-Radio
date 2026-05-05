@@ -167,6 +167,21 @@
   margin: 0 20px;
 }
 
+/* ── Settings content wrapper ── */
+.stg-content-wrap {
+  max-width: 560px;
+  width: 100%;
+}
+
+/* ── Data source link ── */
+.stg-data-source-link {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* ── Light theme ── */
 :root:not([data-theme="dark"]) .stg-card {
   background: var(--bg-primary);

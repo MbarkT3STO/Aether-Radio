@@ -58,107 +58,92 @@ export class SettingsView extends BaseComponent {
     const s = this.settings
 
     content.innerHTML = `
-      <div style="max-width:520px;">
+      <div class="stg-content-wrap">
 
         <!-- ── Appearance ── -->
-      <div class="stg-card">
-        <div class="stg-card-header">
-          <div class="stg-card-icon">
-            ${this.iconSun()}
+        <div class="stg-card">
+          <div class="stg-card-header">
+            <div class="stg-card-icon">${this.iconSun()}</div>
+            <div>
+              <div class="stg-card-title">Appearance</div>
+              <div class="stg-card-sub">Visual preferences</div>
+            </div>
           </div>
-          <div>
-            <div class="stg-card-title">Appearance</div>
-            <div class="stg-card-sub">Visual preferences</div>
-          </div>
-        </div>
-
-        <div class="stg-row">
-          <div class="stg-row-info">
-            <div class="stg-row-label">Theme</div>
-            <div class="stg-row-desc">Choose your preferred color scheme</div>
-          </div>
-          <div class="stg-toggle-group">
-            <button class="stg-toggle-btn ${s.theme === 'dark' ? 'active' : ''}" data-theme="dark">
-              ${this.iconMoon()} Dark
-            </button>
-            <button class="stg-toggle-btn ${s.theme === 'light' ? 'active' : ''}" data-theme="light">
-              ${this.iconSunSmall()} Light
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Audio ── -->
-      <div class="stg-card">
-        <div class="stg-card-header">
-          <div class="stg-card-icon">
-            ${this.iconVolume()}
-          </div>
-          <div>
-            <div class="stg-card-title">Audio</div>
-            <div class="stg-card-sub">Playback settings</div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Theme</div>
+              <div class="stg-row-desc">Choose your preferred color scheme</div>
+            </div>
+            <div class="stg-toggle-group">
+              <button class="stg-toggle-btn ${s.theme === 'dark' ? 'active' : ''}" data-theme="dark">
+                ${this.iconMoon()} Dark
+              </button>
+              <button class="stg-toggle-btn ${s.theme === 'light' ? 'active' : ''}" data-theme="light">
+                ${this.iconSunSmall()} Light
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="stg-row">
-          <div class="stg-row-info">
-            <div class="stg-row-label">Buffer Size</div>
-            <div class="stg-row-desc">Balance between latency and stability</div>
+        <!-- ── Audio ── -->
+        <div class="stg-card">
+          <div class="stg-card-header">
+            <div class="stg-card-icon">${this.iconVolume()}</div>
+            <div>
+              <div class="stg-card-title">Audio</div>
+              <div class="stg-card-sub">Playback settings</div>
+            </div>
           </div>
-          <div class="stg-toggle-group">
-            <button class="stg-toggle-btn ${s.bufferSize === 'low' ? 'active' : ''}" data-buffer="low">Low</button>
-            <button class="stg-toggle-btn ${s.bufferSize === 'balanced' ? 'active' : ''}" data-buffer="balanced">Balanced</button>
-            <button class="stg-toggle-btn ${s.bufferSize === 'high' ? 'active' : ''}" data-buffer="high">High</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── About ── -->
-      <div class="stg-card">
-        <div class="stg-card-header">
-          <div class="stg-card-icon">
-            ${this.iconInfo()}
-          </div>
-          <div>
-            <div class="stg-card-title">About</div>
-            <div class="stg-card-sub">App information</div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Buffer Size</div>
+              <div class="stg-row-desc">Balance between latency and stability</div>
+            </div>
+            <div class="stg-toggle-group">
+              <button class="stg-toggle-btn ${s.bufferSize === 'low' ? 'active' : ''}" data-buffer="low">Low</button>
+              <button class="stg-toggle-btn ${s.bufferSize === 'balanced' ? 'active' : ''}" data-buffer="balanced">Balanced</button>
+              <button class="stg-toggle-btn ${s.bufferSize === 'high' ? 'active' : ''}" data-buffer="high">High</button>
+            </div>
           </div>
         </div>
 
-        <div class="stg-about">
-          <div class="stg-about-logo">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="1.75"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="2"/>
-              <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
-              <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-              <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
-            </svg>
+        <!-- ── About ── -->
+        <div class="stg-card">
+          <div class="stg-card-header">
+            <div class="stg-card-icon">${this.iconInfo()}</div>
+            <div>
+              <div class="stg-card-title">About</div>
+              <div class="stg-card-sub">App information</div>
+            </div>
           </div>
-          <div>
-            <div class="stg-about-name">Aether Radio</div>
-            <div class="stg-about-version">Version 1.1.0 · Radio Browser API</div>
+          <div class="stg-about">
+            <div class="stg-about-logo">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="2"/>
+                <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
+                <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
+              </svg>
+            </div>
+            <div>
+              <div class="stg-about-name">Aether Radio</div>
+              <div class="stg-about-version">Version 1.1.0 · Radio Browser API</div>
+            </div>
           </div>
-        </div>
-
-        <div class="stg-divider"></div>
-
-        <div class="stg-row">
-          <div class="stg-row-info">
-            <div class="stg-row-label">Data Source</div>
-            <div class="stg-row-desc">Community-driven radio station database</div>
-          </div>
-          <div style="font-size:0.75rem;font-weight:700;color:var(--accent-primary);">
-            radio-browser.info
+          <div class="stg-divider"></div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Data Source</div>
+              <div class="stg-row-desc">Community-driven radio station database</div>
+            </div>
+            <span class="stg-data-source-link">radio-browser.info</span>
           </div>
         </div>
 
       </div>
-
-      </div>
-
     `
 
     this.attachListeners()

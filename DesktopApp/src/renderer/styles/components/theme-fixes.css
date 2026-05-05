@@ -35,14 +35,6 @@
 .meta-dot { color: var(--text-tertiary); opacity: 0.6; }
 .meta-sep { color: var(--text-tertiary); opacity: 0.5; }
 
-.player-connecting {
-  color: var(--accent-primary);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.72rem;
-}
-
 /* ═══════════════════════════════════════════════════════════════════
    UNIVERSAL — CSS variables handle both themes automatically
    ═══════════════════════════════════════════════════════════════════ */
@@ -88,6 +80,7 @@ h1, h2, h3, h4             { color: var(--text-primary); }
 .stg-toggle-btn.active     { color: var(--accent-primary); }
 .stg-about-name            { color: var(--text-primary); }
 .stg-about-version         { color: var(--text-tertiary); }
+.stg-data-source-link      { color: var(--accent-primary); }
 
 /* Custom stations */
 .cs-card-name              { color: var(--text-primary); }
@@ -298,6 +291,7 @@ body,
 .stg-toggle-btn,
 .stg-about-name,
 .stg-about-version,
+.stg-data-source-link,
 .btn,
 .btn-primary,
 .btn-secondary,

@@ -12,7 +12,7 @@ export class HistoryView extends BaseComponent {
   render(): string {
     return `
       <div class="history-view animate-fade-in">
-        <div class="view-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="view-header view-header--split">
           <div>
             <div class="view-header-row">
               <div class="view-header-icon">
@@ -50,7 +50,7 @@ export class HistoryView extends BaseComponent {
     const clearContainer = this.querySelector('#clear-btn-container')
     if (clearContainer) {
       clearContainer.innerHTML = this.history.length > 0 ? `
-        <button id="clear-history" class="btn btn-secondary" style="margin-top:4px;">
+        <button id="clear-history" class="btn btn-secondary btn-secondary--top">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/>
             <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
