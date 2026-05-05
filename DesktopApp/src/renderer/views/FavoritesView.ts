@@ -19,12 +19,14 @@ export class FavoritesView extends BaseComponent {
   }
 
   async afterMount(): Promise<void> {
-    // Subscribe and store unsubscriber
     this.unsubscribers.push(
       this.eventBus.on('favorites:changed', ({ favorites }) => {
         this.favorites = favorites
         this.updateContent()
-      })
+      }),
+      this.eventBus.on('player:play',  () => this.syncPlayingState()),
+      this.eventBus.on('player:pause', () => this.syncPlayingState()),
+      this.eventBus.on('player:stop',  () => this.syncPlayingState())
     )
     await this.loadFavorites()
   }
@@ -112,6 +114,15 @@ export class FavoritesView extends BaseComponent {
         const fav = this.favorites.find(f => f.station.id === id)
         if (fav) this.playerStore.play(fav.station)
       })
+    })
+  }
+
+  private syncPlayingState(): void {
+    const currentId = this.playerStore.currentStation?.id ?? null
+    const isPlaying = this.playerStore.isPlaying
+    this.querySelectorAll<HTMLElement>('.station-card').forEach(card => {
+      const active = isPlaying && card.getAttribute('data-station-id') === currentId
+      card.classList.toggle('playing', active)
     })
   }
 

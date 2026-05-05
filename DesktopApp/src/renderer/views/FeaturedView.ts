@@ -2,6 +2,7 @@ import { BaseComponent } from '../components/base/BaseComponent'
 import { BridgeService } from '../services/BridgeService'
 import { PlayerStore } from '../store/PlayerStore'
 import { FavoritesStore } from '../store/FavoritesStore'
+import { EventBus } from '../store/EventBus'
 import type { RadioStation } from '../../domain/entities/RadioStation'
 import { renderStationCard } from '../utils/renderCard'
 
@@ -11,9 +12,21 @@ export class FeaturedView extends BaseComponent {
   private favoritesStore = FavoritesStore.getInstance()
   private stations: RadioStation[] = []
   private loading = true
+  private unsubscribers: Array<() => void> = []
+  private eventBus = EventBus.getInstance()
 
   async afterMount(): Promise<void> {
     await this.loadStations()
+    this.unsubscribers.push(
+      this.eventBus.on('player:play',  () => this.syncPlayingState()),
+      this.eventBus.on('player:pause', () => this.syncPlayingState()),
+      this.eventBus.on('player:stop',  () => this.syncPlayingState())
+    )
+  }
+
+  protected beforeUnmount(): void {
+    this.unsubscribers.forEach(u => u())
+    this.unsubscribers = []
   }
 
   private async loadStations(): Promise<void> {
@@ -80,6 +93,15 @@ export class FeaturedView extends BaseComponent {
       </div>
     `
     this.attachListeners()
+  }
+
+  private syncPlayingState(): void {
+    const currentId = this.playerStore.currentStation?.id ?? null
+    const isPlaying = this.playerStore.isPlaying
+    this.querySelectorAll<HTMLElement>('.station-card').forEach(card => {
+      const active = isPlaying && card.getAttribute('data-station-id') === currentId
+      card.classList.toggle('playing', active)
+    })
   }
 
   private attachListeners(): void {

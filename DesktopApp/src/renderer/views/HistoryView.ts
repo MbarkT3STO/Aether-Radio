@@ -1,13 +1,16 @@
 import { BaseComponent } from '../components/base/BaseComponent'
 import { BridgeService } from '../services/BridgeService'
 import { PlayerStore } from '../store/PlayerStore'
+import { EventBus } from '../store/EventBus'
 import type { PlayHistory } from '../../domain/entities/PlayHistory'
 import { renderStationCard } from '../utils/renderCard'
 
 export class HistoryView extends BaseComponent {
   private bridge      = BridgeService.getInstance()
   private playerStore = PlayerStore.getInstance()
+  private eventBus    = EventBus.getInstance()
   private history: PlayHistory[] = []
+  private unsubscribers: Array<() => void> = []
 
   render(): string {
     return `
@@ -36,6 +39,16 @@ export class HistoryView extends BaseComponent {
 
   protected async afterMount(): Promise<void> {
     await this.loadHistory()
+    this.unsubscribers.push(
+      this.eventBus.on('player:play',  () => this.syncPlayingState()),
+      this.eventBus.on('player:pause', () => this.syncPlayingState()),
+      this.eventBus.on('player:stop',  () => this.syncPlayingState())
+    )
+  }
+
+  protected beforeUnmount(): void {
+    this.unsubscribers.forEach(u => u())
+    this.unsubscribers = []
   }
 
   private async loadHistory(): Promise<void> {
@@ -106,6 +119,15 @@ export class HistoryView extends BaseComponent {
         const item = this.history.find(h => h.station.id === id)
         if (item) this.playerStore.play(item.station)
       })
+    })
+  }
+
+  private syncPlayingState(): void {
+    const currentId = this.playerStore.currentStation?.id ?? null
+    const isPlaying = this.playerStore.isPlaying
+    this.querySelectorAll<HTMLElement>('.station-card').forEach(card => {
+      const active = isPlaying && card.getAttribute('data-station-id') === currentId
+      card.classList.toggle('playing', active)
     })
   }
 

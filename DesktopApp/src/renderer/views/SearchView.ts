@@ -2,6 +2,7 @@ import { BaseComponent } from '../components/base/BaseComponent'
 import { BridgeService } from '../services/BridgeService'
 import { PlayerStore } from '../store/PlayerStore'
 import { FavoritesStore } from '../store/FavoritesStore'
+import { EventBus } from '../store/EventBus'
 import type { RadioStation } from '../../domain/entities/RadioStation'
 import { renderStationCard } from '../utils/renderCard'
 
@@ -16,10 +17,12 @@ export class SearchView extends BaseComponent {
   private bridge         = BridgeService.getInstance()
   private playerStore    = PlayerStore.getInstance()
   private favoritesStore = FavoritesStore.getInstance()
+  private eventBus       = EventBus.getInstance()
   private stations: RadioStation[] = []
   private searchTimeout: number | null = null
   private hasSearched = false
   private isLoadingMore = false
+  private unsubscribers: Array<() => void> = []
 
   // Pagination state
   private currentOffset = 0
@@ -50,6 +53,12 @@ export class SearchView extends BaseComponent {
   }
 
   protected async afterMount(): Promise<void> {
+    this.unsubscribers.push(
+      this.eventBus.on('player:play',  () => this.syncPlayingState()),
+      this.eventBus.on('player:pause', () => this.syncPlayingState()),
+      this.eventBus.on('player:stop',  () => this.syncPlayingState())
+    )
+
     const input    = this.querySelector<HTMLInputElement>('#search-input')
     const clearBtn = this.querySelector('#search-clear')
 
@@ -99,6 +108,11 @@ export class SearchView extends BaseComponent {
     this.currentOffset = 0
     this.hasMore = false
     this.lastQuery = null
+  }
+
+  protected beforeUnmount(): void {
+    this.unsubscribers.forEach(u => u())
+    this.unsubscribers = []
   }
 
   private updateTitle(title: string): void {
@@ -284,6 +298,15 @@ export class SearchView extends BaseComponent {
       ` : ''}
     `
     this.attachListeners()
+  }
+
+  private syncPlayingState(): void {
+    const currentId = this.playerStore.currentStation?.id ?? null
+    const isPlaying = this.playerStore.isPlaying
+    this.querySelectorAll<HTMLElement>('.station-card').forEach(card => {
+      const active = isPlaying && card.getAttribute('data-station-id') === currentId
+      card.classList.toggle('playing', active)
+    })
   }
 
   private attachListeners(): void {

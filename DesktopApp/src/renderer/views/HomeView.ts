@@ -29,9 +29,9 @@ export class HomeView extends BaseComponent {
 
     // Re-render now-playing card when station changes — store unsubscribers
     this.unsubscribers.push(
-      this.eventBus.on('player:play',  () => this.updateNowPlaying()),
-      this.eventBus.on('player:pause', () => this.updateNowPlaying()),
-      this.eventBus.on('player:stop',  () => this.updateNowPlaying())
+      this.eventBus.on('player:play',  () => { this.updateNowPlaying(); this.syncPlayingState() }),
+      this.eventBus.on('player:pause', () => { this.updateNowPlaying(); this.syncPlayingState() }),
+      this.eventBus.on('player:stop',  () => { this.updateNowPlaying(); this.syncPlayingState() })
     )
   }
 
@@ -219,6 +219,15 @@ export class HomeView extends BaseComponent {
 
     this.updateNowPlaying()
     this.attachListeners()
+  }
+
+  private syncPlayingState(): void {
+    const currentId = this.playerStore.currentStation?.id ?? null
+    const isPlaying = this.playerStore.isPlaying
+    this.querySelectorAll<HTMLElement>('.station-card').forEach(card => {
+      const active = isPlaying && card.getAttribute('data-station-id') === currentId
+      card.classList.toggle('playing', active)
+    })
   }
 
   private updateNowPlaying(): void {
