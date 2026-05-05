@@ -2,6 +2,7 @@ import { BaseComponent } from '../components/base/BaseComponent'
 import type { CustomStation } from '../../domain/entities/CustomStation'
 import { Toast } from '../components/Toast'
 import { PlayerStore } from '../store/PlayerStore'
+import { EventBus } from '../store/EventBus'
 import { stationLogoHtml } from '../utils/stationLogo'
 
 export class CustomStationsView extends BaseComponent {
@@ -9,6 +10,7 @@ export class CustomStationsView extends BaseComponent {
   private showAddForm = false
   private editingId: string | null = null
   private playerStore = PlayerStore.getInstance()
+  private eventBus = EventBus.getInstance()
 
   // ── Data ──────────────────────────────────────────────────
 
@@ -65,6 +67,50 @@ export class CustomStationsView extends BaseComponent {
   protected afterMount(): void {
     this.loadStations()
     this.bindHeaderBtn()
+
+    // Keep cards in sync with player bar state changes
+    this.eventBus.on('player:play',  () => this.syncPlayingState())
+    this.eventBus.on('player:pause', () => this.syncPlayingState())
+    this.eventBus.on('player:stop',  () => this.syncPlayingState())
+  }
+
+  // ── Sync playing state without full re-render ─────────────
+
+  private syncPlayingState(): void {
+    const isPlaying  = this.playerStore.isPlaying
+    const currentId  = this.playerStore.currentStation?.id ?? null
+
+    this.querySelectorAll<HTMLElement>('.cs-card').forEach(card => {
+      const id = card.getAttribute('data-id')
+      const isThisPlaying = isPlaying && id === currentId
+
+      // Toggle playing border class on the card
+      card.classList.toggle('cs-card--playing', isThisPlaying)
+
+      // Update the play button label + icon
+      const playBtn = card.querySelector<HTMLElement>('.cs-play-btn')
+      if (playBtn) {
+        playBtn.title = isThisPlaying ? 'Now playing' : 'Play'
+        playBtn.innerHTML = isThisPlaying
+          ? `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg> Playing`
+          : `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Play`
+      }
+
+      // Show/hide the live badge
+      const header = card.querySelector<HTMLElement>('.cs-card-header')
+      if (header) {
+        const existingBadge = header.querySelector('.cs-playing-badge')
+        if (isThisPlaying && !existingBadge) {
+          header.insertAdjacentHTML('beforeend', `
+            <div class="cs-playing-badge">
+              <span class="cs-playing-dot"></span>
+              Live
+            </div>`)
+        } else if (!isThisPlaying && existingBadge) {
+          existingBadge.remove()
+        }
+      }
+    })
   }
 
   // ── Header button ─────────────────────────────────────────
@@ -362,6 +408,12 @@ export class CustomStationsView extends BaseComponent {
   // ── Actions ───────────────────────────────────────────────
 
   private playStation(station: CustomStation): void {
+    // If this station is already playing, pause it instead of restarting
+    if (this.playerStore.currentStation?.id === station.id && this.playerStore.isPlaying) {
+      this.playerStore.pause()
+      return
+    }
+
     this.playerStore.play({
       id: station.id,
       name: station.name,
@@ -383,8 +435,6 @@ export class CustomStationsView extends BaseComponent {
       lastChangeTime: '',
       hls: false
     })
-    // Re-render list to update playing state
-    this.renderList()
   }
 
   private async handleAddStation(form: HTMLFormElement): Promise<void> {
