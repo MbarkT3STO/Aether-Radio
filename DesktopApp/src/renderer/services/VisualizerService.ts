@@ -32,18 +32,27 @@ export class VisualizerService {
     const accentColor = isDark
       ? 'hsl(258, 85%, 65%)'   // Keyra dark accent
       : 'hsl(258, 85%, 55%)'   // Keyra light accent
+    const accentColorFaded = isDark
+      ? 'hsla(258, 85%, 65%, 0.4)'
+      : 'hsla(258, 85%, 55%, 0.4)'
+
+    const width    = canvas.width
+    const height   = canvas.height
+    const barCount = 24
+    const barWidth = width / barCount
+    const gap      = 2
+
+    // Pre-compute a single full-height gradient — reused every frame
+    const gradient = ctx.createLinearGradient(0, 0, 0, height)
+    gradient.addColorStop(0, accentColor)
+    gradient.addColorStop(1, accentColorFaded)
+    ctx.fillStyle = gradient
 
     const draw = (): void => {
       this.animationId = requestAnimationFrame(draw)
       if (!this.analyser || !this.dataArray) return
 
       this.analyser.getByteFrequencyData(this.dataArray)
-
-      const width    = canvas.width
-      const height   = canvas.height
-      const barCount = 24
-      const barWidth = width / barCount
-      const gap      = 2
 
       ctx.clearRect(0, 0, width, height)
 
@@ -52,13 +61,6 @@ export class VisualizerService {
         const barHeight = (value / 255) * height * 0.85
         const x = i * barWidth
         const y = height - barHeight
-
-        // Keyra accent color with opacity fade at bottom
-        const gradient = ctx.createLinearGradient(0, y, 0, height)
-        gradient.addColorStop(0, accentColor)
-        gradient.addColorStop(1, accentColor.replace(')', ', 0.4)').replace('hsl', 'hsla'))
-
-        ctx.fillStyle = gradient
         ctx.fillRect(x, y, barWidth - gap, barHeight)
       }
     }

@@ -16,14 +16,18 @@ export class PlayerBar extends BaseComponent {
   private visualizer     = new VisualizerService()
   private audioService   = AudioService.getInstance()
 
+  // Document-level drag listeners — kept so we can remove them on unmount
+  private _onMouseMove: ((e: Event) => void) | null = null
+  private _onMouseUp:   (() => void) | null = null
+
   constructor(props: Record<string, never>) {
     super(props)
-    this.eventBus.on('player:play',       () => this.updateUI())
-    this.eventBus.on('player:pause',      () => this.updateUI())
-    this.eventBus.on('player:stop',       () => this.updateUI())
+    this.eventBus.on('player:play',       () => this.onPlayStateChange())
+    this.eventBus.on('player:pause',      () => this.onPlayStateChange())
+    this.eventBus.on('player:stop',       () => this.onStopChange())
     this.eventBus.on('player:volume',     ({ volume }) => this.updateVolumeUI(volume))
-    this.eventBus.on('player:loading',    () => this.updateUI())
-    this.eventBus.on('favorites:changed', () => this.updateUI())
+    this.eventBus.on('player:loading',    ({ loading }) => this.updateLoadingUI(loading))
+    this.eventBus.on('favorites:changed', () => this.updateFavoriteUI())
   }
 
   render(): string {
@@ -80,28 +84,12 @@ export class PlayerBar extends BaseComponent {
         <div class="player-station-info">
           <div class="player-station-logo-wrap">
             ${this.logoInnerHtml(station.favicon, station.name)}
-            ${isPlaying ? `<span class="player-live-dot"></span>` : ''}
+            ${isPlaying ? `<span class="player-live-dot" id="player-live-dot"></span>` : ''}
           </div>
           <div class="player-station-details">
             <div class="player-station-name">${this.esc(station.name)}</div>
-            <div class="player-station-meta">
-              <span>${countryFlag(station.countryCode)} ${this.esc(station.country)}</span>
-              ${station.tags.length > 0
-                ? `<span class="meta-sep">·</span><span>${this.esc(station.tags[0] ?? '')}</span>`
-                : ''
-              }
-              ${station.bitrate
-                ? `<span class="meta-sep">·</span><span class="player-bitrate-badge">${station.bitrate} kbps</span>`
-                : ''
-              }
-              ${isLoading
-                ? `<span class="meta-sep">·</span>
-                   <span class="player-connecting">
-                     <span class="loading-spinner loading-spinner--sm"></span>
-                     Connecting…
-                   </span>`
-                : ''
-              }
+            <div class="player-station-meta" id="player-station-meta">
+              ${this.buildMetaHtml(station.countryCode, station.country, station.tags, station.bitrate, isLoading)}
             </div>
           </div>
         </div>
@@ -116,6 +104,7 @@ export class PlayerBar extends BaseComponent {
           </button>
 
           <button class="player-btn player-btn-play ${isPlaying ? 'playing' : ''}"
+            id="player-play-btn"
             data-action="${isPlaying ? 'pause' : 'play'}"
             title="${isPlaying ? 'Pause' : 'Play'}">
             ${isLoading
@@ -125,6 +114,7 @@ export class PlayerBar extends BaseComponent {
           </button>
 
           <button class="player-btn player-card-favorite ${isFavorite ? 'active' : ''}"
+            id="player-favorite-btn"
             data-action="favorite"
             title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
@@ -141,18 +131,18 @@ export class PlayerBar extends BaseComponent {
         <div class="player-extras">
 
           <div class="player-volume">
-            <button class="player-btn player-btn-mute" data-action="mute"
+            <button class="player-btn player-btn-mute" id="player-mute-btn" data-action="mute"
               title="${volume === 0 ? 'Unmute' : 'Mute'}">
               ${this.volumeIcon(volume)}
             </button>
-            <div class="volume-slider" title="${volPct}%">
-              <div class="volume-slider-fill" style="width:${volPct}%">
+            <div class="volume-slider" id="player-volume-slider" title="${volPct}%">
+              <div class="volume-slider-fill" id="player-volume-fill" style="width:${volPct}%">
                 <div class="volume-slider-thumb"></div>
               </div>
             </div>
           </div>
 
-          <div class="player-visualizer-container">
+          <div class="player-visualizer-container" id="player-visualizer-container">
             ${isPlaying
               ? `<canvas id="visualizer-canvas" width="68" height="28"></canvas>`
               : this.idleBars()
@@ -170,12 +160,157 @@ export class PlayerBar extends BaseComponent {
     this.initializeVisualizer()
   }
 
+  protected beforeUnmount(): void {
+    this.visualizer.stopVisualization()
+    this.removeDragListeners()
+  }
+
+  // ── Surgical DOM update methods ───────────────────────────────────────────
+
+  /**
+   * Called on player:play and player:pause.
+   * If the active-state bar is already rendered, updates only the play button,
+   * live dot, meta line, and visualizer — no full re-render.
+   * Falls back to a full render when switching from empty→active state.
+   */
+  private onPlayStateChange(): void {
+    const station = this.playerStore.currentStation
+
+    // No station, or the active-state DOM isn't rendered yet (empty state has
+    // no #player-play-btn) → full render to switch templates.
+    if (!station || !this.element || !this.querySelector('#player-play-btn')) {
+      this.fullRender()
+      return
+    }
+
+    const isPlaying = this.playerStore.isPlaying
+    const isLoading = this.playerStore.isLoading
+
+    // Play button
+    const playBtn = this.querySelector<HTMLElement>('#player-play-btn')
+    if (playBtn) {
+      playBtn.classList.toggle('playing', isPlaying)
+      playBtn.setAttribute('data-action', isPlaying ? 'pause' : 'play')
+      playBtn.title = isPlaying ? 'Pause' : 'Play'
+      if (!isLoading) {
+        playBtn.innerHTML = isPlaying ? this.pauseIcon() : this.playIcon()
+      }
+    }
+
+    // Live dot
+    const logoWrap = this.querySelector<HTMLElement>('.player-station-logo-wrap')
+    if (logoWrap) {
+      const existingDot = logoWrap.querySelector('#player-live-dot')
+      if (isPlaying && !existingDot) {
+        logoWrap.insertAdjacentHTML('beforeend', `<span class="player-live-dot" id="player-live-dot"></span>`)
+      } else if (!isPlaying && existingDot) {
+        existingDot.remove()
+      }
+    }
+
+    // Visualizer
+    this.syncVisualizer(isPlaying)
+  }
+
+  /**
+   * Called on player:stop — station becomes null, need full re-render to
+   * switch to the empty state template.
+   */
+  private onStopChange(): void {
+    this.fullRender()
+  }
+
+  /**
+   * Updates only the loading spinner inside the play button and the
+   * "Connecting…" text in the meta line.
+   */
+  private updateLoadingUI(loading: boolean): void {
+    // If the active-state DOM isn't rendered yet, do a full render instead
+    if (!this.querySelector('#player-play-btn')) {
+      this.fullRender()
+      return
+    }
+
+    const isPlaying = this.playerStore.isPlaying
+    const station   = this.playerStore.currentStation
+
+    const playBtn = this.querySelector<HTMLElement>('#player-play-btn')
+    if (playBtn) {
+      playBtn.innerHTML = loading
+        ? `<span class="loading-spinner loading-spinner--md"></span>`
+        : (isPlaying ? this.pauseIcon() : this.playIcon())
+    }
+
+    if (station) {
+      const meta = this.querySelector<HTMLElement>('#player-station-meta')
+      if (meta) {
+        meta.innerHTML = this.buildMetaHtml(
+          station.countryCode, station.country, station.tags, station.bitrate, loading
+        )
+      }
+    }
+  }
+
+  /**
+   * Updates only the favorite button icon/state.
+   */
+  private updateFavoriteUI(): void {
+    const station = this.playerStore.currentStation
+    if (!station) return
+    const isFavorite = this.favoritesStore.isFavorite(station.id)
+    const btn = this.querySelector<HTMLElement>('#player-favorite-btn')
+    if (!btn) return
+    btn.classList.toggle('active', isFavorite)
+    btn.title = isFavorite ? 'Remove from favorites' : 'Add to favorites'
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+      fill="${isFavorite ? 'currentColor' : 'none'}"
+      stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+    </svg>`
+  }
+
+  /**
+   * Full re-render — only used when the station changes (play new station,
+   * stop). Keeps the visualizer alive if possible.
+   */
+  private fullRender(): void {
+    if (this.element && this.element.parentNode) {
+      this.visualizer.stopVisualization()
+      this.removeDragListeners()
+      const parent = this.element.parentNode as HTMLElement
+      parent.innerHTML = this.render()
+      this.element = parent.firstElementChild as HTMLElement
+      this.setupImageErrorHandlers()
+      this.afterMount()
+    }
+  }
+
+  private syncVisualizer(isPlaying: boolean): void {
+    const container = this.querySelector<HTMLElement>('#player-visualizer-container')
+    if (!container) return
+
+    if (isPlaying) {
+      const existingCanvas = container.querySelector('#visualizer-canvas')
+      if (!existingCanvas) {
+        this.visualizer.stopVisualization()
+        container.innerHTML = `<canvas id="visualizer-canvas" width="68" height="28"></canvas>`
+        this.initializeVisualizer()
+      }
+    } else {
+      this.visualizer.stopVisualization()
+      container.innerHTML = this.idleBars()
+    }
+  }
+
+  // ── Event listeners ───────────────────────────────────────────────────────
+
   private attachEventListeners(): void {
     const playBtn      = this.querySelector('[data-action="play"], [data-action="pause"]')
     const stopBtn      = this.querySelector('[data-action="stop"]')
     const muteBtn      = this.querySelector('[data-action="mute"]')
     const favoriteBtn  = this.querySelector('[data-action="favorite"]')
-    const volumeSlider = this.querySelector('.volume-slider')
+    const volumeSlider = this.querySelector('#player-volume-slider')
 
     if (playBtn) {
       this.on(playBtn, 'click', () => {
@@ -196,7 +331,6 @@ export class PlayerBar extends BaseComponent {
         if (this.playerStore.volume > 0) {
           this.playerStore.setVolume(0)
         } else {
-          // Restore to pre-mute level, fall back to 0.8 if somehow zero
           const restore = this.playerStore.volumeBeforeMute || 0.8
           this.playerStore.setVolume(restore)
         }
@@ -224,25 +358,31 @@ export class PlayerBar extends BaseComponent {
         this.playerStore.setVolume(vol)
       }
       let dragging = false
+
       this.on(volumeSlider, 'mousedown', (e) => {
         dragging = true
-        // Disable CSS transition while dragging for instant response
-        const fill = (volumeSlider as HTMLElement).querySelector('.volume-slider-fill') as HTMLElement | null
+        const fill = this.querySelector<HTMLElement>('#player-volume-fill')
         if (fill) fill.style.transition = 'none'
         updateVolume(e as MouseEvent)
       })
-      const onMove = (e: Event) => { if (dragging) updateVolume(e as MouseEvent) }
-      const onUp   = () => {
+
+      // Store document listeners so we can remove them on unmount
+      this._onMouseMove = (e: Event) => { if (dragging) updateVolume(e as MouseEvent) }
+      this._onMouseUp   = () => {
         if (dragging) {
           dragging = false
-          // Re-enable CSS transition after drag ends
-          const fill = (volumeSlider as HTMLElement).querySelector('.volume-slider-fill') as HTMLElement | null
+          const fill = this.querySelector<HTMLElement>('#player-volume-fill')
           if (fill) fill.style.transition = ''
         }
       }
-      document.addEventListener('mousemove', onMove)
-      document.addEventListener('mouseup', onUp)
+      document.addEventListener('mousemove', this._onMouseMove)
+      document.addEventListener('mouseup',   this._onMouseUp)
     }
+  }
+
+  private removeDragListeners(): void {
+    if (this._onMouseMove) { document.removeEventListener('mousemove', this._onMouseMove); this._onMouseMove = null }
+    if (this._onMouseUp)   { document.removeEventListener('mouseup',   this._onMouseUp);   this._onMouseUp   = null }
   }
 
   private async initializeVisualizer(): Promise<void> {
@@ -253,10 +393,12 @@ export class PlayerBar extends BaseComponent {
     }
   }
 
+  // ── Volume UI (called from EventBus, no re-render) ────────────────────────
+
   private updateVolumeUI(volume: number): void {
-    const fill    = this.querySelector<HTMLElement>('.volume-slider-fill')
-    const slider  = this.querySelector<HTMLElement>('.volume-slider')
-    const muteBtn = this.querySelector<HTMLElement>('[data-action="mute"]')
+    const fill    = this.querySelector<HTMLElement>('#player-volume-fill')
+    const slider  = this.querySelector<HTMLElement>('#player-volume-slider')
+    const muteBtn = this.querySelector<HTMLElement>('#player-mute-btn')
     const volPct  = Math.round(volume * 100)
 
     if (fill)    fill.style.width = `${volPct}%`
@@ -267,18 +409,37 @@ export class PlayerBar extends BaseComponent {
     }
   }
 
-  private updateUI(): void {
-    if (this.element && this.element.parentNode) {
-      this.visualizer.stopVisualization()
-      const parent = this.element.parentNode as HTMLElement
-      parent.innerHTML = this.render()
-      this.element = parent.firstElementChild as HTMLElement
-      this.setupImageErrorHandlers()
-      this.afterMount()
-    }
+  // ── HTML helpers ──────────────────────────────────────────────────────────
+
+  private buildMetaHtml(
+    countryCode: string,
+    country: string,
+    tags: string[],
+    bitrate: number,
+    isLoading: boolean
+  ): string {
+    return `
+      <span>${countryFlag(countryCode)} ${this.esc(country)}</span>
+      ${tags.length > 0
+        ? `<span class="meta-sep">·</span><span>${this.esc(tags[0] ?? '')}</span>`
+        : ''
+      }
+      ${bitrate
+        ? `<span class="meta-sep">·</span><span class="player-bitrate-badge">${bitrate} kbps</span>`
+        : ''
+      }
+      ${isLoading
+        ? `<span class="meta-sep">·</span>
+           <span class="player-connecting">
+             <span class="loading-spinner loading-spinner--sm"></span>
+             Connecting…
+           </span>`
+        : ''
+      }
+    `
   }
 
-  // ── Icon helpers ──────────────────────────────────────────
+  // ── Icon helpers ──────────────────────────────────────────────────────────
 
   private radioIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"

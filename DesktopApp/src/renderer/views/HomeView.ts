@@ -18,6 +18,7 @@ export class HomeView extends BaseComponent {
 
   private recentHistory: PlayHistory[] = []
   private favoritesCount = 0
+  private unsubscribers: Array<() => void> = []
 
   async afterMount(): Promise<void> {
     // Render the page structure immediately — don't wait for data
@@ -26,10 +27,17 @@ export class HomeView extends BaseComponent {
     // Then load data and refresh
     await this.loadData()
 
-    // Re-render now-playing card when station changes
-    this.eventBus.on('player:play',  () => this.updateNowPlaying())
-    this.eventBus.on('player:pause', () => this.updateNowPlaying())
-    this.eventBus.on('player:stop',  () => this.updateNowPlaying())
+    // Re-render now-playing card when station changes — store unsubscribers
+    this.unsubscribers.push(
+      this.eventBus.on('player:play',  () => this.updateNowPlaying()),
+      this.eventBus.on('player:pause', () => this.updateNowPlaying()),
+      this.eventBus.on('player:stop',  () => this.updateNowPlaying())
+    )
+  }
+
+  protected beforeUnmount(): void {
+    this.unsubscribers.forEach(unsub => unsub())
+    this.unsubscribers = []
   }
 
   private async loadData(): Promise<void> {

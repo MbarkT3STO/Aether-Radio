@@ -11,6 +11,7 @@ export class CustomStationsView extends BaseComponent {
   private editingId: string | null = null
   private playerStore = PlayerStore.getInstance()
   private eventBus = EventBus.getInstance()
+  private unsubscribers: Array<() => void> = []
 
   // ── Data ──────────────────────────────────────────────────
 
@@ -68,10 +69,17 @@ export class CustomStationsView extends BaseComponent {
     this.loadStations()
     this.bindHeaderBtn()
 
-    // Keep cards in sync with player bar state changes
-    this.eventBus.on('player:play',  () => this.syncPlayingState())
-    this.eventBus.on('player:pause', () => this.syncPlayingState())
-    this.eventBus.on('player:stop',  () => this.syncPlayingState())
+    // Keep cards in sync with player bar state changes — store unsubscribers
+    this.unsubscribers.push(
+      this.eventBus.on('player:play',  () => this.syncPlayingState()),
+      this.eventBus.on('player:pause', () => this.syncPlayingState()),
+      this.eventBus.on('player:stop',  () => this.syncPlayingState())
+    )
+  }
+
+  protected beforeUnmount(): void {
+    this.unsubscribers.forEach(unsub => unsub())
+    this.unsubscribers = []
   }
 
   // ── Sync playing state without full re-render ─────────────

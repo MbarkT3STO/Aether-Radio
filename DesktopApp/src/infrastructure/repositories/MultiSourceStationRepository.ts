@@ -7,6 +7,8 @@ import { RadioBrowserApiClient } from '../api/RadioBrowserApiClient'
 
 export class MultiSourceStationRepository implements IStationRepository {
   private apiClients: RadioBrowserApiClient[]
+  // Index of the currently healthy mirror — starts at 0 (highest priority)
+  private activeClientIndex = 0
 
   constructor(
     private readonly customStationsRepo: ICustomStationsRepository,
@@ -15,90 +17,94 @@ export class MultiSourceStationRepository implements IStationRepository {
     this.apiClients = apiBaseUrls.map(url => new RadioBrowserApiClient(url))
   }
 
-  async search(query: SearchQueryDto, pagination: PaginationDto): Promise<RadioStation[]> {
-    const results = await Promise.allSettled([
-      // Search custom stations
-      this.searchCustomStations(query),
-      // Search all API sources
-      ...this.apiClients.map(client => client.search(query, pagination))
-    ])
+  // ── Primary-with-failover helper ──────────────────────────────────────────
 
-    return this.mergeResults(results, pagination.limit)
+  /**
+   * Calls `fn` on the active client. If it fails, tries the next mirror in
+   * order and remembers the new active index for subsequent calls.
+   */
+  private async withFailover<T>(fn: (client: RadioBrowserApiClient) => Promise<T>): Promise<T> {
+    const total = this.apiClients.length
+    for (let attempt = 0; attempt < total; attempt++) {
+      const idx = (this.activeClientIndex + attempt) % total
+      const client = this.apiClients[idx]
+      if (!client) continue
+      try {
+        const result = await fn(client)
+        // Promote this mirror as the active one if it succeeded after a failover
+        if (attempt > 0) this.activeClientIndex = idx
+        return result
+      } catch (err) {
+        console.warn(`API mirror ${idx} failed, trying next…`, err)
+      }
+    }
+    throw new Error('All API mirrors failed')
+  }
+
+  // ── IStationRepository ────────────────────────────────────────────────────
+
+  async search(query: SearchQueryDto, pagination: PaginationDto): Promise<RadioStation[]> {
+    const [customResults, apiResults] = await Promise.all([
+      this.searchCustomStations(query),
+      this.withFailover(c => c.search(query, pagination))
+    ])
+    return this.mergeResults([customResults, apiResults], pagination.limit)
   }
 
   async getTopVoted(count: number): Promise<RadioStation[]> {
-    // Use first API client for top voted (they all have the same data)
-    const apiResults = await this.apiClients[0]?.getTopVoted(count)
-    return apiResults || []
+    return this.withFailover(c => c.getTopVoted(count))
   }
 
   async getTopClicked(count: number): Promise<RadioStation[]> {
-    const apiResults = await this.apiClients[0]?.getTopClicked(count)
-    return apiResults || []
+    return this.withFailover(c => c.getTopClicked(count))
   }
 
   async getByCountry(countryCode: string, pagination: PaginationDto): Promise<RadioStation[]> {
-    const results = await Promise.allSettled([
-      // Get custom stations for this country
+    const [customResults, apiResults] = await Promise.all([
       this.getCustomStationsByCountry(countryCode),
-      // Get from all API sources
-      ...this.apiClients.map(client => client.getByCountry(countryCode, pagination))
+      this.withFailover(c => c.getByCountry(countryCode, pagination))
     ])
-
-    return this.mergeResults(results, pagination.limit)
+    return this.mergeResults([customResults, apiResults], pagination.limit)
   }
 
   async getByGenre(tag: string, pagination: PaginationDto): Promise<RadioStation[]> {
-    const results = await Promise.allSettled([
-      // Get custom stations for this genre
+    const [customResults, apiResults] = await Promise.all([
       this.getCustomStationsByGenre(tag),
-      // Get from all API sources
-      ...this.apiClients.map(client => client.getByTag(tag, pagination))
+      this.withFailover(c => c.getByTag(tag, pagination))
     ])
-
-    return this.mergeResults(results, pagination.limit)
+    return this.mergeResults([customResults, apiResults], pagination.limit)
   }
 
   async getById(id: string): Promise<RadioStation | null> {
-    // Check custom stations first
+    // Check custom stations first (no network call)
     const customStations = await this.customStationsRepo.getAll()
     const customStation = customStations.find(s => s.id === id)
     if (customStation) {
       return this.customStationsRepo.toRadioStation(customStation)
     }
 
-    // Try API sources
-    for (const client of this.apiClients) {
-      try {
-        const results = await client.search({ name: id }, { limit: 1, offset: 0 })
-        if (results.length > 0) {
-          return results[0] ?? null
-        }
-      } catch (error) {
-        continue
-      }
+    try {
+      const results = await this.withFailover(c => c.search({ name: id }, { limit: 1, offset: 0 }))
+      return results[0] ?? null
+    } catch {
+      return null
     }
-
-    return null
   }
 
   async getCountries(): Promise<Array<{ name: string; code: string; stationCount: number }>> {
-    // Use first API client (they all have the same country data)
-    const apiCountries = await this.apiClients[0]?.getCountries() || []
-    
-    // Add custom stations count
-    const customStations = await this.customStationsRepo.getAll()
+    const [apiCountries, customStations] = await Promise.all([
+      this.withFailover(c => c.getCountries()),
+      this.customStationsRepo.getAll()
+    ])
+
     const customCountryCounts = new Map<string, number>()
-    
     customStations.forEach(station => {
-      const count = customCountryCounts.get(station.countryCode) || 0
-      customCountryCounts.set(station.countryCode, count + 1)
+      customCountryCounts.set(station.countryCode, (customCountryCounts.get(station.countryCode) ?? 0) + 1)
     })
 
-    // Merge counts
     const mergedCountries = apiCountries.map(country => ({
       ...country,
-      stationCount: country.stationCount + (customCountryCounts.get(country.code) || 0)
+      stationCount: country.stationCount + (customCountryCounts.get(country.code) ?? 0)
     }))
 
     // Add countries that only exist in custom stations
@@ -106,11 +112,7 @@ export class MultiSourceStationRepository implements IStationRepository {
       if (!mergedCountries.find(c => c.code === code)) {
         const customStation = customStations.find(s => s.countryCode === code)
         if (customStation) {
-          mergedCountries.push({
-            name: customStation.country,
-            code: code,
-            stationCount: count
-          })
+          mergedCountries.push({ name: customStation.country, code, stationCount: count })
         }
       }
     })
@@ -119,26 +121,23 @@ export class MultiSourceStationRepository implements IStationRepository {
   }
 
   async getGenres(): Promise<Array<{ name: string; stationCount: number }>> {
-    const apiGenres = await this.apiClients[0]?.getTags() || []
-    
-    // Add custom stations genres
-    const customStations = await this.customStationsRepo.getAll()
+    const [apiGenres, customStations] = await Promise.all([
+      this.withFailover(c => c.getTags()),
+      this.customStationsRepo.getAll()
+    ])
+
     const customGenreCounts = new Map<string, number>()
-    
     customStations.forEach(station => {
       if (station.genre) {
-        const count = customGenreCounts.get(station.genre) || 0
-        customGenreCounts.set(station.genre, count + 1)
+        customGenreCounts.set(station.genre, (customGenreCounts.get(station.genre) ?? 0) + 1)
       }
     })
 
-    // Merge counts
     const mergedGenres = apiGenres.map(genre => ({
       ...genre,
-      stationCount: genre.stationCount + (customGenreCounts.get(genre.name) || 0)
+      stationCount: genre.stationCount + (customGenreCounts.get(genre.name) ?? 0)
     }))
 
-    // Add genres that only exist in custom stations
     customGenreCounts.forEach((count, name) => {
       if (!mergedGenres.find(g => g.name === name)) {
         mergedGenres.push({ name, stationCount: count })
@@ -149,33 +148,27 @@ export class MultiSourceStationRepository implements IStationRepository {
   }
 
   async reportClick(stationId: string): Promise<void> {
-    // Try to report to all API clients (fire and forget)
-    await Promise.allSettled(
-      this.apiClients.map(client => client.reportClick(stationId))
-    )
+    // Report only to the active mirror — fire-and-forget
+    const client = this.apiClients[this.activeClientIndex]
+    if (client) client.reportClick(stationId)
   }
+
+  // ── Private helpers ───────────────────────────────────────────────────────
 
   private async searchCustomStations(query: SearchQueryDto): Promise<RadioStation[]> {
     const customStations = await this.customStationsRepo.getAll()
-    
     let filtered = customStations
 
     if (query.name) {
       const searchTerm = query.name.toLowerCase()
-      filtered = filtered.filter(s => 
+      filtered = filtered.filter(s =>
         s.name.toLowerCase().includes(searchTerm) ||
         s.description?.toLowerCase().includes(searchTerm)
       )
     }
-
-    if (query.countryCode) {
-      filtered = filtered.filter(s => s.countryCode === query.countryCode)
-    }
-
+    if (query.countryCode) filtered = filtered.filter(s => s.countryCode === query.countryCode)
     if (query.country) {
-      filtered = filtered.filter(s => 
-        s.country.toLowerCase().includes(query.country!.toLowerCase())
-      )
+      filtered = filtered.filter(s => s.country.toLowerCase().includes(query.country!.toLowerCase()))
     }
 
     return filtered.map(s => this.customStationsRepo.toRadioStation(s))
@@ -195,24 +188,19 @@ export class MultiSourceStationRepository implements IStationRepository {
       .map(s => this.customStationsRepo.toRadioStation(s))
   }
 
-  private mergeResults(
-    results: PromiseSettledResult<RadioStation[]>[],
-    limit: number
-  ): RadioStation[] {
-    const allStations: RadioStation[] = []
+  private mergeResults(groups: RadioStation[][], limit: number): RadioStation[] {
     const seenIds = new Set<string>()
+    const merged: RadioStation[] = []
 
-    results.forEach(result => {
-      if (result.status === 'fulfilled') {
-        result.value.forEach(station => {
-          if (!seenIds.has(station.id)) {
-            seenIds.add(station.id)
-            allStations.push(station)
-          }
-        })
+    for (const group of groups) {
+      for (const station of group) {
+        if (!seenIds.has(station.id)) {
+          seenIds.add(station.id)
+          merged.push(station)
+        }
       }
-    })
+    }
 
-    return allStations.slice(0, limit)
+    return merged.slice(0, limit)
   }
 }

@@ -12,17 +12,26 @@ export class FavoritesView extends BaseComponent {
   private favoritesStore = FavoritesStore.getInstance()
   private eventBus       = EventBus.getInstance()
   private favorites: Favorite[] = []
+  private unsubscribers: Array<() => void> = []
 
   constructor(props: Record<string, never>) {
     super(props)
-    this.eventBus.on('favorites:changed', ({ favorites }) => {
-      this.favorites = favorites
-      this.updateContent()
-    })
   }
 
   async afterMount(): Promise<void> {
+    // Subscribe and store unsubscriber
+    this.unsubscribers.push(
+      this.eventBus.on('favorites:changed', ({ favorites }) => {
+        this.favorites = favorites
+        this.updateContent()
+      })
+    )
     await this.loadFavorites()
+  }
+
+  protected beforeUnmount(): void {
+    this.unsubscribers.forEach(unsub => unsub())
+    this.unsubscribers = []
   }
 
   private async loadFavorites(): Promise<void> {
@@ -114,8 +123,10 @@ export class FavoritesView extends BaseComponent {
   }
 
   private esc = (text: string): string => {
-    const div = document.createElement('div')
-    div.textContent = text
-    return div.innerHTML
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
   }
 }
