@@ -1,0 +1,252 @@
+/* ═══════════════════════════════════════════════════════════════
+   CONFIRM MODAL — Keyra neumorphic design
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Overlay ── */
+.cm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cmOverlayIn 0.2s ease forwards;
+}
+
+.cm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ── Dialog ── */
+.cm-dialog {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-primary);
+  box-shadow:
+    var(--nm-raised),
+    0 24px 64px rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  width: 100%;
+  max-width: 400px;
+  margin: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+  animation: cmDialogIn 0.3s var(--ease-spring) forwards;
+}
+
+[data-theme="dark"] .cm-dialog {
+  background: var(--bg-secondary);
+}
+
+/* ── Icon ── */
+.cm-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .cm-icon {
+  background: var(--bg-primary);
+}
+
+.cm-icon--danger {
+  color: #ff3b30;
+  box-shadow: var(--nm-raised), 0 0 0 1px rgba(255, 59, 48, 0.15);
+}
+
+.cm-icon--danger svg {
+  filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.4));
+}
+
+/* ── Body ── */
+.cm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cm-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.cm-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Actions ── */
+.cm-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.cm-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.cm-btn:focus-visible {
+  box-shadow: var(--nm-raised), 0 0 0 3px var(--accent-soft);
+}
+
+/* Cancel */
+.cm-btn--cancel {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .cm-btn--cancel {
+  background: var(--bg-primary);
+}
+
+.cm-btn--cancel:hover {
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.cm-btn--cancel:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+/* Confirm (neutral) */
+.cm-btn--confirm {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--accent-primary);
+}
+
+[data-theme="dark"] .cm-btn--confirm {
+  background: var(--bg-primary);
+}
+
+.cm-btn--confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neu-shadow-hover);
+  color: var(--accent-hover);
+}
+
+.cm-btn--confirm:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+/* Danger confirm */
+.cm-btn--danger {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 0 0 1px rgba(255, 59, 48, 0.12);
+  color: #ff3b30;
+}
+
+[data-theme="dark"] .cm-btn--danger {
+  background: var(--bg-primary);
+}
+
+.cm-btn--danger:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neu-shadow-hover), 0 0 16px rgba(255, 59, 48, 0.25);
+  color: #ff453a;
+}
+
+.cm-btn--danger:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+/* ── Animations ── */
+@keyframes cmOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes cmOverlayOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes cmDialogIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes cmDialogOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+}
+
+/* ── Light mode: confirm modal ── */
+:root:not([data-theme="dark"]) .cm-dialog {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 24px 64px rgba(163, 177, 198, 0.6);
+}
+
+:root:not([data-theme="dark"]) .cm-backdrop {
+  background: rgba(30, 35, 40, 0.3);
+}
+
+:root:not([data-theme="dark"]) .cm-icon {
+  background: var(--bg-secondary);
+}
+
+:root:not([data-theme="dark"]) .cm-title {
+  color: var(--text-primary);
+}
+
+:root:not([data-theme="dark"]) .cm-message {
+  color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark"]) .cm-btn--cancel,
+:root:not([data-theme="dark"]) .cm-btn--confirm,
+:root:not([data-theme="dark"]) .cm-btn--danger {
+  background: var(--bg-primary);
+}

@@ -1,0 +1,50 @@
+# ═══════════════════════════════════════════════
+#  Aether Radio Android — .gitignore
+# ═══════════════════════════════════════════════
+
+# ── Dependencies ─────────────────────────────────
+node_modules/
+
+# ── Vite build output ─────────────────────────────
+dist/
+dist-ssr/
+.vite/
+*.tsbuildinfo
+
+# ── Logs ─────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── Environment variables ─────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── OS artifacts ─────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# ── IDE / Editor ─────────────────────────────────
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── Keystore files — NEVER commit these ──────────
+*.keystore
+*.jks
+release.keystore
+
+# ── Capacitor generated (rebuilt by cap sync) ────
+# android/ is committed EXCEPT generated/copied files
+# (those are handled by AndroidApp/android/.gitignore)

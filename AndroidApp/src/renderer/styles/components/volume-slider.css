@@ -1,0 +1,52 @@
+/* ── Volume Slider ── */
+
+.volume-slider {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-pressed);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  padding: 7px 0;
+  box-sizing: content-box;
+  margin: -7px 0;
+}
+
+.volume-slider-fill {
+  height: 6px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: var(--radius-full);
+  position: relative;
+  pointer-events: none;
+}
+
+.volume-slider-thumb {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+
+.volume-slider:hover .volume-slider-thumb {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* Light theme */
+:root:not([data-theme="dark"]) .volume-slider {
+  background: var(--bg-tertiary);
+}
+
+:root:not([data-theme="dark"]) .volume-slider-thumb {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+}

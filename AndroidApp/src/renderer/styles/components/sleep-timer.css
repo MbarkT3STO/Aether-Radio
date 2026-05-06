@@ -1,0 +1,244 @@
+/* ═══════════════════════════════════════════════════════════════
+   SLEEP TIMER — Aether Radio
+   ═══════════════════════════════════════════════════════════════ */
+
+.sleep-timer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Toggle button ── */
+.sleep-timer-btn {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  color: var(--text-tertiary);
+}
+
+.sleep-timer-btn:hover { color: var(--accent-primary); }
+
+.sleep-timer-btn--active {
+  color: var(--accent-primary);
+  box-shadow: var(--nm-pressed);
+}
+
+/* ── Countdown badge ── */
+.sleep-timer-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: var(--radius-full);
+  background: var(--accent-primary);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ── Popover ── */
+.sleep-timer-popover {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  z-index: 200;
+  width: 200px;
+  background: var(--bg-secondary);
+  box-shadow: var(--nm-raised);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: sleepTimerFadeIn 0.15s var(--ease-smooth) both;
+}
+
+@keyframes sleepTimerFadeIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+.sleep-timer-popover-header {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Custom input row ── */
+.sleep-timer-custom {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.sleep-timer-input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  /* hide browser spin arrows */
+  -moz-appearance: textfield;
+}
+.sleep-timer-input::-webkit-outer-spin-button,
+.sleep-timer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.sleep-timer-input::placeholder { color: var(--text-tertiary); }
+
+.sleep-timer-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: var(--nm-pressed), 0 0 0 2px var(--accent-soft);
+}
+
+/* Shake animation on invalid input */
+.sleep-timer-input--error {
+  border-color: var(--accent-red);
+  animation: sleepTimerShake 0.4s var(--ease-smooth);
+}
+
+@keyframes sleepTimerShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  40%       { transform: translateX(4px); }
+  60%       { transform: translateX(-3px); }
+  80%       { transform: translateX(3px); }
+}
+
+.sleep-timer-set-btn {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  background: var(--accent-primary);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.sleep-timer-set-btn:hover  { background: var(--accent-hover); transform: translateY(-1px); }
+.sleep-timer-set-btn:active { transform: translateY(0); }
+
+/* ── Quick presets label ── */
+.sleep-timer-presets-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: -4px;
+}
+
+/* ── Quick preset pills ── */
+.sleep-timer-presets {
+  display: flex;
+  gap: 5px;
+}
+
+.sleep-timer-preset {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  box-shadow: var(--nm-raised);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.sleep-timer-preset:hover  { background: var(--accent-primary); color: #fff; transform: translateY(-1px); }
+.sleep-timer-preset:active { box-shadow: var(--nm-pressed); transform: translateY(0); }
+
+/* ── Active timer row ── */
+.sleep-timer-active-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sleep-timer-active-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.sleep-timer-cancel {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--accent-red);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.sleep-timer-cancel:hover { background: rgba(255, 59, 48, 0.1); }
+
+/* ── Dark theme ── */
+[data-theme="dark"] .sleep-timer-popover { border-color: var(--border-medium); }
+[data-theme="dark"] .sleep-timer-input   { background: var(--bg-tertiary); }
+[data-theme="dark"] .sleep-timer-preset:hover { color: var(--bg-primary); }
+
+/* ── Light mode: sleep timer ── */
+:root:not([data-theme="dark"]) .sleep-timer-popover {
+  background: var(--bg-primary);
+  border-color: var(--border-medium);
+  box-shadow: var(--nm-raised);
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-input {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-preset {
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-preset:hover {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+:root:not([data-theme="dark"]) .sleep-timer-active-row {
+  border-top-color: var(--border-medium);
+}
