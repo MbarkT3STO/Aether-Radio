@@ -163,7 +163,7 @@
   height: 110px;
   border-radius: 50%;
   filter: blur(8px);
-  opacity: 0;
+  opacity: 0.85;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -328,8 +328,6 @@
 .rcm-particle-4 { animation: rcmFloat4 2.6s ease-in-out infinite; animation-delay: 1.2s; }
 .rcm-particle-5 { animation: rcmFloat5 3.1s ease-in-out infinite; animation-delay: 1.6s; }
 .rcm-particle-6 { animation: rcmFloat6 2.9s ease-in-out infinite; animation-delay: 2s; }
-
-/* ── Text labels ── */
 .rcm-listening-label {
   font-family: var(--font-display);
   font-size: 1.1rem;
@@ -472,35 +470,41 @@
   }
 }
 
-/* Floating particle animations */
+/* Floating particle animations — stay near center */
 @keyframes rcmFloat1 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.3; }
-  50% { transform: translate(-50%, -50%) translate(80px, -60px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);      opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(28px, -22px); opacity: 1;   }
 }
 
 @keyframes rcmFloat2 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.4; }
-  50% { transform: translate(-50%, -50%) translate(-70px, -80px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);       opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(-25px, -28px); opacity: 1;   }
 }
 
 @keyframes rcmFloat3 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.3; }
-  50% { transform: translate(-50%, -50%) translate(90px, 70px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);      opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(30px, 24px); opacity: 1;   }
 }
 
 @keyframes rcmFloat4 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.4; }
-  50% { transform: translate(-50%, -50%) translate(-85px, 65px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);       opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(-28px, 22px); opacity: 1;   }
 }
 
 @keyframes rcmFloat5 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.3; }
-  50% { transform: translate(-50%, -50%) translate(60px, -90px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);       opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(20px, -30px); opacity: 1;   }
 }
 
 @keyframes rcmFloat6 {
-  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.4; }
-  50% { transform: translate(-50%, -50%) translate(-75px, -70px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);       opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(-22px, -26px); opacity: 1;   }
+}
+
+/* Pulsing dot on result label */
+@keyframes rcmDotPulse {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%       { opacity: 0.4; transform: scale(0.75); }
 }
 /* ═══════════════════════════════════════════════════════════════
    RESULT STATE — FOUND
