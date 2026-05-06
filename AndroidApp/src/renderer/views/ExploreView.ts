@@ -22,24 +22,44 @@ export class ExploreView extends BaseComponent {
   }
 
   private async loadData(): Promise<void> {
-    const [countriesResult, genresResult] = await Promise.all([
-      this.bridge.radio.getCountries(),
-      this.bridge.radio.getGenres()
-    ])
+    try {
+      const [countriesResult, genresResult] = await Promise.all([
+        this.bridge.radio.getCountries(),
+        this.bridge.radio.getGenres()
+      ])
 
-    if (countriesResult.success) {
-      // Keep all countries sorted by station count — no artificial slice
-      this.countries = countriesResult.data.filter(c => c.code && c.name)
+      if (countriesResult.success) {
+        this.countries = countriesResult.data.filter(c => c.code && c.name)
+      }
+
+      if (genresResult.success) {
+        this.genres = genresResult.data
+          .filter(g => g.name.trim().length > 1 && g.stationCount > 5)
+          .slice(0, GENRES_MAX)
+      }
+
+      this.renderContent()
+    } catch {
+      const content = this.querySelector('#explore-content')
+      if (content) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <div class="empty-state-title">Couldn't load content</div>
+            <div class="empty-state-message">Check your connection and try again.</div>
+            <button class="btn btn-primary" id="explore-retry">Retry</button>
+          </div>`
+        const retryBtn = content.querySelector('#explore-retry')
+        if (retryBtn) retryBtn.addEventListener('click', () => {
+          content.innerHTML = `<div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">Loading…</div></div>`
+          void this.loadData()
+        })
+      }
     }
-
-    if (genresResult.success) {
-      // Filter out junk genres (too short, numbers only, etc.)
-      this.genres = genresResult.data
-        .filter(g => g.name.trim().length > 1 && g.stationCount > 5)
-        .slice(0, GENRES_MAX)
-    }
-
-    this.renderContent()
   }
 
   render(): string {

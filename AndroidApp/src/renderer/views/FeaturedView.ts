@@ -30,12 +30,39 @@ export class FeaturedView extends BaseComponent {
   }
 
   private async loadStations(): Promise<void> {
-    const result = await this.bridge.radio.getTop(100)
-    if (result.success) {
-      this.stations = result.data
-      this.loading  = false
-      this.updateContent()
+    try {
+      const result = await this.bridge.radio.getTop(100)
+      if (result.success) {
+        this.stations = result.data
+        this.loading  = false
+        this.updateContent()
+      } else {
+        this.showError()
+      }
+    } catch {
+      this.showError()
     }
+  }
+
+  private showError(): void {
+    const grid = this.querySelector('#featured-grid')
+    if (!grid) return
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="empty-state-title">Couldn't load stations</div>
+        <div class="empty-state-message">Check your connection and try again.</div>
+        <button class="btn btn-primary" id="featured-retry">Retry</button>
+      </div>`
+    const retryBtn = grid.querySelector('#featured-retry')
+    if (retryBtn) retryBtn.addEventListener('click', () => {
+      grid.innerHTML = `<div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">Loading stations…</div></div>`
+      void this.loadStations()
+    })
   }
 
   render(): string {

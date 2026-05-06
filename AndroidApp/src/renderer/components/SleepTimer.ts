@@ -164,7 +164,9 @@ export class SleepTimer extends BaseComponent {
       })
     }
 
-    // Outside click closes popover
+    // Outside click closes popover — attach synchronously, not via setTimeout,
+    // to avoid the race where unmount fires before the timeout and the handler
+    // gets added to document after cleanup and is never removed.
     this.removeOutsideClickHandler()
     if (this.isOpen) {
       this.outsideClickHandler = (e: Event): void => {
@@ -173,11 +175,13 @@ export class SleepTimer extends BaseComponent {
           this.rerender()
         }
       }
-      setTimeout(() => {
+      // Use requestAnimationFrame so the current click event that opened the
+      // popover has fully propagated before we start listening for outside clicks.
+      requestAnimationFrame(() => {
         if (this.outsideClickHandler) {
           document.addEventListener('click', this.outsideClickHandler)
         }
-      }, 0)
+      })
     }
   }
 

@@ -1,6 +1,7 @@
 import { BaseComponent } from '../components/base/BaseComponent'
 import { BridgeService } from '../services/BridgeService'
 import { EventBus } from '../store/EventBus'
+import { ConfirmModal } from '../components/ConfirmModal'
 import type { AppSettings, Theme } from '../../domain/entities/AppSettings'
 
 export class SettingsView extends BaseComponent {
@@ -190,6 +191,18 @@ export class SettingsView extends BaseComponent {
     const clearHistoryBtn = this.querySelector<HTMLElement>('#stg-clear-history')
     if (clearHistoryBtn) {
       this.on(clearHistoryBtn, 'click', async () => {
+        const confirmed = await ConfirmModal.show({
+          title: 'Clear History',
+          message: 'All recently played stations will be removed. This cannot be undone.',
+          confirmLabel: 'Clear All',
+          cancelLabel: 'Cancel',
+          danger: true,
+          icon: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+          </svg>`
+        })
+        if (!confirmed) return
         const result = await this.bridge.history.clear()
         if (result.success) {
           this.showToast('Play history cleared', 'success')
@@ -231,10 +244,6 @@ export class SettingsView extends BaseComponent {
 
   private iconInfo(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
-  }
-
-  private iconKeyboard(): string {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h.01M12 14h.01M16 14h.01M6 14h.01M18 14h.01"/></svg>`
   }
 
   private iconDatabase(): string {

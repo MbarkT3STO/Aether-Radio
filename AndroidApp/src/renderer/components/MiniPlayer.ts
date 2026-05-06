@@ -96,6 +96,9 @@ export class MiniPlayer extends BaseComponent {
   }
 
   protected afterMount(): void {
+    // Track which station is currently rendered so onPlayStateChange
+    // can do a lightweight update instead of a full re-render
+    this._renderedStationId = this.playerStore.currentStation?.id ?? null
     this.attachListeners()
     this.audioService.setOnPlayStarted(async (audioEl) => {
       await this.visualizer.initialize(audioEl)

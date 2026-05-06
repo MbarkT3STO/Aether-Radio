@@ -132,12 +132,4 @@ export class FavoritesView extends BaseComponent {
     await this.bridge.favorites.remove(id)
     await this.loadFavorites()
   }
-
-  private esc = (text: string): string => {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-  }
 }

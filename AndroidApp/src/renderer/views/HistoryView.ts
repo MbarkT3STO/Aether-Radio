@@ -2,6 +2,7 @@ import { BaseComponent } from '../components/base/BaseComponent'
 import { BridgeService } from '../services/BridgeService'
 import { PlayerStore } from '../store/PlayerStore'
 import { EventBus } from '../store/EventBus'
+import { ConfirmModal } from '../components/ConfirmModal'
 import type { PlayHistory } from '../../domain/entities/PlayHistory'
 import { renderStationCard } from '../utils/renderCard'
 
@@ -74,6 +75,18 @@ export class HistoryView extends BaseComponent {
       const clearBtn = this.querySelector('#clear-history')
       if (clearBtn) {
         this.on(clearBtn, 'click', async () => {
+          const confirmed = await ConfirmModal.show({
+            title: 'Clear History',
+            message: 'All recently played stations will be removed. This cannot be undone.',
+            confirmLabel: 'Clear All',
+            cancelLabel: 'Cancel',
+            danger: true,
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+            </svg>`
+          })
+          if (!confirmed) return
           await this.bridge.history.clear()
           await this.loadHistory()
         })
@@ -139,13 +152,5 @@ export class HistoryView extends BaseComponent {
     const hrs = Math.floor(mins / 60)
     if (hrs < 24)   return `${hrs}h ago`
     return `${Math.floor(hrs / 24)}d ago`
-  }
-
-  private esc = (text: string): string => {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
   }
 }

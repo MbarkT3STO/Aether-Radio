@@ -16,13 +16,19 @@ export class BottomNav extends BaseComponent {
   private router = Router.getInstance()
   private eventBus = EventBus.getInstance()
   private currentRoute = '/'
+  private unsubscribeRoute: (() => void) | null = null
 
   constructor(props: Record<string, never>) {
     super(props)
-    this.eventBus.on('route:changed', ({ route }) => {
+    this.unsubscribeRoute = this.eventBus.on('route:changed', ({ route }) => {
       this.currentRoute = route.split('?')[0] || '/'
       this.updateActiveState()
     })
+  }
+
+  protected beforeUnmount(): void {
+    this.unsubscribeRoute?.()
+    this.unsubscribeRoute = null
   }
 
   render(): string {

@@ -80,12 +80,16 @@ export class MediaSessionService {
     const ms = navigator.mediaSession
     ms.playbackState = playing ? 'playing' : 'paused'
 
-    // Build artwork array — use station favicon if available, else our app logo
+    // Build artwork array — use station favicon if it's a safe URL, else app logo only
     const artwork: MediaImage[] = []
 
     if (station.favicon && station.favicon.trim() !== '') {
-      artwork.push({ src: station.favicon, sizes: '512x512', type: 'image/png' })
-      artwork.push({ src: station.favicon, sizes: '256x256', type: 'image/png' })
+      const favicon = station.favicon.trim()
+      // Only allow http/https URLs — same policy as stationLogo.ts
+      if (favicon.startsWith('http://') || favicon.startsWith('https://')) {
+        artwork.push({ src: favicon, sizes: '512x512', type: 'image/png' })
+        artwork.push({ src: favicon, sizes: '256x256', type: 'image/png' })
+      }
     }
 
     // Always include our app logo as a fallback artwork

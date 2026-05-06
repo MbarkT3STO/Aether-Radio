@@ -75,7 +75,11 @@ public class RadioPlaybackService extends Service {
         }
 
         if (ACTION_STOP.equals(action)) {
-            stopForeground(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                stopForeground(STOP_FOREGROUND_REMOVE);
+            } else {
+                stopForeground(true);
+            }
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -153,7 +157,11 @@ public class RadioPlaybackService extends Service {
             @Override
             public void onStop() {
                 broadcastAction(ACTION_STOP);
-                stopForeground(true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    stopForeground(STOP_FOREGROUND_REMOVE);
+                } else {
+                    stopForeground(true);
+                }
                 stopSelf();
             }
         });

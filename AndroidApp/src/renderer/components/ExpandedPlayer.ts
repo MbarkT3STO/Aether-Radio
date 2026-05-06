@@ -3,7 +3,6 @@ import { EventBus } from '../store/EventBus'
 import { PlayerStore } from '../store/PlayerStore'
 import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
-import { AudioService } from '../services/AudioService'
 import { stationLogoHtml } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
@@ -12,17 +11,21 @@ export class ExpandedPlayer extends BaseComponent {
   private playerStore = PlayerStore.getInstance()
   private favoritesStore = FavoritesStore.getInstance()
   private bridge = BridgeService.getInstance()
-  private audioService = AudioService.getInstance()
   private onClose: () => void
+  // Store unsubscribers so EventBus handlers are cleaned up when the player closes
+  private unsubscribers: Array<() => void> = []
 
   constructor(onClose: () => void) {
     super({})
     this.onClose = onClose
-    this.eventBus.on('player:play',    () => this.updateControls())
-    this.eventBus.on('player:pause',   () => this.updateControls())
-    this.eventBus.on('player:stop',    () => this.close())
-    this.eventBus.on('player:loading', ({ loading }) => this.updateLoadingUI(loading))
-    this.eventBus.on('favorites:changed', () => this.updateFavBtn())
+    // Register handlers and store unsubscribers — prevents accumulation on reopen
+    this.unsubscribers.push(
+      this.eventBus.on('player:play',       () => this.onStationChange()),
+      this.eventBus.on('player:pause',      () => this.updateControls()),
+      this.eventBus.on('player:stop',       () => this.close()),
+      this.eventBus.on('player:loading',    ({ loading }) => this.updateLoadingUI(loading)),
+      this.eventBus.on('favorites:changed', () => this.updateFavBtn())
+    )
   }
 
   render(): string {
@@ -127,6 +130,12 @@ export class ExpandedPlayer extends BaseComponent {
     })
   }
 
+  protected beforeUnmount(): void {
+    // Clean up all EventBus subscriptions — prevents handler accumulation
+    this.unsubscribers.forEach(u => u())
+    this.unsubscribers = []
+  }
+
   private attachListeners(): void {
     const closeBtn = this.querySelector('#ep-close')
     if (closeBtn) this.on(closeBtn, 'click', () => this.close())
@@ -222,6 +231,42 @@ export class ExpandedPlayer extends BaseComponent {
     if (sheet) sheet.classList.remove('open')
     if (backdrop) backdrop.classList.remove('open')
     setTimeout(() => this.onClose(), 300)
+  }
+
+  // Called on player:play — station may have changed, so re-render artwork + info
+  private onStationChange(): void {
+    const station = this.playerStore.currentStation
+    if (!station) return
+
+    // Update artwork
+    const artwork = this.querySelector<HTMLElement>('#ep-artwork')
+    if (artwork) {
+      artwork.innerHTML = `
+        ${stationLogoHtml(station.favicon, station.name, 'player')}
+        <div class="expanded-player-artwork-glow"></div>
+      `
+    }
+
+    // Update station info
+    const nameEl = this.querySelector<HTMLElement>('.expanded-player-name')
+    if (nameEl) nameEl.textContent = station.name
+
+    const metaEl = this.querySelector<HTMLElement>('.expanded-player-meta')
+    if (metaEl) metaEl.innerHTML = `
+      ${countryFlag(station.countryCode)} ${this.esc(station.country)}
+      ${station.tags[0] ? ` · ${this.esc(station.tags[0])}` : ''}
+    `
+
+    const statsEl = this.querySelector<HTMLElement>('.expanded-player-stats')
+    const bitrate = station.bitrate ? `${station.bitrate} kbps` : ''
+    const codec = station.codec || ''
+    const votes = station.votes ? `${station.votes.toLocaleString()} votes` : ''
+    const meta = [bitrate, codec, votes].filter(Boolean).join(' · ')
+    if (statsEl) statsEl.textContent = meta
+
+    // Also update controls (play state, fav button)
+    this.updateControls()
+    this.updateFavBtn()
   }
 
   private updateControls(): void {

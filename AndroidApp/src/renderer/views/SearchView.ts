@@ -111,6 +111,11 @@ export class SearchView extends BaseComponent {
   }
 
   protected beforeUnmount(): void {
+    // Cancel any pending debounced search to avoid firing on a detached component
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout)
+      this.searchTimeout = null
+    }
     this.unsubscribers.forEach(u => u())
     this.unsubscribers = []
   }

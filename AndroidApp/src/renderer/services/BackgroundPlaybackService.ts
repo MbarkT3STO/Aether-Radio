@@ -27,7 +27,10 @@ export class BackgroundPlaybackService {
   private listenerHandle: { remove: () => void } | null = null
 
   private constructor() {
-    this.init()
+    // Subscribe to player events immediately — before the async plugin load —
+    // so we never miss a play event that fires before the import resolves.
+    this.subscribeToPlayerEvents()
+    void this.init()
   }
 
   static getInstance(): BackgroundPlaybackService {
@@ -50,12 +53,16 @@ export class BackgroundPlaybackService {
       this.listenerHandle = await MediaControl.addListener('playerControl', (data) => {
         this.handleNativeControl(data.action)
       })
+
+      // If a station is already playing when the plugin finishes loading
+      // (e.g. user tapped play before the import resolved), start the service now.
+      const station = this.playerStore.currentStation
+      if (station && this.playerStore.isPlaying) {
+        await this.onPlay(station)
+      }
     } catch {
       // Plugin not available — graceful degradation
-      return
     }
-
-    this.subscribeToPlayerEvents()
   }
 
   private subscribeToPlayerEvents(): void {
