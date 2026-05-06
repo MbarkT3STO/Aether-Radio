@@ -1122,139 +1122,123 @@ export class PlayerBar extends BaseComponent {
   private startRecognitionCanvas(): void {
     const canvas = document.getElementById('rcm-canvas') as HTMLCanvasElement | null
     if (!canvas) return
-
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const SIZE = 220
-    canvas.width  = SIZE
-    canvas.height = SIZE
+    // Fill the full dialog
+    const dialog = document.getElementById('rcm-dialog')
+    const W = dialog?.offsetWidth  || 340
+    const H = (document.getElementById('rcm-listening') as HTMLElement)?.offsetHeight || 280
+    canvas.width  = W
+    canvas.height = H
 
-    // Accent color — read from CSS variable
-    const style   = getComputedStyle(document.documentElement)
-    const accent  = style.getPropertyValue('--accent-primary').trim() || '#7c6fff'
-
-    // Parse hex/rgb accent to r,g,b
+    // Read accent colour from CSS
+    const style = getComputedStyle(document.documentElement)
+    const accent = style.getPropertyValue('--accent-primary').trim() || '#7c6fff'
     const tmp = document.createElement('div')
     tmp.style.color = accent
     document.body.appendChild(tmp)
-    const rgb = getComputedStyle(tmp).color  // "rgb(r, g, b)"
+    const rgb = getComputedStyle(tmp).color
     document.body.removeChild(tmp)
     const [r, g, b] = rgb.match(/\d+/g)?.map(Number) ?? [124, 111, 255]
 
-    // Particles
-    const N = 60
-    type Particle = { x: number; y: number; vx: number; vy: number; radius: number; alpha: number; phase: number }
-    const cx = SIZE / 2, cy = SIZE / 2
+    // Secondary colour — slightly shifted hue
+    const r2 = Math.min(255, r + 60), g2 = Math.max(0, g - 30), b2 = Math.min(255, b + 40)
 
-    const particles: Particle[] = Array.from({ length: N }, () => {
-      const angle  = Math.random() * Math.PI * 2
-      const dist   = 20 + Math.random() * 80
-      return {
-        x:      cx + Math.cos(angle) * dist,
-        y:      cy + Math.sin(angle) * dist,
-        vx:     (Math.random() - 0.5) * 0.4,
-        vy:     (Math.random() - 0.5) * 0.4,
-        radius: 1.5 + Math.random() * 2.5,
-        alpha:  0.2 + Math.random() * 0.6,
-        phase:  Math.random() * Math.PI * 2,
-      }
-    })
+    // Blob definitions
+    type Blob = { x: number; y: number; vx: number; vy: number; radius: number; phase: number; speed: number }
+    const blobs: Blob[] = [
+      { x: W * 0.25, y: H * 0.3,  vx: 0.35, vy: 0.22, radius: 110, phase: 0,    speed: 0.008 },
+      { x: W * 0.75, y: H * 0.6,  vx:-0.28, vy: 0.30, radius: 130, phase: 1.5,  speed: 0.006 },
+      { x: W * 0.5,  y: H * 0.8,  vx: 0.20, vy:-0.35, radius: 90,  phase: 3.0,  speed: 0.010 },
+      { x: W * 0.15, y: H * 0.7,  vx: 0.40, vy:-0.18, radius: 80,  phase: 0.8,  speed: 0.007 },
+      { x: W * 0.85, y: H * 0.2,  vx:-0.22, vy: 0.38, radius: 100, phase: 2.2,  speed: 0.009 },
+    ]
 
-    // Waveform ring points
-    const WAVE_PTS = 128
     let t = 0
 
     const draw = (): void => {
-      if (!document.getElementById('rcm-canvas')) return  // modal closed
-      t += 0.025
+      if (!document.getElementById('rcm-canvas')) return
+      t += 1
 
-      ctx.clearRect(0, 0, SIZE, SIZE)
+      ctx.clearRect(0, 0, W, H)
 
-      // ── Radial gradient background glow ──
-      const grd = ctx.createRadialGradient(cx, cy, 10, cx, cy, 100)
-      grd.addColorStop(0,   `rgba(${r},${g},${b},0.18)`)
-      grd.addColorStop(0.5, `rgba(${r},${g},${b},0.06)`)
-      grd.addColorStop(1,   `rgba(${r},${g},${b},0)`)
-      ctx.fillStyle = grd
-      ctx.beginPath()
-      ctx.arc(cx, cy, 100, 0, Math.PI * 2)
-      ctx.fill()
+      // Dark base
+      ctx.fillStyle = 'rgba(10,10,20,0.92)'
+      ctx.fillRect(0, 0, W, H)
 
-      // ── Animated waveform ring ──
-      const baseR = 72
-      ctx.beginPath()
-      for (let i = 0; i <= WAVE_PTS; i++) {
-        const angle = (i / WAVE_PTS) * Math.PI * 2
-        const noise = Math.sin(angle * 6 + t * 2.1) * 8
-                    + Math.sin(angle * 11 + t * 1.3) * 4
-                    + Math.sin(angle * 3  - t * 0.9) * 6
-        const rad = baseR + noise
-        const px  = cx + Math.cos(angle) * rad
-        const py  = cy + Math.sin(angle) * rad
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
-      }
-      ctx.closePath()
-      ctx.strokeStyle = `rgba(${r},${g},${b},0.55)`
-      ctx.lineWidth   = 1.5
-      ctx.stroke()
+      // Draw each blob as a soft radial gradient
+      for (const blob of blobs) {
+        // Drift
+        blob.x += blob.vx
+        blob.y += blob.vy
+        blob.phase += blob.speed
 
-      // ── Second inner ring (counter-rotate) ──
-      const baseR2 = 50
-      ctx.beginPath()
-      for (let i = 0; i <= WAVE_PTS; i++) {
-        const angle = (i / WAVE_PTS) * Math.PI * 2
-        const noise = Math.sin(angle * 8 - t * 1.7) * 5
-                    + Math.sin(angle * 4  + t * 2.3) * 3
-        const rad = baseR2 + noise
-        const px  = cx + Math.cos(angle) * rad
-        const py  = cy + Math.sin(angle) * rad
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
-      }
-      ctx.closePath()
-      ctx.strokeStyle = `rgba(${r},${g},${b},0.3)`
-      ctx.lineWidth   = 1
-      ctx.stroke()
+        // Bounce off walls
+        if (blob.x < -blob.radius * 0.5 || blob.x > W + blob.radius * 0.5) blob.vx *= -1
+        if (blob.y < -blob.radius * 0.5 || blob.y > H + blob.radius * 0.5) blob.vy *= -1
 
-      // ── Particles ──
-      for (const p of particles) {
-        p.x += p.vx
-        p.y += p.vy
-        p.phase += 0.03
+        // Pulsing radius
+        const pr = blob.radius * (0.85 + 0.15 * Math.sin(blob.phase))
 
-        // Soft boundary — drift back toward center
-        const dx = p.x - cx, dy = p.y - cy
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist > 95) {
-          p.vx -= dx * 0.002
-          p.vy -= dy * 0.002
-        }
+        // Alternate between accent and secondary colour per blob
+        const useSecondary = blobs.indexOf(blob) % 2 === 1
+        const cr = useSecondary ? r2 : r
+        const cg = useSecondary ? g2 : g
+        const cb = useSecondary ? b2 : b
 
-        const a = p.alpha * (0.5 + 0.5 * Math.sin(p.phase))
+        const grd = ctx.createRadialGradient(blob.x, blob.y, 0, blob.x, blob.y, pr)
+        grd.addColorStop(0,   `rgba(${cr},${cg},${cb},0.28)`)
+        grd.addColorStop(0.5, `rgba(${cr},${cg},${cb},0.10)`)
+        grd.addColorStop(1,   `rgba(${cr},${cg},${cb},0)`)
+
         ctx.beginPath()
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(${r},${g},${b},${a})`
+        ctx.arc(blob.x, blob.y, pr, 0, Math.PI * 2)
+        ctx.fillStyle = grd
         ctx.fill()
       }
 
-      // ── Center icon ──
-      const iconAlpha = 0.7 + 0.3 * Math.sin(t * 1.5)
-      ctx.strokeStyle = `rgba(${r},${g},${b},${iconAlpha})`
-      ctx.lineWidth   = 1.75
-      ctx.lineCap     = 'round'
-      // Music note path (simplified)
+      // Scanline shimmer — a thin bright horizontal band that sweeps down
+      const scanY = ((t * 1.2) % (H + 40)) - 20
+      const scanGrd = ctx.createLinearGradient(0, scanY - 12, 0, scanY + 12)
+      scanGrd.addColorStop(0,   'rgba(255,255,255,0)')
+      scanGrd.addColorStop(0.5, `rgba(${r},${g},${b},0.07)`)
+      scanGrd.addColorStop(1,   'rgba(255,255,255,0)')
+      ctx.fillStyle = scanGrd
+      ctx.fillRect(0, scanY - 12, W, 24)
+
+      // Waveform line across the middle
+      const waveY = H * 0.52
       ctx.beginPath()
-      ctx.moveTo(cx - 5, cy + 5)
-      ctx.lineTo(cx - 5, cy - 7)
-      ctx.lineTo(cx + 7, cy - 9)
-      ctx.lineTo(cx + 7, cy + 3)
+      for (let x = 0; x <= W; x += 2) {
+        const freq1 = Math.sin((x / W) * Math.PI * 8  + t * 0.06) * 10
+        const freq2 = Math.sin((x / W) * Math.PI * 14 - t * 0.04) * 5
+        const freq3 = Math.sin((x / W) * Math.PI * 4  + t * 0.03) * 7
+        const y = waveY + freq1 + freq2 + freq3
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+      }
+      ctx.strokeStyle = `rgba(${r},${g},${b},0.5)`
+      ctx.lineWidth   = 1.5
       ctx.stroke()
+
+      // Second thinner wave
       ctx.beginPath()
-      ctx.arc(cx - 8, cy + 5, 3, 0, Math.PI * 2)
+      for (let x = 0; x <= W; x += 2) {
+        const freq1 = Math.sin((x / W) * Math.PI * 12 - t * 0.05) * 6
+        const freq2 = Math.sin((x / W) * Math.PI * 6  + t * 0.07) * 4
+        const y = waveY + freq1 + freq2 - 18
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+      }
+      ctx.strokeStyle = `rgba(${r2},${g2},${b2},0.3)`
+      ctx.lineWidth   = 1
       ctx.stroke()
-      ctx.beginPath()
-      ctx.arc(cx + 4, cy + 3, 3, 0, Math.PI * 2)
-      ctx.stroke()
+
+      // Vignette overlay to keep edges dark
+      const vig = ctx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, H*0.85)
+      vig.addColorStop(0, 'rgba(0,0,0,0)')
+      vig.addColorStop(1, 'rgba(0,0,0,0.55)')
+      ctx.fillStyle = vig
+      ctx.fillRect(0, 0, W, H)
 
       this._rcmAnimFrame = requestAnimationFrame(draw)
     }
