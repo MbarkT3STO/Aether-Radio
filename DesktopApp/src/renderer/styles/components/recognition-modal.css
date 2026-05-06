@@ -88,7 +88,11 @@
   position: relative;
   overflow: hidden;
   transition: opacity 0.3s ease, transform 0.3s ease;
-  background: radial-gradient(ellipse 70% 50% at 50% 40%, rgba(138, 43, 226, 0.03) 0%, transparent 70%);
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .rcm-listening {
+  background: var(--bg-secondary);
 }
 
 .rcm-listening.rcm-fade-out {
@@ -105,172 +109,156 @@
   justify-content: center;
   pointer-events: none;
   padding-bottom: 60px;
-  perspective: 1000px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   3D FLUID WAVE MESH — Cyberpunk Particle Visualization
+   AMBIENT BLUR POINTS — AI Voice Assistant Animation
+   Inspired by Apple Siri - fluid, organic, breathing, thinking
    ═══════════════════════════════════════════════════════════════ */
 
-.rcm-wave-mesh {
+.rcm-ambient-container {
   position: relative;
-  width: 300px;
-  height: 160px;
-  transform-style: preserve-3d;
-  animation: rcmMeshFloat 10s ease-in-out infinite;
-}
-
-/* ── Wave layers (3 layers for depth) ── */
-.rcm-wave-layer {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  transform-style: preserve-3d;
-  gap: 8px;
-}
-
-.rcm-wave-layer-1 {
-  z-index: 3;
-  opacity: 1;
-  transform: translateZ(40px);
-}
-
-.rcm-wave-layer-2 {
-  z-index: 2;
-  opacity: 0.7;
-  transform: translateZ(0px);
-  filter: blur(0.5px);
-}
-
-.rcm-wave-layer-3 {
-  z-index: 1;
-  opacity: 0.4;
-  transform: translateZ(-40px);
-  filter: blur(1px);
-}
-
-/* ── Individual wave lines (horizontal ribbons) ── */
-.rcm-wave-line {
-  height: 2.5px;
-  width: 100%;
-  position: relative;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(138, 43, 226, 0.5) 15%,
-    rgba(168, 85, 247, 1) 50%,
-    rgba(138, 43, 226, 0.5) 85%,
-    transparent 100%
-  );
-  box-shadow: 
-    0 0 12px rgba(200, 120, 255, 0.8),
-    0 0 24px rgba(168, 85, 247, 0.5),
-    0 0 36px rgba(138, 43, 226, 0.3);
-  animation: rcmWaveFlow 4.5s ease-in-out infinite;
-  transform-origin: center;
-}
-
-/* Stagger animations for each line */
-.rcm-wave-layer-1 .rcm-wave-line:nth-child(1) { animation-delay: 0s; }
-.rcm-wave-layer-1 .rcm-wave-line:nth-child(2) { animation-delay: 0.3s; }
-.rcm-wave-layer-1 .rcm-wave-line:nth-child(3) { animation-delay: 0.6s; }
-.rcm-wave-layer-1 .rcm-wave-line:nth-child(4) { animation-delay: 0.9s; }
-.rcm-wave-layer-1 .rcm-wave-line:nth-child(5) { animation-delay: 1.2s; }
-
-.rcm-wave-layer-2 .rcm-wave-line:nth-child(1) { animation-delay: 0.4s; }
-.rcm-wave-layer-2 .rcm-wave-line:nth-child(2) { animation-delay: 0.7s; }
-.rcm-wave-layer-2 .rcm-wave-line:nth-child(3) { animation-delay: 1s; }
-.rcm-wave-layer-2 .rcm-wave-line:nth-child(4) { animation-delay: 1.3s; }
-.rcm-wave-layer-2 .rcm-wave-line:nth-child(5) { animation-delay: 1.6s; }
-
-.rcm-wave-layer-3 .rcm-wave-line:nth-child(1) { animation-delay: 0.8s; }
-.rcm-wave-layer-3 .rcm-wave-line:nth-child(2) { animation-delay: 1.1s; }
-.rcm-wave-layer-3 .rcm-wave-line:nth-child(3) { animation-delay: 1.4s; }
-.rcm-wave-layer-3 .rcm-wave-line:nth-child(4) { animation-delay: 1.7s; }
-.rcm-wave-layer-3 .rcm-wave-line:nth-child(5) { animation-delay: 2s; }
-
-/* ── Particle grid overlay (dotted mesh effect) ── */
-.rcm-particle-grid {
-  position: absolute;
-  inset: 0;
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 7px,
-      rgba(168, 85, 247, 0.1) 7px,
-      rgba(168, 85, 247, 0.1) 8px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 9px,
-      rgba(168, 85, 247, 0.08) 9px,
-      rgba(168, 85, 247, 0.08) 10px
-    );
-  opacity: 0.6;
-  animation: rcmGridPulse 5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-/* ── Luminous glow highlights (bright crests) ── */
-.rcm-wave-glow {
-  position: absolute;
-  width: 140px;
-  height: 70px;
-  border-radius: 50%;
-  filter: blur(35px);
-  opacity: 0.7;
-  animation: rcmGlowPulse 4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.rcm-wave-glow-1 {
-  top: 15%;
-  left: 20%;
-  background: radial-gradient(
-    ellipse,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(200, 120, 255, 0.8) 30%,
-    rgba(168, 85, 247, 0.5) 50%,
-    transparent 70%
-  );
-  animation-delay: 0s;
-}
-
-.rcm-wave-glow-2 {
-  bottom: 15%;
-  right: 20%;
-  background: radial-gradient(
-    ellipse,
-    rgba(255, 200, 255, 0.85) 0%,
-    rgba(200, 120, 255, 0.7) 30%,
-    rgba(168, 85, 247, 0.4) 50%,
-    transparent 70%
-  );
-  animation-delay: 2s;
-}
-
-/* ── Music icon (floating above waves) ── */
-.rcm-music-icon {
-  position: absolute;
-  z-index: 10;
-  color: rgba(255, 255, 255, 0.95);
+  width: 340px;
+  height: 340px;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 16px rgba(200, 120, 255, 0.9)) 
-          drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
-  animation: rcmIconFloat 4s ease-in-out infinite;
 }
 
-.rcm-music-icon svg {
-  width: 32px;
-  height: 32px;
+/* ── Central search orb (pulsing core) ── */
+.rcm-search-orb {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    hsla(var(--h), var(--s), 65%, 0.9) 0%,
+    hsla(var(--h), var(--s), 55%, 0.6) 40%,
+    hsla(var(--h), var(--s), 45%, 0.2) 70%,
+    transparent 100%
+  );
+  filter: blur(30px);
+  animation: rcmOrbBreath 2.5s ease-in-out infinite;
+  z-index: 5;
 }
 
+[data-theme="dark"] .rcm-search-orb {
+  background: radial-gradient(
+    circle,
+    hsla(var(--h), var(--s), 70%, 0.95) 0%,
+    hsla(var(--h), var(--s), 60%, 0.7) 40%,
+    hsla(var(--h), var(--s), 50%, 0.3) 70%,
+    transparent 100%
+  );
+}
+
+/* ── Orbiting blur points (6 points moving in wave-like patterns) ── */
+.rcm-blur-point {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  filter: blur(28px);
+  opacity: 0;
+}
+
+/* Point 1 - Primary accent color */
+.rcm-point-1 {
+  background: radial-gradient(
+    circle,
+    hsla(var(--h), var(--s), 65%, 0.85) 0%,
+    hsla(var(--h), var(--s), 55%, 0.5) 50%,
+    transparent 100%
+  );
+  animation: rcmPointWave1 4s ease-in-out infinite;
+}
+
+/* Point 2 - Cyan shifted */
+.rcm-point-2 {
+  background: radial-gradient(
+    circle,
+    hsla(calc(var(--h) + 40), var(--s), 65%, 0.8) 0%,
+    hsla(calc(var(--h) + 40), var(--s), 55%, 0.45) 50%,
+    transparent 100%
+  );
+  animation: rcmPointWave2 4.2s ease-in-out infinite;
+}
+
+/* Point 3 - Pink shifted */
+.rcm-point-3 {
+  background: radial-gradient(
+    circle,
+    hsla(calc(var(--h) - 30), var(--s), 65%, 0.75) 0%,
+    hsla(calc(var(--h) - 30), var(--s), 55%, 0.4) 50%,
+    transparent 100%
+  );
+  animation: rcmPointWave3 3.8s ease-in-out infinite;
+}
+
+/* Point 4 - Blue shifted */
+.rcm-point-4 {
+  background: radial-gradient(
+    circle,
+    hsla(calc(var(--h) + 20), var(--s), 65%, 0.8) 0%,
+    hsla(calc(var(--h) + 20), var(--s), 55%, 0.45) 50%,
+    transparent 100%
+  );
+  animation: rcmPointWave4 4.1s ease-in-out infinite;
+}
+
+/* Point 5 - Purple shifted */
+.rcm-point-5 {
+  background: radial-gradient(
+    circle,
+    hsla(calc(var(--h) - 15), var(--s), 65%, 0.75) 0%,
+    hsla(calc(var(--h) - 15), var(--s), 55%, 0.4) 50%,
+    transparent 100%
+  );
+  animation: rcmPointWave5 3.9s ease-in-out infinite;
+}
+
+/* Point 6 - Teal shifted */
+.rcm-point-6 {
+  background: radial-gradient(
+    circle,
+    hsla(calc(var(--h) + 50), var(--s), 65%, 0.8) 0%,
+    hsla(calc(var(--h) + 50), var(--s), 55%, 0.45) 50%,
+    transparent 100%
+  );
+  animation: rcmPointWave6 4.3s ease-in-out infinite;
+}
+
+[data-theme="dark"] .rcm-blur-point {
+  filter: blur(32px);
+}
+
+/* ── Scanning rings (expanding circles for search effect) ── */
+.rcm-scan-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid hsla(var(--h), var(--s), 60%, 0.4);
+  animation: rcmRingPulse 3s ease-out infinite;
+  opacity: 0;
+}
+
+[data-theme="dark"] .rcm-scan-ring {
+  border-color: hsla(var(--h), var(--s), 65%, 0.5);
+}
+
+.rcm-ring-1 {
+  animation-delay: 0s;
+}
+
+.rcm-ring-2 {
+  animation-delay: 1s;
+}
+
+.rcm-ring-3 {
+  animation-delay: 2s;
+}
+
+/* ── Text labels ── */
 .rcm-listening-label {
   font-family: var(--font-display);
   font-size: 1.1rem;
@@ -279,7 +267,7 @@
   letter-spacing: -0.3px;
   margin-bottom: 6px;
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
 .rcm-listening-sub {
@@ -289,69 +277,158 @@
   text-align: center;
   line-height: 1.5;
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   WAVE ANIMATIONS
+   AI VOICE ASSISTANT ANIMATIONS — Siri-inspired
+   Fluid, organic, breathing, wave-like movements
    ═══════════════════════════════════════════════════════════════ */
 
-@keyframes rcmWaveFlow {
+/* Central orb breathing (like AI listening/thinking) */
+@keyframes rcmOrbBreath {
   0%, 100% {
-    transform: scaleX(1) translateY(0) scaleY(1);
-    opacity: 0.5;
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+}
+
+/* Wave-like movements for blur points - each has unique fluid motion */
+@keyframes rcmPointWave1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0.7;
   }
   25% {
-    transform: scaleX(1.2) translateY(-10px) scaleY(1.8);
+    transform: translate(80px, -60px) scale(1.1);
     opacity: 1;
   }
   50% {
-    transform: scaleX(1) translateY(0) scaleY(1);
-    opacity: 0.7;
+    transform: translate(120px, 20px) scale(0.9);
+    opacity: 0.85;
   }
   75% {
-    transform: scaleX(1.15) translateY(10px) scaleY(1.6);
+    transform: translate(60px, 80px) scale(1.05);
     opacity: 0.95;
   }
 }
 
-@keyframes rcmMeshFloat {
+@keyframes rcmPointWave2 {
   0%, 100% {
-    transform: rotateX(10deg) rotateY(-2deg) translateY(0);
+    transform: translate(0, 0) scale(0.85);
+    opacity: 0.65;
+  }
+  25% {
+    transform: translate(-70px, -80px) scale(1);
+    opacity: 0.9;
   }
   50% {
-    transform: rotateX(14deg) rotateY(2deg) translateY(-8px);
+    transform: translate(-110px, -20px) scale(1.15);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(-50px, 70px) scale(0.95);
+    opacity: 0.8;
   }
 }
 
-@keyframes rcmGridPulse {
+@keyframes rcmPointWave3 {
   0%, 100% {
-    opacity: 0.4;
+    transform: translate(0, 0) scale(0.9);
+    opacity: 0.75;
+  }
+  25% {
+    transform: translate(40px, 90px) scale(1.05);
+    opacity: 0.95;
   }
   50% {
+    transform: translate(100px, 110px) scale(0.85);
+    opacity: 0.85;
+  }
+  75% {
+    transform: translate(130px, 50px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes rcmPointWave4 {
+  0%, 100% {
+    transform: translate(0, 0) scale(0.95);
     opacity: 0.7;
   }
-}
-
-@keyframes rcmGlowPulse {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(1);
+  25% {
+    transform: translate(-90px, 70px) scale(0.9);
+    opacity: 0.85;
   }
   50% {
+    transform: translate(-130px, 110px) scale(1.1);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(-70px, 40px) scale(1);
     opacity: 0.9;
-    transform: scale(1.3);
   }
 }
 
-@keyframes rcmIconFloat {
+@keyframes rcmPointWave5 {
   0%, 100% {
-    transform: translateY(0) scale(1);
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translate(110px, -40px) scale(1.05);
     opacity: 0.95;
   }
   50% {
-    transform: translateY(-10px) scale(1.08);
+    transform: translate(70px, -100px) scale(0.95);
+    opacity: 0.85;
+  }
+  75% {
+    transform: translate(20px, -70px) scale(1.15);
     opacity: 1;
+  }
+}
+
+@keyframes rcmPointWave6 {
+  0%, 100% {
+    transform: translate(0, 0) scale(0.85);
+    opacity: 0.75;
+  }
+  25% {
+    transform: translate(-100px, -50px) scale(1.1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-60px, -110px) scale(0.9);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translate(-20px, -80px) scale(1.05);
+    opacity: 0.95;
+  }
+}
+
+/* Scanning rings pulsing outward (more frequent, Siri-like) */
+@keyframes rcmRingPulse {
+  0% {
+    width: 80px;
+    height: 80px;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    width: 340px;
+    height: 340px;
+    opacity: 0;
   }
 }
 

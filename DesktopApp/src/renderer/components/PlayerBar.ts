@@ -1001,49 +1001,25 @@ export class PlayerBar extends BaseComponent {
         <!-- Listening state -->
         <div class="rcm-listening" id="rcm-listening">
           <div class="rcm-viz-wrap">
-            <!-- 3D Fluid Wave Mesh -->
-            <div class="rcm-wave-mesh">
-              <!-- Multiple wave layers for depth -->
-              <div class="rcm-wave-layer rcm-wave-layer-1">
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-              </div>
-              <div class="rcm-wave-layer rcm-wave-layer-2">
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-              </div>
-              <div class="rcm-wave-layer rcm-wave-layer-3">
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-                <div class="rcm-wave-line"></div>
-              </div>
-              <!-- Particle grid overlay -->
-              <div class="rcm-particle-grid"></div>
-              <!-- Glow highlights -->
-              <div class="rcm-wave-glow rcm-wave-glow-1"></div>
-              <div class="rcm-wave-glow rcm-wave-glow-2"></div>
-            </div>
-            <!-- Music note icon -->
-            <div class="rcm-music-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="1.75"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18V5l12-2v13"/>
-                <circle cx="6" cy="18" r="3"/>
-                <circle cx="18" cy="16" r="3"/>
-              </svg>
+            <!-- Ambient blur points recognition animation -->
+            <div class="rcm-ambient-container">
+              <!-- Central search orb -->
+              <div class="rcm-search-orb"></div>
+              <!-- Orbiting blur points -->
+              <div class="rcm-blur-point rcm-point-1"></div>
+              <div class="rcm-blur-point rcm-point-2"></div>
+              <div class="rcm-blur-point rcm-point-3"></div>
+              <div class="rcm-blur-point rcm-point-4"></div>
+              <div class="rcm-blur-point rcm-point-5"></div>
+              <div class="rcm-blur-point rcm-point-6"></div>
+              <!-- Scanning rings -->
+              <div class="rcm-scan-ring rcm-ring-1"></div>
+              <div class="rcm-scan-ring rcm-ring-2"></div>
+              <div class="rcm-scan-ring rcm-ring-3"></div>
             </div>
           </div>
           <div class="rcm-listening-label">Identifying song…</div>
-          <div class="rcm-listening-sub">Capturing audio fingerprint</div>
+          <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
         </div>
 
         <!-- Result state (hidden initially) -->
