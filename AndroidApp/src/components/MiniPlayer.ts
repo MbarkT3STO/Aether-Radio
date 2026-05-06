@@ -5,17 +5,19 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
 import { AudioService } from '../services/AudioService'
 import { VisualizerService } from '../services/VisualizerService'
+import { SleepTimer } from './SleepTimer'
 import { stationLogoHtml } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
 export class MiniPlayer extends BaseComponent {
-  private eventBus       = EventBus.getInstance()
-  private playerStore    = PlayerStore.getInstance()
-  private favoritesStore = FavoritesStore.getInstance()
-  private bridge         = BridgeService.getInstance()
-  private audioService   = AudioService.getInstance()
-  private _barVisualizer = new VisualizerService()   // ambient behind mini bar
-  private _sheetVisualizer = new VisualizerService() // ambient behind expanded sheet
+  private eventBus         = EventBus.getInstance()
+  private playerStore      = PlayerStore.getInstance()
+  private favoritesStore   = FavoritesStore.getInstance()
+  private bridge           = BridgeService.getInstance()
+  private audioService     = AudioService.getInstance()
+  private _barVisualizer   = new VisualizerService()
+  private _sheetVisualizer = new VisualizerService()
+  private _sleepTimer      = new SleepTimer()
   private _renderedStationId: string | null = null
   private _expanded = false
 
@@ -139,6 +141,7 @@ export class MiniPlayer extends BaseComponent {
   private closeExpanded(): void {
     this._expanded = false
     this._sheetVisualizer.stopVisualization()
+    this._sleepTimer.unmount()
     const sheet = document.getElementById('mp-expanded-sheet')
     if (!sheet) return
     sheet.classList.remove('mp-sheet--open')
@@ -197,14 +200,17 @@ export class MiniPlayer extends BaseComponent {
         <button class="mp-sheet-btn mp-sheet-stop" id="mp-sheet-stop" aria-label="Stop">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
         </button>
-        <button class="mp-sheet-btn mp-sheet-play${isPlaying ? ' playing' : ''}" id="mp-sheet-play" aria-label="${isPlaying ? 'Pause' : 'Play'}">
-          ${this.playerStore.isLoading
-            ? `<span class="loading-spinner loading-spinner--md"></span>`
-            : isPlaying
-              ? `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.5"/><rect x="14" y="4" width="4" height="16" rx="1.5"/></svg>`
-              : `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
-          }
-        </button>
+        <!-- Play button wrapped in isolation layer so ambient canvas colors don't bleed in -->
+        <div class="mp-sheet-play-wrap">
+          <button class="mp-sheet-btn mp-sheet-play${isPlaying ? ' playing' : ''}" id="mp-sheet-play" aria-label="${isPlaying ? 'Pause' : 'Play'}">
+            ${this.playerStore.isLoading
+              ? `<span class="loading-spinner loading-spinner--md"></span>`
+              : isPlaying
+                ? `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.5"/><rect x="14" y="4" width="4" height="16" rx="1.5"/></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
+            }
+          </button>
+        </div>
       </div>
 
       <div class="mp-sheet-volume">
@@ -216,6 +222,9 @@ export class MiniPlayer extends BaseComponent {
         </div>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
       </div>
+
+      <!-- Sleep timer -->
+      <div class="mp-sheet-sleep-row" id="mp-sheet-sleep"></div>
     `
 
     document.body.appendChild(sheet)
@@ -224,12 +233,16 @@ export class MiniPlayer extends BaseComponent {
     this.attachSheetListeners(sheet)
     this.syncSheetWithEvents(sheet)
 
+    // Mount sleep timer
+    const sleepContainer = sheet.querySelector<HTMLElement>('#mp-sheet-sleep')
+    if (sleepContainer) this._sleepTimer.mount(sleepContainer)
+
     // Start ambient if already playing
     if (isPlaying) {
       const ambCanvas = sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
       if (ambCanvas) {
         this._sheetVisualizer.startAmbientVisualization(
-          ambCanvas, this.audioService.getVisualizer(), 0.65, true
+          ambCanvas, this.audioService.getVisualizer(), 0.42, true
         )
         requestAnimationFrame(() => ambCanvas.classList.add('active'))
       }
@@ -303,7 +316,7 @@ export class MiniPlayer extends BaseComponent {
       const ambCanvas = sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
       if (ambCanvas) {
         if (isPlaying) {
-          this._sheetVisualizer.startAmbientVisualization(ambCanvas, this.audioService.getVisualizer(), 0.65, true)
+          this._sheetVisualizer.startAmbientVisualization(ambCanvas, this.audioService.getVisualizer(), 0.42, true)
           requestAnimationFrame(() => ambCanvas.classList.add('active'))
         } else {
           this._sheetVisualizer.stopVisualization()

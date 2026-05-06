@@ -6,6 +6,7 @@ import { BridgeService } from './services/BridgeService'
 import { AudioService } from './services/AudioService'
 import { PlayerStore } from './store/PlayerStore'
 import { FavoritesStore } from './store/FavoritesStore'
+import { MediaNotificationService } from './services/MediaNotificationService'
 import { BottomNav } from './components/BottomNav'
 import { MiniPlayer } from './components/MiniPlayer'
 import { initToast } from './components/Toast'
@@ -44,6 +45,8 @@ class App {
     this.registerRoutes()
     this.setupPlayerListeners()
     this.setupCapacitor()
+    // Boot media notification service (no-op on web)
+    MediaNotificationService.getInstance()
   }
 
   private async loadSettings(): Promise<void> {

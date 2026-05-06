@@ -6,7 +6,6 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
-    // Allow radio stream URLs from any origin
     allowNavigation: ['*'],
     cleartext: true,
   },
@@ -14,6 +13,8 @@ const config: CapacitorConfig = {
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: false,
+    // Keep WebView alive when app goes to background
+    backgroundColor: '#121214',
   },
   plugins: {
     StatusBar: {
