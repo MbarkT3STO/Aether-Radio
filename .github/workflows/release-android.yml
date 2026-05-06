@@ -46,6 +46,10 @@ jobs:
         working-directory: AndroidApp
 
       # ── 7. Sync Capacitor → Android ────────────────────────────
+      - name: Clean stale web assets before sync
+        run: rm -rf android/app/src/main/assets/public
+        working-directory: AndroidApp
+
       - name: Capacitor sync
         run: npx cap sync android
         working-directory: AndroidApp
