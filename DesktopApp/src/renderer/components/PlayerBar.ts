@@ -1005,17 +1005,25 @@ export class PlayerBar extends BaseComponent {
             <div class="rcm-ambient-container">
               <!-- Central search orb -->
               <div class="rcm-search-orb"></div>
-              <!-- Orbiting blur points -->
+              <!-- Inner ring of blur points (6 points) -->
               <div class="rcm-blur-point rcm-point-1"></div>
               <div class="rcm-blur-point rcm-point-2"></div>
               <div class="rcm-blur-point rcm-point-3"></div>
               <div class="rcm-blur-point rcm-point-4"></div>
               <div class="rcm-blur-point rcm-point-5"></div>
               <div class="rcm-blur-point rcm-point-6"></div>
+              <!-- Outer ring of blur points (6 more points) -->
+              <div class="rcm-blur-point rcm-outer rcm-point-7"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-8"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-9"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-10"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-11"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-12"></div>
               <!-- Scanning rings -->
               <div class="rcm-scan-ring rcm-ring-1"></div>
               <div class="rcm-scan-ring rcm-ring-2"></div>
               <div class="rcm-scan-ring rcm-ring-3"></div>
+              <div class="rcm-scan-ring rcm-ring-4"></div>
             </div>
           </div>
           <div class="rcm-listening-label">Identifying song…</div>
