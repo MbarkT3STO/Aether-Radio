@@ -1,17 +1,27 @@
 /**
- * SongRecognitionService — identifies the currently playing song via
- * Chromaprint (WASM) + AcoustID lookup API.
+ * SongRecognitionService — identifies the currently playing song.
  *
- * Debug overlay is shown on-device so you can see exactly which step fails
- * without needing a USB-connected computer.
+ * Strategy: tap into the EXISTING AudioContext + AnalyserNode that the
+ * VisualizerService already has connected to the playing HTMLAudioElement.
+ * We insert a ScriptProcessorNode into that graph to capture raw PCM samples
+ * directly from the live audio — no fetch, no CORS, works on every station.
+ *
+ * Pipeline:
+ *  1. Record ~20 s of PCM float32 samples from the playing audio via
+ *     ScriptProcessorNode tapped off the existing AnalyserNode
+ *  2. Encode the samples as a WAV ArrayBuffer
+ *  3. Feed the WAV to @unimusic/chromaprint (WASM) → fingerprint string
+ *  4. POST fingerprint + duration to AcoustID lookup API
+ *  5. Return title / artist / album
  */
+
+import { AudioService } from './AudioService'
 
 const ACOUSTID_CLIENT_KEY = 'hTUfbqGtFY'
 const ACOUSTID_API        = 'https://api.acoustid.org/v2/lookup'
 
-// ~25 s at 128 kbps = 400 KB
-const FETCH_BYTES      = 400 * 1024
-const FETCH_TIMEOUT_MS = 30_000
+// How many seconds of audio to capture before fingerprinting
+const CAPTURE_SECONDS = 20
 
 export interface RecognitionResult {
   title: string
@@ -41,31 +51,19 @@ interface AcoustIdResponse {
 // ── Debug overlay ─────────────────────────────────────────────────────────────
 function dbg(msg: string): void {
   console.log('[Recognition]', msg)
-
-  // Show on-screen so we can see it on the device without USB debugging
   let el = document.getElementById('rcm-debug-overlay')
   if (!el) {
     el = document.createElement('div')
     el.id = 'rcm-debug-overlay'
     Object.assign(el.style, {
-      position:   'fixed',
-      bottom:     '80px',
-      left:       '10px',
-      right:      '10px',
-      background: 'rgba(0,0,0,0.85)',
-      color:      '#0f0',
-      fontSize:   '11px',
-      fontFamily: 'monospace',
-      padding:    '8px',
-      borderRadius: '6px',
-      zIndex:     '99999',
-      maxHeight:  '220px',
-      overflowY:  'auto',
+      position: 'fixed', bottom: '80px', left: '10px', right: '10px',
+      background: 'rgba(0,0,0,0.88)', color: '#0f0', fontSize: '11px',
+      fontFamily: 'monospace', padding: '8px', borderRadius: '6px',
+      zIndex: '99999', maxHeight: '240px', overflowY: 'auto',
       pointerEvents: 'none',
     })
     document.body.appendChild(el)
-    // Auto-remove after 30 s
-    setTimeout(() => el?.remove(), 30_000)
+    setTimeout(() => el?.remove(), 40_000)
   }
   el.innerHTML += `<div>${new Date().toISOString().slice(11, 23)} ${msg}</div>`
   el.scrollTop = el.scrollHeight
@@ -83,13 +81,12 @@ export class SongRecognitionService {
 
   get busy(): boolean { return this._busy }
 
-  async recognize(streamUrl: string): Promise<RecognitionResult | null> {
+  async recognize(_streamUrl: string): Promise<RecognitionResult | null> {
     if (this._busy) return null
     this._busy = true
-    // Clear old overlay
     document.getElementById('rcm-debug-overlay')?.remove()
     try {
-      return await this._recognize(streamUrl)
+      return await this._recognize()
     } catch (e) {
       dbg(`UNCAUGHT: ${String(e)}`)
       return null
@@ -98,47 +95,28 @@ export class SongRecognitionService {
     }
   }
 
-  private async _recognize(streamUrl: string): Promise<RecognitionResult | null> {
-    dbg(`URL: ${streamUrl.slice(0, 60)}`)
+  private async _recognize(): Promise<RecognitionResult | null> {
+    // ── Step 1: Capture PCM from the live audio graph ─────────────────────────
+    dbg('Step 1: capturing PCM from audio graph...')
+    const pcmResult = await this.capturePcm()
+    if (!pcmResult) { dbg('FAIL: PCM capture failed'); return null }
 
-    // ── Step 1: Fetch stream bytes ────────────────────────────────────────────
-    dbg('Step 1: fetching stream...')
-    const rawBytes = await this.fetchStreamChunk(streamUrl)
-    if (!rawBytes) { dbg('FAIL: fetch returned null'); return null }
-    if (rawBytes.byteLength < 16_384) {
-      dbg(`FAIL: too few bytes: ${rawBytes.byteLength}`)
-      return null
-    }
-    dbg(`OK: fetched ${rawBytes.byteLength} bytes`)
+    const { samples, sampleRate, channels } = pcmResult
+    dbg(`OK: captured ${samples[0]!.length} samples @ ${sampleRate}Hz x${channels}ch`)
 
-    // ── Step 2: Decode audio ──────────────────────────────────────────────────
-    dbg('Step 2: decoding audio...')
-    let audioBuffer: AudioBuffer | null = null
-    try {
-      const ctx = new AudioContext()
-      audioBuffer = await ctx.decodeAudioData(rawBytes.slice(0)) // slice = copy
-      ctx.close().catch(() => {})
-    } catch (e) {
-      dbg(`FAIL decode: ${String(e)}`)
-      return null
-    }
-    dbg(`OK: ${audioBuffer.duration.toFixed(1)}s, ${audioBuffer.numberOfChannels}ch, ${audioBuffer.sampleRate}Hz`)
-
-    // ── Step 3: Build WAV + fingerprint ───────────────────────────────────────
-    dbg('Step 3: building WAV...')
-    const wavBuffer = this.audioBufferToWav(audioBuffer)
+    // ── Step 2: Encode as WAV ─────────────────────────────────────────────────
+    dbg('Step 2: encoding WAV...')
+    const wavBuffer = this.pcmToWav(samples, sampleRate, channels)
     dbg(`OK: WAV ${wavBuffer.byteLength} bytes`)
 
-    dbg('Step 3b: generating fingerprint (WASM)...')
+    // ── Step 3: Chromaprint fingerprint ───────────────────────────────────────
+    dbg('Step 3: generating fingerprint (WASM)...')
     let fingerprint: string | null = null
     try {
       const { processAudioFile } = await import('@unimusic/chromaprint')
       for await (const fp of processAudioFile(wavBuffer, {
-        maxDuration:   120,
-        chunkDuration: 0,
-        algorithm:     1,
-        rawOutput:     false,
-        overlap:       false,
+        maxDuration: 120, chunkDuration: 0,
+        algorithm: 1, rawOutput: false, overlap: false,
       })) {
         fingerprint = fp
         break
@@ -149,79 +127,113 @@ export class SongRecognitionService {
     }
 
     if (!fingerprint) { dbg('FAIL: empty fingerprint'); return null }
-    dbg(`OK: fp len=${fingerprint.length}`)
-
-    const duration = Math.max(10, Math.round(audioBuffer.duration))
-    dbg(`duration=${duration}s`)
+    const duration = Math.round(samples[0]!.length / sampleRate)
+    dbg(`OK: fp len=${fingerprint.length} duration=${duration}s`)
 
     // ── Step 4: AcoustID lookup ───────────────────────────────────────────────
     dbg('Step 4: querying AcoustID...')
-    const result = await this.queryAcoustId(fingerprint, duration)
-    if (!result) { dbg('FAIL: no match from AcoustID'); return null }
-    dbg(`MATCH: "${result.title}" — ${result.artist}`)
-    return result
+    return await this.queryAcoustId(fingerprint, duration)
   }
 
-  // ── Fetch ─────────────────────────────────────────────────────────────────
-  private async fetchStreamChunk(streamUrl: string): Promise<ArrayBuffer | null> {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-    try {
-      const response = await fetch(streamUrl, {
-        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
-        signal: controller.signal,
-      })
-      clearTimeout(timer)
+  // ── PCM capture via ScriptProcessorNode ──────────────────────────────────
+  private capturePcm(): Promise<{
+    samples: Float32Array[]
+    sampleRate: number
+    channels: number
+  } | null> {
+    return new Promise((resolve) => {
+      const audioService = AudioService.getInstance()
+      const visualizer   = audioService.getVisualizer()
+      const analyser     = visualizer.sharedAnalyser
 
-      if (!response.ok || !response.body) {
-        dbg(`fetch HTTP ${response.status}`)
-        return null
+      if (!analyser) {
+        dbg('FAIL: no analyser (audio not playing?)')
+        resolve(null)
+        return
       }
 
-      const reader = response.body.getReader()
-      const chunks: Uint8Array[] = []
-      let total = 0
-      try {
-        while (total < FETCH_BYTES) {
-          const { done, value } = await reader.read()
-          if (done || !value) break
-          chunks.push(value)
-          total += value.length
+      const ctx      = analyser.context as AudioContext
+      const sr       = ctx.sampleRate
+      const numCh    = 2
+      const bufSize  = 4096
+      const needed   = CAPTURE_SECONDS * sr
+      const recorded: Float32Array[][] = [[], []]
+
+      dbg(`capturing ${CAPTURE_SECONDS}s @ ${sr}Hz...`)
+
+      // ScriptProcessorNode taps the audio stream without interrupting playback
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      const proc = ctx.createScriptProcessor(bufSize, numCh, numCh)
+      let collected = 0
+      let done = false
+
+      // Safety timeout — if we never get enough samples, resolve with what we have
+      const timeout = setTimeout(() => {
+        if (!done) {
+          done = true
+          proc.disconnect()
+          analyser.disconnect(proc)
+          dbg(`timeout: collected ${collected} samples`)
+          resolve(collected > sr * 5 ? buildResult() : null)
         }
-      } finally {
-        reader.cancel().catch(() => {})
+      }, (CAPTURE_SECONDS + 5) * 1000)
+
+      function buildResult() {
+        const out: Float32Array[] = []
+        for (let c = 0; c < numCh; c++) {
+          const total = recorded[c]!.reduce((s, a) => s + a.length, 0)
+          const merged = new Float32Array(total)
+          let off = 0
+          for (const chunk of recorded[c]!) {
+            merged.set(chunk, off)
+            off += chunk.length
+          }
+          out.push(merged)
+        }
+        return { samples: out, sampleRate: sr, channels: numCh }
       }
 
-      if (total === 0) return null
-      const merged = new Uint8Array(total)
-      let off = 0
-      for (const c of chunks) { merged.set(c, off); off += c.length }
-      return merged.buffer
-    } catch (e) {
-      clearTimeout(timer)
-      dbg(`fetch error: ${String(e)}`)
-      return null
-    }
+      proc.onaudioprocess = (e) => {
+        if (done) return
+        for (let c = 0; c < numCh; c++) {
+          const data = e.inputBuffer.getChannelData(c)
+          recorded[c]!.push(new Float32Array(data))
+        }
+        collected += bufSize
+        if (collected >= needed) {
+          done = true
+          clearTimeout(timeout)
+          proc.disconnect()
+          try { analyser.disconnect(proc) } catch { /* already disconnected */ }
+          resolve(buildResult())
+        }
+      }
+
+      // Connect: analyser → scriptProcessor → (no output needed)
+      analyser.connect(proc)
+      proc.connect(ctx.destination) // must connect to destination or it won't fire
+    })
   }
 
   // ── WAV encoder ──────────────────────────────────────────────────────────
-  private audioBufferToWav(buf: AudioBuffer): ArrayBuffer {
-    const ch   = Math.min(buf.numberOfChannels, 2)
-    const sr   = buf.sampleRate
-    const len  = buf.length
-    const data = 44 + len * ch * 2
+  private pcmToWav(samples: Float32Array[], sampleRate: number, channels: number): ArrayBuffer {
+    const len  = samples[0]!.length
+    const data = 44 + len * channels * 2
     const wav  = new ArrayBuffer(data)
     const v    = new DataView(wav)
     const ws   = (o: number, s: string) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)) }
-    ws(0, 'RIFF'); v.setUint32(4, 36 + len * ch * 2, true); ws(8, 'WAVE')
+
+    ws(0, 'RIFF'); v.setUint32(4, 36 + len * channels * 2, true); ws(8, 'WAVE')
     ws(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true)
-    v.setUint16(22, ch, true); v.setUint32(24, sr, true)
-    v.setUint32(28, sr * ch * 2, true); v.setUint16(32, ch * 2, true); v.setUint16(34, 16, true)
-    ws(36, 'data'); v.setUint32(40, len * ch * 2, true)
+    v.setUint16(22, channels, true); v.setUint32(24, sampleRate, true)
+    v.setUint32(28, sampleRate * channels * 2, true)
+    v.setUint16(32, channels * 2, true); v.setUint16(34, 16, true)
+    ws(36, 'data'); v.setUint32(40, len * channels * 2, true)
+
     let off = 44
     for (let i = 0; i < len; i++) {
-      for (let c = 0; c < ch; c++) {
-        const s = buf.getChannelData(c)[i] ?? 0
+      for (let c = 0; c < channels; c++) {
+        const s = samples[c]![i] ?? 0
         v.setInt16(off, Math.max(-1, Math.min(1, s)) * 32767, true)
         off += 2
       }
@@ -230,11 +242,7 @@ export class SongRecognitionService {
   }
 
   // ── AcoustID ──────────────────────────────────────────────────────────────
-  private async queryAcoustId(
-    fingerprint: string,
-    duration: number
-  ): Promise<RecognitionResult | null> {
-    // Build body manually — URLSearchParams would percent-encode the '+' in meta
+  private async queryAcoustId(fingerprint: string, duration: number): Promise<RecognitionResult | null> {
     const body = [
       `client=${encodeURIComponent(ACOUSTID_CLIENT_KEY)}`,
       `fingerprint=${encodeURIComponent(fingerprint)}`,
@@ -246,7 +254,7 @@ export class SongRecognitionService {
     let resp: Response
     try {
       resp = await fetch(ACOUSTID_API, {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body,
       })
@@ -255,47 +263,39 @@ export class SongRecognitionService {
       return null
     }
 
-    if (!resp.ok) {
-      dbg(`AcoustID HTTP ${resp.status}`)
-      return null
-    }
+    if (!resp.ok) { dbg(`AcoustID HTTP ${resp.status}`); return null }
 
     let data: AcoustIdResponse
-    try {
-      data = await resp.json() as AcoustIdResponse
-    } catch (e) {
-      dbg(`AcoustID JSON error: ${String(e)}`)
-      return null
-    }
+    try { data = await resp.json() as AcoustIdResponse }
+    catch (e) { dbg(`AcoustID JSON error: ${String(e)}`); return null }
 
     dbg(`AcoustID status=${data.status} results=${data.results?.length ?? 0}`)
-    if (data.error) dbg(`AcoustID error msg: ${data.error.message}`)
-
+    if (data.error) dbg(`AcoustID error: ${data.error.message}`)
     if (data.status !== 'ok' || !data.results?.length) return null
 
-    // Log all scores so we can tune the threshold
-    data.results.slice(0, 3).forEach((r, i) => {
-      dbg(`  result[${i}] score=${r.score.toFixed(3)} recs=${r.recordings?.length ?? 0}`)
-    })
+    data.results.slice(0, 3).forEach((r, i) =>
+      dbg(`  [${i}] score=${r.score.toFixed(3)} recs=${r.recordings?.length ?? 0}`)
+    )
 
     const best = data.results
       .filter(r => r.score >= 0.3 && r.recordings?.length)
       .sort((a, b) => b.score - a.score)[0]
 
     if (!best?.recordings?.length) {
-      dbg(`no result >= 0.3 (top=${data.results[0]?.score.toFixed(3)})`)
+      dbg(`no match >= 0.3 (top=${data.results[0]?.score.toFixed(3)})`)
       return null
     }
 
-    const rec     = best.recordings.find(r => r.title && r.artists?.length) ?? best.recordings[0]!
-    const title   = rec.title?.trim()
-    const artist  = rec.artists?.[0]?.name?.trim()
+    const rec   = best.recordings.find(r => r.title && r.artists?.length) ?? best.recordings[0]!
+    const title  = rec.title?.trim()
+    const artist = rec.artists?.[0]?.name?.trim()
     if (!title || !artist) { dbg('rec missing title/artist'); return null }
 
     const rg          = rec.releasegroups?.[0]
     const album       = rg?.title?.trim()
     const releaseDate = rg?.releases?.[0]?.date?.slice(0, 4)
 
+    dbg(`MATCH: "${title}" — ${artist}`)
     return { title, artist, album, releaseDate }
   }
 }
