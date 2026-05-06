@@ -654,3 +654,41 @@
 
 /* ── Dark theme overrides (from theme-fixes) ── */
 [data-theme="dark"] .cs-card-meta              { color: var(--text-secondary); }
+
+/* ── Mobile form: custom validation errors ── */
+.cs-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+.cs-form-group--sm {
+  flex: 0 0 80px;
+  min-width: 80px;
+}
+
+.cs-field-error {
+  font-size: 0.75rem;
+  color: var(--accent-red);
+  margin-top: 4px;
+  min-height: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+  opacity: 0;
+}
+
+.cs-field-error.visible {
+  max-height: 40px;
+  opacity: 1;
+}
+
+/* Highlight invalid field */
+.cs-form-group:has(.cs-field-error.visible) input {
+  border-color: var(--accent-red) !important;
+  box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2) !important;
+}

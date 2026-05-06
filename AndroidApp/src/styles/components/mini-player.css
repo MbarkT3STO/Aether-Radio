@@ -1,6 +1,7 @@
 /* ── Mini player bar ─────────────────────────────────────────────────────── */
 
 .mini-player {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0;
@@ -8,7 +9,20 @@
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-subtle);
   box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+  overflow: hidden;
 }
+
+/* Ambient canvas — sits behind everything */
+.mini-player-ambient {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.mini-player-ambient.active { opacity: 1; }
 
 .mini-player--empty {
   justify-content: center;
@@ -140,6 +154,22 @@
   transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   overflow-y: auto;
 }
+
+/* Ambient canvas behind the sheet */
+.mp-sheet-ambient {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 0;
+}
+.mp-sheet-ambient.active { opacity: 1; }
+
+/* All sheet children sit above the canvas */
+.mp-sheet > *:not(.mp-sheet-ambient) { position: relative; z-index: 1; }
 
 .mp-sheet--open {
   transform: translateY(0);

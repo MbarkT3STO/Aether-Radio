@@ -1,5 +1,6 @@
 import { EventBus } from '../store/EventBus'
 import { PlayerStore } from '../store/PlayerStore'
+import { VisualizerService } from './VisualizerService'
 import type { RadioStation } from '../domain/entities/RadioStation'
 
 const MAX_RETRIES = 3
@@ -12,6 +13,8 @@ export class AudioService {
   private playerStore = PlayerStore.getInstance()
   private retryCount = 0
   private currentStationId: string | null = null
+  private _visualizer = new VisualizerService()
+  private _onPlayStarted: ((audio: HTMLAudioElement) => Promise<void>) | null = null
 
   private constructor() {
     this.audio = new Audio()
@@ -24,8 +27,11 @@ export class AudioService {
     return AudioService.instance
   }
 
-  getAudioElement(): HTMLAudioElement {
-    return this.audio
+  getAudioElement(): HTMLAudioElement { return this.audio }
+  getVisualizer(): VisualizerService  { return this._visualizer }
+
+  setOnPlayStarted(cb: (audio: HTMLAudioElement) => Promise<void>): void {
+    this._onPlayStarted = cb
   }
 
   async play(station: RadioStation): Promise<void> {
@@ -36,6 +42,9 @@ export class AudioService {
       this.audio.src = station.urlResolved || station.url
       this.audio.volume = this.playerStore.volume
       await this.audio.play()
+      // Initialize visualizer on first play
+      await this._visualizer.initialize(this.audio)
+      if (this._onPlayStarted) await this._onPlayStarted(this.audio)
       this.playerStore.setLoading(false)
     } catch (error) {
       console.error('Playback error:', error)

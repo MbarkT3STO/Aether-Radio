@@ -107,49 +107,90 @@ export class CustomStationsView extends BaseComponent {
     slot.innerHTML = `
       <div class="cs-form-card">
         <div class="cs-form-title">${isEdit ? `Edit "${this.esc(prefill!.name)}"` : 'Add New Station'}</div>
-        <form id="add-station-form" class="cs-form" autocomplete="off">
+        <div class="cs-form" id="add-station-form">
+          <div class="cs-form-group">
+            <label class="cs-label" for="cs-name">Station Name <span class="cs-required">*</span></label>
+            <input type="text" id="cs-name" name="name" placeholder="My Radio Station"
+              value="${prefill ? this.esc(prefill.name) : ''}" autocomplete="off" inputmode="text">
+            <div class="cs-field-error" id="err-name"></div>
+          </div>
+          <div class="cs-form-group">
+            <label class="cs-label" for="cs-url">Stream URL <span class="cs-required">*</span></label>
+            <input type="text" id="cs-url" name="url" placeholder="https://example.com/stream"
+              value="${prefill ? this.esc(prefill.url) : ''}" autocomplete="off" inputmode="url">
+            <div class="cs-field-error" id="err-url"></div>
+          </div>
           <div class="cs-form-row">
             <div class="cs-form-group">
-              <label for="cs-name">Name <span class="cs-required">*</span></label>
-              <input type="text" id="cs-name" name="name" required placeholder="My Radio Station" value="${prefill ? this.esc(prefill.name) : ''}">
+              <label class="cs-label" for="cs-country">Country <span class="cs-required">*</span></label>
+              <input type="text" id="cs-country" name="country" placeholder="Morocco"
+                value="${prefill ? this.esc(prefill.country) : ''}" autocomplete="off">
+              <div class="cs-field-error" id="err-country"></div>
             </div>
-            <div class="cs-form-group">
-              <label for="cs-genre">Genre <span class="cs-required">*</span></label>
-              <input type="text" id="cs-genre" name="genre" required placeholder="Pop, Rock…" value="${prefill ? this.esc(prefill.genre) : ''}">
+            <div class="cs-form-group cs-form-group--sm">
+              <label class="cs-label" for="cs-code">Code <span class="cs-required">*</span></label>
+              <input type="text" id="cs-code" name="countryCode" placeholder="MA" maxlength="2"
+                style="text-transform:uppercase"
+                value="${prefill ? this.esc(prefill.countryCode) : ''}" autocomplete="off">
+              <div class="cs-field-error" id="err-code"></div>
             </div>
           </div>
           <div class="cs-form-group">
-            <label for="cs-url">Stream URL <span class="cs-required">*</span></label>
-            <input type="url" id="cs-url" name="url" required placeholder="https://example.com/stream" value="${prefill ? this.esc(prefill.url) : ''}">
-          </div>
-          <div class="cs-form-row">
-            <div class="cs-form-group">
-              <label for="cs-country">Country <span class="cs-required">*</span></label>
-              <input type="text" id="cs-country" name="country" required placeholder="Morocco" value="${prefill ? this.esc(prefill.country) : ''}">
-            </div>
-            <div class="cs-form-group">
-              <label for="cs-code">Code <span class="cs-required">*</span></label>
-              <input type="text" id="cs-code" name="countryCode" required placeholder="MA" maxlength="2" style="text-transform:uppercase" value="${prefill ? this.esc(prefill.countryCode) : ''}">
-            </div>
+            <label class="cs-label" for="cs-genre">Genre <span class="cs-required">*</span></label>
+            <input type="text" id="cs-genre" name="genre" placeholder="Pop, Rock, News…"
+              value="${prefill ? this.esc(prefill.genre) : ''}" autocomplete="off">
+            <div class="cs-field-error" id="err-genre"></div>
           </div>
           <div class="cs-form-group">
-            <label for="cs-favicon">Logo URL <span class="cs-optional">(optional)</span></label>
-            <input type="url" id="cs-favicon" name="favicon" placeholder="https://example.com/logo.png" value="${prefill?.favicon ? this.esc(prefill.favicon) : ''}">
+            <label class="cs-label" for="cs-favicon">Logo URL <span class="cs-optional">(optional)</span></label>
+            <input type="text" id="cs-favicon" name="favicon" placeholder="https://example.com/logo.png"
+              value="${prefill?.favicon ? this.esc(prefill.favicon) : ''}" autocomplete="off" inputmode="url">
           </div>
           <div class="cs-form-actions">
-            <button type="submit" class="cs-btn-submit">${isEdit ? 'Save Changes' : 'Add Station'}</button>
+            <button type="button" id="cs-submit-btn" class="cs-btn-submit">${isEdit ? 'Save Changes' : 'Add Station'}</button>
             <button type="button" id="cs-cancel-btn" class="cs-btn-cancel">Cancel</button>
           </div>
-        </form>
+        </div>
       </div>`
-    const form = this.querySelector<HTMLFormElement>('#add-station-form')
+
+    const submitBtn = this.querySelector<HTMLElement>('#cs-submit-btn')
     const cancelBtn = this.querySelector('#cs-cancel-btn')
-    if (form) this.on(form, 'submit', async (e) => {
-      e.preventDefault()
-      if (isEdit && this.editingId) await this.handleEdit(form, this.editingId)
-      else await this.handleAdd(form)
+    if (submitBtn) this.on(submitBtn, 'click', async () => {
+      if (isEdit && this.editingId) await this.handleEdit(this.editingId)
+      else await this.handleAdd()
     })
     if (cancelBtn) this.on(cancelBtn, 'click', () => this.closeForm())
+  }
+
+  private getFormValues() {
+    const g = (id: string) => (this.querySelector<HTMLInputElement>(id)?.value ?? '').trim()
+    return {
+      name:        g('#cs-name'),
+      url:         g('#cs-url'),
+      country:     g('#cs-country'),
+      countryCode: g('#cs-code').toUpperCase(),
+      genre:       g('#cs-genre'),
+      favicon:     g('#cs-favicon') || undefined,
+    }
+  }
+
+  private validateForm(v: ReturnType<typeof this.getFormValues>): boolean {
+    let valid = true
+    const setErr = (id: string, msg: string) => {
+      const el = this.querySelector<HTMLElement>(id)
+      if (el) { el.textContent = msg; el.classList.toggle('visible', !!msg) }
+    }
+    // Clear all
+    ;['#err-name','#err-url','#err-country','#err-code','#err-genre'].forEach(id => setErr(id, ''))
+
+    if (!v.name)        { setErr('#err-name',    'Station name is required'); valid = false }
+    if (!v.url)         { setErr('#err-url',     'Stream URL is required'); valid = false }
+    else if (!v.url.startsWith('http')) { setErr('#err-url', 'Must start with http:// or https://'); valid = false }
+    if (!v.country)     { setErr('#err-country', 'Country is required'); valid = false }
+    if (!v.countryCode) { setErr('#err-code',    'Code is required'); valid = false }
+    else if (v.countryCode.length !== 2) { setErr('#err-code', 'Must be 2 letters'); valid = false }
+    if (!v.genre)       { setErr('#err-genre',   'Genre is required'); valid = false }
+    return valid
   }
 
   private renderList(): void {
@@ -212,21 +253,20 @@ export class CustomStationsView extends BaseComponent {
     this.playerStore.play({ id: s.id, name: s.name, url: s.url, urlResolved: s.url, homepage: '', favicon: s.favicon ?? '', country: s.country, countryCode: s.countryCode, state: '', language: '', tags: s.genre ? [s.genre] : [], codec: '', bitrate: 0, votes: 0, clickCount: 0, clickTrend: 0, lastCheckOk: true, lastChangeTime: '', hls: false })
   }
 
-  private async handleAdd(form: HTMLFormElement): Promise<void> {
-    const d = new FormData(form)
-    const station = { id: `custom-${Date.now()}`, name: (d.get('name') as string).trim(), url: (d.get('url') as string).trim(), country: (d.get('country') as string).trim(), countryCode: (d.get('countryCode') as string).trim().toUpperCase(), genre: (d.get('genre') as string).trim(), favicon: (d.get('favicon') as string)?.trim() || undefined }
-    if (!station.name || !station.url || !station.country || !station.countryCode || !station.genre) { toast('Please fill in all required fields', 'error'); return }
+  private async handleAdd(): Promise<void> {
+    const v = this.getFormValues()
+    if (!this.validateForm(v)) return
+    const station = { id: `custom-${Date.now()}`, ...v }
     const result = await this.bridge.customStations.add(station)
-    if (result.success) { toast(`"${station.name}" added`, 'success'); this.closeForm(); await this.loadStations() }
+    if (result.success) { toast(`"${v.name}" added`, 'success'); this.closeForm(); await this.loadStations() }
     else toast('Failed to add station', 'error')
   }
 
-  private async handleEdit(form: HTMLFormElement, id: string): Promise<void> {
-    const d = new FormData(form)
-    const updates = { name: (d.get('name') as string).trim(), url: (d.get('url') as string).trim(), country: (d.get('country') as string).trim(), countryCode: (d.get('countryCode') as string).trim().toUpperCase(), genre: (d.get('genre') as string).trim(), favicon: (d.get('favicon') as string)?.trim() || undefined }
-    if (!updates.name || !updates.url || !updates.country || !updates.countryCode || !updates.genre) { toast('Please fill in all required fields', 'error'); return }
-    const result = await this.bridge.customStations.update(id, updates)
-    if (result.success) { toast(`"${updates.name}" updated`, 'success'); this.closeForm(); await this.loadStations() }
+  private async handleEdit(id: string): Promise<void> {
+    const v = this.getFormValues()
+    if (!this.validateForm(v)) return
+    const result = await this.bridge.customStations.update(id, v)
+    if (result.success) { toast(`"${v.name}" updated`, 'success'); this.closeForm(); await this.loadStations() }
     else toast('Failed to update station', 'error')
   }
 

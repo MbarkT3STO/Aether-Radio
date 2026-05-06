@@ -3,6 +3,8 @@ import { EventBus } from '../store/EventBus'
 import { PlayerStore } from '../store/PlayerStore'
 import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
+import { AudioService } from '../services/AudioService'
+import { VisualizerService } from '../services/VisualizerService'
 import { stationLogoHtml } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
@@ -11,6 +13,9 @@ export class MiniPlayer extends BaseComponent {
   private playerStore    = PlayerStore.getInstance()
   private favoritesStore = FavoritesStore.getInstance()
   private bridge         = BridgeService.getInstance()
+  private audioService   = AudioService.getInstance()
+  private _barVisualizer = new VisualizerService()   // ambient behind mini bar
+  private _sheetVisualizer = new VisualizerService() // ambient behind expanded sheet
   private _renderedStationId: string | null = null
   private _expanded = false
 
@@ -42,6 +47,7 @@ export class MiniPlayer extends BaseComponent {
     const isFav = this.favoritesStore.isFavorite(station.id)
     return `
       <div class="mini-player" id="mini-player-bar">
+        <canvas class="mini-player-ambient" id="mp-ambient-canvas"></canvas>
         <button class="mini-player-expand-area" id="mp-expand-area" aria-label="Expand player">
           <div class="mini-player-logo">
             ${stationLogoHtml(station.favicon, station.name, 'player')}
@@ -78,6 +84,22 @@ export class MiniPlayer extends BaseComponent {
   protected afterMount(): void {
     this._renderedStationId = this.playerStore.currentStation?.id ?? null
     this.attachListeners()
+    this.startBarAmbient()
+  }
+
+  private startBarAmbient(): void {
+    const canvas = this.querySelector<HTMLCanvasElement>('#mp-ambient-canvas')
+    if (!canvas || !this.playerStore.isPlaying) return
+    this._barVisualizer.startAmbientVisualization(
+      canvas, this.audioService.getVisualizer(), false, true
+    )
+    requestAnimationFrame(() => canvas.classList.add('active'))
+  }
+
+  private stopBarAmbient(): void {
+    this._barVisualizer.stopVisualization()
+    const canvas = this.querySelector<HTMLCanvasElement>('#mp-ambient-canvas')
+    if (canvas) canvas.classList.remove('active')
   }
 
   private attachListeners(): void {
@@ -116,11 +138,12 @@ export class MiniPlayer extends BaseComponent {
 
   private closeExpanded(): void {
     this._expanded = false
+    this._sheetVisualizer.stopVisualization()
     const sheet = document.getElementById('mp-expanded-sheet')
     if (!sheet) return
     sheet.classList.remove('mp-sheet--open')
     sheet.addEventListener('transitionend', () => sheet.remove(), { once: true })
-    setTimeout(() => sheet.remove(), 400) // fallback
+    setTimeout(() => sheet.remove(), 400)
   }
 
   private mountExpandedSheet(): void {
@@ -136,13 +159,14 @@ export class MiniPlayer extends BaseComponent {
     sheet.id = 'mp-expanded-sheet'
     sheet.className = 'mp-sheet'
     sheet.innerHTML = `
+      <canvas class="mp-sheet-ambient" id="mp-sheet-ambient"></canvas>
       <div class="mp-sheet-handle-wrap">
         <div class="mp-sheet-handle"></div>
       </div>
 
       <button class="mp-sheet-close" id="mp-sheet-close" aria-label="Close">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="18 15 12 9 6 15"/>
+          <polyline points="6 9 12 15 18 9"/>
         </svg>
       </button>
 
@@ -197,6 +221,17 @@ export class MiniPlayer extends BaseComponent {
 
     this.attachSheetListeners(sheet)
     this.syncSheetWithEvents(sheet)
+
+    // Start ambient if already playing
+    if (isPlaying) {
+      const ambCanvas = sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
+      if (ambCanvas) {
+        this._sheetVisualizer.startAmbientVisualization(
+          ambCanvas, this.audioService.getVisualizer(), true, true
+        )
+        requestAnimationFrame(() => ambCanvas.classList.add('active'))
+      }
+    }
   }
 
   private attachSheetListeners(sheet: HTMLElement): void {
@@ -262,6 +297,17 @@ export class MiniPlayer extends BaseComponent {
       if (isPlaying && !liveEl && artwork) {
         artwork.insertAdjacentHTML('beforeend', `<div class="mp-sheet-live"><span class="mp-sheet-live-dot"></span> Live</div>`)
       } else if (!isPlaying && liveEl) liveEl.remove()
+      // Start/stop ambient
+      const ambCanvas = sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
+      if (ambCanvas) {
+        if (isPlaying) {
+          this._sheetVisualizer.startAmbientVisualization(ambCanvas, this.audioService.getVisualizer(), true, true)
+          requestAnimationFrame(() => ambCanvas.classList.add('active'))
+        } else {
+          this._sheetVisualizer.stopVisualization()
+          ambCanvas.classList.remove('active')
+        }
+      }
     })
 
     const unsub2 = this.eventBus.on('player:pause', () => {
@@ -271,6 +317,8 @@ export class MiniPlayer extends BaseComponent {
         btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
       }
       sheet.querySelector('.mp-sheet-live')?.remove()
+      this._sheetVisualizer.stopVisualization()
+      sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')?.classList.remove('active')
     })
 
     const unsub3 = this.eventBus.on('player:stop', () => { unsub1(); unsub2(); unsub3(); unsub4(); this.closeExpanded() })
@@ -314,10 +362,14 @@ export class MiniPlayer extends BaseComponent {
     const logoWrap = this.querySelector('.mini-player-logo')
     if (isPlaying && !dot && logoWrap) logoWrap.insertAdjacentHTML('beforeend', `<span class="mini-player-live-dot"></span>`)
     else if (!isPlaying && dot) dot.remove()
+    // Sync bar ambient
+    if (isPlaying) this.startBarAmbient()
+    else this.stopBarAmbient()
   }
 
   private onStopChange(): void {
     this._renderedStationId = null
+    this.stopBarAmbient()
     this.fullRender()
   }
 
@@ -330,6 +382,9 @@ export class MiniPlayer extends BaseComponent {
       : isPlaying
         ? `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.5"/><rect x="14" y="4" width="4" height="16" rx="1.5"/></svg>`
         : `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
+    // Stop ambient while buffering, restart when done
+    if (loading) this.stopBarAmbient()
+    else if (isPlaying) this.startBarAmbient()
   }
 
   private updateFavBtn(): void {
