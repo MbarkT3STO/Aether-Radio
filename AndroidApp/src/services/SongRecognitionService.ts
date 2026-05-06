@@ -1,26 +1,18 @@
 /**
- * SongRecognitionService — identifies the currently playing song.
+ * SongRecognitionService — identifies the currently playing song via
+ * Chromaprint (WASM) + AcoustID lookup API.
  *
- * Pipeline:
- *  1. Fetch ~25 s of raw audio bytes from the live stream
- *  2. Decode the bytes into PCM using the app's existing AudioContext
- *     (avoids the "already connected" conflict with the playback AudioContext)
- *  3. Generate a Chromaprint fingerprint by calling the WASM C API directly
- *     with the decoded PCM samples — bypassing @unimusic/chromaprint's
- *     internal AudioContext creation which conflicts on Android WebView
- *  4. POST fingerprint + real duration to AcoustID lookup API
- *  5. Return the best-scoring recording's title / artist / album
+ * Debug overlay is shown on-device so you can see exactly which step fails
+ * without needing a USB-connected computer.
  */
 
-// ── Configuration ─────────────────────────────────────────────────────────────
 const ACOUSTID_CLIENT_KEY = 'hTUfbqGtFY'
 const ACOUSTID_API        = 'https://api.acoustid.org/v2/lookup'
 
-// ~25 s at 128 kbps
+// ~25 s at 128 kbps = 400 KB
 const FETCH_BYTES      = 400 * 1024
 const FETCH_TIMEOUT_MS = 30_000
 
-// ── Types ─────────────────────────────────────────────────────────────────────
 export interface RecognitionResult {
   title: string
   artist: string
@@ -31,9 +23,8 @@ export interface RecognitionResult {
 
 interface AcoustIdRecording {
   title?: string
-  duration?: number
   artists?: { name: string }[]
-  releasegroups?: { title?: string; type?: string; releases?: { date?: string }[] }[]
+  releasegroups?: { title?: string; releases?: { date?: string }[] }[]
 }
 
 interface AcoustIdResult {
@@ -43,16 +34,47 @@ interface AcoustIdResult {
 
 interface AcoustIdResponse {
   status: string
+  error?: { message: string }
   results?: AcoustIdResult[]
+}
+
+// ── Debug overlay ─────────────────────────────────────────────────────────────
+function dbg(msg: string): void {
+  console.log('[Recognition]', msg)
+
+  // Show on-screen so we can see it on the device without USB debugging
+  let el = document.getElementById('rcm-debug-overlay')
+  if (!el) {
+    el = document.createElement('div')
+    el.id = 'rcm-debug-overlay'
+    Object.assign(el.style, {
+      position:   'fixed',
+      bottom:     '80px',
+      left:       '10px',
+      right:      '10px',
+      background: 'rgba(0,0,0,0.85)',
+      color:      '#0f0',
+      fontSize:   '11px',
+      fontFamily: 'monospace',
+      padding:    '8px',
+      borderRadius: '6px',
+      zIndex:     '99999',
+      maxHeight:  '220px',
+      overflowY:  'auto',
+      pointerEvents: 'none',
+    })
+    document.body.appendChild(el)
+    // Auto-remove after 30 s
+    setTimeout(() => el?.remove(), 30_000)
+  }
+  el.innerHTML += `<div>${new Date().toISOString().slice(11, 23)} ${msg}</div>`
+  el.scrollTop = el.scrollHeight
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
 export class SongRecognitionService {
   private static instance: SongRecognitionService
   private _busy = false
-
-  // Reuse a single offline AudioContext for decoding — never connected to speakers
-  private _decodeCtx: OfflineAudioContext | null = null
 
   static getInstance(): SongRecognitionService {
     if (!this.instance) this.instance = new SongRecognitionService()
@@ -64,10 +86,12 @@ export class SongRecognitionService {
   async recognize(streamUrl: string): Promise<RecognitionResult | null> {
     if (this._busy) return null
     this._busy = true
+    // Clear old overlay
+    document.getElementById('rcm-debug-overlay')?.remove()
     try {
       return await this._recognize(streamUrl)
     } catch (e) {
-      console.warn('[Recognition] error:', e)
+      dbg(`UNCAUGHT: ${String(e)}`)
       return null
     } finally {
       this._busy = false
@@ -75,71 +99,88 @@ export class SongRecognitionService {
   }
 
   private async _recognize(streamUrl: string): Promise<RecognitionResult | null> {
-    // Step 1 — fetch raw stream bytes
+    dbg(`URL: ${streamUrl.slice(0, 60)}`)
+
+    // ── Step 1: Fetch stream bytes ────────────────────────────────────────────
+    dbg('Step 1: fetching stream...')
     const rawBytes = await this.fetchStreamChunk(streamUrl)
-    if (!rawBytes || rawBytes.byteLength < 16_384) {
-      console.warn('[Recognition] fetch returned too few bytes:', rawBytes?.byteLength)
+    if (!rawBytes) { dbg('FAIL: fetch returned null'); return null }
+    if (rawBytes.byteLength < 16_384) {
+      dbg(`FAIL: too few bytes: ${rawBytes.byteLength}`)
       return null
     }
-    console.log('[Recognition] fetched bytes:', rawBytes.byteLength)
+    dbg(`OK: fetched ${rawBytes.byteLength} bytes`)
 
-    // Step 2 — decode to PCM using a standard AudioContext
-    // We use a regular AudioContext (not OfflineAudioContext) because
-    // decodeAudioData works on both, but we never connect it to any output
+    // ── Step 2: Decode audio ──────────────────────────────────────────────────
+    dbg('Step 2: decoding audio...')
     let audioBuffer: AudioBuffer | null = null
     try {
-      // Create a fresh AudioContext just for decoding — separate from the
-      // playback AudioContext so there's no conflict
       const ctx = new AudioContext()
-      audioBuffer = await ctx.decodeAudioData(rawBytes)
-      // Close immediately — we only needed it for decoding
+      audioBuffer = await ctx.decodeAudioData(rawBytes.slice(0)) // slice = copy
       ctx.close().catch(() => {})
     } catch (e) {
-      console.warn('[Recognition] decodeAudioData failed:', e)
+      dbg(`FAIL decode: ${String(e)}`)
+      return null
+    }
+    dbg(`OK: ${audioBuffer.duration.toFixed(1)}s, ${audioBuffer.numberOfChannels}ch, ${audioBuffer.sampleRate}Hz`)
+
+    // ── Step 3: Build WAV + fingerprint ───────────────────────────────────────
+    dbg('Step 3: building WAV...')
+    const wavBuffer = this.audioBufferToWav(audioBuffer)
+    dbg(`OK: WAV ${wavBuffer.byteLength} bytes`)
+
+    dbg('Step 3b: generating fingerprint (WASM)...')
+    let fingerprint: string | null = null
+    try {
+      const { processAudioFile } = await import('@unimusic/chromaprint')
+      for await (const fp of processAudioFile(wavBuffer, {
+        maxDuration:   120,
+        chunkDuration: 0,
+        algorithm:     1,
+        rawOutput:     false,
+        overlap:       false,
+      })) {
+        fingerprint = fp
+        break
+      }
+    } catch (e) {
+      dbg(`FAIL WASM: ${String(e)}`)
       return null
     }
 
-    if (!audioBuffer) return null
-    console.log('[Recognition] decoded duration:', audioBuffer.duration, 's, channels:', audioBuffer.numberOfChannels, 'sampleRate:', audioBuffer.sampleRate)
+    if (!fingerprint) { dbg('FAIL: empty fingerprint'); return null }
+    dbg(`OK: fp len=${fingerprint.length}`)
 
-    // Step 3 — generate Chromaprint fingerprint
-    const result = await this.generateFingerprint(audioBuffer)
-    if (!result) {
-      console.warn('[Recognition] fingerprint generation failed')
-      return null
-    }
+    const duration = Math.max(10, Math.round(audioBuffer.duration))
+    dbg(`duration=${duration}s`)
 
-    const { fingerprint, duration } = result
-    console.log('[Recognition] fingerprint length:', fingerprint.length, 'duration:', duration)
-
-    // Step 4 — query AcoustID
-    return await this.queryAcoustId(fingerprint, duration)
+    // ── Step 4: AcoustID lookup ───────────────────────────────────────────────
+    dbg('Step 4: querying AcoustID...')
+    const result = await this.queryAcoustId(fingerprint, duration)
+    if (!result) { dbg('FAIL: no match from AcoustID'); return null }
+    dbg(`MATCH: "${result.title}" — ${result.artist}`)
+    return result
   }
 
+  // ── Fetch ─────────────────────────────────────────────────────────────────
   private async fetchStreamChunk(streamUrl: string): Promise<ArrayBuffer | null> {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-
     try {
       const response = await fetch(streamUrl, {
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-        },
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
         signal: controller.signal,
       })
-
       clearTimeout(timer)
 
       if (!response.ok || !response.body) {
-        console.warn('[Recognition] fetch failed, status:', response.status)
+        dbg(`fetch HTTP ${response.status}`)
         return null
       }
 
       const reader = response.body.getReader()
       const chunks: Uint8Array[] = []
       let total = 0
-
       try {
         while (total < FETCH_BYTES) {
           const { done, value } = await reader.read()
@@ -152,116 +193,49 @@ export class SongRecognitionService {
       }
 
       if (total === 0) return null
-
       const merged = new Uint8Array(total)
-      let offset = 0
-      for (const chunk of chunks) {
-        merged.set(chunk, offset)
-        offset += chunk.length
-      }
+      let off = 0
+      for (const c of chunks) { merged.set(c, off); off += c.length }
       return merged.buffer
-
     } catch (e) {
       clearTimeout(timer)
-      console.warn('[Recognition] fetch error:', e)
+      dbg(`fetch error: ${String(e)}`)
       return null
     }
   }
 
-  private async generateFingerprint(
-    audioBuffer: AudioBuffer
-  ): Promise<{ fingerprint: string; duration: number } | null> {
-    try {
-      // Dynamically import the WASM module
-      const { processAudioFile } = await import('@unimusic/chromaprint')
-
-      // Re-encode the AudioBuffer back to a WAV ArrayBuffer so processAudioFile
-      // can decode it cleanly (it calls decodeAudioData internally on the bytes)
-      const wavBuffer = this.audioBufferToWav(audioBuffer)
-
-      let fingerprint: string | null = null
-      for await (const fp of processAudioFile(wavBuffer, {
-        maxDuration:   120,
-        chunkDuration: 0,
-        algorithm:     1,  // ChromaprintAlgorithm.Default
-        rawOutput:     false,
-        overlap:       false,
-      })) {
-        fingerprint = fp
-        break
-      }
-
-      if (!fingerprint) return null
-
-      // Use the real decoded duration — critical for AcoustID matching
-      const duration = Math.round(audioBuffer.duration)
-      return { fingerprint, duration }
-
-    } catch (e) {
-      console.warn('[Recognition] WASM fingerprint error:', e)
-      return null
-    }
-  }
-
-  /**
-   * Encode an AudioBuffer as a standard PCM WAV file (ArrayBuffer).
-   * This gives processAudioFile a clean, complete file it can decode reliably.
-   */
-  private audioBufferToWav(buffer: AudioBuffer): ArrayBuffer {
-    const numChannels = Math.min(buffer.numberOfChannels, 2) // max stereo
-    const sampleRate  = buffer.sampleRate
-    const numSamples  = buffer.length
-    const bytesPerSample = 2 // 16-bit PCM
-    const dataSize    = numSamples * numChannels * bytesPerSample
-    const wavSize     = 44 + dataSize
-
-    const wav    = new ArrayBuffer(wavSize)
-    const view   = new DataView(wav)
-
-    // RIFF header
-    this.writeString(view, 0, 'RIFF')
-    view.setUint32(4,  36 + dataSize, true)
-    this.writeString(view, 8, 'WAVE')
-    // fmt chunk
-    this.writeString(view, 12, 'fmt ')
-    view.setUint32(16, 16, true)                          // chunk size
-    view.setUint16(20, 1,  true)                          // PCM format
-    view.setUint16(22, numChannels, true)
-    view.setUint32(24, sampleRate, true)
-    view.setUint32(28, sampleRate * numChannels * bytesPerSample, true) // byte rate
-    view.setUint16(32, numChannels * bytesPerSample, true) // block align
-    view.setUint16(34, 16, true)                          // bits per sample
-    // data chunk
-    this.writeString(view, 36, 'data')
-    view.setUint32(40, dataSize, true)
-
-    // Interleave channels as 16-bit signed PCM
-    let offset = 44
-    for (let i = 0; i < numSamples; i++) {
-      for (let ch = 0; ch < numChannels; ch++) {
-        const sample = buffer.getChannelData(ch)[i] ?? 0
-        const clamped = Math.max(-1, Math.min(1, sample))
-        view.setInt16(offset, clamped * 32767, true)
-        offset += 2
+  // ── WAV encoder ──────────────────────────────────────────────────────────
+  private audioBufferToWav(buf: AudioBuffer): ArrayBuffer {
+    const ch   = Math.min(buf.numberOfChannels, 2)
+    const sr   = buf.sampleRate
+    const len  = buf.length
+    const data = 44 + len * ch * 2
+    const wav  = new ArrayBuffer(data)
+    const v    = new DataView(wav)
+    const ws   = (o: number, s: string) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)) }
+    ws(0, 'RIFF'); v.setUint32(4, 36 + len * ch * 2, true); ws(8, 'WAVE')
+    ws(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true)
+    v.setUint16(22, ch, true); v.setUint32(24, sr, true)
+    v.setUint32(28, sr * ch * 2, true); v.setUint16(32, ch * 2, true); v.setUint16(34, 16, true)
+    ws(36, 'data'); v.setUint32(40, len * ch * 2, true)
+    let off = 44
+    for (let i = 0; i < len; i++) {
+      for (let c = 0; c < ch; c++) {
+        const s = buf.getChannelData(c)[i] ?? 0
+        v.setInt16(off, Math.max(-1, Math.min(1, s)) * 32767, true)
+        off += 2
       }
     }
-
     return wav
   }
 
-  private writeString(view: DataView, offset: number, str: string): void {
-    for (let i = 0; i < str.length; i++) {
-      view.setUint8(offset + i, str.charCodeAt(i))
-    }
-  }
-
+  // ── AcoustID ──────────────────────────────────────────────────────────────
   private async queryAcoustId(
     fingerprint: string,
     duration: number
   ): Promise<RecognitionResult | null> {
-    // Build POST body manually to avoid URLSearchParams double-encoding the
-    // meta value — spaces must be literal '+' in the query string
-    const params = [
+    // Build body manually — URLSearchParams would percent-encode the '+' in meta
+    const body = [
       `client=${encodeURIComponent(ACOUSTID_CLIENT_KEY)}`,
       `fingerprint=${encodeURIComponent(fingerprint)}`,
       `duration=${duration}`,
@@ -269,56 +243,54 @@ export class SongRecognitionService {
       `format=json`,
     ].join('&')
 
-    console.log('[Recognition] querying AcoustID, duration:', duration)
-
-    let response: Response
+    let resp: Response
     try {
-      response = await fetch(ACOUSTID_API, {
+      resp = await fetch(ACOUSTID_API, {
         method:  'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:    params,
+        body,
       })
     } catch (e) {
-      console.warn('[Recognition] AcoustID fetch error:', e)
+      dbg(`AcoustID fetch error: ${String(e)}`)
       return null
     }
 
-    if (!response.ok) {
-      console.warn('[Recognition] AcoustID HTTP error:', response.status)
+    if (!resp.ok) {
+      dbg(`AcoustID HTTP ${resp.status}`)
       return null
     }
 
     let data: AcoustIdResponse
     try {
-      data = await response.json() as AcoustIdResponse
+      data = await resp.json() as AcoustIdResponse
     } catch (e) {
-      console.warn('[Recognition] AcoustID JSON parse error:', e)
+      dbg(`AcoustID JSON error: ${String(e)}`)
       return null
     }
 
-    console.log('[Recognition] AcoustID status:', data.status, 'results:', data.results?.length)
+    dbg(`AcoustID status=${data.status} results=${data.results?.length ?? 0}`)
+    if (data.error) dbg(`AcoustID error msg: ${data.error.message}`)
 
     if (data.status !== 'ok' || !data.results?.length) return null
 
-    // Pick the highest-scoring result that has recording metadata
-    // Use a low threshold (0.3) — short clips often score 0.3–0.6
+    // Log all scores so we can tune the threshold
+    data.results.slice(0, 3).forEach((r, i) => {
+      dbg(`  result[${i}] score=${r.score.toFixed(3)} recs=${r.recordings?.length ?? 0}`)
+    })
+
     const best = data.results
       .filter(r => r.score >= 0.3 && r.recordings?.length)
       .sort((a, b) => b.score - a.score)[0]
 
     if (!best?.recordings?.length) {
-      console.warn('[Recognition] no results above threshold. Top score:', data.results[0]?.score)
+      dbg(`no result >= 0.3 (top=${data.results[0]?.score.toFixed(3)})`)
       return null
     }
 
-    console.log('[Recognition] best score:', best.score)
-
-    // Pick the recording with the most metadata
-    const rec = best.recordings.find(r => r.title && r.artists?.length) ?? best.recordings[0]!
-    const title  = rec.title?.trim()
-    const artist = rec.artists?.[0]?.name?.trim()
-
-    if (!title || !artist) return null
+    const rec     = best.recordings.find(r => r.title && r.artists?.length) ?? best.recordings[0]!
+    const title   = rec.title?.trim()
+    const artist  = rec.artists?.[0]?.name?.trim()
+    if (!title || !artist) { dbg('rec missing title/artist'); return null }
 
     const rg          = rec.releasegroups?.[0]
     const album       = rg?.title?.trim()
