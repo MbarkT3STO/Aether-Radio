@@ -19,7 +19,6 @@ export class PlayerBar extends BaseComponent {
   private audioService   = AudioService.getInstance()
   private sleepTimer     = new SleepTimer()
   private recognition    = SongRecognitionService.getInstance()
-  private _rcmAnimFrame: number | null = null
 
   // Document-level drag listeners — kept so we can remove them on unmount
   private _onMouseMove: ((e: Event) => void) | null = null
@@ -991,7 +990,7 @@ export class PlayerBar extends BaseComponent {
       <div class="rcm-dialog" id="rcm-dialog">
 
         <button class="rcm-close" id="rcm-close" aria-label="Close">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -1001,10 +1000,45 @@ export class PlayerBar extends BaseComponent {
         <!-- Listening state -->
         <div class="rcm-listening" id="rcm-listening">
           <div class="rcm-viz-wrap">
-            <canvas class="rcm-canvas" id="rcm-canvas"></canvas>
-            <div class="rcm-viz-label">
-              <span class="rcm-viz-dot"></span>
-              Listening
+            <!-- 3D Fluid Wave Mesh -->
+            <div class="rcm-wave-mesh">
+              <!-- Multiple wave layers for depth -->
+              <div class="rcm-wave-layer rcm-wave-layer-1">
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+              </div>
+              <div class="rcm-wave-layer rcm-wave-layer-2">
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+              </div>
+              <div class="rcm-wave-layer rcm-wave-layer-3">
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+                <div class="rcm-wave-line"></div>
+              </div>
+              <!-- Particle grid overlay -->
+              <div class="rcm-particle-grid"></div>
+              <!-- Glow highlights -->
+              <div class="rcm-wave-glow rcm-wave-glow-1"></div>
+              <div class="rcm-wave-glow rcm-wave-glow-2"></div>
+            </div>
+            <!-- Music note icon -->
+            <div class="rcm-music-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+              </svg>
             </div>
           </div>
           <div class="rcm-listening-label">Identifying song…</div>
@@ -1018,9 +1052,6 @@ export class PlayerBar extends BaseComponent {
     `
 
     document.body.appendChild(modal)
-
-    // Start canvas visualizer
-    this.startRecognitionCanvas()
 
     // Close only via the X button — no backdrop click
     modal.querySelector('#rcm-close')?.addEventListener('click', () => this.closeRecognitionModal())
@@ -1039,24 +1070,26 @@ export class PlayerBar extends BaseComponent {
     listening.classList.add('rcm-fade-out')
 
     setTimeout(() => {
-      this.stopRecognitionCanvas()
       listening.style.display = 'none'
       resultEl.style.display  = 'flex'
 
       if (!result) {
         resultEl.innerHTML = `
-          <div class="rcm-miss-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="1.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="8" y1="12" x2="16" y2="12"/>
-            </svg>
-          </div>
-          <div class="rcm-miss-title">Song not recognized</div>
-          <div class="rcm-miss-sub">The stream may be playing speech or a less common track.<br>Try again in a few seconds.</div>
-          <div class="rcm-miss-actions">
-            <button class="rcm-retry-btn" id="rcm-retry">Try again</button>
+          <div class="rcm-miss-wrap">
+            <div class="rcm-miss-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
+            <div class="rcm-miss-title">Song not recognized</div>
+            <div class="rcm-miss-sub">The stream may be playing speech or a less common track.<br>Try again in a few seconds.</div>
+            <div class="rcm-miss-actions">
+              <button class="rcm-retry-btn" id="rcm-retry">Try again</button>
+            </div>
           </div>
         `
         resultEl.querySelector('#rcm-retry')?.addEventListener('click', () => {
@@ -1065,23 +1098,37 @@ export class PlayerBar extends BaseComponent {
         })
 
       } else {
-        resultEl.innerHTML = `
-          ${result.coverArt
-            ? `<div class="rcm-cover-wrap"><img class="rcm-cover" src="${result.coverArt.replace(/"/g, '%22')}" alt="${this.esc(result.title)}"></div>`
-            : `<div class="rcm-found-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+        // Build result HTML with hero section
+        const coverHtml = result.coverArt
+          ? `<div class="rcm-cover-hero">
+              <div class="rcm-cover-blur-bg" style="background-image: url('${result.coverArt.replace(/"/g, '%22')}')"></div>
+              <div class="rcm-cover-wrap">
+                <img class="rcm-cover" src="${result.coverArt.replace(/"/g, '%22')}" alt="${this.esc(result.title)}">
+              </div>
+            </div>`
+          : `<div class="rcm-found-icon-hero">
+              <div class="rcm-found-icon-orb">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
                   fill="none" stroke="currentColor" stroke-width="1.75"
                   stroke-linecap="round" stroke-linejoin="round">
                   <path d="M9 18V5l12-2v13"/>
                   <circle cx="6" cy="18" r="3"/>
                   <circle cx="18" cy="16" r="3"/>
                 </svg>
-              </div>`
-          }
-          <div class="rcm-found-label">Now Playing</div>
-          <div class="rcm-found-title">${this.esc(result.title)}</div>
-          <div class="rcm-found-artist">${this.esc(result.artist)}</div>
-          ${result.album ? `<div class="rcm-found-album">${this.esc(result.album)}${result.releaseDate ? ` · ${result.releaseDate.slice(0, 4)}` : ''}</div>` : ''}
+              </div>
+            </div>`
+
+        resultEl.innerHTML = `
+          ${coverHtml}
+          <div class="rcm-found-info">
+            <div class="rcm-found-label">
+              <span class="rcm-found-label-dot"></span>
+              Now Playing
+            </div>
+            <div class="rcm-found-title">${this.esc(result.title)}</div>
+            <div class="rcm-found-artist">${this.esc(result.artist)}</div>
+            ${result.album ? `<div class="rcm-found-album">${this.esc(result.album)}${result.releaseDate ? ` · ${result.releaseDate.slice(0, 4)}` : ''}</div>` : ''}
+          </div>
           ${(result.spotifyUrl || result.appleMusicUrl) ? `
             <div class="rcm-result-divider"></div>
             <div class="rcm-found-links">
@@ -1112,145 +1159,10 @@ export class PlayerBar extends BaseComponent {
   }
 
   private closeRecognitionModal(): void {
-    this.stopRecognitionCanvas()
     const modal = document.getElementById('recognition-modal')
     if (!modal) return
     modal.classList.add('rcm-fade-out-modal')
     setTimeout(() => modal.remove(), 320)
-  }
-
-  private startRecognitionCanvas(): void {
-    const canvas = document.getElementById('rcm-canvas') as HTMLCanvasElement | null
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Fill the full dialog
-    const dialog = document.getElementById('rcm-dialog')
-    const W = dialog?.offsetWidth  || 340
-    const H = (document.getElementById('rcm-listening') as HTMLElement)?.offsetHeight || 280
-    canvas.width  = W
-    canvas.height = H
-
-    // Read accent colour from CSS
-    const style = getComputedStyle(document.documentElement)
-    const accent = style.getPropertyValue('--accent-primary').trim() || '#7c6fff'
-    const tmp = document.createElement('div')
-    tmp.style.color = accent
-    document.body.appendChild(tmp)
-    const rgb = getComputedStyle(tmp).color
-    document.body.removeChild(tmp)
-    const [r, g, b] = rgb.match(/\d+/g)?.map(Number) ?? [124, 111, 255]
-
-    // Secondary colour — slightly shifted hue
-    const r2 = Math.min(255, r + 60), g2 = Math.max(0, g - 30), b2 = Math.min(255, b + 40)
-
-    // Blob definitions
-    type Blob = { x: number; y: number; vx: number; vy: number; radius: number; phase: number; speed: number }
-    const blobs: Blob[] = [
-      { x: W * 0.25, y: H * 0.3,  vx: 0.35, vy: 0.22, radius: 110, phase: 0,    speed: 0.008 },
-      { x: W * 0.75, y: H * 0.6,  vx:-0.28, vy: 0.30, radius: 130, phase: 1.5,  speed: 0.006 },
-      { x: W * 0.5,  y: H * 0.8,  vx: 0.20, vy:-0.35, radius: 90,  phase: 3.0,  speed: 0.010 },
-      { x: W * 0.15, y: H * 0.7,  vx: 0.40, vy:-0.18, radius: 80,  phase: 0.8,  speed: 0.007 },
-      { x: W * 0.85, y: H * 0.2,  vx:-0.22, vy: 0.38, radius: 100, phase: 2.2,  speed: 0.009 },
-    ]
-
-    let t = 0
-
-    const draw = (): void => {
-      if (!document.getElementById('rcm-canvas')) return
-      t += 1
-
-      ctx.clearRect(0, 0, W, H)
-
-      // Dark base
-      ctx.fillStyle = 'rgba(10,10,20,0.92)'
-      ctx.fillRect(0, 0, W, H)
-
-      // Draw each blob as a soft radial gradient
-      for (const blob of blobs) {
-        // Drift
-        blob.x += blob.vx
-        blob.y += blob.vy
-        blob.phase += blob.speed
-
-        // Bounce off walls
-        if (blob.x < -blob.radius * 0.5 || blob.x > W + blob.radius * 0.5) blob.vx *= -1
-        if (blob.y < -blob.radius * 0.5 || blob.y > H + blob.radius * 0.5) blob.vy *= -1
-
-        // Pulsing radius
-        const pr = blob.radius * (0.85 + 0.15 * Math.sin(blob.phase))
-
-        // Alternate between accent and secondary colour per blob
-        const useSecondary = blobs.indexOf(blob) % 2 === 1
-        const cr = useSecondary ? r2 : r
-        const cg = useSecondary ? g2 : g
-        const cb = useSecondary ? b2 : b
-
-        const grd = ctx.createRadialGradient(blob.x, blob.y, 0, blob.x, blob.y, pr)
-        grd.addColorStop(0,   `rgba(${cr},${cg},${cb},0.28)`)
-        grd.addColorStop(0.5, `rgba(${cr},${cg},${cb},0.10)`)
-        grd.addColorStop(1,   `rgba(${cr},${cg},${cb},0)`)
-
-        ctx.beginPath()
-        ctx.arc(blob.x, blob.y, pr, 0, Math.PI * 2)
-        ctx.fillStyle = grd
-        ctx.fill()
-      }
-
-      // Scanline shimmer — a thin bright horizontal band that sweeps down
-      const scanY = ((t * 1.2) % (H + 40)) - 20
-      const scanGrd = ctx.createLinearGradient(0, scanY - 12, 0, scanY + 12)
-      scanGrd.addColorStop(0,   'rgba(255,255,255,0)')
-      scanGrd.addColorStop(0.5, `rgba(${r},${g},${b},0.07)`)
-      scanGrd.addColorStop(1,   'rgba(255,255,255,0)')
-      ctx.fillStyle = scanGrd
-      ctx.fillRect(0, scanY - 12, W, 24)
-
-      // Waveform line across the middle
-      const waveY = H * 0.52
-      ctx.beginPath()
-      for (let x = 0; x <= W; x += 2) {
-        const freq1 = Math.sin((x / W) * Math.PI * 8  + t * 0.06) * 10
-        const freq2 = Math.sin((x / W) * Math.PI * 14 - t * 0.04) * 5
-        const freq3 = Math.sin((x / W) * Math.PI * 4  + t * 0.03) * 7
-        const y = waveY + freq1 + freq2 + freq3
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-      }
-      ctx.strokeStyle = `rgba(${r},${g},${b},0.5)`
-      ctx.lineWidth   = 1.5
-      ctx.stroke()
-
-      // Second thinner wave
-      ctx.beginPath()
-      for (let x = 0; x <= W; x += 2) {
-        const freq1 = Math.sin((x / W) * Math.PI * 12 - t * 0.05) * 6
-        const freq2 = Math.sin((x / W) * Math.PI * 6  + t * 0.07) * 4
-        const y = waveY + freq1 + freq2 - 18
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-      }
-      ctx.strokeStyle = `rgba(${r2},${g2},${b2},0.3)`
-      ctx.lineWidth   = 1
-      ctx.stroke()
-
-      // Vignette overlay to keep edges dark
-      const vig = ctx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, H*0.85)
-      vig.addColorStop(0, 'rgba(0,0,0,0)')
-      vig.addColorStop(1, 'rgba(0,0,0,0.55)')
-      ctx.fillStyle = vig
-      ctx.fillRect(0, 0, W, H)
-
-      this._rcmAnimFrame = requestAnimationFrame(draw)
-    }
-
-    this._rcmAnimFrame = requestAnimationFrame(draw)
-  }
-
-  private stopRecognitionCanvas(): void {
-    if (this._rcmAnimFrame !== null) {
-      cancelAnimationFrame(this._rcmAnimFrame)
-      this._rcmAnimFrame = null
-    }
   }
 
   // ── Icon helpers (recognition) ────────────────────────────────────────────
