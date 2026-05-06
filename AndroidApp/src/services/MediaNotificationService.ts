@@ -4,8 +4,11 @@
  * Manages the Android media notification (lock screen + notification shade)
  * using capacitor-music-controls-plugin-v3.
  *
- * Shows: app icon, station name, play/pause, stop, favorite buttons.
+ * Shows: station name, country, app name, station artwork, play/pause, stop.
  * Keeps audio playing in the background via the plugin's foreground service.
+ *
+ * NOTE: On Android 13+ the plugin fires events via document.addEventListener
+ * (not plugin.addListener) due to a Capacitor bug with notifyListeners.
  */
 import { EventBus } from '../store/EventBus'
 import { PlayerStore } from '../store/PlayerStore'
@@ -13,37 +16,39 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
 import type { RadioStation } from '../domain/entities/RadioStation'
 
-// The plugin is loaded dynamically to avoid breaking web/dev builds
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MusicControlsPlugin = any
+type AnyPlugin = any
 
-let MusicControls: MusicControlsPlugin | null = null
+let _plugin: AnyPlugin | null = null
+let _pluginLoaded = false
 
-async function getPlugin(): Promise<MusicControlsPlugin | null> {
-  if (MusicControls) return MusicControls
+async function getPlugin(): Promise<AnyPlugin | null> {
+  if (_pluginLoaded) return _plugin
+  _pluginLoaded = true
   try {
-    // Only available on native Android
     const mod = await import('capacitor-music-controls-plugin-v3')
-    MusicControls = mod.CapacitorMusicControls ?? mod.default ?? null
-    return MusicControls
+    _plugin = mod.CapacitorMusicControls ?? mod.default ?? null
   } catch {
-    return null
+    _plugin = null
   }
+  return _plugin
 }
 
 export class MediaNotificationService {
   private static instance: MediaNotificationService
-  private eventBus       = EventBus.getInstance()
-  private playerStore    = PlayerStore.getInstance()
+  private eventBus     = EventBus.getInstance()
+  private playerStore  = PlayerStore.getInstance()
   private favoritesStore = FavoritesStore.getInstance()
-  private bridge         = BridgeService.getInstance()
-  private _active        = false
+  private bridge       = BridgeService.getInstance()
+  private _active      = false
+  private _listening   = false
 
   private constructor() {
     this.eventBus.on('player:play',  () => void this.onPlay())
     this.eventBus.on('player:pause', () => void this.onPause())
-    this.eventBus.on('player:stop',  () => void this.destroy())
-    this.eventBus.on('favorites:changed', () => void this.refresh())
+    this.eventBus.on('player:stop',  () => void this.onStop())
+    // Register document-level event listener for Android 13+ immediately
+    this.registerDocumentListener()
   }
 
   static getInstance(): MediaNotificationService {
@@ -58,119 +63,119 @@ export class MediaNotificationService {
   private async onPlay(): Promise<void> {
     const station = this.playerStore.currentStation
     if (!station) return
-    if (!this._active) {
-      await this.create(station)
-    } else {
-      await this.updatePlayState(true)
-    }
+    // Always recreate to update station info
+    await this.create(station, true)
   }
 
   private async onPause(): Promise<void> {
-    await this.updatePlayState(false)
-  }
-
-  private async refresh(): Promise<void> {
-    if (!this._active) return
-    const station = this.playerStore.currentStation
-    if (station) await this.create(station)
-  }
-
-  // ── Plugin calls ──────────────────────────────────────────────────────────
-
-  private async create(station: RadioStation): Promise<void> {
-    const plugin = await getPlugin()
-    if (!plugin) return
-
-    const isFav = this.favoritesStore.isFavorite(station.id)
-    const isPlaying = this.playerStore.isPlaying
-
-    try {
-      await plugin.create({
-        track:        station.name,
-        artist:       station.country || 'Live Radio',
-        album:        'Aether Radio',
-        cover:        station.favicon || 'public/assets/logo.png',
-        isPlaying:    isPlaying,
-        dismissable:  false,          // keep alive while playing
-        hasPrev:      false,
-        hasNext:      false,
-        hasClose:     true,           // stop button
-        hasSkipForward:  false,
-        hasSkipBackward: false,
-        // Custom action for favorite toggle
-        hasFavorite:  true,
-        isFavorite:   isFav,
-        // Ticker text shown in notification
-        ticker:       `Now playing: ${station.name}`,
-        // App name shown in notification header
-        notificationIcon: 'ic_launcher',
-      })
-
-      this._active = true
-      this.listenToControls()
-    } catch (e) {
-      console.warn('MediaNotification create failed:', e)
-    }
-  }
-
-  private async updatePlayState(playing: boolean): Promise<void> {
     const plugin = await getPlugin()
     if (!plugin || !this._active) return
     try {
-      await plugin.updateIsPlaying({ isPlaying: playing })
-    } catch { /* ignore */ }
+      await plugin.updateIsPlaying({ isPlaying: false })
+    } catch (e) {
+      console.warn('[MediaNotification] updateIsPlaying failed:', e)
+    }
   }
 
-  async destroy(): Promise<void> {
-    const plugin = await getPlugin()
+  private async onStop(): Promise<void> {
     this._active = false
+    const plugin = await getPlugin()
     if (!plugin) return
     try { await plugin.destroy() } catch { /* ignore */ }
   }
 
-  // ── Control events from notification ─────────────────────────────────────
+  // ── Create notification ───────────────────────────────────────────────────
 
-  private _controlsListening = false
+  private async create(station: RadioStation, isPlaying: boolean): Promise<void> {
+    const plugin = await getPlugin()
+    if (!plugin) return
 
-  private listenToControls(): void {
-    if (this._controlsListening) return
-    this._controlsListening = true
+    // Use station favicon if it's a valid https URL, otherwise fall back to app logo
+    const cover = station.favicon?.startsWith('https://')
+      ? station.favicon
+      : 'public/assets/logo.png'
 
+    try {
+      await plugin.create({
+        track:       station.name,
+        artist:      station.country || 'Live Radio',
+        album:       'Aether Radio',
+        cover:       cover,
+        isPlaying:   isPlaying,
+        dismissable: false,   // keep notification alive while playing
+        hasPrev:     false,
+        hasNext:     false,
+        hasClose:    true,    // shows a stop/close button
+        ticker:      `Now playing: ${station.name}`,
+        // Use built-in Android media icons (no custom drawable needed)
+        playIcon:    'media_play',
+        pauseIcon:   'media_pause',
+        closeIcon:   'media_close',
+        notificationIcon: 'notification',
+      })
+      this._active = true
+    } catch (e) {
+      console.warn('[MediaNotification] create failed:', e)
+    }
+  }
+
+  // ── Listen for notification button events ─────────────────────────────────
+
+  private registerDocumentListener(): void {
+    if (this._listening) return
+    this._listening = true
+
+    // Android 13+: plugin fires via triggerJSEvent → document event
+    document.addEventListener('controlsNotification', (event: Event) => {
+      const message = (event as CustomEvent).detail?.message
+        ?? (event as CustomEvent & { message?: string }).message
+        ?? ''
+      void this.handleMessage(message)
+    })
+
+    // Also try the plugin's addListener for older Android / iOS
     getPlugin().then(plugin => {
       if (!plugin) return
-
-      plugin.addListener('controlsNotification', async (info: { message: string }) => {
-        switch (info.message) {
-          case 'music-controls-play':
-            if (this.playerStore.currentStation) {
-              this.playerStore.play(this.playerStore.currentStation)
-            }
-            break
-          case 'music-controls-pause':
-            this.playerStore.pause()
-            break
-          case 'music-controls-stop':
-          case 'music-controls-destroy':
-            this.playerStore.stop()
-            break
-          case 'music-controls-toggle-play-pause':
-            if (this.playerStore.isPlaying) this.playerStore.pause()
-            else if (this.playerStore.currentStation) this.playerStore.play(this.playerStore.currentStation)
-            break
-          case 'music-controls-favorite': {
-            const station = this.playerStore.currentStation
-            if (!station) break
-            if (this.favoritesStore.isFavorite(station.id)) {
-              await this.bridge.favorites.remove(station.id)
-            } else {
-              await this.bridge.favorites.add(station)
-            }
-            const res = await this.bridge.favorites.getAll()
-            if (res.success) this.favoritesStore.setFavorites(res.data)
-            break
-          }
-        }
-      })
+      try {
+        plugin.addListener('controlsNotification', (info: { message: string }) => {
+          void this.handleMessage(info.message)
+        })
+      } catch { /* plugin may not support addListener */ }
     })
+  }
+
+  private async handleMessage(message: string): Promise<void> {
+    switch (message) {
+      case 'music-controls-play':
+        if (this.playerStore.currentStation) {
+          this.playerStore.play(this.playerStore.currentStation)
+        }
+        break
+
+      case 'music-controls-pause':
+        this.playerStore.pause()
+        break
+
+      case 'music-controls-stop':
+      case 'music-controls-destroy':
+        this.playerStore.stop()
+        break
+
+      case 'music-controls-toggle-play-pause':
+        if (this.playerStore.isPlaying) this.playerStore.pause()
+        else if (this.playerStore.currentStation) this.playerStore.play(this.playerStore.currentStation)
+        break
+
+      case 'music-controls-media-button':
+        // Physical media button — toggle play/pause
+        if (this.playerStore.isPlaying) this.playerStore.pause()
+        else if (this.playerStore.currentStation) this.playerStore.play(this.playerStore.currentStation)
+        break
+
+      case 'music-controls-headset-unplugged':
+        // Auto-pause on headset unplug (good UX)
+        if (this.playerStore.isPlaying) this.playerStore.pause()
+        break
+    }
   }
 }

@@ -270,7 +270,7 @@ export class MiniPlayer extends BaseComponent {
       if (res.success) this.favoritesStore.setFavorites(res.data)
     })
 
-    // Volume slider — touch + mouse
+    // Volume slider — touch + mouse, prevent sheet scroll
     const track = q('#mp-sheet-vol-track')
     if (track) {
       const setVol = (clientX: number) => {
@@ -278,21 +278,48 @@ export class MiniPlayer extends BaseComponent {
         this.playerStore.setVolume(Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)))
       }
       let dragging = false
-      track.addEventListener('mousedown',  (e) => { dragging = true; setVol((e as MouseEvent).clientX) })
-      track.addEventListener('touchstart', (e) => { dragging = true; setVol((e as TouchEvent).touches[0]!.clientX) }, { passive: true })
-      document.addEventListener('mousemove',  (e) => { if (dragging) setVol((e as MouseEvent).clientX) })
-      document.addEventListener('touchmove',  (e) => { if (dragging) setVol((e as TouchEvent).touches[0]!.clientX) }, { passive: true })
-      document.addEventListener('mouseup',  () => { dragging = false })
-      document.addEventListener('touchend', () => { dragging = false })
+
+      track.addEventListener('mousedown', (e) => {
+        dragging = true
+        e.preventDefault()
+        setVol((e as MouseEvent).clientX)
+      })
+
+      track.addEventListener('touchstart', (e) => {
+        dragging = true
+        e.stopPropagation()
+        // Don't preventDefault here — let the browser handle tap
+        setVol((e as TouchEvent).touches[0]!.clientX)
+      }, { passive: true })
+
+      // Use capture on document so we get the event even if finger moves outside track
+      const onTouchMove = (e: TouchEvent) => {
+        if (!dragging) return
+        e.preventDefault()   // stops sheet scroll
+        e.stopPropagation()
+        setVol(e.touches[0]!.clientX)
+      }
+      const onMouseMove = (e: MouseEvent) => { if (dragging) setVol(e.clientX) }
+      const onEnd = () => { dragging = false }
+
+      document.addEventListener('touchmove', onTouchMove, { passive: false })
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('touchend', onEnd)
+      document.addEventListener('mouseup', onEnd)
     }
 
-    // Swipe down to close
-    let touchStartY = 0
-    sheet.addEventListener('touchstart', (e) => { touchStartY = (e as TouchEvent).touches[0]!.clientY }, { passive: true })
-    sheet.addEventListener('touchend', (e) => {
-      const dy = (e as TouchEvent).changedTouches[0]!.clientY - touchStartY
-      if (dy > 80) this.closeExpanded()
-    }, { passive: true })
+    // Swipe down on the handle to close (not the whole sheet)
+    const handle = sheet.querySelector<HTMLElement>('.mp-sheet-handle-wrap')
+    if (handle) {
+      let touchStartY = 0
+      handle.addEventListener('touchstart', (e) => {
+        touchStartY = (e as TouchEvent).touches[0]!.clientY
+      }, { passive: true })
+      handle.addEventListener('touchend', (e) => {
+        const dy = (e as TouchEvent).changedTouches[0]!.clientY - touchStartY
+        if (dy > 60) this.closeExpanded()
+      }, { passive: true })
+    }
   }
 
   private syncSheetWithEvents(sheet: HTMLElement): void {
