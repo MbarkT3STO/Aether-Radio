@@ -8,7 +8,10 @@ export default defineConfig({
     outDir: '../dist',
     emptyOutDir: true,
     sourcemap: false,
-    // Ensure .wasm files are treated as assets and copied to dist
+    // Required: @unimusic/chromaprint uses top-level await (WASM init)
+    // Capacitor's Android WebView fully supports ESNext / top-level await
+    target: 'esnext',
+    // Ensure .wasm files are emitted as separate assets (never inlined)
     assetsInlineLimit: 0,
     rollupOptions: {
       input: {
