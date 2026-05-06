@@ -168,8 +168,9 @@ export class PlayerBar extends BaseComponent {
 
           <div id="player-sleep-timer"></div>
 
-          ${isMacOS ? `<button class="player-btn player-recognize-btn" id="player-recognize-btn"
-            title="Identify song" aria-label="Identify song">
+          ${isMacOS ? `<button class="player-btn player-recognize-btn ${isPlaying ? '' : 'player-btn-disabled'}" id="player-recognize-btn"
+            title="Identify song" aria-label="Identify song"
+            ${isPlaying ? '' : 'disabled'}>
             ${this.recognizeIcon()}
           </button>` : ''}
 
@@ -263,6 +264,13 @@ export class PlayerBar extends BaseComponent {
 
     // Sync favorite button in case it changed while paused
     this.updateFavoriteUI()
+
+    // Sync recognize button enabled state
+    const recognizeBtn = this.querySelector<HTMLElement>('#player-recognize-btn')
+    if (recognizeBtn) {
+      recognizeBtn.classList.toggle('player-btn-disabled', !isPlaying)
+      recognizeBtn.toggleAttribute('disabled', !isPlaying)
+    }
 
     // Visualizer
     this.syncVisualizer(isPlaying)
