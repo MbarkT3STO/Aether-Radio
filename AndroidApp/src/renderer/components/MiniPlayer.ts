@@ -141,18 +141,50 @@ export class MiniPlayer extends BaseComponent {
       })
     }
 
-    // Click anywhere on the mini-player (except buttons) to expand
-    const root = this.querySelector('#mini-player-root')
-    if (root) {
-      this.on(root, 'click', (e) => {
+    // Click anywhere on the mini-player (except buttons) to expand.
+    // this.element IS the .mini-player root — querySelector('#mini-player-root')
+    // would search *inside* it and find nothing, so we attach directly to element.
+    if (this.element) {
+      this.on(this.element, 'click', (e) => {
         const target = e.target as HTMLElement
-        // Don't expand if clicking a button
         if (target.closest('button')) return
         if (this.playerStore.currentStation) {
           this.openExpanded()
         }
       })
+
+      // Swipe-up on the mini player also opens the expanded player
+      this.setupSwipeUpToExpand(this.element)
     }
+  }
+
+  private setupSwipeUpToExpand(el: HTMLElement): void {
+    let startY = 0
+    let startX = 0
+    let tracking = false
+
+    const onTouchStart = (e: Event) => {
+      const touch = (e as TouchEvent).touches[0]
+      startY = touch.clientY
+      startX = touch.clientX
+      tracking = true
+    }
+
+    const onTouchEnd = (e: Event) => {
+      if (!tracking) return
+      tracking = false
+      const touch = (e as TouchEvent).changedTouches[0]
+      const deltaY = startY - touch.clientY   // positive = swipe up
+      const deltaX = Math.abs(touch.clientX - startX)
+      // Trigger if swiped up at least 40px and mostly vertical
+      if (deltaY > 40 && deltaY > deltaX * 1.5 && this.playerStore.currentStation) {
+        this.openExpanded()
+      }
+    }
+
+    // Use this.on() so BaseComponent tracks and cleans up these listeners
+    this.on(el, 'touchstart', onTouchStart)
+    this.on(el, 'touchend', onTouchEnd)
   }
 
   private openExpanded(): void {

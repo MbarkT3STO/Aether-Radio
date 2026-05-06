@@ -185,6 +185,7 @@ export class ExpandedPlayer extends BaseComponent {
     const onTouchStart = (e: Event) => {
       const touch = (e as TouchEvent).touches[0]
       startY = touch.clientY
+      currentY = touch.clientY
       isDragging = true
       sheet.style.transition = 'none'
     }
@@ -209,9 +210,10 @@ export class ExpandedPlayer extends BaseComponent {
       }
     }
 
-    sheet.addEventListener('touchstart', onTouchStart, { passive: true })
-    sheet.addEventListener('touchmove', onTouchMove, { passive: true })
-    sheet.addEventListener('touchend', onTouchEnd)
+    // Use this.on() so BaseComponent tracks and cleans up these listeners
+    this.on(sheet, 'touchstart', onTouchStart)
+    this.on(sheet, 'touchmove', onTouchMove)
+    this.on(sheet, 'touchend', onTouchEnd)
   }
 
   close(): void {
