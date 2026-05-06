@@ -22,7 +22,8 @@
     "@capacitor/status-bar": "^6.0.2",
     "@unimusic/chromaprint": "0.1.4",
     "capacitor-music-controls-plugin-v3": "^2.0.0",
-    "flag-icons": "7.5.0"
+    "flag-icons": "7.5.0",
+    "shazamio-core": "1.3.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.0",

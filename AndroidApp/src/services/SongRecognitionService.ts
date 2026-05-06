@@ -1,28 +1,27 @@
 /**
  * SongRecognitionService — identifies the currently playing song.
  *
- * Strategy: tap into the EXISTING AudioContext + AnalyserNode that the
- * VisualizerService already has connected to the playing HTMLAudioElement.
- * We insert a ScriptProcessorNode into that graph to capture raw PCM samples
- * directly from the live audio — no fetch, no CORS, works on every station.
+ * Uses the same pipeline as the desktop app but adapted for the browser:
+ *  1. Capture ~8 s of raw PCM float32 from the live AudioContext graph
+ *     (no fetch/CORS — taps directly into the playing audio)
+ *  2. Feed PCM to shazamio-core/web (Shazam's own fingerprinting WASM)
+ *     via DecodedSignature.new() — gets a Shazam-format signature URI
+ *  3. POST the signature to Shazam's internal API (amp.shazam.com)
+ *  4. Parse title / artist / album / cover art from the response
  *
- * Pipeline:
- *  1. Record ~20 s of PCM float32 samples from the playing audio via
- *     ScriptProcessorNode tapped off the existing AnalyserNode
- *  2. Encode the samples as a WAV ArrayBuffer
- *  3. Feed the WAV to @unimusic/chromaprint (WASM) → fingerprint string
- *  4. POST fingerprint + duration to AcoustID lookup API
- *  5. Return title / artist / album
+ * Free, unlimited, Shazam's full 100M+ track database.
  */
 
 import { AudioService } from './AudioService'
 
-const ACOUSTID_CLIENT_KEY = 'hTUfbqGtFY'
-const ACOUSTID_API        = 'https://api.acoustid.org/v2/lookup'
+// Shazam API endpoint
+const SHAZAM_HOST   = 'https://amp.shazam.com'
+const SHAZAM_PARAMS = 'sync=true&webv3=true&sampling=true&connected=&shazamapiversion=v3&sharehub=true&hubv5minorversion=v5.1&hidelb=true&video=v3'
 
-// How many seconds of audio to capture before fingerprinting
-const CAPTURE_SECONDS = 20
+// Capture 8 seconds — enough for Shazam, same as desktop
+const CAPTURE_SECONDS = 8
 
+// ── Types ─────────────────────────────────────────────────────────────────────
 export interface RecognitionResult {
   title: string
   artist: string
@@ -31,21 +30,16 @@ export interface RecognitionResult {
   coverArt?: string
 }
 
-interface AcoustIdRecording {
+interface ShazamTrack {
   title?: string
-  artists?: { name: string }[]
-  releasegroups?: { title?: string; releases?: { date?: string }[] }[]
+  subtitle?: string
+  images?: { coverart?: string; coverarthq?: string }
+  sections?: { type: string; metadata?: { title: string; text: string }[] }[]
 }
 
-interface AcoustIdResult {
-  score: number
-  recordings?: AcoustIdRecording[]
-}
-
-interface AcoustIdResponse {
-  status: string
-  error?: { message: string }
-  results?: AcoustIdResult[]
+interface ShazamResponse {
+  matches?: unknown[]
+  track?: ShazamTrack
 }
 
 // ── Debug overlay ─────────────────────────────────────────────────────────────
@@ -67,6 +61,13 @@ function dbg(msg: string): void {
   }
   el.innerHTML += `<div>${new Date().toISOString().slice(11, 23)} ${msg}</div>`
   el.scrollTop = el.scrollHeight
+}
+
+function uuidv4(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  }).toUpperCase()
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
@@ -97,205 +98,180 @@ export class SongRecognitionService {
 
   private async _recognize(): Promise<RecognitionResult | null> {
     // ── Step 1: Capture PCM from the live audio graph ─────────────────────────
-    dbg('Step 1: capturing PCM from audio graph...')
-    const pcmResult = await this.capturePcm()
-    if (!pcmResult) { dbg('FAIL: PCM capture failed'); return null }
+    dbg(`Step 1: capturing ${CAPTURE_SECONDS}s PCM...`)
+    const pcm = await this.capturePcm()
+    if (!pcm) { dbg('FAIL: no PCM (audio not playing?)'); return null }
+    dbg(`OK: ${pcm.samples.length} samples @ ${pcm.sampleRate}Hz x${pcm.channels}ch`)
 
-    const { samples, sampleRate, channels } = pcmResult
-    dbg(`OK: captured ${samples[0]!.length} samples @ ${sampleRate}Hz x${channels}ch`)
+    // ── Step 2: Generate Shazam signature via WASM ────────────────────────────
+    dbg('Step 2: generating Shazam signature (WASM)...')
+    const sigResult = await this.generateSignature(pcm.samples, pcm.sampleRate, pcm.channels)
+    if (!sigResult) { dbg('FAIL: signature generation failed'); return null }
+    dbg(`OK: uri len=${sigResult.uri.length} samplems=${sigResult.samplems}`)
 
-    // ── Step 2: Encode as WAV ─────────────────────────────────────────────────
-    dbg('Step 2: encoding WAV...')
-    const wavBuffer = this.pcmToWav(samples, sampleRate, channels)
-    dbg(`OK: WAV ${wavBuffer.byteLength} bytes`)
-
-    // ── Step 3: Chromaprint fingerprint ───────────────────────────────────────
-    dbg('Step 3: generating fingerprint (WASM)...')
-    let fingerprint: string | null = null
-    try {
-      const { processAudioFile } = await import('@unimusic/chromaprint')
-      for await (const fp of processAudioFile(wavBuffer, {
-        maxDuration: 120, chunkDuration: 0,
-        algorithm: 1, rawOutput: false, overlap: false,
-      })) {
-        fingerprint = fp
-        break
-      }
-    } catch (e) {
-      dbg(`FAIL WASM: ${String(e)}`)
-      return null
-    }
-
-    if (!fingerprint) { dbg('FAIL: empty fingerprint'); return null }
-    const duration = Math.round(samples[0]!.length / sampleRate)
-    dbg(`OK: fp len=${fingerprint.length} duration=${duration}s`)
-
-    // ── Step 4: AcoustID lookup ───────────────────────────────────────────────
-    dbg('Step 4: querying AcoustID...')
-    return await this.queryAcoustId(fingerprint, duration)
+    // ── Step 3: POST to Shazam API ────────────────────────────────────────────
+    dbg('Step 3: querying Shazam API...')
+    return await this.queryShazam(sigResult.uri, sigResult.samplems)
   }
 
   // ── PCM capture via ScriptProcessorNode ──────────────────────────────────
   private capturePcm(): Promise<{
-    samples: Float32Array[]
+    samples: Float32Array
     sampleRate: number
     channels: number
   } | null> {
     return new Promise((resolve) => {
-      const audioService = AudioService.getInstance()
-      const visualizer   = audioService.getVisualizer()
-      const analyser     = visualizer.sharedAnalyser
+      const visualizer = AudioService.getInstance().getVisualizer()
+      const analyser   = visualizer.sharedAnalyser
 
       if (!analyser) {
-        dbg('FAIL: no analyser (audio not playing?)')
+        dbg('no analyser node — is audio playing?')
         resolve(null)
         return
       }
 
       const ctx      = analyser.context as AudioContext
       const sr       = ctx.sampleRate
-      const numCh    = 2
       const bufSize  = 4096
       const needed   = CAPTURE_SECONDS * sr
-      const recorded: Float32Array[][] = [[], []]
+      const recorded: Float32Array[] = []
+      let collected  = 0
+      let done       = false
 
-      dbg(`capturing ${CAPTURE_SECONDS}s @ ${sr}Hz...`)
-
-      // ScriptProcessorNode taps the audio stream without interrupting playback
       // eslint-disable-next-line @typescript-eslint/no-deprecated
-      const proc = ctx.createScriptProcessor(bufSize, numCh, numCh)
-      let collected = 0
-      let done = false
+      const proc = ctx.createScriptProcessor(bufSize, 1, 1) // mono — Shazam needs mono
+      let disconnected = false
 
-      // Safety timeout — if we never get enough samples, resolve with what we have
+      const cleanup = () => {
+        if (disconnected) return
+        disconnected = true
+        proc.disconnect()
+        try { analyser.disconnect(proc) } catch { /* ok */ }
+      }
+
       const timeout = setTimeout(() => {
-        if (!done) {
-          done = true
-          proc.disconnect()
-          analyser.disconnect(proc)
-          dbg(`timeout: collected ${collected} samples`)
-          resolve(collected > sr * 5 ? buildResult() : null)
-        }
-      }, (CAPTURE_SECONDS + 5) * 1000)
+        if (done) return
+        done = true
+        cleanup()
+        dbg(`timeout: ${collected} samples collected`)
+        resolve(collected > sr * 3 ? buildResult() : null)
+      }, (CAPTURE_SECONDS + 6) * 1000)
 
       function buildResult() {
-        const out: Float32Array[] = []
-        for (let c = 0; c < numCh; c++) {
-          const total = recorded[c]!.reduce((s, a) => s + a.length, 0)
-          const merged = new Float32Array(total)
-          let off = 0
-          for (const chunk of recorded[c]!) {
-            merged.set(chunk, off)
-            off += chunk.length
-          }
-          out.push(merged)
-        }
-        return { samples: out, sampleRate: sr, channels: numCh }
+        const total  = recorded.reduce((s, a) => s + a.length, 0)
+        const merged = new Float32Array(total)
+        let off = 0
+        for (const chunk of recorded) { merged.set(chunk, off); off += chunk.length }
+        return { samples: merged, sampleRate: sr, channels: 1 }
       }
 
       proc.onaudioprocess = (e) => {
         if (done) return
-        for (let c = 0; c < numCh; c++) {
-          const data = e.inputBuffer.getChannelData(c)
-          recorded[c]!.push(new Float32Array(data))
-        }
-        collected += bufSize
+        // Use channel 0 (mono mix-down)
+        const data = e.inputBuffer.getChannelData(0)
+        recorded.push(new Float32Array(data))
+        collected += data.length
         if (collected >= needed) {
           done = true
           clearTimeout(timeout)
-          proc.disconnect()
-          try { analyser.disconnect(proc) } catch { /* already disconnected */ }
+          cleanup()
           resolve(buildResult())
         }
       }
 
-      // Connect: analyser → scriptProcessor → (no output needed)
       analyser.connect(proc)
-      proc.connect(ctx.destination) // must connect to destination or it won't fire
+      proc.connect(ctx.destination)
     })
   }
 
-  // ── WAV encoder ──────────────────────────────────────────────────────────
-  private pcmToWav(samples: Float32Array[], sampleRate: number, channels: number): ArrayBuffer {
-    const len  = samples[0]!.length
-    const data = 44 + len * channels * 2
-    const wav  = new ArrayBuffer(data)
-    const v    = new DataView(wav)
-    const ws   = (o: number, s: string) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)) }
+  // ── Shazam signature via shazamio-core/web ────────────────────────────────
+  private async generateSignature(
+    samples: Float32Array,
+    sampleRate: number,
+    _channels: number
+  ): Promise<{ uri: string; samplems: number } | null> {
+    try {
+      // Dynamic import — loads the WASM only when needed
+      const mod = await import('shazamio-core/web')
+      // mod.default is the init function
+      await (mod.default as () => Promise<unknown>)()
 
-    ws(0, 'RIFF'); v.setUint32(4, 36 + len * channels * 2, true); ws(8, 'WAVE')
-    ws(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true)
-    v.setUint16(22, channels, true); v.setUint32(24, sampleRate, true)
-    v.setUint32(28, sampleRate * channels * 2, true)
-    v.setUint16(32, channels * 2, true); v.setUint16(34, 16, true)
-    ws(36, 'data'); v.setUint32(40, len * channels * 2, true)
+      const { DecodedSignature } = mod
 
-    let off = 44
-    for (let i = 0; i < len; i++) {
-      for (let c = 0; c < channels; c++) {
-        const s = samples[c]![i] ?? 0
-        v.setInt16(off, Math.max(-1, Math.min(1, s)) * 32767, true)
-        off += 2
-      }
+      // DecodedSignature.new() takes float32 PCM, sample rate, channel count
+      const sig = DecodedSignature.new(samples, sampleRate, 1)
+      const uri     = sig.uri
+      const samplems = sig.samplems
+      sig.free()
+
+      if (!uri) { dbg('empty URI from WASM'); return null }
+      return { uri, samplems }
+    } catch (e) {
+      dbg(`WASM error: ${String(e)}`)
+      return null
     }
-    return wav
   }
 
-  // ── AcoustID ──────────────────────────────────────────────────────────────
-  private async queryAcoustId(fingerprint: string, duration: number): Promise<RecognitionResult | null> {
-    const body = [
-      `client=${encodeURIComponent(ACOUSTID_CLIENT_KEY)}`,
-      `fingerprint=${encodeURIComponent(fingerprint)}`,
-      `duration=${duration}`,
-      `meta=recordings+releasegroups+compress`,
-      `format=json`,
-    ].join('&')
+  // ── Shazam API call ───────────────────────────────────────────────────────
+  private async queryShazam(
+    signatureUri: string,
+    samplems: number
+  ): Promise<RecognitionResult | null> {
+    const url = `${SHAZAM_HOST}/discovery/v5/en/US/iphone/-/tag/${uuidv4()}/${uuidv4()}?${SHAZAM_PARAMS}`
+
+    const body = JSON.stringify({
+      timezone:  'America/New_York',
+      signature: { uri: signatureUri, samplems },
+      timestamp: Date.now(),
+      context:   {},
+      geolocation: {},
+    })
+
+    const headers: Record<string, string> = {
+      'Content-Type':        'application/json',
+      'X-Shazam-Platform':   'IPHONE',
+      'X-Shazam-AppVersion': '14.1.0',
+      'Accept':              '*/*',
+      'Accept-Language':     'en-US',
+      'User-Agent':          'Shazam/3685 CFNetwork/1485 Darwin/23.1.0',
+    }
 
     let resp: Response
     try {
-      resp = await fetch(ACOUSTID_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body,
-      })
+      resp = await fetch(url, { method: 'POST', headers, body })
     } catch (e) {
-      dbg(`AcoustID fetch error: ${String(e)}`)
+      dbg(`Shazam fetch error: ${String(e)}`)
       return null
     }
 
-    if (!resp.ok) { dbg(`AcoustID HTTP ${resp.status}`); return null }
-
-    let data: AcoustIdResponse
-    try { data = await resp.json() as AcoustIdResponse }
-    catch (e) { dbg(`AcoustID JSON error: ${String(e)}`); return null }
-
-    dbg(`AcoustID status=${data.status} results=${data.results?.length ?? 0}`)
-    if (data.error) dbg(`AcoustID error: ${data.error.message}`)
-    if (data.status !== 'ok' || !data.results?.length) return null
-
-    data.results.slice(0, 3).forEach((r, i) =>
-      dbg(`  [${i}] score=${r.score.toFixed(3)} recs=${r.recordings?.length ?? 0}`)
-    )
-
-    const best = data.results
-      .filter(r => r.score >= 0.3 && r.recordings?.length)
-      .sort((a, b) => b.score - a.score)[0]
-
-    if (!best?.recordings?.length) {
-      dbg(`no match >= 0.3 (top=${data.results[0]?.score.toFixed(3)})`)
+    if (!resp.ok) {
+      dbg(`Shazam HTTP ${resp.status}`)
       return null
     }
 
-    const rec   = best.recordings.find(r => r.title && r.artists?.length) ?? best.recordings[0]!
-    const title  = rec.title?.trim()
-    const artist = rec.artists?.[0]?.name?.trim()
-    if (!title || !artist) { dbg('rec missing title/artist'); return null }
+    let data: ShazamResponse
+    try {
+      data = await resp.json() as ShazamResponse
+    } catch (e) {
+      dbg(`Shazam JSON error: ${String(e)}`)
+      return null
+    }
 
-    const rg          = rec.releasegroups?.[0]
-    const album       = rg?.title?.trim()
-    const releaseDate = rg?.releases?.[0]?.date?.slice(0, 4)
+    dbg(`Shazam matches=${data.matches?.length ?? 0} track=${data.track?.title ?? 'none'}`)
+
+    if (!data.matches?.length || !data.track) return null
+
+    const track = data.track
+    const title  = track.title?.trim()
+    const artist = track.subtitle?.trim()
+    if (!title || !artist) { dbg('missing title/artist'); return null }
+
+    const songSection = track.sections?.find(s => s.type === 'SONG')
+    const album       = songSection?.metadata?.find(m => m.title === 'Album')?.text
+    const releaseDate = songSection?.metadata?.find(m => m.title === 'Released')?.text
+    const coverArt    = track.images?.coverarthq ?? track.images?.coverart
 
     dbg(`MATCH: "${title}" — ${artist}`)
-    return { title, artist, album, releaseDate }
+    return { title, artist, album, releaseDate, coverArt }
   }
 }
