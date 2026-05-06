@@ -46,3 +46,8 @@ yarn-error.log*
 .cache/
 tmp/
 temp/
+
+# ── Android signing (safety net — also in AndroidApp/.gitignore) ──
+*.keystore
+*.jks
+keystore.properties

@@ -1,0 +1,229 @@
+/* ═══════════════════════════════════════════════════════════════════
+   RADIOSPHERE — KEYRA DESIGN SYSTEM
+   Exact colors & neumorphic system from keyraauth.netlify.app
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Keyra Accent Hue (hsl(258, 85%, ...)) ── */
+  --h: 258;
+  --s: 85%;
+
+  /* ── Keyra Light Mode Backgrounds ── */
+  --bg-primary:   #e0e5ec;
+  --bg-secondary: #d1d9e6;
+  --bg-tertiary:  #c2cbd8;
+
+  /* ── Keyra Light Mode Text ── */
+  --text-primary:   #1e2328;   /* contrast ~9:1 on #e0e5ec ✅ */
+  --text-secondary: #4a5568;   /* contrast ~5.5:1 on #e0e5ec ✅ */
+  --text-tertiary:  #64748b;   /* contrast ~4.1:1 on #e0e5ec ✅ AA */
+
+  /* ── Keyra Accent Colors (computed from hsl) ── */
+  --accent-primary:   hsl(var(--h), var(--s), 55%);
+  --accent-secondary: hsl(calc(var(--h) + 40), var(--s), 65%);
+  --accent-hover:     hsl(var(--h), var(--s), 45%);
+  --accent-soft:      hsla(var(--h), var(--s), 55%, 0.12);
+  --accent-glow:      hsla(var(--h), var(--s), 55%, 0.35);
+
+  /* ── Keyra Light Mode Neumorphic Shadows ── */
+  --nm-light-top:          -6px -6px 12px rgba(255, 255, 255, 1);
+  --nm-light-bottom:        6px  6px 12px rgba(163, 177, 198, 0.5);
+  --nm-light-inner-top:    inset -3px -3px 8px rgba(255, 255, 255, 1);
+  --nm-light-inner-bottom: inset  3px  3px 8px rgba(163, 177, 198, 0.5);
+
+  --nm-raised:     var(--nm-light-top), var(--nm-light-bottom);
+  --nm-pressed:    var(--nm-light-inner-top), var(--nm-light-inner-bottom);
+  --nm-inner-top:  var(--nm-light-inner-top);
+  --nm-inner-bottom: var(--nm-light-inner-bottom);
+
+  /* ── Fonts ── */
+  --font-display: 'DM Sans', system-ui, sans-serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  /* ── Keyra Spacing ── */
+  --space-xs:  8px;
+  --space-sm:  16px;
+  --space-md:  24px;
+  --space-lg:  32px;
+  --space-xl:  48px;
+  --space-2xl: 64px;
+
+  /* ── Keyra Radii ── */
+  --radius-sm:   8px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-xl:   32px;
+  --radius-full: 999px;
+
+  /* ── Keyra Transitions ── */
+  --transition-fast:   0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Layout ── */
+  --sidebar-width:      240px;
+  --player-bar-height:  88px;
+
+  /* ── Legacy aliases (backward compat) ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  --text-2xs:  0.625rem;
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.375rem;
+  --text-2xl:  1.75rem;
+  --text-3xl:  2.25rem;
+
+  --radius-xs: 4px;
+
+  --t-fast: 0.2s;
+  --t-base: 0.3s;
+  --t-slow: 0.4s;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --color-bg-base:        var(--bg-primary);
+  --color-bg-elevated:    var(--bg-secondary);
+  --color-bg-overlay:     var(--bg-tertiary);
+  --color-bg-subtle:      var(--bg-secondary);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-glow:    var(--accent-secondary);
+  --color-accent-alt:     var(--accent-secondary);
+  --color-accent-live:    #34c759;
+  --color-accent-warn:    #ff9f0a;
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted:     var(--text-tertiary);
+  --color-border-subtle:  rgba(163, 177, 198, 0.4);
+  --color-border-strong:  rgba(163, 177, 198, 0.7);
+  --shadow-card:          var(--nm-raised);
+  --shadow-glow:          0 0 24px var(--accent-glow);
+  --shadow-glow-live:     0 0 16px rgba(52, 199, 89, 0.4);
+  --transition-fast:      var(--transition-fast);
+  --transition-base:      var(--transition-medium);
+  --transition-slow:      var(--transition-medium);
+
+  /* Neumorphic surface helpers */
+  --neu-bg:        var(--bg-primary);
+  --neu-bg-raised: var(--bg-secondary);
+  --neu-bg-float:  var(--bg-tertiary);
+  --neu-shadow-out:     var(--nm-raised);
+  --neu-shadow-in:      var(--nm-pressed);
+  --neu-shadow-card:    var(--nm-raised);
+  --neu-shadow-hover:   -8px -8px 16px rgba(255,255,255,1), 8px 8px 16px rgba(163,177,198,0.6);
+  --neu-shadow-pressed: var(--nm-pressed);
+  --neu-shadow-float:   -10px -10px 20px rgba(255,255,255,0.9), 10px 10px 20px rgba(163,177,198,0.6);
+
+  /* Gradient helpers */
+  --grad-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --grad-sidebar: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+
+  /* Border helpers */
+  --border-subtle: rgba(163, 177, 198, 0.35);
+  --border-medium: rgba(163, 177, 198, 0.6);
+  --border-strong: rgba(163, 177, 198, 0.85);
+  --border-glass:  rgba(255, 255, 255, 0.5);
+
+  /* Accent aliases */
+  --accent-violet:   var(--accent-primary);
+  --accent-violet-2: var(--accent-secondary);
+  --accent-pink:     var(--accent-secondary);
+  --accent-emerald:  #34c759;
+  --accent-amber:    #ff9f0a;
+  --accent-red:      #ff3b30;
+  --accent-cyan:     hsl(calc(var(--h) + 40), var(--s), 65%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   KEYRA DARK MODE — "Deep Charcoal"
+   ═══════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg-primary:   #121214;
+  --bg-secondary: #18181b;
+  --bg-tertiary:  #202023;
+
+  --text-primary:   #f8fafc;    /* contrast ~16:1 on #121214 ✅ */
+  --text-secondary: #94a3b8;    /* contrast ~5.8:1 on #121214 ✅ */
+  --text-tertiary:  #64748b;    /* improved from #475569 — contrast ~3.5:1 ✅ */
+
+  --accent-primary:   hsl(var(--h), var(--s), 65%);
+  --accent-secondary: hsl(calc(var(--h) + 40), var(--s), 70%);
+  --accent-hover:     hsl(var(--h), var(--s), 75%);
+  --accent-soft:      hsla(var(--h), var(--s), 65%, 0.15);
+  --accent-glow:      hsla(var(--h), var(--s), 65%, 0.35);
+
+  /* Keyra Dark Neumorphic Shadows */
+  --nm-dark-top:          -6px -6px 14px rgba(255, 255, 255, 0.03);
+  --nm-dark-bottom:        6px  6px 14px rgba(0, 0, 0, 0.6);
+  --nm-dark-inner-top:    inset -3px -3px 8px rgba(255, 255, 255, 0.03);
+  --nm-dark-inner-bottom: inset  3px  3px 8px rgba(0, 0, 0, 0.6);
+
+  --nm-raised:   var(--nm-dark-top), var(--nm-dark-bottom);
+  --nm-pressed:  var(--nm-dark-inner-top), var(--nm-dark-inner-bottom);
+
+  --neu-shadow-out:     var(--nm-raised);
+  --neu-shadow-in:      var(--nm-pressed);
+  --neu-shadow-card:    var(--nm-raised);
+  --neu-shadow-hover:   -8px -8px 18px rgba(255,255,255,0.04), 8px 8px 18px rgba(0,0,0,0.7);
+  --neu-shadow-pressed: var(--nm-pressed);
+  --neu-shadow-float:   -10px -10px 24px rgba(255,255,255,0.03), 10px 10px 24px rgba(0,0,0,0.75);
+
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-medium: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-glass:  rgba(255, 255, 255, 0.05);
+
+  --grad-sidebar: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+
+  --color-bg-base:        var(--bg-primary);
+  --color-bg-elevated:    var(--bg-secondary);
+  --color-bg-overlay:     var(--bg-tertiary);
+  --color-bg-subtle:      var(--bg-secondary);
+  --color-accent-primary: var(--accent-primary);
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted:     var(--text-tertiary);
+  --color-border-subtle:  var(--border-subtle);
+  --color-border-strong:  var(--border-strong);
+  --shadow-card:          var(--nm-raised);
+
+  --neu-bg:        var(--bg-primary);
+  --neu-bg-raised: var(--bg-secondary);
+  --neu-bg-float:  var(--bg-tertiary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE REFINEMENTS
+   Stronger contrast, clearer depth, modern feel matching dark mode.
+   ═══════════════════════════════════════════════════════════════════ */
+:root:not([data-theme="dark"]) {
+  /* Slightly stronger border tokens for light mode */
+  --border-subtle: rgba(163, 177, 198, 0.5);
+  --border-medium: rgba(163, 177, 198, 0.75);
+  --border-strong: rgba(163, 177, 198, 1);
+
+  /* Stronger neumorphic shadows for more depth */
+  --nm-raised:
+    -7px -7px 14px rgba(255, 255, 255, 1),
+     7px  7px 14px rgba(163, 177, 198, 0.65);
+  --nm-pressed:
+    inset -4px -4px 10px rgba(255, 255, 255, 1),
+    inset  4px  4px 10px rgba(163, 177, 198, 0.65);
+
+  /* Hover shadow — more pronounced lift */
+  --neu-shadow-hover:
+    -10px -10px 20px rgba(255, 255, 255, 1),
+     10px  10px 20px rgba(163, 177, 198, 0.7);
+}

@@ -1,0 +1,97 @@
+name: Android APK Release
+
+on:
+  push:
+    tags:
+      - 'android-v*'   # trigger on tags like android-v1.1.0
+  workflow_dispatch:   # allow manual trigger from GitHub UI
+
+jobs:
+  build-apk:
+    name: Build & Sign APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Node.js ─────────────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: AndroidApp/package-lock.json
+
+      # ── 3. Java (required by Gradle) ───────────────────────────────────────
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # ── 4. Install JS deps & build web assets ──────────────────────────────
+      - name: Install dependencies
+        run: npm ci
+        working-directory: AndroidApp
+
+      - name: Build web assets
+        run: npm run build
+        working-directory: AndroidApp
+
+      # ── 5. Sync Capacitor ──────────────────────────────────────────────────
+      - name: Sync Capacitor
+        run: npx cap sync android
+        working-directory: AndroidApp
+
+      # ── 6. Decode keystore from secret ────────────────────────────────────
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > AndroidApp/android/aether-radio.keystore
+
+      # ── 7. Build release APK ───────────────────────────────────────────────
+      - name: Build release APK
+        run: ./gradlew assembleRelease --no-daemon
+        working-directory: AndroidApp/android
+        env:
+          KEYSTORE_PATH: aether-radio.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      # ── 8. Rename APK with version ─────────────────────────────────────────
+      - name: Rename APK
+        run: |
+          VERSION="${GITHUB_REF_NAME#android-}"
+          mv AndroidApp/android/app/build/outputs/apk/release/app-release.apk \
+             aether-radio-${VERSION}.apk
+
+      # ── 9. Upload APK as artifact (always available) ───────────────────────
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aether-radio-apk
+          path: aether-radio-*.apk
+          retention-days: 30
+
+      # ── 10. Create GitHub Release with APK attached ────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Aether Radio ${{ github.ref_name }}"
+          body: |
+            ## Aether Radio Android APK
+
+            ### Install
+            1. Download `aether-radio-*.apk` below
+            2. On your Android device go to **Settings → Install unknown apps** and allow your browser/file manager
+            3. Open the downloaded APK and tap **Install**
+
+            ### What's new
+            See [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          files: aether-radio-*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
