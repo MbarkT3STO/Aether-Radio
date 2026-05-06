@@ -5,6 +5,7 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
 import { AudioService } from '../services/AudioService'
 import { VisualizerService } from '../services/VisualizerService'
+import { ExpandedPlayer } from './ExpandedPlayer'
 import { stationLogoHtml } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
@@ -17,6 +18,8 @@ export class MiniPlayer extends BaseComponent {
   private visualizer = new VisualizerService()
   private barAmbient = new VisualizerService()
   private _renderedStationId: string | null = null
+  private expandedPlayer: ExpandedPlayer | null = null
+  private expandedContainer: HTMLElement | null = null
 
   constructor(props: Record<string, never>) {
     super(props)
@@ -137,6 +140,39 @@ export class MiniPlayer extends BaseComponent {
         if (result.success) this.favoritesStore.setFavorites(result.data)
       })
     }
+
+    // Click anywhere on the mini-player (except buttons) to expand
+    const root = this.querySelector('#mini-player-root')
+    if (root) {
+      this.on(root, 'click', (e) => {
+        const target = e.target as HTMLElement
+        // Don't expand if clicking a button
+        if (target.closest('button')) return
+        if (this.playerStore.currentStation) {
+          this.openExpanded()
+        }
+      })
+    }
+  }
+
+  private openExpanded(): void {
+    if (this.expandedPlayer) return // already open
+
+    // Create a container for the expanded player
+    this.expandedContainer = document.createElement('div')
+    this.expandedContainer.id = 'expanded-player-container'
+    document.body.appendChild(this.expandedContainer)
+
+    this.expandedPlayer = new ExpandedPlayer(() => {
+      // On close: remove the container and clear reference
+      if (this.expandedContainer) {
+        this.expandedContainer.remove()
+        this.expandedContainer = null
+      }
+      this.expandedPlayer = null
+    })
+
+    void this.expandedPlayer.mount(this.expandedContainer)
   }
 
   private onPlayStateChange(): void {

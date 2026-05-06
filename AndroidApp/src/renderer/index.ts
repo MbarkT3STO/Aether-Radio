@@ -2,6 +2,8 @@ import { Router } from './router/Router'
 import { EventBus } from './store/EventBus'
 import { BridgeService } from './services/BridgeService'
 import { AudioService } from './services/AudioService'
+import { MediaSessionService } from './services/MediaSessionService'
+import { BackgroundPlaybackService } from './services/BackgroundPlaybackService'
 import { PlayerStore } from './store/PlayerStore'
 import { FavoritesStore } from './store/FavoritesStore'
 import 'flag-icons/css/flag-icons.css'
@@ -25,6 +27,8 @@ class App {
   private eventBus = EventBus.getInstance()
   private bridge = BridgeService.getInstance()
   private audioService = AudioService.getInstance()
+  private mediaSession = MediaSessionService.getInstance()
+  private backgroundPlayback = BackgroundPlaybackService.getInstance()
   private playerStore = PlayerStore.getInstance()
   private favoritesStore = FavoritesStore.getInstance()
 
