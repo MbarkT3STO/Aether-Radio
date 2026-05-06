@@ -1032,7 +1032,7 @@ export class PlayerBar extends BaseComponent {
             </div>
             <!-- Music note icon -->
             <div class="rcm-music-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="1.75"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 18V5l12-2v13"/>
