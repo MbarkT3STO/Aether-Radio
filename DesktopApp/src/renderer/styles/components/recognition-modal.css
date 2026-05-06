@@ -311,34 +311,23 @@
   filter: blur(2.5px);
 }
 
-/* ── Scanning rings (expanding circles for search effect) ── */
-.rcm-scan-ring {
+/* ── Floating micro-particles ── */
+.rcm-particle {
   position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  border: 2px solid hsla(var(--h), var(--s), 60%, 0.5);
-  animation: rcmRingPulse 2.5s ease-out infinite;
-  opacity: 0;
+  background: hsla(var(--h), var(--s), 70%, 0.9);
 }
 
-[data-theme="dark"] .rcm-scan-ring {
-  border-color: hsla(var(--h), var(--s), 65%, 0.6);
-}
-
-.rcm-ring-1 {
-  animation-delay: 0s;
-}
-
-.rcm-ring-2 {
-  animation-delay: 0.6s;
-}
-
-.rcm-ring-3 {
-  animation-delay: 1.2s;
-}
-
-.rcm-ring-4 {
-  animation-delay: 1.8s;
-}
+.rcm-particle-1 { animation: rcmFloat1 3.2s ease-in-out infinite; }
+.rcm-particle-2 { animation: rcmFloat2 2.8s ease-in-out infinite; animation-delay: 0.4s; }
+.rcm-particle-3 { animation: rcmFloat3 3.5s ease-in-out infinite; animation-delay: 0.8s; }
+.rcm-particle-4 { animation: rcmFloat4 2.6s ease-in-out infinite; animation-delay: 1.2s; }
+.rcm-particle-5 { animation: rcmFloat5 3.1s ease-in-out infinite; animation-delay: 1.6s; }
+.rcm-particle-6 { animation: rcmFloat6 2.9s ease-in-out infinite; animation-delay: 2s; }
 
 /* ── Text labels ── */
 .rcm-listening-label {
@@ -581,6 +570,36 @@
   }
 }
 
+/* Floating particle animations */
+@keyframes rcmFloat1 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.3; }
+  50% { transform: translate(-50%, -50%) translate(80px, -60px); opacity: 1; }
+}
+
+@keyframes rcmFloat2 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) translate(-70px, -80px); opacity: 1; }
+}
+
+@keyframes rcmFloat3 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.3; }
+  50% { transform: translate(-50%, -50%) translate(90px, 70px); opacity: 1; }
+}
+
+@keyframes rcmFloat4 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) translate(-85px, 65px); opacity: 1; }
+}
+
+@keyframes rcmFloat5 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.3; }
+  50% { transform: translate(-50%, -50%) translate(60px, -90px); opacity: 1; }
+}
+
+@keyframes rcmFloat6 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) translate(-75px, -70px); opacity: 1; }
+}
 /* ═══════════════════════════════════════════════════════════════
    RESULT STATE — FOUND
    ═══════════════════════════════════════════════════════════════ */

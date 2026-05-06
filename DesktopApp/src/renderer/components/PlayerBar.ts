@@ -1019,11 +1019,13 @@ export class PlayerBar extends BaseComponent {
               <div class="rcm-blur-point rcm-outer rcm-point-10"></div>
               <div class="rcm-blur-point rcm-outer rcm-point-11"></div>
               <div class="rcm-blur-point rcm-outer rcm-point-12"></div>
-              <!-- Scanning rings -->
-              <div class="rcm-scan-ring rcm-ring-1"></div>
-              <div class="rcm-scan-ring rcm-ring-2"></div>
-              <div class="rcm-scan-ring rcm-ring-3"></div>
-              <div class="rcm-scan-ring rcm-ring-4"></div>
+              <!-- Animated particles -->
+              <div class="rcm-particle rcm-particle-1"></div>
+              <div class="rcm-particle rcm-particle-2"></div>
+              <div class="rcm-particle rcm-particle-3"></div>
+              <div class="rcm-particle rcm-particle-4"></div>
+              <div class="rcm-particle rcm-particle-5"></div>
+              <div class="rcm-particle rcm-particle-6"></div>
             </div>
           </div>
           <div class="rcm-listening-label">Identifying song…</div>
