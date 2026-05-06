@@ -138,7 +138,7 @@
     hsla(var(--h), var(--s), 45%, 0.3) 65%,
     transparent 100%
   );
-  filter: blur(35px);
+  filter: blur(18px);
   animation: rcmOrbBreath 2s ease-in-out infinite;
   z-index: 5;
 }
@@ -151,7 +151,7 @@
     hsla(var(--h), var(--s), 50%, 0.4) 65%,
     transparent 100%
   );
-  filter: blur(40px);
+  filter: blur(22px);
 }
 
 /* ── Inner ring blur points (6 points moving in wave patterns) ── */
@@ -160,7 +160,7 @@
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  filter: blur(32px);
+  filter: blur(16px);
   opacity: 0;
 }
 
@@ -168,7 +168,7 @@
 .rcm-blur-point.rcm-outer {
   width: 90px;
   height: 90px;
-  filter: blur(38px);
+  filter: blur(20px);
 }
 
 /* Point 1 - Primary accent color */
@@ -299,11 +299,11 @@
 }
 
 [data-theme="dark"] .rcm-blur-point {
-  filter: blur(36px);
+  filter: blur(18px);
 }
 
 [data-theme="dark"] .rcm-blur-point.rcm-outer {
-  filter: blur(42px);
+  filter: blur(24px);
 }
 
 /* ── Scanning rings (expanding circles for search effect) ── */
