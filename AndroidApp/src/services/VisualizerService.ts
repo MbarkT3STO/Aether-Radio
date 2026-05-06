@@ -71,21 +71,23 @@ export class VisualizerService {
   /**
    * Ambient gradient visualizer — full-bleed canvas behind the expanded player.
    * Draws slow-moving radial blobs that pulse with audio frequency data.
+   * @param scale  Blob size multiplier relative to min(canvas dimension).
+   *               Mini bar: ~0.9  |  Expanded sheet: ~0.7
    */
   startAmbientVisualization(
     canvas: HTMLCanvasElement,
     source: VisualizerService,
-    large = false,
+    scale = 0.9,
     centered = false
   ): void {
     this.analyser  = source.sharedAnalyser
     this.dataArray = source.sharedDataArray
     this.stopVisualization()
     this.activeCanvas = canvas
-    this.ambientLoop(canvas, large, centered)
+    this.ambientLoop(canvas, scale, centered)
   }
 
-  private ambientLoop(canvas: HTMLCanvasElement, large = false, centered = false): void {
+  private ambientLoop(canvas: HTMLCanvasElement, scale = 0.9, centered = false): void {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -137,13 +139,13 @@ export class VisualizerService {
         const phase  = blob.phase + t * blob.speed
         const cx     = (blob.x + Math.sin(phase * 1.3) * (centered ? 0.05 : 0.12)) * w
         const cy     = (blob.y + Math.cos(phase * 0.9) * 0.10) * hh
-        const baseR  = Math.min(w, hh) * (large ? 1.8 : 0.45)
+        const baseR  = Math.min(w, hh) * scale
         const radius = baseR * (0.7 + energy * 0.6 + Math.sin(phase * 2) * 0.08)
 
         const blobHue = (h + blob.hueOff + 360) % 360
         const alpha   = isDark
-          ? (large ? 0.30 + energy * 0.35 : 0.22 + energy * 0.28)
-          : (large ? 0.18 + energy * 0.22 : 0.12 + energy * 0.16)
+          ? (scale > 1.0 ? 0.30 + energy * 0.35 : 0.28 + energy * 0.32)
+          : (scale > 1.0 ? 0.18 + energy * 0.22 : 0.16 + energy * 0.20)
 
         // Use shadowBlur for the soft glow — no CSS filter needed
         ctx.save()

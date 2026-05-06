@@ -91,7 +91,7 @@ export class MiniPlayer extends BaseComponent {
     const canvas = this.querySelector<HTMLCanvasElement>('#mp-ambient-canvas')
     if (!canvas || !this.playerStore.isPlaying) return
     this._barVisualizer.startAmbientVisualization(
-      canvas, this.audioService.getVisualizer(), false, true
+      canvas, this.audioService.getVisualizer(), 0.9, true
     )
     requestAnimationFrame(() => canvas.classList.add('active'))
   }
@@ -198,9 +198,11 @@ export class MiniPlayer extends BaseComponent {
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
         </button>
         <button class="mp-sheet-btn mp-sheet-play${isPlaying ? ' playing' : ''}" id="mp-sheet-play" aria-label="${isPlaying ? 'Pause' : 'Play'}">
-          ${isPlaying
-            ? `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.5"/><rect x="14" y="4" width="4" height="16" rx="1.5"/></svg>`
-            : `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
+          ${this.playerStore.isLoading
+            ? `<span class="loading-spinner loading-spinner--md"></span>`
+            : isPlaying
+              ? `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.5"/><rect x="14" y="4" width="4" height="16" rx="1.5"/></svg>`
+              : `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
           }
         </button>
       </div>
@@ -227,7 +229,7 @@ export class MiniPlayer extends BaseComponent {
       const ambCanvas = sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
       if (ambCanvas) {
         this._sheetVisualizer.startAmbientVisualization(
-          ambCanvas, this.audioService.getVisualizer(), true, true
+          ambCanvas, this.audioService.getVisualizer(), 0.65, true
         )
         requestAnimationFrame(() => ambCanvas.classList.add('active'))
       }
@@ -301,7 +303,7 @@ export class MiniPlayer extends BaseComponent {
       const ambCanvas = sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
       if (ambCanvas) {
         if (isPlaying) {
-          this._sheetVisualizer.startAmbientVisualization(ambCanvas, this.audioService.getVisualizer(), true, true)
+          this._sheetVisualizer.startAmbientVisualization(ambCanvas, this.audioService.getVisualizer(), 0.65, true)
           requestAnimationFrame(() => ambCanvas.classList.add('active'))
         } else {
           this._sheetVisualizer.stopVisualization()
@@ -326,6 +328,17 @@ export class MiniPlayer extends BaseComponent {
     const unsub4 = this.eventBus.on('player:volume', ({ volume }) => {
       const fill = q('#mp-sheet-vol-fill')
       if (fill) fill.style.width = `${Math.round(volume * 100)}%`
+    })
+
+    this.eventBus.on('player:loading', ({ loading }) => {
+      const btn = q('#mp-sheet-play')
+      if (!btn) return
+      const isPlaying = this.playerStore.isPlaying
+      btn.innerHTML = loading
+        ? `<span class="loading-spinner loading-spinner--md"></span>`
+        : isPlaying
+          ? `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.5"/><rect x="14" y="4" width="4" height="16" rx="1.5"/></svg>`
+          : `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
     })
 
     this.eventBus.on('favorites:changed', () => {
