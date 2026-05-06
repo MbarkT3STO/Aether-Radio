@@ -121,4 +121,14 @@ public class MediaControlPlugin extends Plugin {
         getContext().startService(intent);
         call.resolve();
     }
+
+    @PluginMethod
+    public void setNotificationsEnabled(PluginCall call) {
+        boolean enabled = Boolean.TRUE.equals(call.getBoolean("enabled", true));
+        getContext().getSharedPreferences("wavora_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean("notifications_enabled", enabled)
+            .apply();
+        call.resolve();
+    }
 }

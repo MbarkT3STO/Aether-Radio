@@ -7,6 +7,7 @@ export interface AppSettings {
   bufferSize: BufferSize
   apiMirror: string
   audioOutputDeviceId: string | null
+  showNowPlayingNotification: boolean
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -15,4 +16,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   bufferSize: 'balanced',
   apiMirror: 'https://de1.api.radio-browser.info',
   audioOutputDeviceId: null,
+  showNowPlayingNotification: true,
 }

@@ -16,6 +16,7 @@ export type EventMap = {
   'route:changed': { route: string }
   'theme:changed': { theme: 'dark' | 'light' }
   'settings:buffer-changed': { bufferSize: 'low' | 'balanced' | 'high' }
+  'settings:notifications-changed': { enabled: boolean }
 }
 
 type EventHandler<K extends keyof EventMap> = (data: EventMap[K]) => void

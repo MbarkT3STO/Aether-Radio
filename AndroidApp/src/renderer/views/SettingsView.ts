@@ -106,6 +106,17 @@ export class SettingsView extends BaseComponent {
               <button class="stg-toggle-btn ${s.bufferSize === 'high' ? 'active' : ''}" data-buffer="high">High</button>
             </div>
           </div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Now Playing Notifications</div>
+              <div class="stg-row-desc">Show OS notification when a station starts</div>
+            </div>
+            <button class="stg-switch ${s.showNowPlayingNotification ? 'stg-switch--on' : ''}"
+              id="stg-notif-switch" role="switch"
+              aria-checked="${s.showNowPlayingNotification}">
+              <span class="stg-switch-thumb"></span>
+            </button>
+          </div>
         </div>
 
         <!-- ── Data ── -->
@@ -122,7 +133,11 @@ export class SettingsView extends BaseComponent {
               <div class="stg-row-label">Favorites</div>
               <div class="stg-row-desc">Back up or restore your saved stations</div>
             </div>
-            <span class="stg-row-desc">Not available on Android</span>
+            <div class="stg-btn-group">
+              <button class="stg-action-btn" id="stg-export-favs">Export</button>
+              <button class="stg-action-btn" id="stg-import-favs">Import</button>
+            </div>
+            <input type="file" id="stg-import-file" accept=".json" style="display:none">
           </div>
           <div class="stg-row">
             <div class="stg-row-info">
@@ -186,6 +201,66 @@ export class SettingsView extends BaseComponent {
         this.eventBus.emit('settings:buffer-changed', { bufferSize })
       })
     })
+
+    // Notification toggle
+    const notifSwitch = this.querySelector<HTMLElement>('#stg-notif-switch')
+    if (notifSwitch) {
+      this.on(notifSwitch, 'click', async () => {
+        const newVal = !this.settings?.showNowPlayingNotification
+        await this.applyUpdate({ showNowPlayingNotification: newVal })
+        // Propagate to native layer
+        this.eventBus.emit('settings:notifications-changed', { enabled: newVal })
+      })
+    }
+
+    // Export favorites
+    const exportBtn = this.querySelector<HTMLElement>('#stg-export-favs')
+    if (exportBtn) {
+      this.on(exportBtn, 'click', async () => {
+        try {
+          const result = await this.bridge.favorites.getAll()
+          if (!result.success) { this.showToast('Could not load favorites', 'error'); return }
+          const json = JSON.stringify(result.data, null, 2)
+          const { Filesystem, Directory } = await import('@capacitor/filesystem')
+          await Filesystem.writeFile({
+            path: 'aether-favorites.json',
+            data: json,
+            directory: Directory.Cache,
+          })
+          const { Share } = await import('@capacitor/share')
+          await Share.share({
+            title: 'Aether Radio Favorites',
+            text: 'My saved radio stations',
+            files: ['aether-favorites.json'],
+          })
+        } catch {
+          this.showToast('Export failed', 'error')
+        }
+      })
+    }
+
+    // Import favorites
+    const importBtn = this.querySelector<HTMLElement>('#stg-import-favs')
+    const importFile = this.querySelector<HTMLInputElement>('#stg-import-file')
+    if (importBtn && importFile) {
+      this.on(importBtn, 'click', () => importFile.click())
+      this.on(importFile, 'change', async () => {
+        const file = importFile.files?.[0]
+        if (!file) return
+        try {
+          const text = await file.text()
+          const stations = JSON.parse(text)
+          if (!Array.isArray(stations)) throw new Error('Invalid format')
+          for (const station of stations) {
+            await this.bridge.favorites.add(station)
+          }
+          this.showToast(`Imported ${stations.length} stations`, 'success')
+        } catch {
+          this.showToast('Import failed — invalid file', 'error')
+        }
+        importFile.value = ''
+      })
+    }
 
     // Clear history
     const clearHistoryBtn = this.querySelector<HTMLElement>('#stg-clear-history')

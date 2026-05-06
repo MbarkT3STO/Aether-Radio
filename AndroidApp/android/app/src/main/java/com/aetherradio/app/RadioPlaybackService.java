@@ -116,7 +116,7 @@ public class RadioPlaybackService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                "Radio Playback",
+                "Aether Radio",
                 NotificationManager.IMPORTANCE_LOW
             );
             channel.setDescription("Shows currently playing radio station");
@@ -195,9 +195,14 @@ public class RadioPlaybackService extends Service {
             subtitle = subtitle.isEmpty() ? stationTags : subtitle + " · " + stationTags;
         }
 
-        // Use the app launcher icon as album art so it appears in the
-        // media notification artwork area on all Android versions / OEM skins
-        Bitmap albumArt = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        // Use the round launcher icon as album art — ic_launcher_round is always a raster PNG,
+        // unlike ic_launcher which is an adaptive icon (XML) on API 26+ and returns null.
+        Bitmap albumArt = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round);
+        if (albumArt == null) {
+            albumArt = Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888);
+            android.graphics.Canvas artCanvas = new android.graphics.Canvas(albumArt);
+            artCanvas.drawColor(android.graphics.Color.parseColor("#6C52FF"));
+        }
 
         MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
@@ -215,6 +220,11 @@ public class RadioPlaybackService extends Service {
     }
 
     private Notification buildNotification() {
+        // Check user preference — Android 8+ requires a notification for foreground services,
+        // so when disabled we show a minimal silent one with no controls.
+        boolean notifEnabled = getSharedPreferences("wavora_prefs", MODE_PRIVATE)
+            .getBoolean("notifications_enabled", true);
+
         // Intent to open the app when notification is tapped
         Intent openIntent = new Intent(this, MainActivity.class);
         openIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -222,6 +232,19 @@ public class RadioPlaybackService extends Service {
             this, 0, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
+
+        if (!notifEnabled) {
+            // Minimal notification required by Android to keep the foreground service alive
+            return new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Aether Radio")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentIntent(openPendingIntent)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+                .setOngoing(true)
+                .setShowWhen(false)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .build();
+        }
 
         // Play/Pause action
         String toggleAction = isPlaying ? ACTION_PAUSE : ACTION_PLAY;
@@ -245,8 +268,13 @@ public class RadioPlaybackService extends Service {
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // App logo bitmap — used as both the large icon and the media session artwork
-        Bitmap appLogo = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        // App logo bitmap — ic_launcher_round is always a raster PNG (ic_launcher is adaptive XML on API 26+)
+        Bitmap appLogo = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round);
+        if (appLogo == null) {
+            appLogo = Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888);
+            android.graphics.Canvas logoCanvas = new android.graphics.Canvas(appLogo);
+            logoCanvas.drawColor(android.graphics.Color.parseColor("#6C52FF"));
+        }
 
         String subtitle = stationCountry;
         if (stationTags != null && !stationTags.isEmpty()) {
@@ -267,6 +295,9 @@ public class RadioPlaybackService extends Service {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOngoing(true)
             .setShowWhen(false)
+            .setTicker("Aether Radio — " + stationName)
+            .setColorized(true)
+            .setColor(0xFF6C52FF)
             .addAction(toggleIcon, toggleLabel, togglePendingIntent)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopPendingIntent)
             .setStyle(new MediaStyle()

@@ -16,6 +16,7 @@ interface MediaControlPlugin {
   startPlayback(options: { name: string; country: string; tags: string }): Promise<void>
   updatePlayback(options: { name: string; country: string; tags: string; isPlaying: boolean }): Promise<void>
   stopPlayback(): Promise<void>
+  setNotificationsEnabled(options: { enabled: boolean }): Promise<void>
   addListener(event: string, handler: (data: { action: string }) => void): Promise<{ remove: () => void }>
 }
 
@@ -77,6 +78,11 @@ export class BackgroundPlaybackService {
     this.eventBus.on('player:stop', () => {
       void this.onStop()
     })
+
+    // Sync notification preference to native layer whenever it changes in Settings
+    this.eventBus.on('settings:notifications-changed', ({ enabled }) => {
+      void this.setNotificationsEnabled(enabled)
+    })
   }
 
   private async onPlay(station: RadioStation): Promise<void> {
@@ -116,6 +122,15 @@ export class BackgroundPlaybackService {
       await this.plugin.stopPlayback()
     } catch (e) {
       console.warn('BackgroundPlaybackService: stopPlayback failed', e)
+    }
+  }
+
+  private async setNotificationsEnabled(enabled: boolean): Promise<void> {
+    if (!this.plugin) return
+    try {
+      await this.plugin.setNotificationsEnabled({ enabled })
+    } catch (e) {
+      console.warn('BackgroundPlaybackService: setNotificationsEnabled failed', e)
     }
   }
 

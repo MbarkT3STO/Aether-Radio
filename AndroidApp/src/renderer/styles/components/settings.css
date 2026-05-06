@@ -295,3 +295,45 @@
 :root:not([data-theme="dark"]) .stg-action-btn {
   background: var(--bg-primary);
 }
+
+/* ── Toggle Switch (notification toggle) ── */
+.stg-switch {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  padding: 0;
+}
+
+.stg-switch--on {
+  background: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.stg-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  box-shadow: var(--nm-raised);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+  pointer-events: none;
+}
+
+.stg-switch--on .stg-switch-thumb {
+  transform: translateX(18px);
+  background: #fff;
+}
+
+:root:not([data-theme="dark"]) .stg-switch {
+  background: var(--bg-secondary);
+}
