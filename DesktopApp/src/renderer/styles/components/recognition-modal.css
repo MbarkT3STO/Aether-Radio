@@ -1,0 +1,424 @@
+/* ═══════════════════════════════════════════════════════════════
+   SONG RECOGNITION MODAL — Keyra neumorphic
+   ═══════════════════════════════════════════════════════════════ */
+
+.rcm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: rcmOverlayIn 0.22s ease forwards;
+}
+
+.rcm-overlay.rcm-fade-out-modal {
+  animation: rcmOverlayOut 0.3s ease forwards;
+}
+
+.rcm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  /* No click-to-close — user must use the X button */
+  pointer-events: none;
+}
+
+/* ── Dialog ── */
+.rcm-dialog {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 32px 80px rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-xl);
+  width: 340px;
+  overflow: hidden;
+  animation: rcmDialogIn 0.35s var(--ease-spring) forwards;
+}
+
+[data-theme="dark"] .rcm-dialog {
+  background: var(--bg-secondary);
+}
+
+/* ── Close ── */
+.rcm-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rcm-close:hover  { color: var(--text-primary); transform: scale(1.1); box-shadow: var(--neu-shadow-hover); }
+.rcm-close:active { box-shadow: var(--nm-pressed); transform: scale(1); }
+
+/* ═══════════════════════════════════════════════════════════════
+   LISTENING STATE
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-listening {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 32px 40px;
+  transition: opacity 0.3s ease;
+}
+
+.rcm-listening.rcm-fade-out {
+  opacity: 0;
+}
+
+/* ── Orb ── */
+.rcm-orb {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.rcm-orb-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-primary);
+  opacity: 0;
+  animation: rcmRingPulse 2.4s ease-out infinite;
+}
+
+.rcm-orb-ring--1 { width: 100%; height: 100%; animation-delay: 0s;   }
+.rcm-orb-ring--2 { width: 100%; height: 100%; animation-delay: 0.8s; }
+.rcm-orb-ring--3 { width: 100%; height: 100%; animation-delay: 1.6s; }
+
+.rcm-orb-core {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow:
+    var(--nm-raised),
+    0 0 30px var(--accent-glow),
+    0 0 60px var(--accent-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  position: relative;
+  z-index: 1;
+  animation: rcmCoreBreath 2s ease-in-out infinite;
+}
+
+/* ── Audio bars ── */
+.rcm-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 30px;
+  margin-bottom: 22px;
+}
+
+.rcm-bar {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--accent-primary);
+  animation: rcmBarDance 1.2s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+.rcm-bar:nth-child(1) { animation-delay: 0s;    animation-duration: 1.1s;  }
+.rcm-bar:nth-child(2) { animation-delay: 0.15s; animation-duration: 0.9s;  }
+.rcm-bar:nth-child(3) { animation-delay: 0.3s;  animation-duration: 1.3s;  }
+.rcm-bar:nth-child(4) { animation-delay: 0.1s;  animation-duration: 1.0s;  }
+.rcm-bar:nth-child(5) { animation-delay: 0.25s; animation-duration: 1.2s;  }
+.rcm-bar:nth-child(6) { animation-delay: 0.05s; animation-duration: 0.95s; }
+.rcm-bar:nth-child(7) { animation-delay: 0.35s; animation-duration: 1.15s; }
+
+.rcm-listening-label {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  margin-bottom: 7px;
+}
+
+.rcm-listening-sub {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULT STATE — FOUND
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-result {
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 28px 32px;
+  opacity: 0;
+}
+
+.rcm-result.rcm-result-in {
+  animation: rcmResultIn 0.4s var(--ease-spring) forwards;
+}
+
+/* ── Cover art (when available) ── */
+.rcm-cover-wrap {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--nm-raised), 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 18px;
+  flex-shrink: 0;
+  animation: rcmIconPop 0.5s var(--ease-spring) forwards;
+}
+
+.rcm-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rcm-found-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 0 28px var(--accent-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  margin-bottom: 18px;
+  animation: rcmIconPop 0.5s var(--ease-spring) forwards;
+}
+
+.rcm-found-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-bottom: 12px;
+}
+
+.rcm-found-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.4px;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 7px;
+  padding: 0 8px;
+}
+
+.rcm-found-artist {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.rcm-found-album {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+/* ── Divider ── */
+.rcm-result-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 22px 0 20px;
+}
+
+/* ── Platform buttons — always one row ── */
+.rcm-found-links {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+.rcm-platform-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  white-space: nowrap;
+}
+
+.rcm-platform-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.rcm-platform-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+.rcm-spotify { color: #1db954; }
+.rcm-apple   { color: #fc3c44; }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULT STATE — NOT FOUND
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-miss-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-pressed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  margin-bottom: 18px;
+}
+
+.rcm-miss-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.rcm-miss-sub {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.rcm-miss-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  width: 100%;
+  justify-content: center;
+}
+
+.rcm-retry-btn {
+  padding: 10px 32px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rcm-retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--neu-shadow-hover);
+}
+
+.rcm-retry-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes rcmOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes rcmOverlayOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes rcmDialogIn {
+  from { opacity: 0; transform: scale(0.88) translateY(20px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+@keyframes rcmRingPulse {
+  0%   { transform: scale(0.6); opacity: 0.7; }
+  100% { transform: scale(1.6); opacity: 0;   }
+}
+
+@keyframes rcmCoreBreath {
+  0%, 100% { box-shadow: var(--nm-raised), 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow); }
+  50%       { box-shadow: var(--nm-raised), 0 0 40px var(--accent-glow), 0 0 80px var(--accent-glow); }
+}
+
+@keyframes rcmBarDance {
+  0%, 100% { height: 5px;  }
+  50%       { height: 26px; }
+}
+
+@keyframes rcmResultIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);    }
+}
+
+@keyframes rcmIconPop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  70%  { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Light theme ── */
+:root:not([data-theme="dark"]) .rcm-dialog {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 32px 80px rgba(163, 177, 198, 0.5);
+}
+
+:root:not([data-theme="dark"]) .rcm-backdrop {
+  background: rgba(30, 35, 40, 0.4);
+}
+
+:root:not([data-theme="dark"]) .rcm-orb-core,
+:root:not([data-theme="dark"]) .rcm-close,
+:root:not([data-theme="dark"]) .rcm-found-icon,
+:root:not([data-theme="dark"]) .rcm-miss-icon,
+:root:not([data-theme="dark"]) .rcm-platform-btn,
+:root:not([data-theme="dark"]) .rcm-retry-btn {
+  background: var(--bg-secondary);
+}

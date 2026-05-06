@@ -33,4 +33,7 @@ export enum IpcChannel {
 
   // Shell
   OPEN_EXTERNAL = 'shell:openExternal',
+
+  // Song recognition
+  RECOGNIZE_SONG = 'recognition:recognize',
 }

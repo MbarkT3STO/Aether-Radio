@@ -57,11 +57,16 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  // Allow radio stream CORS
+  // Allow radio stream CORS — only inject the header if the response
+  // doesn't already include one, to avoid duplicate '*, *' values.
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const headers = details.responseHeaders ?? {}
+    const alreadySet = Object.keys(headers).some(
+      k => k.toLowerCase() === 'access-control-allow-origin'
+    )
     callback({
-      responseHeaders: {
-        ...details.responseHeaders,
+      responseHeaders: alreadySet ? headers : {
+        ...headers,
         'Access-Control-Allow-Origin': ['*'],
       },
     })

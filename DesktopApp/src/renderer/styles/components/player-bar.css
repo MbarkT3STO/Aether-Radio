@@ -381,3 +381,18 @@
 :root:not([data-theme="dark"]) .player-bar {
   box-shadow: 0 -2px 20px rgba(163, 177, 198, 0.5);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SONG RECOGNITION — button only (modal is in recognition-modal.css)
+   ═══════════════════════════════════════════════════════════════ */
+
+.player-recognize-btn {
+  width: 34px;
+  height: 34px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.player-recognize-btn:hover {
+  color: var(--accent-primary);
+}

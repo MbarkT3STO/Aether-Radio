@@ -6,6 +6,7 @@ import { BridgeService } from '../services/BridgeService'
 import { VisualizerService } from '../services/VisualizerService'
 import { AudioService } from '../services/AudioService'
 import { SleepTimer } from './SleepTimer'
+import { SongRecognitionService } from '../services/SongRecognitionService'
 import { FALLBACK_HTML } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
@@ -17,6 +18,7 @@ export class PlayerBar extends BaseComponent {
   private visualizer     = new VisualizerService()
   private audioService   = AudioService.getInstance()
   private sleepTimer     = new SleepTimer()
+  private recognition    = SongRecognitionService.getInstance()
 
   // Document-level drag listeners — kept so we can remove them on unmount
   private _onMouseMove: ((e: Event) => void) | null = null
@@ -164,6 +166,11 @@ export class PlayerBar extends BaseComponent {
           </div>
 
           <div id="player-sleep-timer"></div>
+
+          <button class="player-btn player-recognize-btn" id="player-recognize-btn"
+            title="Identify song" aria-label="Identify song">
+            ${this.recognizeIcon()}
+          </button>
 
           <button class="player-btn player-expand-btn ${this._isExpanded ? 'expanded' : ''}"
             id="player-expand-btn"
@@ -372,6 +379,11 @@ export class PlayerBar extends BaseComponent {
         const expandBtn = this.querySelector<HTMLElement>('#player-expand-btn')
         if (expandBtn) expandBtn.click()
       })
+    }
+
+    const recognizeBtn = this.querySelector<HTMLElement>('#player-recognize-btn')
+    if (recognizeBtn) {
+      this.on(recognizeBtn, 'click', () => this.handleRecognize())
     }
 
     if (playBtn) {
@@ -942,6 +954,203 @@ export class PlayerBar extends BaseComponent {
       <div class="visualizer-idle-bar"></div>
       <div class="visualizer-idle-bar"></div>
     </div>`
+  }
+
+  // ── Song Recognition ─────────────────────────────────────────────────────
+
+  private async handleRecognize(): Promise<void> {
+    const station = this.playerStore.currentStation
+    if (!station || !this.playerStore.isPlaying) return
+
+    const btn = this.querySelector<HTMLElement>('#player-recognize-btn')
+    if (!btn || this.recognition.busy) return
+
+    // Open modal in listening state immediately
+    this.openRecognitionModal()
+
+    const streamUrl = station.urlResolved || station.url
+    const result = await this.recognition.recognize(streamUrl)
+
+    // Transition modal to result
+    this.resolveRecognitionModal(result)
+  }
+
+  private openRecognitionModal(): void {
+    document.getElementById('recognition-modal')?.remove()
+
+    const modal = document.createElement('div')
+    modal.id = 'recognition-modal'
+    modal.className = 'rcm-overlay'
+    modal.setAttribute('role', 'dialog')
+    modal.setAttribute('aria-modal', 'true')
+    modal.setAttribute('aria-label', 'Song recognition')
+
+    modal.innerHTML = `
+      <div class="rcm-backdrop"></div>
+      <div class="rcm-dialog" id="rcm-dialog">
+
+        <button class="rcm-close" id="rcm-close" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        <!-- Listening state -->
+        <div class="rcm-listening" id="rcm-listening">
+          <div class="rcm-orb">
+            <div class="rcm-orb-ring rcm-orb-ring--1"></div>
+            <div class="rcm-orb-ring rcm-orb-ring--2"></div>
+            <div class="rcm-orb-ring rcm-orb-ring--3"></div>
+            <div class="rcm-orb-core">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+              </svg>
+            </div>
+          </div>
+          <div class="rcm-bars">
+            <span class="rcm-bar"></span>
+            <span class="rcm-bar"></span>
+            <span class="rcm-bar"></span>
+            <span class="rcm-bar"></span>
+            <span class="rcm-bar"></span>
+            <span class="rcm-bar"></span>
+            <span class="rcm-bar"></span>
+          </div>
+          <div class="rcm-listening-label">Listening…</div>
+          <div class="rcm-listening-sub">Capturing audio to identify the song</div>
+        </div>
+
+        <!-- Result state (hidden initially) -->
+        <div class="rcm-result" id="rcm-result" style="display:none"></div>
+
+      </div>
+    `
+
+    document.body.appendChild(modal)
+
+    // Close only via the X button — no backdrop click
+    modal.querySelector('#rcm-close')?.addEventListener('click', () => this.closeRecognitionModal())
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { document.removeEventListener('keydown', onKey); this.closeRecognitionModal() }
+    }
+    document.addEventListener('keydown', onKey)
+  }
+
+  private resolveRecognitionModal(result: import('../services/SongRecognitionService').RecognitionResult | null): void {
+    const listening = document.getElementById('rcm-listening')
+    const resultEl  = document.getElementById('rcm-result')
+    if (!listening || !resultEl) return
+
+    listening.classList.add('rcm-fade-out')
+
+    setTimeout(() => {
+      listening.style.display = 'none'
+      resultEl.style.display  = 'flex'
+
+      if (!result) {
+        resultEl.innerHTML = `
+          <div class="rcm-miss-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <div class="rcm-miss-title">Song not recognized</div>
+          <div class="rcm-miss-sub">The stream may be playing speech or a less common track.<br>Try again in a few seconds.</div>
+          <div class="rcm-miss-actions">
+            <button class="rcm-retry-btn" id="rcm-retry">Try again</button>
+          </div>
+        `
+        resultEl.querySelector('#rcm-retry')?.addEventListener('click', () => {
+          this.closeRecognitionModal()
+          setTimeout(() => this.handleRecognize(), 150)
+        })
+
+      } else {
+        resultEl.innerHTML = `
+          ${result.coverArt
+            ? `<div class="rcm-cover-wrap"><img class="rcm-cover" src="${result.coverArt.replace(/"/g, '%22')}" alt="${this.esc(result.title)}"></div>`
+            : `<div class="rcm-found-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="1.75"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18V5l12-2v13"/>
+                  <circle cx="6" cy="18" r="3"/>
+                  <circle cx="18" cy="16" r="3"/>
+                </svg>
+              </div>`
+          }
+          <div class="rcm-found-label">Now Playing</div>
+          <div class="rcm-found-title">${this.esc(result.title)}</div>
+          <div class="rcm-found-artist">${this.esc(result.artist)}</div>
+          ${result.album ? `<div class="rcm-found-album">${this.esc(result.album)}${result.releaseDate ? ` · ${result.releaseDate.slice(0, 4)}` : ''}</div>` : ''}
+          ${(result.spotifyUrl || result.appleMusicUrl) ? `
+            <div class="rcm-result-divider"></div>
+            <div class="rcm-found-links">
+              ${result.spotifyUrl ? `<button class="rcm-platform-btn rcm-spotify" id="rcm-spotify">
+                ${this.spotifyIcon()} Spotify
+              </button>` : ''}
+              ${result.appleMusicUrl ? `<button class="rcm-platform-btn rcm-apple" id="rcm-apple">
+                ${this.appleMusicIcon()} Apple Music
+              </button>` : ''}
+            </div>
+          ` : ''}
+        `
+
+        if (result.spotifyUrl) {
+          resultEl.querySelector('#rcm-spotify')?.addEventListener('click', () => {
+            window.electronAPI.openExternal(result.spotifyUrl!)
+          })
+        }
+        if (result.appleMusicUrl) {
+          resultEl.querySelector('#rcm-apple')?.addEventListener('click', () => {
+            window.electronAPI.openExternal(result.appleMusicUrl!)
+          })
+        }
+      }
+
+      resultEl.classList.add('rcm-result-in')
+    }, 350)
+  }
+
+  private closeRecognitionModal(): void {
+    const modal = document.getElementById('recognition-modal')
+    if (!modal) return
+    modal.classList.add('rcm-fade-out-modal')
+    setTimeout(() => modal.remove(), 320)
+  }
+
+  // ── Icon helpers (recognition) ────────────────────────────────────────────
+
+  private recognizeIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 18V5l12-2v13"/>
+      <circle cx="6" cy="18" r="3"/>
+      <circle cx="18" cy="16" r="3"/>
+    </svg>`
+  }
+
+  private spotifyIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+    </svg>`
+  }
+
+  private appleMusicIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M23.994 6.124a9.23 9.23 0 0 0-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 0 0-1.877-.726 10.496 10.496 0 0 0-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026C4.786.07 4.043.15 3.34.428 2.004.958 1.04 1.88.475 3.208a5.494 5.494 0 0 0-.39 1.548c-.06.34-.087.686-.09 1.03-.002.05-.007.1-.01.15v12.128c.01.15.017.302.027.453.063.97.24 1.914.724 2.782.35.627.8 1.162 1.38 1.583.98.706 2.1 1.02 3.28 1.077.45.02.9.03 1.35.03h11.28c.45 0 .9-.01 1.35-.03 1.18-.057 2.3-.37 3.28-1.077.58-.42 1.03-.956 1.38-1.583.484-.868.66-1.812.724-2.782.01-.15.017-.302.027-.453V6.124zm-6.985 1.23v7.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V9.854l-4.5 1.5v5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5v-7.5c0-.69.47-1.29 1.14-1.45l6-2c.47-.12.96-.01 1.32.3.36.31.54.76.54 1.15z"/>
+    </svg>`
   }
 
   private esc(text: string): string {

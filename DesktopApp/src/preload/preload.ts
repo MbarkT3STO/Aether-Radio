@@ -9,6 +9,7 @@ import type { PaginationDto } from '../application/dtos/PaginationDto'
 import type { Result } from '../application/Result'
 import type { Country } from '../domain/value-objects/Country'
 import type { Genre } from '../domain/value-objects/Genre'
+import type { RecognitionResult } from '../main/ipc/handlers/RecognitionIpcHandler'
 
 export interface ElectronAPI {
   // Radio
@@ -55,6 +56,9 @@ export interface ElectronAPI {
 
   // Shell
   openExternal: (url: string) => void
+
+  // Song recognition
+  recognizeSong: (streamUrl: string) => Promise<{ success: boolean; data?: RecognitionResult; error?: string }>
 }
 
 const electronAPI: ElectronAPI = {
@@ -115,6 +119,9 @@ const electronAPI: ElectronAPI = {
 
   // Shell
   openExternal: (url) => ipcRenderer.send('shell:openExternal', url),
+
+  // Song recognition
+  recognizeSong: (streamUrl) => ipcRenderer.invoke('recognition:recognize', streamUrl),
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

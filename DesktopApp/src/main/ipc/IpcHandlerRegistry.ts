@@ -4,6 +4,7 @@ import { HistoryIpcHandler } from './handlers/HistoryIpcHandler'
 import { SettingsIpcHandler } from './handlers/SettingsIpcHandler'
 import { CustomStationsIpcHandler } from './handlers/CustomStationsIpcHandler'
 import { WindowIpcHandler } from './handlers/WindowIpcHandler'
+import { RecognitionIpcHandler } from './handlers/RecognitionIpcHandler'
 import type { BrowserWindow } from 'electron'
 import type { TrayManager } from '../tray/TrayManager'
 
@@ -15,5 +16,6 @@ export class IpcHandlerRegistry {
     SettingsIpcHandler.register()
     CustomStationsIpcHandler.register()
     WindowIpcHandler.register(mainWindow, trayManager)
+    RecognitionIpcHandler.register()
   }
 }
