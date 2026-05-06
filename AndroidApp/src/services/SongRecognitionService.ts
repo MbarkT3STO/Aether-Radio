@@ -13,6 +13,7 @@
  */
 
 import { AudioService } from './AudioService'
+import { nativePost } from './NativeHttp'
 
 // Shazam API endpoint
 const SHAZAM_HOST   = 'https://amp.shazam.com'
@@ -185,22 +186,28 @@ export class SongRecognitionService {
   }
 
   // ── Shazam signature via shazamio-core/web ────────────────────────────────
+  private _wasmReady = false
+
   private async generateSignature(
     samples: Float32Array,
     sampleRate: number,
     _channels: number
   ): Promise<{ uri: string; samplems: number } | null> {
     try {
-      // Dynamic import — loads the WASM only when needed
       const mod = await import('shazamio-core/web')
-      // mod.default is the init function
-      await (mod.default as () => Promise<unknown>)()
+
+      // Init WASM only once — subsequent calls are no-ops
+      if (!this._wasmReady) {
+        await mod.default()
+        this._wasmReady = true
+        dbg('WASM init OK')
+      }
 
       const { DecodedSignature } = mod
 
       // DecodedSignature.new() takes float32 PCM, sample rate, channel count
-      const sig = DecodedSignature.new(samples, sampleRate, 1)
-      const uri     = sig.uri
+      const sig      = DecodedSignature.new(samples, sampleRate, 1)
+      const uri      = sig.uri
       const samplems = sig.samplems
       sig.free()
 
@@ -212,7 +219,7 @@ export class SongRecognitionService {
     }
   }
 
-  // ── Shazam API call ───────────────────────────────────────────────────────
+  // ── Shazam API call (via native HTTP to bypass WebView CORS) ─────────────
   private async queryShazam(
     signatureUri: string,
     samplems: number
@@ -220,10 +227,10 @@ export class SongRecognitionService {
     const url = `${SHAZAM_HOST}/discovery/v5/en/US/iphone/-/tag/${uuidv4()}/${uuidv4()}?${SHAZAM_PARAMS}`
 
     const body = JSON.stringify({
-      timezone:  'America/New_York',
-      signature: { uri: signatureUri, samplems },
-      timestamp: Date.now(),
-      context:   {},
+      timezone:    'America/New_York',
+      signature:   { uri: signatureUri, samplems },
+      timestamp:   Date.now(),
+      context:     {},
       geolocation: {},
     })
 
@@ -236,24 +243,30 @@ export class SongRecognitionService {
       'User-Agent':          'Shazam/3685 CFNetwork/1485 Darwin/23.1.0',
     }
 
-    let resp: Response
+    let status: number
+    let responseText: string
+
     try {
-      resp = await fetch(url, { method: 'POST', headers, body })
+      // Use native Android HTTP — bypasses WebView CORS completely
+      const result = await nativePost(url, body, headers)
+      status       = result.status
+      responseText = result.data
+      dbg(`Shazam native HTTP ${status}`)
     } catch (e) {
-      dbg(`Shazam fetch error: ${String(e)}`)
+      dbg(`Shazam native error: ${String(e)}`)
       return null
     }
 
-    if (!resp.ok) {
-      dbg(`Shazam HTTP ${resp.status}`)
+    if (status < 200 || status >= 300) {
+      dbg(`Shazam HTTP error ${status}: ${responseText.slice(0, 100)}`)
       return null
     }
 
     let data: ShazamResponse
     try {
-      data = await resp.json() as ShazamResponse
+      data = JSON.parse(responseText) as ShazamResponse
     } catch (e) {
-      dbg(`Shazam JSON error: ${String(e)}`)
+      dbg(`Shazam JSON parse error: ${String(e)}`)
       return null
     }
 
@@ -261,9 +274,9 @@ export class SongRecognitionService {
 
     if (!data.matches?.length || !data.track) return null
 
-    const track = data.track
-    const title  = track.title?.trim()
-    const artist = track.subtitle?.trim()
+    const track      = data.track
+    const title      = track.title?.trim()
+    const artist     = track.subtitle?.trim()
     if (!title || !artist) { dbg('missing title/artist'); return null }
 
     const songSection = track.sections?.find(s => s.type === 'SONG')
