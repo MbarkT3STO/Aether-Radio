@@ -61,21 +61,12 @@ export class MiniPlayer extends BaseComponent {
       <div class="mini-player" id="mini-player-root">
         <canvas class="mini-player-ambient" id="mini-player-ambient"></canvas>
 
-        <!-- Expand hint chevron -->
-        <div class="mini-player-expand-hint" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="18 15 12 9 6 15"/>
-          </svg>
-        </div>
-
         <div class="mini-player-logo" id="mini-player-logo">
           ${stationLogoHtml(station.favicon, station.name, 'player')}
           ${isPlaying ? `<span class="mini-player-live-dot"></span>` : ''}
         </div>
 
-        <div class="mini-player-info mini-player-expand-area" id="mini-player-info-area">
+        <div class="mini-player-info" id="mini-player-info-area">
           <div class="mini-player-name">${this.esc(station.name)}</div>
           <div class="mini-player-meta">
             ${countryFlag(station.countryCode)} ${this.esc(station.country)}
@@ -113,6 +104,16 @@ export class MiniPlayer extends BaseComponent {
               ? `<span class="loading-spinner loading-spinner--md"></span>`
               : (isPlaying ? this.pauseIcon() : this.playIcon())
             }
+          </button>
+
+          <!-- Expand -->
+          <button class="mini-player-btn mini-player-btn--expand" id="mini-expand-btn"
+            title="Open player" aria-label="Open full player">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
           </button>
         </div>
       </div>
@@ -181,64 +182,20 @@ export class MiniPlayer extends BaseComponent {
       })
     }
 
-    // Tapping the logo or the info/name area opens the expanded player.
-    // We use both 'click' and 'touchend' because Android WebView inside a
-    // fixed container can swallow synthetic click events.
-    const expandAreas = [
-      this.querySelector('#mini-player-logo'),
-      this.querySelector('#mini-player-info-area'),
-    ]
-    expandAreas.forEach(area => {
-      if (!area) return
-      this.on(area, 'click', (e) => {
+    // Dedicated expand button — most reliable trigger on Android WebView
+    const expandBtn = this.querySelector('#mini-expand-btn')
+    if (expandBtn) {
+      this.on(expandBtn, 'click', (e) => {
         e.stopPropagation()
         if (this.playerStore.currentStation) this.openExpanded()
       })
-      this.on(area, 'touchend', (e) => {
-        const touch = (e as TouchEvent).changedTouches[0]
-        const startTouch = (area as HTMLElement & { _touchStartY?: number })._touchStartY
-        // Only treat as tap if the finger didn't move much (not a scroll)
-        if (startTouch !== undefined && Math.abs(touch.clientY - startTouch) > 10) return
+      // touchend as backup for Android WebView fixed-position click issues
+      this.on(expandBtn, 'touchend', (e) => {
         e.preventDefault()
+        e.stopPropagation()
         if (this.playerStore.currentStation) this.openExpanded()
       })
-      this.on(area, 'touchstart', (e) => {
-        const touch = (e as TouchEvent).touches[0];
-        (area as HTMLElement & { _touchStartY?: number })._touchStartY = touch.clientY
-      })
-    })
-
-    // Swipe up on the whole mini-player also opens the expanded player
-    if (this.element) {
-      this.setupSwipeUpToExpand(this.element)
     }
-  }
-
-  private setupSwipeUpToExpand(el: HTMLElement): void {
-    let startY = 0
-    let startX = 0
-    let tracking = false
-
-    const onTouchStart = (e: Event) => {
-      const touch = (e as TouchEvent).touches[0]
-      startY = touch.clientY
-      startX = touch.clientX
-      tracking = true
-    }
-
-    const onTouchEnd = (e: Event) => {
-      if (!tracking) return
-      tracking = false
-      const touch = (e as TouchEvent).changedTouches[0]
-      const deltaY = startY - touch.clientY
-      const deltaX = Math.abs(touch.clientX - startX)
-      if (deltaY > 40 && deltaY > deltaX * 1.5 && this.playerStore.currentStation) {
-        this.openExpanded()
-      }
-    }
-
-    this.on(el, 'touchstart', onTouchStart)
-    this.on(el, 'touchend', onTouchEnd)
   }
 
   private openExpanded(): void {
