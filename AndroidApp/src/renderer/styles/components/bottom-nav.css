@@ -1,11 +1,10 @@
 /* ── Bottom Navigation ── */
 
 .bottom-nav {
-  height: var(--bottom-nav-height);
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: stretch;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
   box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
   /* Scrollable when there are more tabs than fit on screen */
   overflow-x: auto;
@@ -13,7 +12,8 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  gap: 0;
+  /* Height is the nav items height only — safe area is handled by app-bottom-nav */
+  height: var(--bottom-nav-height);
 }
 
 .bottom-nav::-webkit-scrollbar {
@@ -21,14 +21,14 @@
 }
 
 .bottom-nav-item {
-  flex: 0 0 auto;        /* don't shrink — keep items their natural size */
-  min-width: 64px;
+  flex: 1 0 0;           /* grow equally, don't shrink below min-width */
+  min-width: 56px;
   max-width: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   cursor: pointer;
   border: none;
   background: transparent;
@@ -39,7 +39,7 @@
   letter-spacing: 0.02em;
   transition: color var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
-  padding: 0 2px;
+  padding: 0 4px;
   /* Minimum touch target */
   min-height: 44px;
 }
@@ -68,7 +68,7 @@
 /* ── Very small screens: hide labels ── */
 @media (max-width: 360px) {
   .bottom-nav-item span { display: none; }
-  .bottom-nav-item { gap: 0; }
+  .bottom-nav-item { gap: 0; min-width: 44px; }
   .bottom-nav-item svg { width: 22px; height: 22px; }
 }
 

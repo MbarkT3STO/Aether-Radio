@@ -75,7 +75,7 @@ export class MiniPlayer extends BaseComponent {
           ${isPlaying ? `<span class="mini-player-live-dot"></span>` : ''}
         </div>
 
-        <div class="mini-player-info">
+        <div class="mini-player-info mini-player-expand-area" id="mini-player-info-area">
           <div class="mini-player-name">${this.esc(station.name)}</div>
           <div class="mini-player-meta">
             ${countryFlag(station.countryCode)} ${this.esc(station.country)}
@@ -93,7 +93,7 @@ export class MiniPlayer extends BaseComponent {
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
               fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round"
-              style="color:${isFav ? 'var(--accent-secondary)' : 'var(--text-tertiary)'}">
+              class="${isFav ? 'fav-icon--active' : 'fav-icon--inactive'}">
               <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
             </svg>
           </button>
@@ -181,17 +181,35 @@ export class MiniPlayer extends BaseComponent {
       })
     }
 
-    // The entire mini-player area (except buttons) opens the expanded player.
-    // We attach to this.element directly — it IS the .mini-player root div.
-    if (this.element) {
-      this.on(this.element, 'click', (e) => {
-        const target = e.target as HTMLElement
-        // Ignore clicks on any button or the sleep timer popover
-        if (target.closest('button') || target.closest('.sleep-timer-popover')) return
+    // Tapping the logo or the info/name area opens the expanded player.
+    // We use both 'click' and 'touchend' because Android WebView inside a
+    // fixed container can swallow synthetic click events.
+    const expandAreas = [
+      this.querySelector('#mini-player-logo'),
+      this.querySelector('#mini-player-info-area'),
+    ]
+    expandAreas.forEach(area => {
+      if (!area) return
+      this.on(area, 'click', (e) => {
+        e.stopPropagation()
         if (this.playerStore.currentStation) this.openExpanded()
       })
+      this.on(area, 'touchend', (e) => {
+        const touch = (e as TouchEvent).changedTouches[0]
+        const startTouch = (area as HTMLElement & { _touchStartY?: number })._touchStartY
+        // Only treat as tap if the finger didn't move much (not a scroll)
+        if (startTouch !== undefined && Math.abs(touch.clientY - startTouch) > 10) return
+        e.preventDefault()
+        if (this.playerStore.currentStation) this.openExpanded()
+      })
+      this.on(area, 'touchstart', (e) => {
+        const touch = (e as TouchEvent).touches[0];
+        (area as HTMLElement & { _touchStartY?: number })._touchStartY = touch.clientY
+      })
+    })
 
-      // Swipe up also opens the expanded player
+    // Swipe up on the whole mini-player also opens the expanded player
+    if (this.element) {
       this.setupSwipeUpToExpand(this.element)
     }
   }
@@ -287,7 +305,7 @@ export class MiniPlayer extends BaseComponent {
     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
       fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"
       stroke-linecap="round" stroke-linejoin="round"
-      style="color:${isFav ? 'var(--accent-secondary)' : 'var(--text-tertiary)'}">
+      class="${isFav ? 'fav-icon--active' : 'fav-icon--inactive'}">
       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
     </svg>`
   }

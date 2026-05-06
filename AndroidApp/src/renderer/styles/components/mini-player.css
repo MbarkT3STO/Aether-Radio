@@ -223,3 +223,13 @@
 :root:not([data-theme="dark"]) .mini-player-btn { background: var(--bg-secondary); }
 :root:not([data-theme="dark"]) .mini-player-live-dot { border-color: var(--bg-primary); }
 :root:not([data-theme="dark"]) #mini-sleep-timer-slot .sleep-timer-btn { background: var(--bg-secondary); }
+
+/* ── Fav icon color via CSS class (no inline styles) ── */
+.fav-icon--active   { color: var(--accent-secondary); }
+.fav-icon--inactive { color: var(--text-tertiary); }
+
+/* ── Mini-player expand areas — pointer cursor, no tap highlight ── */
+.mini-player-expand-area {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}

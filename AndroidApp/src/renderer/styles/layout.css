@@ -61,10 +61,12 @@ html {
   left: 0;
   right: 0;
   z-index: 110;
-  /* Safe area padding so nav items aren't behind the home indicator */
+  pointer-events: all;
+  /* Safe area padding so nav items aren't behind the home indicator.
+     The .bottom-nav inside handles its own height; this wrapper only
+     adds the safe-area gap below it. */
   padding-bottom: var(--safe-bottom);
   background: var(--bg-secondary);
-  pointer-events: all;
 }
 
 /* ── Scrollbar ── */

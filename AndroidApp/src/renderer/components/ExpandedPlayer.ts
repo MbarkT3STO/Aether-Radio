@@ -84,7 +84,7 @@ export class ExpandedPlayer extends BaseComponent {
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                 fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round"
-                style="color:${isFav ? 'var(--accent-secondary)' : 'var(--text-secondary)'}">
+                class="${isFav ? 'fav-icon--active' : 'fav-icon--inactive'}">
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
               </svg>
             </button>
@@ -196,7 +196,7 @@ export class ExpandedPlayer extends BaseComponent {
       startY = touch.clientY
       currentY = touch.clientY
       isDragging = true
-      sheet.style.transition = 'none'
+      sheet.classList.add('dragging')
     }
 
     const onTouchMove = (e: Event) => {
@@ -210,7 +210,7 @@ export class ExpandedPlayer extends BaseComponent {
     const onTouchEnd = () => {
       if (!isDragging) return
       isDragging = false
-      sheet.style.transition = ''
+      sheet.classList.remove('dragging')
       const delta = currentY - startY
       if (delta > 120) {
         this.close()
@@ -219,7 +219,6 @@ export class ExpandedPlayer extends BaseComponent {
       }
     }
 
-    // Use this.on() so BaseComponent tracks and cleans up these listeners
     this.on(sheet, 'touchstart', onTouchStart)
     this.on(sheet, 'touchmove', onTouchMove)
     this.on(sheet, 'touchend', onTouchEnd)
@@ -321,7 +320,7 @@ export class ExpandedPlayer extends BaseComponent {
     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
       fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"
       stroke-linecap="round" stroke-linejoin="round"
-      style="color:${isFav ? 'var(--accent-secondary)' : 'var(--text-secondary)'}">
+      class="${isFav ? 'fav-icon--active' : 'fav-icon--inactive'}">
       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
     </svg>`
   }
