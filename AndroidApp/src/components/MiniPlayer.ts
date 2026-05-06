@@ -6,6 +6,8 @@ import { BridgeService } from '../services/BridgeService'
 import { AudioService } from '../services/AudioService'
 import { VisualizerService } from '../services/VisualizerService'
 import { SleepTimer } from './SleepTimer'
+import { SongRecognitionService } from '../services/SongRecognitionService'
+import type { RecognitionResult } from '../services/SongRecognitionService'
 import { stationLogoHtml } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
@@ -18,6 +20,7 @@ export class MiniPlayer extends BaseComponent {
   private _barVisualizer   = new VisualizerService()
   private _sheetVisualizer = new VisualizerService()
   private _sleepTimer      = new SleepTimer()
+  private _recognition     = SongRecognitionService.getInstance()
   private _renderedStationId: string | null = null
   private _expanded = false
 
@@ -61,6 +64,11 @@ export class MiniPlayer extends BaseComponent {
           </div>
         </button>
         <div class="mini-player-controls">
+          <button class="mp-recognize-btn${isPlaying ? '' : ' disabled'}" id="mp-recognize-btn"
+            aria-label="Identify song" title="Identify song"
+            ${isPlaying ? '' : 'disabled'}>
+            ${this.recognizeIcon()}
+          </button>
           <button class="mini-player-btn mini-player-fav${isFav ? ' active' : ''}" id="mp-fav" aria-label="Favorite">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
               fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
@@ -105,12 +113,14 @@ export class MiniPlayer extends BaseComponent {
   }
 
   private attachListeners(): void {
-    const expandArea = this.querySelector('#mp-expand-area')
-    const playBtn    = this.querySelector('#mp-play')
-    const stopBtn    = this.querySelector('#mp-stop')
-    const favBtn     = this.querySelector('#mp-fav')
+    const expandArea  = this.querySelector('#mp-expand-area')
+    const playBtn     = this.querySelector('#mp-play')
+    const stopBtn     = this.querySelector('#mp-stop')
+    const favBtn      = this.querySelector('#mp-fav')
+    const recognizeBtn = this.querySelector('#mp-recognize-btn')
 
     if (expandArea) this.on(expandArea, 'click', () => this.openExpanded())
+    if (recognizeBtn) this.on(recognizeBtn, 'click', () => void this.handleRecognize())
     if (playBtn) {
       this.on(playBtn, 'click', () => {
         if (this.playerStore.isPlaying) this.playerStore.pause()
@@ -225,6 +235,15 @@ export class MiniPlayer extends BaseComponent {
 
       <!-- Sleep timer -->
       <div class="mp-sheet-sleep-row" id="mp-sheet-sleep"></div>
+
+      <!-- Identify song -->
+      <div class="mp-sheet-recognize-row">
+        <button class="mp-sheet-recognize-btn${isPlaying ? '' : ' disabled'}" id="mp-sheet-recognize"
+          aria-label="Identify song" ${isPlaying ? '' : 'disabled'}>
+          ${this.recognizeIcon()}
+          Identify Song
+        </button>
+      </div>
     `
 
     document.body.appendChild(sheet)
@@ -253,6 +272,8 @@ export class MiniPlayer extends BaseComponent {
     const q = (sel: string) => sheet.querySelector<HTMLElement>(sel)
 
     q('#mp-sheet-close')?.addEventListener('click', () => this.closeExpanded())
+
+    q('#mp-sheet-recognize')?.addEventListener('click', () => void this.handleRecognize())
 
     q('#mp-sheet-play')?.addEventListener('click', () => {
       if (this.playerStore.isPlaying) this.playerStore.pause()
@@ -350,6 +371,12 @@ export class MiniPlayer extends BaseComponent {
           ambCanvas.classList.remove('active')
         }
       }
+      // Sync recognize button
+      const recBtn = q('#mp-sheet-recognize')
+      if (recBtn) {
+        recBtn.classList.toggle('disabled', !isPlaying)
+        recBtn.toggleAttribute('disabled', !isPlaying)
+      }
     })
 
     const unsub2 = this.eventBus.on('player:pause', () => {
@@ -415,6 +442,12 @@ export class MiniPlayer extends BaseComponent {
     const logoWrap = this.querySelector('.mini-player-logo')
     if (isPlaying && !dot && logoWrap) logoWrap.insertAdjacentHTML('beforeend', `<span class="mini-player-live-dot"></span>`)
     else if (!isPlaying && dot) dot.remove()
+    // Sync recognize button
+    const recBtn = this.querySelector<HTMLElement>('#mp-recognize-btn')
+    if (recBtn) {
+      recBtn.classList.toggle('disabled', !isPlaying)
+      recBtn.toggleAttribute('disabled', !isPlaying)
+    }
     // Sync bar ambient
     if (isPlaying) this.startBarAmbient()
     else this.stopBarAmbient()
@@ -465,5 +498,176 @@ export class MiniPlayer extends BaseComponent {
 
   private esc(t: string): string {
     return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+  }
+
+  // ── Song Recognition ──────────────────────────────────────────────────────
+
+  private async handleRecognize(): Promise<void> {
+    const station = this.playerStore.currentStation
+    if (!station || !this.playerStore.isPlaying || this._recognition.busy) return
+    this.openRecognitionModal()
+    const streamUrl = station.urlResolved || station.url
+    const result = await this._recognition.recognize(streamUrl)
+    this.resolveRecognitionModal(result)
+  }
+
+  private openRecognitionModal(): void {
+    document.getElementById('recognition-modal')?.remove()
+
+    const modal = document.createElement('div')
+    modal.id = 'recognition-modal'
+    modal.className = 'rcm-overlay'
+    modal.setAttribute('role', 'dialog')
+    modal.setAttribute('aria-modal', 'true')
+    modal.setAttribute('aria-label', 'Song recognition')
+
+    modal.innerHTML = `
+      <div class="rcm-backdrop"></div>
+      <div class="rcm-dialog" id="rcm-dialog">
+
+        <button class="rcm-close" id="rcm-close" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        <!-- Listening / animation state -->
+        <div class="rcm-listening" id="rcm-listening">
+          <div class="rcm-viz-wrap">
+            <div class="rcm-ambient-container">
+              <div class="rcm-search-orb"></div>
+              <div class="rcm-blur-point rcm-point-1"></div>
+              <div class="rcm-blur-point rcm-point-2"></div>
+              <div class="rcm-blur-point rcm-point-3"></div>
+              <div class="rcm-blur-point rcm-point-4"></div>
+              <div class="rcm-blur-point rcm-point-5"></div>
+              <div class="rcm-blur-point rcm-point-6"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-7"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-8"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-9"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-10"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-11"></div>
+              <div class="rcm-blur-point rcm-outer rcm-point-12"></div>
+              <div class="rcm-particle rcm-particle-1"></div>
+              <div class="rcm-particle rcm-particle-2"></div>
+              <div class="rcm-particle rcm-particle-3"></div>
+              <div class="rcm-particle rcm-particle-4"></div>
+              <div class="rcm-particle rcm-particle-5"></div>
+              <div class="rcm-particle rcm-particle-6"></div>
+            </div>
+          </div>
+          <div class="rcm-listening-label">Identifying song…</div>
+          <div class="rcm-listening-sub">Reading stream metadata</div>
+        </div>
+
+        <!-- Result state (hidden initially) -->
+        <div class="rcm-result" id="rcm-result" style="display:none"></div>
+
+      </div>
+    `
+
+    document.body.appendChild(modal)
+    modal.querySelector('#rcm-close')?.addEventListener('click', () => this.closeRecognitionModal())
+  }
+
+  private resolveRecognitionModal(result: RecognitionResult | null): void {
+    const listening = document.getElementById('rcm-listening')
+    const resultEl  = document.getElementById('rcm-result')
+    if (!listening || !resultEl) return
+
+    listening.classList.add('rcm-fade-out')
+
+    setTimeout(() => {
+      listening.style.display = 'none'
+      resultEl.style.display  = 'flex'
+
+      if (!result || (!result.title && !result.artist)) {
+        // ── Not found ──
+        resultEl.innerHTML = `
+          <div class="rcm-miss-wrap">
+            <div class="rcm-miss-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
+            <div class="rcm-miss-title">Song not recognized</div>
+            <div class="rcm-miss-sub">This station may not broadcast track info.<br>Try again in a few seconds.</div>
+            <div class="rcm-miss-actions">
+              <button class="rcm-retry-btn" id="rcm-retry">Try again</button>
+            </div>
+          </div>
+        `
+        resultEl.querySelector('#rcm-retry')?.addEventListener('click', () => {
+          this.closeRecognitionModal()
+          setTimeout(() => void this.handleRecognize(), 150)
+        })
+
+      } else {
+        // ── Found ──
+        const titleText  = this.esc(result.title)
+        const artistText = result.artist ? this.esc(result.artist) : ''
+
+        const coverHtml = result.coverArt
+          ? `<div class="rcm-cover-hero">
+               <div class="rcm-cover-blur-bg" style="background-image:url('${result.coverArt.replace(/"/g, '%22')}')"></div>
+               <div class="rcm-cover-wrap">
+                 <img class="rcm-cover" src="${result.coverArt.replace(/"/g, '%22')}" alt="${titleText}">
+               </div>
+             </div>`
+          : `<div class="rcm-found-icon-hero">
+               <div class="rcm-found-icon-orb">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1.75"
+                   stroke-linecap="round" stroke-linejoin="round">
+                   <path d="M9 18V5l12-2v13"/>
+                   <circle cx="6" cy="18" r="3"/>
+                   <circle cx="18" cy="16" r="3"/>
+                 </svg>
+               </div>
+             </div>`
+
+        resultEl.innerHTML = `
+          ${coverHtml}
+          <div class="rcm-found-info">
+            <div class="rcm-found-label">
+              <span class="rcm-found-label-dot"></span>
+              Now Playing
+            </div>
+            <div class="rcm-found-title">${titleText}</div>
+            ${artistText ? `<div class="rcm-found-artist">${artistText}</div>` : ''}
+            ${result.album
+              ? `<div class="rcm-found-album">${this.esc(result.album)}${result.releaseDate ? ` · ${result.releaseDate.slice(0, 4)}` : ''}</div>`
+              : ''}
+          </div>
+        `
+      }
+
+      resultEl.classList.add('rcm-result-in')
+    }, 350)
+  }
+
+  private closeRecognitionModal(): void {
+    const modal = document.getElementById('recognition-modal')
+    if (!modal) return
+    modal.classList.add('rcm-fade-out-modal')
+    setTimeout(() => modal.remove(), 320)
+  }
+
+  private recognizeIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2v20"/>
+      <path d="M5 6v12"/>
+      <path d="M13 4v16"/>
+      <path d="M17 7v10"/>
+      <path d="M21 10v4"/>
+    </svg>`
   }
 }

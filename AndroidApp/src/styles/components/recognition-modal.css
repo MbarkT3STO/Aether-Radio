@@ -1,0 +1,682 @@
+/* ═══════════════════════════════════════════════════════════════
+   SONG RECOGNITION MODAL — neumorphic design (Android)
+   ═══════════════════════════════════════════════════════════════ */
+
+.rcm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: rcmOverlayIn 0.2s ease forwards;
+}
+
+.rcm-overlay.rcm-fade-out-modal {
+  animation: rcmOverlayOut 0.25s ease forwards;
+}
+
+.rcm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ── Dialog ── */
+.rcm-dialog {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 24px 64px rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-xl);
+  width: min(360px, calc(100vw - 40px));
+  overflow: hidden;
+  animation: rcmDialogIn 0.3s var(--ease-spring) forwards;
+}
+
+[data-theme="dark"] .rcm-dialog {
+  background: var(--bg-secondary);
+}
+
+/* ── Close ── */
+.rcm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.rcm-close:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(0.95);
+}
+
+[data-theme="dark"] .rcm-close {
+  background: var(--bg-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LISTENING STATE
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-listening {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 var(--space-lg) var(--space-lg);
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .rcm-listening {
+  background: var(--bg-secondary);
+}
+
+.rcm-listening.rcm-fade-out {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+.rcm-viz-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding-bottom: 60px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AMBIENT BLUR POINTS — Siri-inspired animation
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-ambient-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rcm-search-orb {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  background: radial-gradient(
+    circle,
+    hsla(var(--h), var(--s), 65%, 0.95) 0%,
+    hsla(var(--h), var(--s), 55%, 0.7) 35%,
+    hsla(var(--h), var(--s), 45%, 0.3) 65%,
+    transparent 100%
+  );
+  filter: blur(12px);
+  animation: rcmOrbBreath 2s ease-in-out infinite;
+  z-index: 5;
+}
+
+[data-theme="dark"] .rcm-search-orb {
+  background: radial-gradient(
+    circle,
+    hsla(var(--h), var(--s), 70%, 1) 0%,
+    hsla(var(--h), var(--s), 60%, 0.8) 35%,
+    hsla(var(--h), var(--s), 50%, 0.4) 65%,
+    transparent 100%
+  );
+  filter: blur(14px);
+}
+
+.rcm-blur-point {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  filter: blur(8px);
+  opacity: 0.85;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rcm-blur-point.rcm-outer {
+  width: 80px;
+  height: 80px;
+  filter: blur(10px);
+}
+
+.rcm-point-1 {
+  background: radial-gradient(circle, hsla(var(--h), var(--s), 65%, 0.9) 0%, hsla(var(--h), var(--s), 55%, 0.55) 50%, transparent 100%);
+  animation: rcmPointWave1 3.6s ease-in-out infinite;
+}
+.rcm-point-2 {
+  background: radial-gradient(circle, hsla(calc(var(--h) + 45), var(--s), 65%, 0.85) 0%, hsla(calc(var(--h) + 45), var(--s), 55%, 0.5) 50%, transparent 100%);
+  animation: rcmPointWave2 3.6s ease-in-out infinite;
+}
+.rcm-point-3 {
+  background: radial-gradient(circle, hsla(calc(var(--h) - 35), var(--s), 65%, 0.8) 0%, hsla(calc(var(--h) - 35), var(--s), 55%, 0.45) 50%, transparent 100%);
+  animation: rcmPointWave3 4s ease-in-out infinite;
+}
+.rcm-point-4 {
+  background: radial-gradient(circle, hsla(calc(var(--h) + 25), var(--s), 65%, 0.85) 0%, hsla(calc(var(--h) + 25), var(--s), 55%, 0.5) 50%, transparent 100%);
+  animation: rcmPointWave4 4s ease-in-out infinite;
+}
+.rcm-point-5 {
+  background: radial-gradient(circle, hsla(calc(var(--h) - 20), var(--s), 65%, 0.8) 0%, hsla(calc(var(--h) - 20), var(--s), 55%, 0.45) 50%, transparent 100%);
+  animation: rcmPointWave5 2.8s ease-in-out infinite;
+}
+.rcm-point-6 {
+  background: radial-gradient(circle, hsla(calc(var(--h) + 55), var(--s), 65%, 0.85) 0%, hsla(calc(var(--h) + 55), var(--s), 55%, 0.5) 50%, transparent 100%);
+  animation: rcmPointWave6 2.8s ease-in-out infinite;
+}
+.rcm-point-7 {
+  background: radial-gradient(circle, hsla(calc(var(--h) + 10), var(--s), 65%, 0.75) 0%, hsla(calc(var(--h) + 10), var(--s), 55%, 0.4) 50%, transparent 100%);
+  animation: rcmPointWave7 4.4s ease-in-out infinite;
+}
+.rcm-point-8 {
+  background: radial-gradient(circle, hsla(calc(var(--h) + 60), var(--s), 65%, 0.7) 0%, hsla(calc(var(--h) + 60), var(--s), 55%, 0.35) 50%, transparent 100%);
+  animation: rcmPointWave8 4.4s ease-in-out infinite;
+}
+.rcm-point-9 {
+  background: radial-gradient(circle, hsla(calc(var(--h) - 40), var(--s), 65%, 0.75) 0%, hsla(calc(var(--h) - 40), var(--s), 55%, 0.4) 50%, transparent 100%);
+  animation: rcmPointWave9 3.2s ease-in-out infinite;
+}
+.rcm-point-10 {
+  background: radial-gradient(circle, hsla(calc(var(--h) + 35), var(--s), 65%, 0.7) 0%, hsla(calc(var(--h) + 35), var(--s), 55%, 0.35) 50%, transparent 100%);
+  animation: rcmPointWave10 3.2s ease-in-out infinite;
+}
+.rcm-point-11 {
+  background: radial-gradient(circle, hsla(calc(var(--h) - 10), var(--s), 65%, 0.75) 0%, hsla(calc(var(--h) - 10), var(--s), 55%, 0.4) 50%, transparent 100%);
+  animation: rcmPointWave11 3.2s ease-in-out infinite;
+}
+.rcm-point-12 {
+  background: radial-gradient(circle, hsla(calc(var(--h) + 70), var(--s), 65%, 0.7) 0%, hsla(calc(var(--h) + 70), var(--s), 55%, 0.35) 50%, transparent 100%);
+  animation: rcmPointWave12 3.2s ease-in-out infinite;
+}
+
+[data-theme="dark"] .rcm-blur-point       { filter: blur(10px); }
+[data-theme="dark"] .rcm-blur-point.rcm-outer { filter: blur(12px); }
+
+/* ── Particles ── */
+.rcm-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: hsla(var(--h), var(--s), 70%, 0.9);
+}
+.rcm-particle-1 { animation: rcmFloat1 3.2s ease-in-out infinite; }
+.rcm-particle-2 { animation: rcmFloat2 2.8s ease-in-out infinite; animation-delay: 0.4s; }
+.rcm-particle-3 { animation: rcmFloat3 3.5s ease-in-out infinite; animation-delay: 0.8s; }
+.rcm-particle-4 { animation: rcmFloat4 2.6s ease-in-out infinite; animation-delay: 1.2s; }
+.rcm-particle-5 { animation: rcmFloat5 3.1s ease-in-out infinite; animation-delay: 1.6s; }
+.rcm-particle-6 { animation: rcmFloat6 2.9s ease-in-out infinite; animation-delay: 2s; }
+
+.rcm-listening-label {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 10;
+}
+
+.rcm-listening-sub {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+  position: relative;
+  z-index: 10;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes rcmOrbBreath {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.9; }
+  50%       { transform: translate(-50%, -50%) scale(1.5); opacity: 1;   }
+}
+
+@keyframes rcmPointWave1 {
+  0%   { transform: translate(calc(-50% + 38px), calc(-50% +  0px)) scale(1);    opacity: 0.9; }
+  25%  { transform: translate(calc(-50% +  0px), calc(-50% - 38px)) scale(1.1);  opacity: 1;   }
+  50%  { transform: translate(calc(-50% - 38px), calc(-50% +  0px)) scale(1);    opacity: 0.9; }
+  75%  { transform: translate(calc(-50% +  0px), calc(-50% + 38px)) scale(0.95); opacity: 0.8; }
+  100% { transform: translate(calc(-50% + 38px), calc(-50% +  0px)) scale(1);    opacity: 0.9; }
+}
+@keyframes rcmPointWave2 {
+  0%   { transform: translate(calc(-50% - 38px), calc(-50% +  0px)) scale(1);    opacity: 0.9; }
+  25%  { transform: translate(calc(-50% +  0px), calc(-50% + 38px)) scale(1.1);  opacity: 1;   }
+  50%  { transform: translate(calc(-50% + 38px), calc(-50% +  0px)) scale(1);    opacity: 0.9; }
+  75%  { transform: translate(calc(-50% +  0px), calc(-50% - 38px)) scale(0.95); opacity: 0.8; }
+  100% { transform: translate(calc(-50% - 38px), calc(-50% +  0px)) scale(1);    opacity: 0.9; }
+}
+@keyframes rcmPointWave3 {
+  0%   { transform: translate(calc(-50% + 26px), calc(-50% - 26px)) scale(1.05); opacity: 0.85; }
+  33%  { transform: translate(calc(-50% - 32px), calc(-50% - 18px)) scale(1.15); opacity: 1;    }
+  66%  { transform: translate(calc(-50% -  8px), calc(-50% + 35px)) scale(0.95); opacity: 0.85; }
+  100% { transform: translate(calc(-50% + 26px), calc(-50% - 26px)) scale(1.05); opacity: 0.85; }
+}
+@keyframes rcmPointWave4 {
+  0%   { transform: translate(calc(-50% - 26px), calc(-50% + 26px)) scale(1.05); opacity: 0.85; }
+  33%  { transform: translate(calc(-50% + 32px), calc(-50% + 18px)) scale(1.15); opacity: 1;    }
+  66%  { transform: translate(calc(-50% +  8px), calc(-50% - 35px)) scale(0.95); opacity: 0.85; }
+  100% { transform: translate(calc(-50% - 26px), calc(-50% + 26px)) scale(1.05); opacity: 0.85; }
+}
+@keyframes rcmPointWave5 {
+  0%   { transform: translate(calc(-50% +  0px), calc(-50% - 42px)) scale(0.9); opacity: 0.8; }
+  50%  { transform: translate(calc(-50% +  0px), calc(-50% + 42px)) scale(1.1); opacity: 1;   }
+  100% { transform: translate(calc(-50% +  0px), calc(-50% - 42px)) scale(0.9); opacity: 0.8; }
+}
+@keyframes rcmPointWave6 {
+  0%   { transform: translate(calc(-50% +  0px), calc(-50% + 42px)) scale(0.9); opacity: 0.8; }
+  50%  { transform: translate(calc(-50% +  0px), calc(-50% - 42px)) scale(1.1); opacity: 1;   }
+  100% { transform: translate(calc(-50% +  0px), calc(-50% + 42px)) scale(0.9); opacity: 0.8; }
+}
+@keyframes rcmPointWave7 {
+  0%   { transform: translate(calc(-50% + 50px), calc(-50% +  0px)) scale(0.9);  opacity: 0.7;  }
+  25%  { transform: translate(calc(-50% +  0px), calc(-50% - 50px)) scale(1.05); opacity: 0.85; }
+  50%  { transform: translate(calc(-50% - 50px), calc(-50% +  0px)) scale(0.9);  opacity: 0.7;  }
+  75%  { transform: translate(calc(-50% +  0px), calc(-50% + 50px)) scale(1.05); opacity: 0.85; }
+  100% { transform: translate(calc(-50% + 50px), calc(-50% +  0px)) scale(0.9);  opacity: 0.7;  }
+}
+@keyframes rcmPointWave8 {
+  0%   { transform: translate(calc(-50% - 50px), calc(-50% +  0px)) scale(0.9);  opacity: 0.7;  }
+  25%  { transform: translate(calc(-50% +  0px), calc(-50% + 50px)) scale(1.05); opacity: 0.85; }
+  50%  { transform: translate(calc(-50% + 50px), calc(-50% +  0px)) scale(0.9);  opacity: 0.7;  }
+  75%  { transform: translate(calc(-50% +  0px), calc(-50% - 50px)) scale(1.05); opacity: 0.85; }
+  100% { transform: translate(calc(-50% - 50px), calc(-50% +  0px)) scale(0.9);  opacity: 0.7;  }
+}
+@keyframes rcmPointWave9 {
+  0%   { transform: translate(calc(-50% + 35px), calc(-50% - 35px)) scale(0.95); opacity: 0.75; }
+  50%  { transform: translate(calc(-50% - 35px), calc(-50% + 35px)) scale(1.1);  opacity: 0.9;  }
+  100% { transform: translate(calc(-50% + 35px), calc(-50% - 35px)) scale(0.95); opacity: 0.75; }
+}
+@keyframes rcmPointWave10 {
+  0%   { transform: translate(calc(-50% - 35px), calc(-50% - 35px)) scale(0.95); opacity: 0.75; }
+  50%  { transform: translate(calc(-50% + 35px), calc(-50% + 35px)) scale(1.1);  opacity: 0.9;  }
+  100% { transform: translate(calc(-50% - 35px), calc(-50% - 35px)) scale(0.95); opacity: 0.75; }
+}
+@keyframes rcmPointWave11 {
+  0%   { transform: translate(calc(-50% + 35px), calc(-50% + 35px)) scale(0.95); opacity: 0.75; }
+  50%  { transform: translate(calc(-50% - 35px), calc(-50% - 35px)) scale(1.1);  opacity: 0.9;  }
+  100% { transform: translate(calc(-50% + 35px), calc(-50% + 35px)) scale(0.95); opacity: 0.75; }
+}
+@keyframes rcmPointWave12 {
+  0%   { transform: translate(calc(-50% - 35px), calc(-50% + 35px)) scale(0.95); opacity: 0.75; }
+  50%  { transform: translate(calc(-50% + 35px), calc(-50% - 35px)) scale(1.1);  opacity: 0.9;  }
+  100% { transform: translate(calc(-50% - 35px), calc(-50% + 35px)) scale(0.95); opacity: 0.75; }
+}
+
+@keyframes rcmFloat1 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);       opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(26px, -20px); opacity: 1;   }
+}
+@keyframes rcmFloat2 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);        opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(-23px, -26px); opacity: 1;   }
+}
+@keyframes rcmFloat3 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);       opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(28px, 22px); opacity: 1;   }
+}
+@keyframes rcmFloat4 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);        opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(-26px, 20px); opacity: 1;   }
+}
+@keyframes rcmFloat5 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);        opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(18px, -28px); opacity: 1;   }
+}
+@keyframes rcmFloat6 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0);         opacity: 0.4; }
+  50%       { transform: translate(-50%, -50%) translate(-20px, -24px); opacity: 1;   }
+}
+
+@keyframes rcmDotPulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULT STATE — FOUND
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-result {
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.rcm-result.rcm-result-in {
+  animation: rcmResultIn 0.4s var(--ease-spring) forwards;
+}
+
+.rcm-cover-hero {
+  position: relative;
+  width: 100%;
+  padding: var(--space-lg) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .rcm-cover-hero { background: var(--bg-tertiary); }
+
+.rcm-cover-blur-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) saturate(1.5) brightness(0.4);
+  opacity: 0.3;
+}
+
+.rcm-cover-wrap { position: relative; z-index: 1; }
+
+.rcm-cover {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  display: block;
+  box-shadow: var(--nm-raised), 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: rcmCoverPop 0.5s var(--ease-spring) forwards;
+}
+
+.rcm-found-icon-hero {
+  width: 100%;
+  padding: var(--space-lg) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+[data-theme="dark"] .rcm-found-icon-hero { background: var(--bg-tertiary); }
+
+.rcm-found-icon-orb {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 0 28px var(--accent-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  animation: rcmIconPop 0.5s var(--ease-spring) forwards;
+}
+
+.rcm-found-info {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rcm-found-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-bottom: 10px;
+}
+
+.rcm-found-label-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px var(--accent-glow);
+  animation: rcmDotPulse 1.4s ease-in-out infinite;
+}
+
+.rcm-found-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.4px;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  padding: 0 8px;
+}
+
+.rcm-found-artist {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.rcm-found-album {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULT STATE — NOT FOUND
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-miss-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+}
+
+.rcm-miss-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+  animation: rcmMissShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+}
+
+[data-theme="dark"] .rcm-miss-icon { background: var(--bg-primary); }
+
+.rcm-miss-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+
+.rcm-miss-sub {
+  font-size: 0.73rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.rcm-miss-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  width: 100%;
+  justify-content: center;
+}
+
+.rcm-retry-btn {
+  padding: 10px 32px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  transition: all var(--transition-fast);
+}
+
+.rcm-retry-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(0.97);
+}
+
+[data-theme="dark"] .rcm-retry-btn { background: var(--bg-primary); }
+
+/* ── Recognize button in mini player bar ── */
+.mp-recognize-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--transition-fast), transform 0.12s ease, box-shadow 0.15s ease;
+}
+
+.mp-recognize-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(0.93);
+  color: var(--accent-primary);
+}
+
+.mp-recognize-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ── Recognize button in expanded sheet ── */
+.mp-sheet-recognize-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  transition: all var(--transition-fast);
+  margin-top: 4px;
+}
+
+.mp-sheet-recognize-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(0.97);
+}
+
+.mp-sheet-recognize-btn.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ENTRY / EXIT ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes rcmOverlayIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rcmOverlayOut { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes rcmDialogIn {
+  from { opacity: 0; transform: scale(0.88) translateY(16px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+@keyframes rcmResultIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes rcmCoverPop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  70%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes rcmIconPop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  70%  { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes rcmMissShake {
+  0%, 100%              { transform: translateX(0);  }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80%    { transform: translateX(4px);  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME
+   ═══════════════════════════════════════════════════════════════ */
+:root:not([data-theme="dark"]) .rcm-dialog {
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised), 0 24px 64px rgba(163, 177, 198, 0.6);
+}
+
+:root:not([data-theme="dark"]) .rcm-backdrop {
+  background: rgba(30, 35, 40, 0.3);
+}
+
+:root:not([data-theme="dark"]) .rcm-close,
+:root:not([data-theme="dark"]) .rcm-found-icon-orb,
+:root:not([data-theme="dark"]) .rcm-miss-icon,
+:root:not([data-theme="dark"]) .rcm-retry-btn {
+  background: var(--bg-primary);
+}
+
+:root:not([data-theme="dark"]) .rcm-cover-hero,
+:root:not([data-theme="dark"]) .rcm-found-icon-hero {
+  background: var(--bg-secondary);
+}
