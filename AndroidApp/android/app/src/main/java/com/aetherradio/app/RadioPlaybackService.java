@@ -195,13 +195,21 @@ public class RadioPlaybackService extends Service {
             subtitle = subtitle.isEmpty() ? stationTags : subtitle + " · " + stationTags;
         }
 
+        // Use the app launcher icon as album art so it appears in the
+        // media notification artwork area on all Android versions / OEM skins
+        Bitmap albumArt = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
         MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, subtitle)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, subtitle.isEmpty() ? "Aether Radio" : subtitle)
             .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "Aether Radio")
             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, stationName)
             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle.isEmpty() ? "Aether Radio" : subtitle)
             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, "Aether Radio")
+            // METADATA_KEY_ART is what the media notification widget uses for artwork
+            .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, albumArt)
+            // METADATA_KEY_ALBUM_ART is the fallback used by some OEM skins
+            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArt)
             .build();
         mediaSession.setMetadata(metadata);
     }
@@ -237,8 +245,8 @@ public class RadioPlaybackService extends Service {
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // App launcher icon as the large icon (station artwork)
-        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        // App logo bitmap — used as both the large icon and the media session artwork
+        Bitmap appLogo = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
         String subtitle = stationCountry;
         if (stationTags != null && !stationTags.isEmpty()) {
@@ -246,15 +254,15 @@ public class RadioPlaybackService extends Service {
         }
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-            // Title = station name, text = country/tags, subText = app name
+            // App name always visible as the notification header label
             .setContentTitle(stationName)
             .setContentText(subtitle.isEmpty() ? "Aether Radio" : subtitle)
+            // setSubText shows "Aether Radio" as the app label above the title
             .setSubText("Aether Radio")
-            // Small icon MUST be a monochrome white-on-transparent drawable
-            // (shown in status bar and notification shade header)
+            // Small icon: monochrome white-on-transparent vector (status bar + header)
             .setSmallIcon(R.drawable.ic_notification)
-            // Large icon = app logo (shown as the big square on the left)
-            .setLargeIcon(largeIcon)
+            // Large icon: full-color app logo (left side of notification)
+            .setLargeIcon(appLogo)
             .setContentIntent(openPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOngoing(true)
@@ -263,6 +271,7 @@ public class RadioPlaybackService extends Service {
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopPendingIntent)
             .setStyle(new MediaStyle()
                 .setMediaSession(mediaSession.getSessionToken())
+                // Show Play/Pause (0) and Stop (1) in the compact notification view
                 .setShowActionsInCompactView(0, 1))
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build();

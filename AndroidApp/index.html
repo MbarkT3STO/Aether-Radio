@@ -39,5 +39,14 @@
     <div class="app-bottom-nav" id="bottom-nav"></div>
   </div>
   <script type="module" src="./src/renderer/index.ts"></script>
+  <script>
+    // Fix 100vh on Android — address bar changes viewport height.
+    // Set --vh to the actual inner height so layout.css can use it.
+    function setVh() {
+      document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+    }
+    setVh();
+    window.addEventListener('resize', setVh);
+  </script>
 </body>
 </html>

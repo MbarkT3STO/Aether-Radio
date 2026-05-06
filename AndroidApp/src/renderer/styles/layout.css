@@ -1,17 +1,30 @@
 /* ── Mobile App Shell ── */
 
 :root {
-  --bottom-nav-height: 64px;
+  --bottom-nav-height: 60px;
   --mini-player-height: 72px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* Prevent text size adjustment on orientation change */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 #app {
   display: flex;
   flex-direction: column;
   height: 100dvh;
+  /* Fallback for browsers without dvh */
+  height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
   background: var(--bg-primary);
+  /* Prevent overscroll bounce on iOS/Android */
+  overscroll-behavior: none;
 }
 
 /* Main scrollable content area */
@@ -20,12 +33,15 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--space-sm) var(--space-sm) 0;
-  /* leave room for mini-player + bottom nav */
-  padding-bottom: calc(var(--mini-player-height) + var(--bottom-nav-height) + var(--safe-bottom) + 8px);
+  padding-left: max(var(--space-sm), var(--safe-left));
+  padding-right: max(var(--space-sm), var(--safe-right));
+  /* leave room for mini-player + bottom nav + safe area */
+  padding-bottom: calc(var(--mini-player-height) + var(--bottom-nav-height) + var(--safe-bottom) + 12px);
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
-/* Mini player sits above bottom nav */
+/* Mini player — sits above bottom nav, full width */
 .app-mini-player {
   flex-shrink: 0;
   position: fixed;
@@ -33,6 +49,8 @@
   left: 0;
   right: 0;
   z-index: 100;
+  /* Must have explicit pointer-events so it receives touches */
+  pointer-events: all;
 }
 
 /* Bottom navigation */
@@ -43,7 +61,10 @@
   left: 0;
   right: 0;
   z-index: 110;
+  /* Safe area padding so nav items aren't behind the home indicator */
   padding-bottom: var(--safe-bottom);
+  background: var(--bg-secondary);
+  pointer-events: all;
 }
 
 /* ── Scrollbar ── */
@@ -53,8 +74,14 @@
 
 /* ── Grids ── */
 .grid { display: grid; gap: var(--space-sm); }
-.grid-cols-auto    { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-.grid-cols-country { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.grid-cols-auto    { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.grid-cols-country { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+
+/* Narrow screens: single column */
+@media (max-width: 320px) {
+  .grid-cols-auto    { grid-template-columns: 1fr; }
+  .grid-cols-country { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* ── View Header ── */
 .view-header { margin-bottom: var(--space-md); }
@@ -68,7 +95,7 @@
 }
 
 .view-header-row h1 {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 900;
   letter-spacing: -0.4px;
   color: var(--text-primary);
@@ -140,3 +167,4 @@
 /* ── Light theme ── */
 :root:not([data-theme="dark"]) .view-header-icon { background: var(--bg-secondary); box-shadow: var(--nm-pressed); }
 :root:not([data-theme="dark"]) h1 { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .app-bottom-nav { background: var(--bg-primary); }

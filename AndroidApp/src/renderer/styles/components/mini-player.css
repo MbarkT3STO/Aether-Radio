@@ -6,11 +6,15 @@
   border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 12px;
+  padding: 0 12px;
+  gap: 10px;
   position: relative;
+  /* Explicit pointer-events so the wrapper never blocks touches */
+  pointer-events: all;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Accent line at top */
@@ -21,6 +25,19 @@
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--accent-primary), var(--accent-secondary), transparent);
   opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Expand hint chevron — centered at top */
+.mini-player-expand-hint {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-tertiary);
+  opacity: 0.5;
+  pointer-events: none;
+  line-height: 0;
 }
 
 /* Ambient canvas */
@@ -41,9 +58,9 @@
 
 /* Logo */
 .mini-player-logo {
-  width: 46px;
-  height: 46px;
-  min-width: 46px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   border-radius: var(--radius-sm);
   box-shadow: var(--nm-raised);
   overflow: hidden;
@@ -96,7 +113,7 @@
 
 .mini-player-name {
   font-family: var(--font-display);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 800;
   color: var(--text-primary);
   white-space: nowrap;
@@ -107,7 +124,7 @@
 }
 
 .mini-player-meta {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -121,17 +138,47 @@
   font-weight: 600;
 }
 
-/* Controls */
+/* Controls row */
 .mini-player-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
+/* Sleep timer slot — inline in controls */
+#mini-sleep-timer-slot .sleep-timer {
+  position: relative;
+}
+
+#mini-sleep-timer-slot .sleep-timer-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  position: relative;
+}
+
+#mini-sleep-timer-slot .sleep-timer-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  z-index: 300;
+}
+
+/* Buttons */
 .mini-player-btn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
   background: var(--bg-primary);
@@ -143,13 +190,19 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color var(--transition-fast), box-shadow var(--transition-fast);
+  flex-shrink: 0;
+  /* Minimum touch target */
+  min-width: 36px;
+  min-height: 36px;
 }
 
 .mini-player-btn:active { box-shadow: var(--nm-pressed); }
 
 .mini-player-btn--play {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   color: var(--accent-primary);
   box-shadow: var(--nm-raised), 0 0 0 2px var(--accent-soft);
 }
@@ -158,7 +211,15 @@
   box-shadow: var(--nm-raised), 0 0 0 2px var(--accent-soft), 0 0 14px var(--accent-soft);
 }
 
+/* ── Small screens: hide sleep timer to save space ── */
+@media (max-width: 360px) {
+  #mini-sleep-timer-slot { display: none; }
+  .mini-player { padding: 0 10px; gap: 8px; }
+  .mini-player-logo { width: 40px; height: 40px; min-width: 40px; }
+}
+
 /* ── Light theme ── */
 :root:not([data-theme="dark"]) .mini-player { background: var(--bg-primary); }
-:root:not([data-theme="dark"]) .mini-player-btn { background: var(--bg-primary); }
+:root:not([data-theme="dark"]) .mini-player-btn { background: var(--bg-secondary); }
 :root:not([data-theme="dark"]) .mini-player-live-dot { border-color: var(--bg-primary); }
+:root:not([data-theme="dark"]) #mini-sleep-timer-slot .sleep-timer-btn { background: var(--bg-secondary); }
