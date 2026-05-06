@@ -19,6 +19,7 @@ export class PlayerBar extends BaseComponent {
   private audioService   = AudioService.getInstance()
   private sleepTimer     = new SleepTimer()
   private recognition    = SongRecognitionService.getInstance()
+  private _rcmAnimFrame: number | null = null
 
   // Document-level drag listeners — kept so we can remove them on unmount
   private _onMouseMove: ((e: Event) => void) | null = null
@@ -999,31 +1000,15 @@ export class PlayerBar extends BaseComponent {
 
         <!-- Listening state -->
         <div class="rcm-listening" id="rcm-listening">
-          <div class="rcm-orb">
-            <div class="rcm-orb-ring rcm-orb-ring--1"></div>
-            <div class="rcm-orb-ring rcm-orb-ring--2"></div>
-            <div class="rcm-orb-ring rcm-orb-ring--3"></div>
-            <div class="rcm-orb-core">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="1.75"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18V5l12-2v13"/>
-                <circle cx="6" cy="18" r="3"/>
-                <circle cx="18" cy="16" r="3"/>
-              </svg>
+          <div class="rcm-viz-wrap">
+            <canvas class="rcm-canvas" id="rcm-canvas"></canvas>
+            <div class="rcm-viz-label">
+              <span class="rcm-viz-dot"></span>
+              Listening
             </div>
           </div>
-          <div class="rcm-bars">
-            <span class="rcm-bar"></span>
-            <span class="rcm-bar"></span>
-            <span class="rcm-bar"></span>
-            <span class="rcm-bar"></span>
-            <span class="rcm-bar"></span>
-            <span class="rcm-bar"></span>
-            <span class="rcm-bar"></span>
-          </div>
-          <div class="rcm-listening-label">Listening…</div>
-          <div class="rcm-listening-sub">Capturing audio to identify the song</div>
+          <div class="rcm-listening-label">Identifying song…</div>
+          <div class="rcm-listening-sub">Capturing audio fingerprint</div>
         </div>
 
         <!-- Result state (hidden initially) -->
@@ -1033,6 +1018,9 @@ export class PlayerBar extends BaseComponent {
     `
 
     document.body.appendChild(modal)
+
+    // Start canvas visualizer
+    this.startRecognitionCanvas()
 
     // Close only via the X button — no backdrop click
     modal.querySelector('#rcm-close')?.addEventListener('click', () => this.closeRecognitionModal())
@@ -1051,6 +1039,7 @@ export class PlayerBar extends BaseComponent {
     listening.classList.add('rcm-fade-out')
 
     setTimeout(() => {
+      this.stopRecognitionCanvas()
       listening.style.display = 'none'
       resultEl.style.display  = 'flex'
 
@@ -1123,10 +1112,161 @@ export class PlayerBar extends BaseComponent {
   }
 
   private closeRecognitionModal(): void {
+    this.stopRecognitionCanvas()
     const modal = document.getElementById('recognition-modal')
     if (!modal) return
     modal.classList.add('rcm-fade-out-modal')
     setTimeout(() => modal.remove(), 320)
+  }
+
+  private startRecognitionCanvas(): void {
+    const canvas = document.getElementById('rcm-canvas') as HTMLCanvasElement | null
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const SIZE = 220
+    canvas.width  = SIZE
+    canvas.height = SIZE
+
+    // Accent color — read from CSS variable
+    const style   = getComputedStyle(document.documentElement)
+    const accent  = style.getPropertyValue('--accent-primary').trim() || '#7c6fff'
+
+    // Parse hex/rgb accent to r,g,b
+    const tmp = document.createElement('div')
+    tmp.style.color = accent
+    document.body.appendChild(tmp)
+    const rgb = getComputedStyle(tmp).color  // "rgb(r, g, b)"
+    document.body.removeChild(tmp)
+    const [r, g, b] = rgb.match(/\d+/g)?.map(Number) ?? [124, 111, 255]
+
+    // Particles
+    const N = 60
+    type Particle = { x: number; y: number; vx: number; vy: number; radius: number; alpha: number; phase: number }
+    const cx = SIZE / 2, cy = SIZE / 2
+
+    const particles: Particle[] = Array.from({ length: N }, () => {
+      const angle  = Math.random() * Math.PI * 2
+      const dist   = 20 + Math.random() * 80
+      return {
+        x:      cx + Math.cos(angle) * dist,
+        y:      cy + Math.sin(angle) * dist,
+        vx:     (Math.random() - 0.5) * 0.4,
+        vy:     (Math.random() - 0.5) * 0.4,
+        radius: 1.5 + Math.random() * 2.5,
+        alpha:  0.2 + Math.random() * 0.6,
+        phase:  Math.random() * Math.PI * 2,
+      }
+    })
+
+    // Waveform ring points
+    const WAVE_PTS = 128
+    let t = 0
+
+    const draw = (): void => {
+      if (!document.getElementById('rcm-canvas')) return  // modal closed
+      t += 0.025
+
+      ctx.clearRect(0, 0, SIZE, SIZE)
+
+      // ── Radial gradient background glow ──
+      const grd = ctx.createRadialGradient(cx, cy, 10, cx, cy, 100)
+      grd.addColorStop(0,   `rgba(${r},${g},${b},0.18)`)
+      grd.addColorStop(0.5, `rgba(${r},${g},${b},0.06)`)
+      grd.addColorStop(1,   `rgba(${r},${g},${b},0)`)
+      ctx.fillStyle = grd
+      ctx.beginPath()
+      ctx.arc(cx, cy, 100, 0, Math.PI * 2)
+      ctx.fill()
+
+      // ── Animated waveform ring ──
+      const baseR = 72
+      ctx.beginPath()
+      for (let i = 0; i <= WAVE_PTS; i++) {
+        const angle = (i / WAVE_PTS) * Math.PI * 2
+        const noise = Math.sin(angle * 6 + t * 2.1) * 8
+                    + Math.sin(angle * 11 + t * 1.3) * 4
+                    + Math.sin(angle * 3  - t * 0.9) * 6
+        const rad = baseR + noise
+        const px  = cx + Math.cos(angle) * rad
+        const py  = cy + Math.sin(angle) * rad
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
+      }
+      ctx.closePath()
+      ctx.strokeStyle = `rgba(${r},${g},${b},0.55)`
+      ctx.lineWidth   = 1.5
+      ctx.stroke()
+
+      // ── Second inner ring (counter-rotate) ──
+      const baseR2 = 50
+      ctx.beginPath()
+      for (let i = 0; i <= WAVE_PTS; i++) {
+        const angle = (i / WAVE_PTS) * Math.PI * 2
+        const noise = Math.sin(angle * 8 - t * 1.7) * 5
+                    + Math.sin(angle * 4  + t * 2.3) * 3
+        const rad = baseR2 + noise
+        const px  = cx + Math.cos(angle) * rad
+        const py  = cy + Math.sin(angle) * rad
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
+      }
+      ctx.closePath()
+      ctx.strokeStyle = `rgba(${r},${g},${b},0.3)`
+      ctx.lineWidth   = 1
+      ctx.stroke()
+
+      // ── Particles ──
+      for (const p of particles) {
+        p.x += p.vx
+        p.y += p.vy
+        p.phase += 0.03
+
+        // Soft boundary — drift back toward center
+        const dx = p.x - cx, dy = p.y - cy
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist > 95) {
+          p.vx -= dx * 0.002
+          p.vy -= dy * 0.002
+        }
+
+        const a = p.alpha * (0.5 + 0.5 * Math.sin(p.phase))
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`
+        ctx.fill()
+      }
+
+      // ── Center icon ──
+      const iconAlpha = 0.7 + 0.3 * Math.sin(t * 1.5)
+      ctx.strokeStyle = `rgba(${r},${g},${b},${iconAlpha})`
+      ctx.lineWidth   = 1.75
+      ctx.lineCap     = 'round'
+      // Music note path (simplified)
+      ctx.beginPath()
+      ctx.moveTo(cx - 5, cy + 5)
+      ctx.lineTo(cx - 5, cy - 7)
+      ctx.lineTo(cx + 7, cy - 9)
+      ctx.lineTo(cx + 7, cy + 3)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(cx - 8, cy + 5, 3, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(cx + 4, cy + 3, 3, 0, Math.PI * 2)
+      ctx.stroke()
+
+      this._rcmAnimFrame = requestAnimationFrame(draw)
+    }
+
+    this._rcmAnimFrame = requestAnimationFrame(draw)
+  }
+
+  private stopRecognitionCanvas(): void {
+    if (this._rcmAnimFrame !== null) {
+      cancelAnimationFrame(this._rcmAnimFrame)
+      this._rcmAnimFrame = null
+    }
   }
 
   // ── Icon helpers (recognition) ────────────────────────────────────────────
