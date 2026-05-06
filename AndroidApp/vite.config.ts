@@ -8,6 +8,8 @@ export default defineConfig({
     outDir: '../dist',
     emptyOutDir: true,
     sourcemap: false,
+    // Ensure .wasm files are treated as assets and copied to dist
+    assetsInlineLimit: 0,
     rollupOptions: {
       input: {
         index: resolve(__dirname, 'src/index.html'),

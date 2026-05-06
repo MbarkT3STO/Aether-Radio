@@ -1,12 +1,30 @@
 /**
- * SongRecognitionService — identifies the currently playing song via ICY stream metadata.
+ * SongRecognitionService — identifies the currently playing song.
  *
- * Fetches a raw byte chunk from the live stream, parses the Shoutcast/Icecast
- * ICY metadata block (StreamTitle field), and returns the track info.
+ * Pipeline:
+ *  1. Fetch ~20 s of raw audio bytes from the live stream
+ *  2. Feed the ArrayBuffer to @unimusic/chromaprint (Chromaprint compiled to WASM)
+ *     which decodes the audio via Web Audio API and generates an AcoustID fingerprint
+ *  3. POST the fingerprint + duration to the AcoustID lookup API
+ *  4. Return the best-scoring recording's title / artist / album
  *
- * No API key, no rate limit, no external service — 100% free and unlimited.
+ * Completely free, no rate-limit for reasonable usage, no API key cost.
+ * You must register a free application at https://acoustid.org/new-application
+ * to get your own client key (replace ACOUSTID_CLIENT_KEY below).
  */
 
+import { processAudioFile } from '@unimusic/chromaprint'
+
+// ── Configuration ─────────────────────────────────────────────────────────────
+// Register your free app at https://acoustid.org/new-application
+const ACOUSTID_CLIENT_KEY = 'hTUfbqGtFY'
+const ACOUSTID_API        = 'https://api.acoustid.org/v2/lookup'
+
+// How many bytes to fetch from the stream (~20 s at 128 kbps = ~320 KB)
+const FETCH_BYTES      = 320 * 1024
+const FETCH_TIMEOUT_MS = 25_000
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 export interface RecognitionResult {
   title: string
   artist: string
@@ -15,10 +33,24 @@ export interface RecognitionResult {
   coverArt?: string
 }
 
-const FETCH_TIMEOUT_MS = 12_000
-// How many bytes to read before giving up looking for the metadata block
-const MAX_READ_BYTES = 256 * 1024 // 256 KB
+interface AcoustIdRecording {
+  title?: string
+  duration?: number
+  artists?: { name: string }[]
+  releasegroups?: { title?: string; type?: string; releases?: { date?: string }[] }[]
+}
 
+interface AcoustIdResult {
+  score: number
+  recordings?: AcoustIdRecording[]
+}
+
+interface AcoustIdResponse {
+  status: string
+  results?: AcoustIdResult[]
+}
+
+// ── Service ───────────────────────────────────────────────────────────────────
 export class SongRecognitionService {
   private static instance: SongRecognitionService
   private _busy = false
@@ -34,126 +66,145 @@ export class SongRecognitionService {
     if (this._busy) return null
     this._busy = true
     try {
-      return await this.fetchIcyMetadata(streamUrl)
-    } catch {
+      return await this._recognize(streamUrl)
+    } catch (e) {
+      console.warn('[Recognition] error:', e)
       return null
     } finally {
       this._busy = false
     }
   }
 
-  private async fetchIcyMetadata(streamUrl: string): Promise<RecognitionResult | null> {
+  private async _recognize(streamUrl: string): Promise<RecognitionResult | null> {
+    // 1. Fetch a chunk of the live stream
+    const audioBuffer = await this.fetchStreamChunk(streamUrl)
+    if (!audioBuffer || audioBuffer.byteLength < 8192) return null
+
+    // 2. Generate Chromaprint fingerprint via WASM
+    //    processAudioFile decodes the audio internally using Web Audio API
+    let fingerprint: string | null = null
+    let duration = 0
+
+    try {
+      for await (const fp of processAudioFile(audioBuffer, {
+        maxDuration:  120,
+        chunkDuration: 0,
+        algorithm:    1, // ChromaprintAlgorithm.Default = Test2 = 1
+        rawOutput:    false,
+        overlap:      false,
+      })) {
+        fingerprint = fp
+        break // we only need the first (and only) fingerprint
+      }
+    } catch (e) {
+      console.warn('[Recognition] Chromaprint error:', e)
+      return null
+    }
+
+    if (!fingerprint) return null
+
+    // Estimate duration from bytes fetched (assume 128 kbps = 16 KB/s)
+    duration = Math.round(audioBuffer.byteLength / (128 * 1024 / 8))
+    duration = Math.max(10, Math.min(120, duration))
+
+    // 3. Query AcoustID
+    return await this.queryAcoustId(fingerprint, duration)
+  }
+
+  private async fetchStreamChunk(streamUrl: string): Promise<ArrayBuffer | null> {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
 
     try {
       const response = await fetch(streamUrl, {
-        headers: {
-          'Icy-MetaData': '1',
-          // Prevent caching so we always get a fresh stream connection
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-        },
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
         signal: controller.signal,
       })
 
       clearTimeout(timer)
-
       if (!response.ok || !response.body) return null
 
-      // Try to get the ICY metadata interval from response headers
-      const icyMetaIntHeader = response.headers.get('icy-metaint')
-      const icyMetaInt = icyMetaIntHeader ? parseInt(icyMetaIntHeader, 10) : 0
-
-      // If no icy-metaint, try to get station name from icy-name header as fallback
-      if (!icyMetaInt || isNaN(icyMetaInt) || icyMetaInt <= 0) {
-        const icyName = response.headers.get('icy-name')
-        response.body.cancel().catch(() => {})
-        if (icyName) {
-          return this.parseStreamTitle(icyName)
-        }
-        return null
-      }
-
-      // Read enough bytes to reach the first metadata block
-      // Layout: [icyMetaInt audio bytes][1 byte length][length*16 metadata bytes]
-      const needed = icyMetaInt + 1 + 255 * 16 // worst case metadata size
       const reader = response.body.getReader()
       const chunks: Uint8Array[] = []
-      let totalBytes = 0
+      let total = 0
 
       try {
-        while (totalBytes < Math.min(needed, MAX_READ_BYTES)) {
+        while (total < FETCH_BYTES) {
           const { done, value } = await reader.read()
           if (done || !value) break
           chunks.push(value)
-          totalBytes += value.length
+          total += value.length
         }
       } finally {
         reader.cancel().catch(() => {})
       }
 
-      if (totalBytes < icyMetaInt + 1) return null
+      if (total === 0) return null
 
-      // Concatenate all chunks into one buffer
-      const buffer = new Uint8Array(totalBytes)
+      // Merge into a single ArrayBuffer
+      const merged = new Uint8Array(total)
       let offset = 0
       for (const chunk of chunks) {
-        buffer.set(chunk, offset)
+        merged.set(chunk, offset)
         offset += chunk.length
       }
+      return merged.buffer
 
-      // The byte at position icyMetaInt is the metadata length indicator
-      // Actual metadata length = this byte * 16
-      const metaLengthByte = buffer[icyMetaInt]
-      if (metaLengthByte === undefined || metaLengthByte === 0) return null
-
-      const metaLength = metaLengthByte * 16
-      const metaStart = icyMetaInt + 1
-      const metaEnd = metaStart + metaLength
-
-      if (metaEnd > totalBytes) return null
-
-      const metaBytes = buffer.slice(metaStart, metaEnd)
-      const metaString = new TextDecoder('utf-8', { fatal: false }).decode(metaBytes)
-
-      // Parse StreamTitle='Artist - Song Title';
-      const match = metaString.match(/StreamTitle='([^']*)'/i)
-      const streamTitle = match?.[1]?.trim()
-
-      if (!streamTitle) return null
-      return this.parseStreamTitle(streamTitle)
-
-    } catch (err) {
+    } catch {
       clearTimeout(timer)
-      // AbortError = timeout, just return null
       return null
     }
   }
 
-  /**
-   * Parses a StreamTitle string into a RecognitionResult.
-   * Most stations use "Artist - Title" format, some use "Title - Artist" or just "Title".
-   */
-  private parseStreamTitle(raw: string): RecognitionResult | null {
-    // Remove null bytes and trim
-    const cleaned = raw.replace(/\0/g, '').trim()
-    if (!cleaned) return null
+  private async queryAcoustId(fingerprint: string, duration: number): Promise<RecognitionResult | null> {
+    const body = new URLSearchParams({
+      client:      ACOUSTID_CLIENT_KEY,
+      fingerprint,
+      duration:    String(duration),
+      meta:        'recordings+releasegroups+compress',
+      format:      'json',
+    })
 
-    // Common separator patterns: " - ", " – ", " | "
-    const separators = [' - ', ' – ', ' | ', ' / ']
-    for (const sep of separators) {
-      const idx = cleaned.indexOf(sep)
-      if (idx > 0 && idx < cleaned.length - sep.length) {
-        const left  = cleaned.slice(0, idx).trim()
-        const right = cleaned.slice(idx + sep.length).trim()
-        if (left && right) {
-          return { artist: left, title: right }
-        }
-      }
+    let response: Response
+    try {
+      response = await fetch(ACOUSTID_API, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    body.toString(),
+      })
+    } catch {
+      return null
     }
 
-    // No separator found — treat the whole string as the title
-    return { artist: '', title: cleaned }
+    if (!response.ok) return null
+
+    let data: AcoustIdResponse
+    try {
+      data = await response.json() as AcoustIdResponse
+    } catch {
+      return null
+    }
+
+    if (data.status !== 'ok' || !data.results?.length) return null
+
+    // Pick the result with the highest score
+    const best = data.results
+      .filter(r => r.score > 0.5 && r.recordings?.length)
+      .sort((a, b) => b.score - a.score)[0]
+
+    if (!best?.recordings?.length) return null
+
+    const rec = best.recordings[0]!
+    const title  = rec.title?.trim()
+    const artist = rec.artists?.[0]?.name?.trim()
+
+    if (!title || !artist) return null
+
+    // Album + release year from the first release group
+    const rg    = rec.releasegroups?.[0]
+    const album = rg?.title?.trim()
+    const releaseDate = rg?.releases?.[0]?.date?.slice(0, 4)
+
+    return { title, artist, album, releaseDate }
   }
 }

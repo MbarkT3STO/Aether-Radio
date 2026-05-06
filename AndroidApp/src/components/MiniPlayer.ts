@@ -559,7 +559,7 @@ export class MiniPlayer extends BaseComponent {
             </div>
           </div>
           <div class="rcm-listening-label">Identifying song…</div>
-          <div class="rcm-listening-sub">Reading stream metadata</div>
+          <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
         </div>
 
         <!-- Result state (hidden initially) -->

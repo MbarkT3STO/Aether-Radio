@@ -20,6 +20,7 @@
     "@capacitor/haptics": "^6.0.2",
     "@capacitor/preferences": "^6.0.3",
     "@capacitor/status-bar": "^6.0.2",
+    "@unimusic/chromaprint": "0.1.4",
     "capacitor-music-controls-plugin-v3": "^2.0.0",
     "flag-icons": "7.5.0"
   },
