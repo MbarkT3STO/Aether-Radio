@@ -140,7 +140,7 @@
     hsla(var(--h), var(--s), 45%, 0.3) 65%,
     transparent 100%
   );
-  filter: blur(2px);
+  filter: blur(12px);
   animation: rcmOrbBreath 2s ease-in-out infinite;
   z-index: 5;
 }
@@ -153,7 +153,7 @@
     hsla(var(--h), var(--s), 50%, 0.4) 65%,
     transparent 100%
   );
-  filter: blur(3px);
+  filter: blur(14px);
 }
 
 /* ── Inner ring blur points (6 points moving in wave patterns) ── */
@@ -162,7 +162,7 @@
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  filter: blur(1.5px);
+  filter: blur(8px);
   opacity: 0;
   top: 50%;
   left: 50%;
@@ -173,7 +173,7 @@
 .rcm-blur-point.rcm-outer {
   width: 90px;
   height: 90px;
-  filter: blur(2px);
+  filter: blur(10px);
 }
 
 /* Point 1 - Primary accent color */
@@ -304,11 +304,11 @@
 }
 
 [data-theme="dark"] .rcm-blur-point {
-  filter: blur(2px);
+  filter: blur(10px);
 }
 
 [data-theme="dark"] .rcm-blur-point.rcm-outer {
-  filter: blur(2.5px);
+  filter: blur(12px);
 }
 
 /* ── Floating micro-particles ── */
