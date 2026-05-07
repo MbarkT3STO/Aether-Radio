@@ -24,7 +24,7 @@ img, picture, video, canvas, svg { display: block; max-width: 100%; }
 
 input, button, textarea, select { font: inherit; color: inherit; }
 
-button { cursor: pointer; border: none; background: none; outline: none; }
+button { cursor: pointer; border: none; background: none; }
 
 a { color: inherit; text-decoration: none; }
 

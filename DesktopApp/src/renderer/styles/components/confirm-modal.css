@@ -42,8 +42,8 @@
 
 @supports (backdrop-filter: blur(20px)) {
   .cm-dialog {
-    backdrop-filter: blur(40px) saturate(1.8);
-    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    backdrop-filter: blur(40px) saturate(1.4);
+    -webkit-backdrop-filter: blur(40px) saturate(1.4);
   }
 }
 

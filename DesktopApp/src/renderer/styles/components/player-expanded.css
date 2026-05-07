@@ -82,14 +82,17 @@
 /* ── Collapse button ── */
 .pex-collapse-btn {
   position: absolute;
-  top: 14px;
-  left: 18px;
+  top: 10px;
+  left: 14px;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Visual 32px, hit area 44×44 via padding for HIG compliance */
   width: 32px;
   height: 32px;
+  padding: 6px;
+  box-sizing: content-box;
   border-radius: 50%;
   border: 1px solid var(--border-subtle);
   cursor: pointer;

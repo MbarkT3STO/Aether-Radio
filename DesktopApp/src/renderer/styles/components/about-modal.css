@@ -42,18 +42,21 @@
 
 @supports (backdrop-filter: blur(20px)) {
   .am-dialog {
-    backdrop-filter: blur(40px) saturate(1.8);
-    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    backdrop-filter: blur(40px) saturate(1.4);
+    -webkit-backdrop-filter: blur(40px) saturate(1.4);
   }
 }
 
 /* ── Close button ── */
 .am-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
+  /* Visual 28px, hit area 44×44 via padding for HIG compliance */
   width: 28px;
   height: 28px;
+  padding: 8px;
+  box-sizing: content-box;
   border-radius: 50%;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);

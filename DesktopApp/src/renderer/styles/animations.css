@@ -65,3 +65,41 @@
 .animate-scale-in { animation: scaleIn var(--transition-fast) both; }
 .animate-pulse    { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 .animate-spin     { animation: spin 0.8s linear infinite; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ACCESSIBILITY — Reduced Motion
+   Apple HIG: Respect the user's motion preference.
+   When prefers-reduced-motion is set, disable or tone down all
+   animations and transitions to prevent vestibular discomfort.
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:   0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:  0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep opacity fades but remove transforms */
+  .animate-fade-in  { animation: fadeIn 0.01ms both; }
+  .animate-slide-up { animation: fadeIn 0.01ms both; }
+  .animate-scale-in { animation: fadeIn 0.01ms both; }
+  .animate-pulse    { animation: none; opacity: 1; }
+  .animate-spin     { animation: none; }
+
+  /* Disable ambient canvas animations */
+  .player-bar-ambient,
+  .pex-ambient-canvas { transition: none !important; }
+
+  /* Disable live dot pulse */
+  .home-now-playing-dot,
+  .station-card.playing::before,
+  .cs-playing-dot { animation: none !important; }
+
+  /* Disable bar dance */
+  .home-now-playing-bars span,
+  .visualizer-idle-bar { animation: none !important; transform: scaleY(0.6) !important; }
+}

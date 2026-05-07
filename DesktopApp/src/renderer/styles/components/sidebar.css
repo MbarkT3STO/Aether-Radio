@@ -166,6 +166,8 @@
   color: var(--accent-primary);
   background: var(--accent-soft);
   font-weight: 600;
+  /* Add a left accent indicator for non-color accessibility */
+  box-shadow: inset 3px 0 0 var(--accent-primary);
 }
 
 .sidebar-nav-icon {
@@ -227,6 +229,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Visual size 28px, but hit area expanded to 44px via padding for HIG compliance */
   width: 28px;
   height: 28px;
   min-width: 28px;
@@ -239,6 +242,9 @@
   flex-shrink: 0;
   align-self: center;
   -webkit-app-region: no-drag;
+  /* Expand touch target to 44×44 without changing visual size */
+  padding: 8px;
+  box-sizing: content-box;
   transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 
@@ -382,7 +388,7 @@
 }
 
 :root:not([data-theme="dark"]) .sidebar {
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(242, 242, 247, 0.88);
   border-right: 1px solid var(--border-subtle);
 }
 

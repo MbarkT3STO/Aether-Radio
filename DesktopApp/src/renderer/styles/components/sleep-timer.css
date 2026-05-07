@@ -63,8 +63,8 @@
 
 @supports (backdrop-filter: blur(20px)) {
   .sleep-timer-popover {
-    backdrop-filter: blur(40px) saturate(1.8);
-    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    backdrop-filter: blur(40px) saturate(1.4);
+    -webkit-backdrop-filter: blur(40px) saturate(1.4);
   }
 }
 

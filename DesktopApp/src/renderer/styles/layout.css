@@ -19,18 +19,19 @@
   transition: width var(--transition-slow);
 }
 
-/* macOS vibrancy-style sidebar */
+/* macOS vibrancy-style sidebar — Apple HIG: use subtle saturation (1.4),
+   not aggressive (1.8), to avoid color distortion */
 @supports (backdrop-filter: blur(20px)) {
   .app-sidebar {
     background: rgba(242, 242, 247, 0.82);
-    backdrop-filter: blur(20px) saturate(1.8);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
   }
 
   [data-theme="dark"] .app-sidebar {
-    background: rgba(28, 28, 30, 0.85);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    background: rgba(28, 28, 30, 0.92);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
   }
 }
 
@@ -289,4 +290,63 @@
   .player-volume { width: 90px; }
   .view-header { margin-bottom: var(--space-4); }
   h1 { font-size: 1.4rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACCESSIBILITY — Increased Contrast
+   Apple HIG: Support the "Increase Contrast" accessibility setting.
+   When active, borders become more visible and backgrounds more opaque.
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-contrast: more) {
+  :root {
+    --border-subtle:  rgba(60, 60, 67, 0.28);
+    --border-medium:  rgba(60, 60, 67, 0.40);
+    --border-strong:  rgba(60, 60, 67, 0.60);
+    --text-muted:     rgba(60, 60, 67, 0.55);
+  }
+
+  [data-theme="dark"] {
+    --border-subtle:  rgba(255, 255, 255, 0.20);
+    --border-medium:  rgba(255, 255, 255, 0.32);
+    --border-strong:  rgba(255, 255, 255, 0.50);
+    --text-muted:     rgba(235, 235, 245, 0.50);
+  }
+
+  /* Disable translucency — Apple HIG: reduce transparency when requested */
+  .app-sidebar,
+  .player-bar,
+  .toast,
+  .sleep-timer-popover,
+  .cm-dialog,
+  .am-dialog {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .app-sidebar {
+    background: #F2F2F7 !important;
+    border-right: 1px solid rgba(60, 60, 67, 0.40) !important;
+  }
+
+  [data-theme="dark"] .app-sidebar {
+    background: #1C1C1E !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.32) !important;
+  }
+
+  .player-bar {
+    background: #FFFFFF !important;
+    border-top: 1px solid rgba(60, 60, 67, 0.40) !important;
+  }
+
+  [data-theme="dark"] .player-bar {
+    background: #1C1C1E !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.32) !important;
+  }
+
+  /* Ensure focus rings are always visible */
+  :focus-visible {
+    outline: 3px solid var(--accent-primary) !important;
+    outline-offset: 2px !important;
+  }
 }
