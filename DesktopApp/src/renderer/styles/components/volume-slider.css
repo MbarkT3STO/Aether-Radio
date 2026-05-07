@@ -7,9 +7,10 @@
   background: rgba(0, 0, 0, 0.10);
   border-radius: var(--radius-full);
   cursor: pointer;
-  padding: 8px 0;
+  /* 10px padding = 24px total hit area — enough for a drag target */
+  padding: 10px 0;
   box-sizing: content-box;
-  margin: -8px 0;
+  margin: -10px 0;
 }
 
 [data-theme="dark"] .volume-slider {
@@ -22,6 +23,7 @@
   border-radius: var(--radius-full);
   position: relative;
   pointer-events: none;
+  transition: width 0.05s linear;
 }
 
 .volume-slider-thumb {
@@ -31,9 +33,11 @@
   transform: translateY(-50%);
   width: 12px;
   height: 12px;
-  background: #ffffff;
+  /* Use text-primary so it's black in light mode, white in dark — adapts correctly */
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--border-medium);
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-sm);
   opacity: 0;
   transition: opacity var(--transition-fast), transform var(--transition-fast);
   pointer-events: none;
@@ -41,7 +45,7 @@
 
 .volume-slider:hover .volume-slider-thumb {
   opacity: 1;
-  transform: translateY(-50%) scale(1.1);
+  transform: translateY(-50%) scale(1.15);
 }
 
 /* ── Light Mode ── */
@@ -51,5 +55,12 @@
 
 :root:not([data-theme="dark"]) .volume-slider-thumb {
   background: #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.20);
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Dark Mode ── */
+[data-theme="dark"] .volume-slider-thumb {
+  background: #ffffff;
+  border-color: rgba(255, 255, 255, 0.20);
 }

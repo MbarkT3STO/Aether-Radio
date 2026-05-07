@@ -38,7 +38,8 @@
   z-index: 0;
   opacity: 0;
   transition: opacity 1.4s ease;
-  filter: blur(28px) saturate(1.8);
+  /* Reduced saturation — Apple HIG: avoid over-saturated backgrounds */
+  filter: blur(28px) saturate(1.4);
   clip-path: inset(0);
 }
 
@@ -235,6 +236,11 @@
   height: 34px;
 }
 
+.player-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
 [data-theme="dark"] .player-btn {
   background: rgba(255, 255, 255, 0.10);
   color: var(--text-secondary);
@@ -255,12 +261,15 @@
 .player-btn-stop {
   width: 30px;
   height: 30px;
+  /* Expand hit area to 44pt via padding — HIG compliance */
+  padding: 7px;
+  box-sizing: content-box;
   color: var(--text-muted);
 }
 
 .player-btn-stop:hover {
   color: var(--status-error);
-  background: rgba(255, 59, 48, 0.10);
+  background: rgba(255, 56, 48, 0.10);
 }
 
 /* ── Play/Pause — hero ── */
@@ -301,12 +310,12 @@
 }
 
 .player-card-favorite:hover {
-  color: #ff2d55;
+  color: var(--palette-pink);
   background: rgba(255, 45, 85, 0.10);
 }
 
 .player-card-favorite.active {
-  color: #ff2d55;
+  color: var(--palette-pink);
   background: rgba(255, 45, 85, 0.10);
 }
 
@@ -342,8 +351,11 @@
 }
 
 .player-btn-mute {
+  /* Visual 26px, expanded hit area to 44pt via padding */
   width: 26px;
   height: 26px;
+  padding: 9px;
+  box-sizing: content-box;
 }
 
 .player-btn-mute:hover {
@@ -356,8 +368,11 @@
 
 /* ── Song recognition button ── */
 .player-recognize-btn {
+  /* Visual 30px, expanded hit area to 44pt via padding */
   width: 30px;
   height: 30px;
+  padding: 7px;
+  box-sizing: content-box;
 }
 
 .player-recognize-btn:hover {
@@ -375,8 +390,11 @@
 
 /* ── Expand button ── */
 .player-expand-btn {
+  /* Visual 26px, expanded hit area to 44pt via padding */
   width: 26px;
   height: 26px;
+  padding: 9px;
+  box-sizing: content-box;
 }
 
 .player-expand-btn:hover {
@@ -472,5 +490,5 @@
 
 :root:not([data-theme="dark"]) .player-bar-ambient.active {
   opacity: 0.28;
-  filter: blur(28px) saturate(1.5);
+  filter: blur(28px) saturate(1.3);
 }

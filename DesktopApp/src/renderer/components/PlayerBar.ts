@@ -548,14 +548,6 @@ export class PlayerBar extends BaseComponent {
     overlay.innerHTML = `
       <canvas class="pex-ambient-canvas" id="pex-ambient-canvas"></canvas>
 
-      <button class="pex-collapse-btn" id="pex-collapse-btn" title="Collapse player" aria-label="Collapse player">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="m18 15-6-6-6 6"/>
-        </svg>
-      </button>
-
       <div class="player-expanded-body">
 
         <div class="pex-artwork-col">
@@ -613,6 +605,18 @@ export class PlayerBar extends BaseComponent {
           </div>
         </div>
 
+      </div>
+
+      <!-- Mini bar — always visible at bottom, contains the collapse button -->
+      <div class="player-expanded-mini">
+        <button class="pex-collapse-btn" id="pex-collapse-btn"
+          title="Collapse player" aria-label="Collapse player">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
       </div>
     `
 

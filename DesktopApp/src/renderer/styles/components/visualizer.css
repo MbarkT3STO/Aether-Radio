@@ -1,9 +1,19 @@
 /* ── Visualizer ── */
 
-.visualizer { width: 100%; height: 100%; border-radius: var(--radius-sm); overflow: hidden; }
-.visualizer canvas { width: 100%; height: 100%; display: block; }
+.visualizer {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
 
-/* Idle bars */
+.visualizer canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Idle bars (shown when no audio data yet) ── */
 .visualizer-idle {
   display: flex;
   align-items: flex-end;
@@ -17,8 +27,12 @@
   flex: 1;
   background: var(--accent-primary);
   border-radius: 2px 2px 0 0;
-  opacity: 0.3;
+  opacity: 0.25;
   animation: barDance 1.4s ease-in-out infinite;
+}
+
+[data-theme="dark"] .visualizer-idle-bar {
+  opacity: 0.35;
 }
 
 .visualizer-idle-bar:nth-child(1) { animation-delay: 0s;    height: 30%; }

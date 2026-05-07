@@ -41,9 +41,10 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 16px 0 8px;
   gap: 0;
   order: 2;
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* ── Full expanded content (above mini bar) ── */
@@ -74,47 +75,59 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.8s ease;
-  filter: blur(60px) saturate(2);
+  /* Reduced saturation — Apple HIG: avoid over-saturated backgrounds */
+  filter: blur(60px) saturate(1.6);
 }
 
 .player-expanded-overlay.is-expanded .pex-ambient-canvas { opacity: 0.6; }
 
-/* ── Collapse button ── */
+/* ── Collapse button — inline in the mini bar, left-anchored ──
+   Moved out of absolute positioning so it never overlaps content.
+   Lives in the persistent bottom bar, spatially tied to what it collapses.
+   Mirrors Apple Music's chevron placement in the Now Playing bar. ── */
 .pex-collapse-btn {
-  position: absolute;
-  top: 10px;
-  left: 14px;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Visual 32px, hit area 44×44 via padding for HIG compliance */
-  width: 32px;
-  height: 32px;
-  padding: 6px;
+  flex-shrink: 0;
+  /* Visual 28px, padding expands hit area to 44pt */
+  width: 28px;
+  height: 28px;
+  padding: 8px;
   box-sizing: content-box;
-  border-radius: 50%;
-  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  border: none;
   cursor: pointer;
-  background: var(--bg-tertiary);
+  background: transparent;
   color: var(--text-muted);
+  margin-right: 4px;
   transition:
     color var(--transition-fast),
     background var(--transition-fast),
-    border-color var(--transition-fast),
     transform var(--transition-fast);
 }
 
-.pex-collapse-btn svg { transform: rotate(180deg); }
+/* Chevron points down — "collapse downward" */
+.pex-collapse-btn svg {
+  transition: transform var(--transition-slow);
+}
 
 .pex-collapse-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
-  transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.06);
 }
 
-.pex-collapse-btn:active { transform: translateY(0) scale(0.95); }
+[data-theme="dark"] .pex-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pex-collapse-btn:active { transform: scale(0.92); }
+
+.pex-collapse-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
 
 /* ═══════════════════════════════════════════════════════════════
    LEFT — Artwork column
@@ -158,15 +171,15 @@
   opacity: 0.6;
 }
 
-/* Live badge */
+/* Live badge — uses status-live token, not hardcoded hsl */
 .pex-live-badge {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
   border-radius: var(--radius-full);
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-muted);
+  background: rgba(52, 199, 89, 0.10);
+  border: 1px solid rgba(52, 199, 89, 0.25);
   font-size: 0.62rem;
   font-weight: 600;
   color: var(--status-live);
@@ -174,10 +187,10 @@
   text-transform: uppercase;
 }
 
-/* Override: use status-live tint for the badge bg */
-.pex-live-badge {
-  background: hsla(160, 70%, 50%, 0.1);
-  border-color: hsla(160, 70%, 50%, 0.25);
+[data-theme="dark"] .pex-live-badge {
+  background: rgba(48, 209, 88, 0.12);
+  border-color: rgba(48, 209, 88, 0.28);
+  color: var(--status-live);
 }
 
 .pex-live-dot {
@@ -185,6 +198,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--status-live);
+  flex-shrink: 0;
   animation: playerLivePulse 2s ease-in-out infinite;
 }
 
@@ -272,8 +286,14 @@
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  /* Default 44pt — HIG minimum touch target */
+  width: 44px;
+  height: 44px;
+}
+
+.pex-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 [data-theme="dark"] .pex-btn {
@@ -296,7 +316,7 @@
 
 .pex-btn-stop:hover {
   color: var(--status-error);
-  background: rgba(255, 59, 48, 0.10);
+  background: rgba(255, 56, 48, 0.10);
 }
 
 /* Play/Pause — hero */
@@ -326,16 +346,16 @@
   box-shadow: 0 2px 8px var(--accent-glow);
 }
 
-/* Favorite */
+/* Favorite — use palette token, not hardcoded hex */
 .pex-btn-fav { color: var(--text-muted); }
 
 .pex-btn-fav:hover {
-  color: #ff2d55;
+  color: var(--palette-pink);
   background: rgba(255, 45, 85, 0.10);
 }
 
 .pex-btn-fav.active {
-  color: #ff2d55;
+  color: var(--palette-pink);
   background: rgba(255, 45, 85, 0.10);
 }
 
@@ -348,8 +368,11 @@
 }
 
 .pex-btn-mute {
+  /* Visual 28px, expanded hit area to 44pt via padding */
   width: 28px;
   height: 28px;
+  padding: 8px;
+  box-sizing: content-box;
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -359,6 +382,11 @@
 
 .pex-btn-mute:hover  { color: var(--text-primary); background: transparent; border: none; box-shadow: none; }
 .pex-btn-mute:active { transform: scale(0.9); }
+.pex-btn-mute:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
 
 .pex-volume-slider {
   flex: 1;
@@ -454,7 +482,7 @@
 
 [data-theme="dark"] .player-expanded-overlay.is-expanded .pex-ambient-canvas {
   opacity: 0.5;
-  filter: blur(60px) saturate(2);
+  filter: blur(60px) saturate(1.6);
 }
 
 [data-theme="dark"] .pex-volume-thumb {
@@ -499,8 +527,8 @@
 
 /* Live badge */
 :root:not([data-theme="dark"]) .pex-live-badge {
-  background: hsla(160, 70%, 40%, 0.08);
-  border-color: hsla(160, 70%, 40%, 0.2);
+  background: rgba(0, 137, 50, 0.08);
+  border-color: rgba(0, 137, 50, 0.20);
   color: var(--status-live);
 }
 
@@ -528,20 +556,18 @@
 }
 
 :root:not([data-theme="dark"]) .pex-btn-fav.active {
-  color: #ff2d55;
+  color: var(--palette-pink);
   background: rgba(255, 45, 85, 0.10);
 }
 
 /* Collapse button */
 :root:not([data-theme="dark"]) .pex-collapse-btn {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
+  background: transparent;
   color: var(--text-tertiary);
 }
 
 :root:not([data-theme="dark"]) .pex-collapse-btn:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--border-strong);
+  background: rgba(0, 0, 0, 0.06);
   color: var(--text-primary);
 }
 
@@ -577,6 +603,6 @@
 
 /* Ambient — subtle in light */
 :root:not([data-theme="dark"]) .player-expanded-overlay.is-expanded .pex-ambient-canvas {
-  opacity: 0.25;
-  filter: blur(60px) saturate(1.5);
+  opacity: 0.22;
+  filter: blur(60px) saturate(1.3);
 }

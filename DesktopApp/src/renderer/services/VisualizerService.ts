@@ -89,12 +89,6 @@ export class VisualizerService {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // CSS accent hue/sat — Apple System Indigo (245°, 78%)
-    const style   = getComputedStyle(document.documentElement)
-    const h       = parseFloat(style.getPropertyValue('--h').trim()) || 245
-    const s       = style.getPropertyValue('--s').trim() || '78%'
-    const isDark  = document.documentElement.getAttribute('data-theme') === 'dark'
-
     // Three blobs: indigo center, blue-shifted right, violet-shifted bottom
     const blobs = [
       { hueOff: 0,   x: centered ? 0.40 : 0.25, y: 0.40, phase: 0,   speed: 0.0007, freqBin: 2  },
@@ -108,6 +102,12 @@ export class VisualizerService {
       this.animationId = requestAnimationFrame(draw)
       t++
 
+      // Read theme per-frame so theme changes are reflected immediately
+      const style  = getComputedStyle(document.documentElement)
+      const h      = parseFloat(style.getPropertyValue('--h').trim()) || 249
+      const s      = style.getPropertyValue('--s').trim() || '90%'
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+
       const dpr  = window.devicePixelRatio || 1
       const rect = canvas.getBoundingClientRect()
       const pw   = Math.round(rect.width  * dpr)
@@ -120,7 +120,6 @@ export class VisualizerService {
       const w  = canvas.width
       const hh = canvas.height
 
-      // Apply blur via shadowBlur on each blob instead of CSS filter
       ctx.clearRect(0, 0, w, hh)
 
       // Pull fresh frequency data every frame
@@ -145,7 +144,6 @@ export class VisualizerService {
           ? (large ? 0.45 + energy * 0.40 : 0.28 + energy * 0.32)
           : (large ? 0.30 + energy * 0.30 : 0.18 + energy * 0.22)
 
-        // Use shadowBlur for the soft glow — no CSS filter needed
         ctx.save()
         ctx.shadowColor = `hsla(${blobHue}, ${s}, ${isDark ? '65%' : '55%'}, ${alpha})`
         ctx.shadowBlur  = Math.min(w, hh) * 0.35
@@ -172,45 +170,66 @@ export class VisualizerService {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Read accent color from CSS variables so it always matches the current theme
-    const style = getComputedStyle(document.documentElement)
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-
-    // Apple System Indigo spectrum: deep indigo → violet → blue
-    const spectrumColors = isDark
-      ? ['#5E5CE6', '#7B79F0', '#0A84FF', '#32ADE6']
-      : ['#5856D6', '#7B61FF', '#007AFF', '#32ADE6']
-
-    const width    = canvas.width
-    const height   = canvas.height
     const barCount = 24
-    const barWidth = width / barCount
     const gap      = 2
 
-    // Spectrum gradient: bottom faded → vivid indigo → violet → blue at top
-    const gradient = ctx.createLinearGradient(0, height, 0, 0)
-    gradient.addColorStop(0,    isDark ? 'rgba(94, 92, 230, 0.28)' : 'rgba(88, 86, 214, 0.25)')
-    gradient.addColorStop(0.35, spectrumColors[0]!)
-    gradient.addColorStop(0.65, spectrumColors[1]!)
-    gradient.addColorStop(0.85, spectrumColors[2]!)
-    gradient.addColorStop(1,    spectrumColors[3]!)
-    ctx.fillStyle = gradient
+    // Gradient and dimensions — rebuilt on resize or theme change
+    let cachedWidth  = 0
+    let cachedHeight = 0
+    let gradient: CanvasGradient | null = null
 
-    void style
+    const buildGradient = (w: number, h: number): CanvasGradient => {
+      // Updated to 2024/2025 Apple HIG indigo spectrum values
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+      const spectrumColors = isDark
+        ? ['#6D7CFF', '#8A97FF', '#0091FF', '#3CD9FE']
+        : ['#6155F5', '#8B7FFF', '#0088FF', '#00C0E8']
+
+      const g = ctx.createLinearGradient(0, h, 0, 0)
+      g.addColorStop(0,    isDark ? 'rgba(109, 124, 255, 0.28)' : 'rgba(97, 85, 245, 0.25)')
+      g.addColorStop(0.35, spectrumColors[0]!)
+      g.addColorStop(0.65, spectrumColors[1]!)
+      g.addColorStop(0.85, spectrumColors[2]!)
+      g.addColorStop(1,    spectrumColors[3]!)
+      return g
+    }
 
     const draw = (): void => {
       this.animationId = requestAnimationFrame(draw)
       if (!this.analyser || !this.dataArray) return
 
-      this.analyser.getByteFrequencyData(this.dataArray)
+      // Resize canvas to match physical pixels (DPR-aware) — fixes blurry bars on Retina
+      const dpr  = window.devicePixelRatio || 1
+      const rect = canvas.getBoundingClientRect()
+      const pw   = Math.round(rect.width  * dpr)
+      const ph   = Math.round(rect.height * dpr)
+      if (canvas.width !== pw || canvas.height !== ph) {
+        canvas.width  = pw
+        canvas.height = ph
+        cachedWidth   = 0 // force gradient rebuild
+      }
 
-      ctx.clearRect(0, 0, width, height)
+      const w = canvas.width
+      const h = canvas.height
+
+      // Rebuild gradient only when dimensions change or theme changes
+      if (w !== cachedWidth || h !== cachedHeight || !gradient) {
+        gradient     = buildGradient(w, h)
+        cachedWidth  = w
+        cachedHeight = h
+      }
+
+      this.analyser.getByteFrequencyData(this.dataArray)
+      ctx.clearRect(0, 0, w, h)
+
+      const barWidth = w / barCount
+      ctx.fillStyle = gradient
 
       for (let i = 0; i < barCount; i++) {
         const value     = this.dataArray[i * 4] ?? 0
-        const barHeight = (value / 255) * height * 0.85
+        const barHeight = (value / 255) * h * 0.85
         const x = i * barWidth
-        const y = height - barHeight
+        const y = h - barHeight
         ctx.fillRect(x, y, barWidth - gap, barHeight)
       }
     }
@@ -222,6 +241,11 @@ export class VisualizerService {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId)
       this.animationId = null
+    }
+    // Clear the canvas so no frozen frame is left visible
+    if (this.activeCanvas) {
+      const ctx = this.activeCanvas.getContext('2d')
+      if (ctx) ctx.clearRect(0, 0, this.activeCanvas.width, this.activeCanvas.height)
     }
   }
 
