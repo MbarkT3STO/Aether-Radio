@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
    EXPANDED PLAYER — Full-screen immersive overlay
-   Centered artwork + controls, ambient background
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Overlay shell ── */
@@ -34,14 +33,10 @@
 }
 
 .player-expanded-overlay.is-expanded .pex-ambient-canvas {
-  opacity: 0.60;
+  opacity: 0.45;
 }
 
-[data-theme="dark"] .player-expanded-overlay.is-expanded .pex-ambient-canvas {
-  opacity: 0.50;
-}
-
-/* ── Overlay tint — sits above canvas, below content ── */
+/* ── Overlay tint ── */
 .player-expanded-overlay::after {
   content: '';
   position: absolute;
@@ -49,15 +44,11 @@
   z-index: 1;
   pointer-events: none;
   background: var(--bg-primary);
-  opacity: 0.55;
+  opacity: 0.58;
   transition: opacity 0.42s ease;
 }
 
-[data-theme="dark"] .player-expanded-overlay::after {
-  opacity: 0.65;
-}
-
-/* ── Expanded body — all content ── */
+/* ── Expanded body ── */
 .player-expanded-body {
   flex: 1;
   min-height: 0;
@@ -78,7 +69,7 @@
   opacity: 1;
 }
 
-/* ── Inner layout — fills available height ── */
+/* ── Inner layout ── */
 .pex-inner {
   display: flex;
   align-items: center;
@@ -109,7 +100,56 @@
   align-items: center;
 }
 
-/* Live badge — child of .pex-artwork, pinned to its bottom-left */
+.pex-artwork {
+  width: clamp(180px, calc(100vh - 260px), 380px);
+  height: clamp(180px, calc(100vh - 260px), 380px);
+  border-radius: var(--radius-2xl);
+  overflow: visible;
+  position: relative;
+  flex-shrink: 0;
+  background: var(--bg-tertiary);
+  box-shadow: var(--shadow-2xl), 0 0 0 1px var(--border-subtle);
+  transition: transform var(--transition-spring), box-shadow var(--transition-slow);
+}
+
+.pex-artwork:hover {
+  transform: scale(1.02) translateY(-2px);
+}
+
+.pex-artwork > img,
+.pex-artwork > .station-logo-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+
+.pex-artwork .station-logo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+  opacity: 0.5;
+}
+
+/* Artwork reflection */
+.pex-artwork-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 10%;
+  right: 10%;
+  height: 20px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.22) 0%, transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Live badge */
 .pex-live-badge {
   position: absolute;
   bottom: 12px;
@@ -142,83 +182,6 @@
   box-shadow: 0 0 5px var(--status-live);
 }
 
-.pex-artwork {
-  /* Square that fits the available height, capped so it doesn't get absurd */
-  width: clamp(180px, calc(100vh - 260px), 380px);
-  height: clamp(180px, calc(100vh - 260px), 380px);
-  border-radius: var(--radius-2xl);
-  overflow: visible;
-  position: relative;
-  flex-shrink: 0;
-  background: var(--bg-tertiary);
-  box-shadow:
-    0 24px 64px rgba(0,0,0,0.28),
-    0 8px 24px rgba(0,0,0,0.16),
-    0 0 0 1px var(--border-subtle);
-  transition: transform var(--transition-spring), box-shadow var(--transition-slow);
-}
-
-/* clip the image inside but let the badge overflow */
-.pex-artwork > img,
-.pex-artwork > .station-logo-fallback {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
-}
-
-.pex-artwork:hover {
-  transform: scale(1.02) translateY(-2px);
-  box-shadow:
-    0 32px 80px rgba(0,0,0,0.34),
-    0 12px 32px rgba(0,0,0,0.20),
-    0 0 0 1px var(--border-subtle);
-}
-
-.pex-artwork img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.pex-artwork .station-logo-fallback {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-tertiary);
-  color: var(--accent-primary);
-  opacity: 0.5;
-}
-
-/* Artwork reflection — subtle shadow below */
-.pex-artwork-wrap::after {
-  content: '';
-  position: absolute;
-  bottom: -20px;
-  left: 10%;
-  right: 10%;
-  height: 20px;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0.22) 0%, transparent 70%);
-  filter: blur(8px);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.pex-live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--status-live);
-  flex-shrink: 0;
-  animation: playerLivePulse 2s ease-in-out infinite;
-  box-shadow: 0 0 5px var(--status-live);
-}
-
 /* ═══════════════════════════════════════════════════════════════
    INFO + CONTROLS COLUMN
    ═══════════════════════════════════════════════════════════════ */
@@ -232,7 +195,6 @@
   gap: 32px;
 }
 
-/* ── Station identity ── */
 .pex-identity {
   display: flex;
   flex-direction: column;
@@ -290,7 +252,9 @@
   font-weight: 600;
 }
 
-/* ── Controls pill ── */
+/* ═══════════════════════════════════════════════════════════════
+   CONTROLS
+   ═══════════════════════════════════════════════════════════════ */
 .pex-controls-wrap {
   display: flex;
   flex-direction: column;
@@ -310,13 +274,7 @@
   align-self: flex-start;
 }
 
-[data-theme="dark"] .pex-controls {
-  background: rgba(255,255,255,0.07);
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Base button — secondary controls only */
+/* Secondary buttons (stop, favorite) */
 .pex-btn {
   display: flex;
   align-items: center;
@@ -328,8 +286,7 @@
   color: var(--text-tertiary);
   transition:
     color var(--transition-fast),
-    transform var(--transition-spring),
-    box-shadow var(--transition-fast);
+    transform var(--transition-spring);
   flex-shrink: 0;
   width: 40px;
   height: 40px;
@@ -339,11 +296,6 @@
 .pex-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
-  border-radius: 50%;
-}
-
-[data-theme="dark"] .pex-btn {
-  color: var(--text-secondary);
 }
 
 .pex-btn:hover {
@@ -368,7 +320,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   EXPANDED PLAY BUTTON — fully isolated, no inheritance
+   PLAY BUTTON — fully isolated
    ═══════════════════════════════════════════════════════════════ */
 .pex-btn-play {
   display: flex;
@@ -383,10 +335,10 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
   box-shadow:
     0 6px 24px var(--accent-glow),
-    0 3px 10px rgba(0,0,0,0.12),
-    inset 0 1px 0 rgba(255,255,255,0.22);
+    0 3px 10px rgba(0,0,0,0.12);
   transition:
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
@@ -398,8 +350,7 @@
   transform: scale(1.06);
   box-shadow:
     0 8px 32px var(--accent-glow-lg),
-    0 4px 14px rgba(0,0,0,0.14),
-    inset 0 1px 0 rgba(255,255,255,0.24);
+    0 4px 14px rgba(0,0,0,0.14);
 }
 
 .pex-btn-play:active {
@@ -413,10 +364,8 @@
 .pex-btn-play:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 3px;
-  border-radius: 50%;
 }
 
-/* Pulsing ring when playing */
 .pex-btn-play.playing::after {
   content: '';
   position: absolute;
@@ -427,7 +376,10 @@
   pointer-events: none;
 }
 
-/* ═══════════════════════════════════════════════════════════════ */
+@keyframes playRingPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 0; transform: scale(1.18); }
+}
 
 /* Favorite */
 .pex-btn-fav {
@@ -436,15 +388,15 @@
 
 .pex-btn-fav:hover {
   color: var(--palette-pink);
-  background: rgba(255,45,85,0.12);
 }
 
 .pex-btn-fav.active {
   color: var(--palette-pink);
-  background: rgba(255,45,85,0.10);
 }
 
-/* ── Volume row — pill matching the controls pill ── */
+/* ═══════════════════════════════════════════════════════════════
+   VOLUME
+   ═══════════════════════════════════════════════════════════════ */
 .pex-volume {
   display: flex;
   align-items: center;
@@ -455,12 +407,6 @@
   padding: 7px 16px 7px 8px;
   box-shadow: var(--shadow-md), var(--shadow-inset);
   max-width: 320px;
-}
-
-[data-theme="dark"] .pex-volume {
-  background: rgba(255,255,255,0.07);
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-lg);
 }
 
 .pex-btn-mute {
@@ -492,10 +438,8 @@
 .pex-btn-mute:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
-  border-radius: 50%;
 }
 
-/* Volume slider track */
 .pex-volume-slider {
   flex: 1;
   height: 3px;
@@ -507,10 +451,6 @@
   padding: 10px 0;
   box-sizing: content-box;
   margin: -10px 0;
-}
-
-[data-theme="dark"] .pex-volume-slider {
-  background: rgba(255,255,255,0.16);
 }
 
 .pex-volume-fill {
@@ -543,7 +483,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BOTTOM BAR — collapse button + mini info
+   BOTTOM BAR
    ═══════════════════════════════════════════════════════════════ */
 .player-expanded-mini {
   height: var(--player-bar-height);
@@ -558,7 +498,6 @@
   background: transparent;
 }
 
-/* Collapse button */
 .pex-collapse-btn {
   display: flex;
   align-items: center;
@@ -576,7 +515,6 @@
   margin-right: 4px;
   transition:
     color var(--transition-fast),
-    background var(--transition-fast),
     transform var(--transition-spring);
 }
 
@@ -586,12 +524,7 @@
 
 .pex-collapse-btn:hover {
   color: var(--text-primary);
-  background: rgba(0,0,0,0.06);
   transform: scale(1.08);
-}
-
-[data-theme="dark"] .pex-collapse-btn:hover {
-  background: rgba(255,255,255,0.08);
 }
 
 .pex-collapse-btn:active {
@@ -602,105 +535,4 @@
 .pex-collapse-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
-  border-radius: var(--radius-lg);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   DARK MODE
-   ═══════════════════════════════════════════════════════════════ */
-[data-theme="dark"] .player-expanded-overlay {
-  background: var(--bg-primary);
-}
-
-[data-theme="dark"] .pex-artwork {
-  box-shadow:
-    0 24px 72px rgba(0,0,0,0.70),
-    0 8px 28px rgba(0,0,0,0.50),
-    0 0 0 1px rgba(255,255,255,0.06);
-}
-
-[data-theme="dark"] .pex-artwork:hover {
-  box-shadow:
-    0 32px 88px rgba(0,0,0,0.80),
-    0 12px 36px rgba(0,0,0,0.60),
-    0 0 0 1px rgba(255,255,255,0.08);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   LIGHT MODE
-   ═══════════════════════════════════════════════════════════════ */
-:root:not([data-theme="dark"]) .player-expanded-overlay {
-  background: var(--bg-primary);
-}
-
-:root:not([data-theme="dark"]) .player-expanded-overlay::after {
-  opacity: 0.60;
-}
-
-:root:not([data-theme="dark"]) .pex-artwork {
-  box-shadow:
-    0 20px 56px rgba(0,0,0,0.14),
-    0 8px 20px rgba(0,0,0,0.08),
-    0 0 0 1px var(--border-subtle);
-}
-
-:root:not([data-theme="dark"]) .pex-station-name { color: var(--text-primary); }
-:root:not([data-theme="dark"]) .pex-station-meta { color: var(--text-secondary); }
-
-:root:not([data-theme="dark"]) .pex-bitrate {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
-  color: var(--text-tertiary);
-}
-
-:root:not([data-theme="dark"]) .pex-controls {
-  background: var(--bg-elevated);
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-md), var(--shadow-inset);
-}
-
-:root:not([data-theme="dark"]) .pex-btn {
-  color: var(--text-secondary);
-}
-
-:root:not([data-theme="dark"]) .pex-btn-fav.active {
-  color: var(--palette-pink);
-  background: rgba(255,45,85,0.10);
-}
-
-:root:not([data-theme="dark"]) .pex-collapse-btn {
-  background: transparent;
-  color: var(--text-tertiary);
-}
-
-:root:not([data-theme="dark"]) .pex-collapse-btn:hover {
-  background: rgba(0,0,0,0.06);
-  color: var(--text-primary);
-}
-
-:root:not([data-theme="dark"]) .pex-volume {
-  background: var(--bg-elevated);
-  border-color: var(--border-subtle);
-}
-
-:root:not([data-theme="dark"]) .pex-volume-slider {
-  background: rgba(0,0,0,0.12);
-}
-
-:root:not([data-theme="dark"]) .pex-volume-thumb {
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.18), 0 0 0 1.5px var(--accent-primary);
-}
-
-:root:not([data-theme="dark"]) .pex-btn-mute {
-  color: var(--text-tertiary);
-}
-
-:root:not([data-theme="dark"]) .pex-btn-mute:hover {
-  color: var(--text-primary);
-}
-
-:root:not([data-theme="dark"]) .player-expanded-overlay.is-expanded .pex-ambient-canvas {
-  opacity: 0.22;
-  filter: blur(80px) saturate(1.5);
 }
