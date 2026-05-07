@@ -1008,32 +1008,43 @@ export class PlayerBar extends BaseComponent {
 
         <!-- Listening state -->
         <div class="rcm-listening" id="rcm-listening">
-          <div class="rcm-viz-wrap">
-            <div class="rcm-ambient-container">
-              <div class="rcm-search-orb"></div>
-              <div class="rcm-blur-point rcm-point-1"></div>
-              <div class="rcm-blur-point rcm-point-2"></div>
-              <div class="rcm-blur-point rcm-point-3"></div>
-              <div class="rcm-blur-point rcm-point-4"></div>
-              <div class="rcm-blur-point rcm-point-5"></div>
-              <div class="rcm-blur-point rcm-point-6"></div>
-              <div class="rcm-blur-point rcm-outer rcm-point-7"></div>
-              <div class="rcm-blur-point rcm-outer rcm-point-8"></div>
-              <div class="rcm-blur-point rcm-outer rcm-point-9"></div>
-              <div class="rcm-blur-point rcm-outer rcm-point-10"></div>
-              <div class="rcm-blur-point rcm-outer rcm-point-11"></div>
-              <div class="rcm-blur-point rcm-outer rcm-point-12"></div>
-              <div class="rcm-particle rcm-particle-1"></div>
-              <div class="rcm-particle rcm-particle-2"></div>
-              <div class="rcm-particle rcm-particle-3"></div>
-              <div class="rcm-particle rcm-particle-4"></div>
-              <div class="rcm-particle rcm-particle-5"></div>
-              <div class="rcm-particle rcm-particle-6"></div>
+          <div class="rcm-listen-inner">
+
+            <!-- Icon ring with scanning pulse -->
+            <div class="rcm-scan-ring-wrap">
+              <div class="rcm-scan-ring rcm-ring-1"></div>
+              <div class="rcm-scan-ring rcm-ring-2"></div>
+              <div class="rcm-scan-ring rcm-ring-3"></div>
+              <div class="rcm-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="1.75"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18V5l12-2v13"/>
+                  <circle cx="6" cy="18" r="3"/>
+                  <circle cx="18" cy="16" r="3"/>
+                </svg>
+              </div>
             </div>
-          </div>
-          <div class="rcm-listening-text">
-            <div class="rcm-listening-label">Identifying song…</div>
-            <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
+
+            <!-- Waveform bars -->
+            <div class="rcm-waveform">
+              <span class="rcm-bar rcm-bar-1"></span>
+              <span class="rcm-bar rcm-bar-2"></span>
+              <span class="rcm-bar rcm-bar-3"></span>
+              <span class="rcm-bar rcm-bar-4"></span>
+              <span class="rcm-bar rcm-bar-5"></span>
+              <span class="rcm-bar rcm-bar-6"></span>
+              <span class="rcm-bar rcm-bar-7"></span>
+              <span class="rcm-bar rcm-bar-8"></span>
+              <span class="rcm-bar rcm-bar-9"></span>
+            </div>
+
+            <!-- Text -->
+            <div class="rcm-listening-text">
+              <div class="rcm-listening-label">Identifying song…</div>
+              <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
+            </div>
+
           </div>
         </div>
 
