@@ -152,14 +152,12 @@
   position: relative;
   transition:
     color var(--transition-fast),
-    background var(--transition-fast),
-    transform var(--transition-fast);
+    background var(--transition-fast);
 }
 
 .sidebar-nav-item:hover {
   color: var(--text-primary);
   background: rgba(0,0,0,0.05);
-  transform: translateX(1px);
 }
 
 [data-theme="dark"] .sidebar-nav-item:hover {
@@ -168,7 +166,6 @@
 
 .sidebar-nav-item:active {
   background: rgba(0,0,0,0.08);
-  transform: translateX(0) scale(0.98);
   transition-duration: 60ms;
 }
 
@@ -252,7 +249,8 @@
   opacity: 0;
   z-index: 99999;
   box-shadow: var(--shadow-lg);
-  transition: opacity 150ms ease;
+  /* Delay appearance slightly so it doesn't flash on quick passes */
+  transition: opacity 120ms ease 80ms;
   letter-spacing: -0.01em;
 }
 
