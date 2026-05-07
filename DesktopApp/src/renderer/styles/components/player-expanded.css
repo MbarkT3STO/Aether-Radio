@@ -29,11 +29,11 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 1.2s ease;
-  filter: blur(80px) saturate(1.8);
+  filter: blur(60px) saturate(2.0);
 }
 
 .player-expanded-overlay.is-expanded .pex-ambient-canvas {
-  opacity: 0.45;
+  opacity: 0.70;
 }
 
 /* ── Overlay tint ── */
@@ -44,7 +44,7 @@
   z-index: 1;
   pointer-events: none;
   background: var(--bg-primary);
-  opacity: 0.58;
+  opacity: 0.42;
   transition: opacity 0.42s ease;
 }
 
