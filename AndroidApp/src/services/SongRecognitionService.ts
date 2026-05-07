@@ -324,14 +324,20 @@ export class SongRecognitionService {
     if (track.hub?.providers) {
       for (const provider of track.hub.providers) {
         const type = provider.type?.toLowerCase() ?? ''
-        // The "uri" action holds the deep-link (spotify://, music://, etc.)
-        // The "open" action holds the https web URL — prefer that
+        // Prefer the "open" action (https web URL) over the "uri" deep-link scheme
         const openAction = provider.actions?.find(a => a.type === 'open')
         const uriAction  = provider.actions?.find(a => a.type === 'uri')
-        const url = openAction?.uri ?? uriAction?.uri
-        if (url) {
-          streamingLinks.push({ provider: type, url })
+        let url = openAction?.uri ?? uriAction?.uri
+        if (!url) continue
+
+        // Convert spotify: deep-link to https://open.spotify.com so it opens
+        // in the browser (which then offers to launch the Spotify app).
+        // e.g. spotify:track:4uLU6hMCjMI75M1A2tKUQC → https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC
+        if (url.startsWith('spotify:') && !url.startsWith('https://')) {
+          url = url.replace(/^spotify:/, 'https://open.spotify.com/').replace(/:/g, '/')
         }
+
+        streamingLinks.push({ provider: type, url })
       }
     }
 

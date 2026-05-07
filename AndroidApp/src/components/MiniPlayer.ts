@@ -664,6 +664,14 @@ export class MiniPlayer extends BaseComponent {
       }
 
       resultEl.classList.add('rcm-result-in')
+
+      // Wire up streaming link buttons (use Capacitor Browser, not raw href)
+      resultEl.querySelectorAll<HTMLButtonElement>('.rcm-stream-btn[data-stream-url]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const url = btn.dataset.streamUrl
+          if (url) void this.openStreamingLink(url)
+        })
+      })
     }, 350)
   }
 
@@ -688,20 +696,56 @@ export class MiniPlayer extends BaseComponent {
       },
     }
 
+    // Encode URLs into data attributes — click handler uses @capacitor/browser
+    // so links open in an in-app browser with a proper close/back button,
+    // instead of hijacking the WebView (which has no back navigation).
     const items = links.map(link => {
       const meta = providerMeta[link.provider] ?? {
         label: link.provider.charAt(0).toUpperCase() + link.provider.slice(1),
         color: 'var(--accent)',
         icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
       }
-      return `<a class="rcm-stream-btn" href="${link.url}" target="_blank" rel="noopener"
+      const safeUrl = link.url.replace(/"/g, '&quot;')
+      return `<button class="rcm-stream-btn" data-stream-url="${safeUrl}"
           style="--stream-color:${meta.color}">
           ${meta.icon}
           <span>${meta.label}</span>
-        </a>`
+        </button>`
     }).join('')
 
     return `<div class="rcm-stream-links">${items}</div>`
+  }
+
+  /** Open a streaming link correctly depending on its scheme. */
+  private async openStreamingLink(url: string): Promise<void> {
+    const { Browser } = await import('@capacitor/browser')
+    const { Capacitor } = await import('@capacitor/core')
+
+    if (!Capacitor.isNativePlatform()) {
+      // Web fallback
+      window.open(url, '_blank', 'noopener')
+      return
+    }
+
+    if (url.startsWith('spotify:') || url.startsWith('deezer:')) {
+      // Deep-link scheme — open directly so the native app handles it.
+      // On Android this fires an Intent that launches Spotify/Deezer.
+      // If the app isn't installed Android shows the Play Store instead.
+      try {
+        await Browser.open({ url })
+      } catch {
+        // Some Capacitor versions reject non-http schemes; fall back to window.open
+        window.open(url, '_system')
+      }
+      return
+    }
+
+    // https:// links — open in Capacitor's in-app browser (has its own toolbar + close button)
+    await Browser.open({
+      url,
+      presentationStyle: 'popover',
+      toolbarColor: '#121214',
+    })
   }
 
   private closeRecognitionModal(): void {
