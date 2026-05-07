@@ -532,7 +532,7 @@ export class MiniPlayer extends BaseComponent {
       <div class="rcm-backdrop"></div>
       <div class="rcm-dialog" id="rcm-dialog">
 
-        <button class="rcm-close" id="rcm-close" aria-label="Close">
+        <button class="rcm-close" id="rcm-close" aria-label="Close" style="opacity:0;pointer-events:none">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
@@ -589,6 +589,13 @@ export class MiniPlayer extends BaseComponent {
     setTimeout(() => {
       listening.style.display = 'none'
       resultEl.style.display  = 'flex'
+
+      // Reveal the close button now that there's a result to dismiss
+      const closeBtn = document.getElementById('rcm-close')
+      if (closeBtn) {
+        closeBtn.style.opacity = '1'
+        closeBtn.style.pointerEvents = 'auto'
+      }
 
       if (!result || (!result.title && !result.artist)) {
         // ── Not found ──
