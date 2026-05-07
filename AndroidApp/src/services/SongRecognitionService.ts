@@ -331,10 +331,13 @@ export class SongRecognitionService {
         if (!url) continue
 
         // Convert spotify: deep-link to https://open.spotify.com so it opens
-        // in the browser (which then offers to launch the Spotify app).
+        // via a native Intent that Android routes to the Spotify app.
         // e.g. spotify:track:4uLU6hMCjMI75M1A2tKUQC → https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC
+        // NOTE: must NOT use .replace(/:/g, '/') — that also corrupts the https:// prefix.
         if (url.startsWith('spotify:') && !url.startsWith('https://')) {
-          url = url.replace(/^spotify:/, 'https://open.spotify.com/').replace(/:/g, '/')
+          const parts = url.split(':') // ["spotify", "track", "4uLU6hMCjMI75M1A2tKUQC"]
+          parts.shift()                // remove "spotify"
+          url = 'https://open.spotify.com/' + parts.join('/')
         }
 
         streamingLinks.push({ provider: type, url })
