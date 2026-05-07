@@ -45,9 +45,9 @@
 }
 
 @keyframes liveRing {
-  0%   { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.6); }
-  70%  { box-shadow: 0 0 0 8px rgba(52, 199, 89, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+  0%   { box-shadow: 0 0 0 0 hsla(160, 70%, 50%, 0.6); }
+  70%  { box-shadow: 0 0 0 8px hsla(160, 70%, 50%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(160, 70%, 50%, 0); }
 }
 
 @keyframes dotPulse {

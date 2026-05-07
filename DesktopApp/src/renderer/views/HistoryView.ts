@@ -4,6 +4,7 @@ import { PlayerStore } from '../store/PlayerStore'
 import { EventBus } from '../store/EventBus'
 import type { PlayHistory } from '../../domain/entities/PlayHistory'
 import { renderStationCard } from '../utils/renderCard'
+import { ConfirmModal } from '../components/ConfirmModal'
 
 export class HistoryView extends BaseComponent {
   private bridge      = BridgeService.getInstance()
@@ -74,6 +75,20 @@ export class HistoryView extends BaseComponent {
       const clearBtn = this.querySelector('#clear-history')
       if (clearBtn) {
         this.on(clearBtn, 'click', async () => {
+          const confirmed = await ConfirmModal.show({
+            title: 'Clear History',
+            message: 'All play history will be permanently removed. This cannot be undone.',
+            confirmLabel: 'Clear All',
+            cancelLabel: 'Keep it',
+            danger: true,
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.75"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+            </svg>`
+          })
+          if (!confirmed) return
           await this.bridge.history.clear()
           await this.loadHistory()
         })
@@ -87,7 +102,7 @@ export class HistoryView extends BaseComponent {
       content.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
               <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
             </svg>
@@ -105,7 +120,7 @@ export class HistoryView extends BaseComponent {
           station:     item.station,
           isPlaying:   this.playerStore.currentStation?.id === item.station.id && this.playerStore.isPlaying,
           isFavorite:  false,
-          metaOverride: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>${this.getTimeAgo(new Date(item.playedAt))}</span>`
+          metaOverride: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>${this.getTimeAgo(new Date(item.playedAt))}</span>`
         })).join('')}
       </div>
     `
