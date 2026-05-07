@@ -44,7 +44,11 @@ interface ShazamResponse {
 }
 
 // ── Debug overlay ─────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const IS_DEV = (import.meta as any).env?.DEV === true
+
 function dbg(msg: string): void {
+  if (!IS_DEV) return  // Never show debug overlay in production
   console.log('[Recognition]', msg)
   let el = document.getElementById('rcm-debug-overlay')
   if (!el) {

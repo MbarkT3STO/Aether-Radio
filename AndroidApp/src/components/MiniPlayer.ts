@@ -23,6 +23,7 @@ export class MiniPlayer extends BaseComponent {
   private _recognition     = SongRecognitionService.getInstance()
   private _renderedStationId: string | null = null
   private _expanded = false
+  private _sheetCleanup: (() => void) | null = null
 
   constructor(props: Record<string, never>) {
     super(props)
@@ -152,6 +153,8 @@ export class MiniPlayer extends BaseComponent {
     this._expanded = false
     this._sheetVisualizer.stopVisualization()
     this._sleepTimer.unmount()
+    // Clean up all sheet event subscriptions to prevent memory leaks
+    if (this._sheetCleanup) { this._sheetCleanup(); this._sheetCleanup = null }
     const sheet = document.getElementById('mp-expanded-sheet')
     if (!sheet) return
     sheet.classList.remove('mp-sheet--open')
@@ -390,14 +393,14 @@ export class MiniPlayer extends BaseComponent {
       sheet.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')?.classList.remove('active')
     })
 
-    const unsub3 = this.eventBus.on('player:stop', () => { unsub1(); unsub2(); unsub3(); unsub4(); this.closeExpanded() })
+    const unsub3 = this.eventBus.on('player:stop', () => { unsub1(); unsub2(); unsub3(); unsub4(); unsub5(); unsub6(); this.closeExpanded() })
 
     const unsub4 = this.eventBus.on('player:volume', ({ volume }) => {
       const fill = q('#mp-sheet-vol-fill')
       if (fill) fill.style.width = `${Math.round(volume * 100)}%`
     })
 
-    this.eventBus.on('player:loading', ({ loading }) => {
+    const unsub5 = this.eventBus.on('player:loading', ({ loading }) => {
       const btn = q('#mp-sheet-play')
       if (!btn) return
       const isPlaying = this.playerStore.isPlaying
@@ -408,7 +411,7 @@ export class MiniPlayer extends BaseComponent {
           : `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
     })
 
-    this.eventBus.on('favorites:changed', () => {
+    const unsub6 = this.eventBus.on('favorites:changed', () => {
       const station = this.playerStore.currentStation
       if (!station) return
       const isFav = this.favoritesStore.isFavorite(station.id)
@@ -420,6 +423,10 @@ export class MiniPlayer extends BaseComponent {
         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
       </svg>`
     })
+
+    // Store a combined cleanup so closeExpanded() can unsubscribe even when
+    // triggered by a route change rather than the player:stop event.
+    this._sheetCleanup = () => { unsub1(); unsub2(); unsub3(); unsub4(); unsub5(); unsub6() }
   }
 
   // ── Mini bar surgical updates ─────────────────────────────────────────────

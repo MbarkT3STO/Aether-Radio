@@ -1,5 +1,6 @@
 import { App as CapApp } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
+import { Capacitor } from '@capacitor/core'
 import { Router } from './router/Router'
 import { EventBus } from './store/EventBus'
 import { BridgeService } from './services/BridgeService'
@@ -39,6 +40,9 @@ class App {
   private async init(): Promise<void> {
     initToast()
     await this.loadSettings()
+    if (Capacitor.isNativePlatform()) {
+      await this.requestNotificationPermission()
+    }
     await this.loadFavorites()
     await this.bottomNav.mount('#bottom-nav')
     await this.miniPlayer.mount('#mini-player')
@@ -110,8 +114,14 @@ class App {
   }
 
   private setupCapacitor(): void {
-    // Handle Android back button — navigate back or minimize app
+    // Handle Android back button — close expanded player first, then navigate or minimize
     CapApp.addListener('backButton', ({ canGoBack }) => {
+      // If the expanded player sheet is open, close it instead of navigating
+      const expandedSheet = document.getElementById('mp-expanded-sheet')
+      if (expandedSheet) {
+        this.eventBus.emit('route:changed', { route: '' })
+        return
+      }
       const hash = window.location.hash
       if (hash && hash !== '#/' && hash !== '#') {
         this.router.navigate('/')
@@ -119,6 +129,45 @@ class App {
         void CapApp.minimizeApp()
       }
     })
+
+    // Pause visualizer and suspend AudioContext when app goes to background (battery fix)
+    CapApp.addListener('appStateChange', ({ isActive }) => {
+      const visualizer = this.audioService.getVisualizer()
+      if (!isActive) {
+        // App went to background — stop canvas rendering and suspend Web Audio
+        visualizer.stopVisualization()
+        void visualizer.suspendContext()
+        const ambCanvas = document.querySelector<HTMLElement>('#mp-ambient-canvas')
+        if (ambCanvas) ambCanvas.classList.remove('active')
+      } else {
+        // App came to foreground — resume AudioContext and restart visualizer if playing
+        void visualizer.resumeContext()
+        if (this.playerStore.isPlaying) {
+          setTimeout(() => {
+            const canvas = document.querySelector<HTMLCanvasElement>('#mp-ambient-canvas')
+            if (canvas) {
+              visualizer.startAmbientVisualization(
+                canvas, this.audioService.getVisualizer(), 0.9, true
+              )
+              canvas.classList.add('active')
+            }
+          }, 200)
+        }
+      }
+    })
+  }
+
+  /** Request POST_NOTIFICATIONS permission on Android 13+ (API 33+). */
+  private async requestNotificationPermission(): Promise<void> {
+    try {
+      const { PushNotifications } = await import('@capacitor/push-notifications')
+      const permStatus = await PushNotifications.checkPermissions()
+      if (permStatus.receive === 'prompt') {
+        await PushNotifications.requestPermissions()
+      }
+    } catch {
+      // @capacitor/push-notifications may not be configured — skip gracefully
+    }
   }
 }
 

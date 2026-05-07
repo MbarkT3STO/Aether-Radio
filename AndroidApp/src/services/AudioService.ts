@@ -2,6 +2,8 @@ import { EventBus } from '../store/EventBus'
 import { PlayerStore } from '../store/PlayerStore'
 import { VisualizerService } from './VisualizerService'
 import type { RadioStation } from '../domain/entities/RadioStation'
+import { Network } from '@capacitor/network'
+import { Capacitor } from '@capacitor/core'
 
 const MAX_RETRIES = 3
 const RETRY_DELAY_MS = 2000
@@ -20,6 +22,18 @@ export class AudioService {
     this.audio = new Audio()
     this.audio.crossOrigin = 'anonymous'
     this.setupEventListeners()
+    if (Capacitor.isNativePlatform()) {
+      Network.addListener('networkStatusChange', async (status) => {
+        if (status.connected && this.currentStationId) {
+          const station = this.playerStore.currentStation
+          if (station && !this.playerStore.isPlaying) {
+            // Network came back — wait for it to stabilise then reconnect
+            await new Promise(r => setTimeout(r, 1500))
+            await this.play(station)
+          }
+        }
+      })
+    }
   }
 
   static getInstance(): AudioService {

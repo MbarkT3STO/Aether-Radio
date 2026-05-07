@@ -222,6 +222,20 @@ export class VisualizerService {
     }
   }
 
+  /** Called when app is backgrounded — reduces Web Audio CPU usage */
+  async suspendContext(): Promise<void> {
+    if (this.audioContext && this.audioContext.state === 'running') {
+      await this.audioContext.suspend()
+    }
+  }
+
+  /** Called when app returns to foreground */
+  async resumeContext(): Promise<void> {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      await this.audioContext.resume()
+    }
+  }
+
   destroy(): void {
     this.stopVisualization()
     this.activeCanvas = null

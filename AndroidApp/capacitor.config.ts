@@ -12,7 +12,8 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: true,
+    // Disable WebContents debugging in production — re-enable manually for development
+    webContentsDebuggingEnabled: false,
     // Keep WebView alive when app goes to background
     backgroundColor: '#121214',
   },
