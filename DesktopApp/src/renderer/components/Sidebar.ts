@@ -96,10 +96,11 @@ export class Sidebar extends BaseComponent {
           `).join('')}
         </nav>
 
-        <!-- Collapse toggle — icon only, no text -->
+        <!-- Collapse toggle -->
         <button class="sidebar-collapse-btn" id="sidebar-collapse-btn"
-          title="${this.collapsed ? 'Expand' : 'Collapse'}">
+          title="${this.collapsed ? 'Expand sidebar' : 'Collapse sidebar'}">
           ${CHEVRON}
+          <span class="sidebar-collapse-label">${this.collapsed ? '' : 'Collapse'}</span>
         </button>
 
         <!-- Footer -->
