@@ -393,10 +393,12 @@
 }
 
 .player-recognize-btn {
-  width: 28px;
-  height: 28px;
-  padding: 8px;
-  box-sizing: content-box;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .player-recognize-btn:focus-visible {
@@ -407,7 +409,8 @@
 
 .player-recognize-btn:hover {
   color: var(--accent-primary);
-  transform: scale(1.12);
+  background: var(--accent-soft);
+  transform: scale(1.10);
 }
 
 .player-recognize-btn.player-btn-disabled,
@@ -419,10 +422,12 @@
 
 /* ── Expand ── */
 .player-expand-btn {
-  width: 26px;
-  height: 26px;
-  padding: 9px;
-  box-sizing: content-box;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .player-expand-btn:focus-visible {
@@ -433,7 +438,8 @@
 
 .player-expand-btn:hover {
   color: var(--text-primary);
-  transform: scale(1.12);
+  background: rgba(0,0,0,0.07);
+  transform: scale(1.10);
 }
 
 .player-expand-btn svg { transition: transform var(--transition-slow); }
