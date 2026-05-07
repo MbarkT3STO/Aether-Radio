@@ -108,7 +108,7 @@ export class PlayerBar extends BaseComponent {
         <div class="player-station-info">
           <div class="player-station-logo-wrap" id="player-logo-wrap" style="cursor:pointer" title="${this._isExpanded ? 'Collapse player' : 'Expand player'}">
             ${this.logoInnerHtml(station.favicon, station.name)}
-            ${isPlaying ? `<span class="player-live-dot" id="player-live-dot"></span>` : ''}
+            ${isPlaying ? `<span class="player-live-ring" id="player-live-ring"></span>` : ''}
           </div>
           <div class="player-station-details">
             <div class="player-station-name">${this.esc(station.name)}</div>
@@ -254,11 +254,11 @@ export class PlayerBar extends BaseComponent {
     // Live dot
     const logoWrap = this.querySelector<HTMLElement>('.player-station-logo-wrap')
     if (logoWrap) {
-      const existingDot = logoWrap.querySelector('#player-live-dot')
-      if (isPlaying && !existingDot) {
-        logoWrap.insertAdjacentHTML('beforeend', `<span class="player-live-dot" id="player-live-dot"></span>`)
-      } else if (!isPlaying && existingDot) {
-        existingDot.remove()
+      const existingRing = logoWrap.querySelector('#player-live-ring')
+      if (isPlaying && !existingRing) {
+        logoWrap.insertAdjacentHTML('beforeend', `<span class="player-live-ring" id="player-live-ring"></span>`)
+      } else if (!isPlaying && existingRing) {
+        existingRing.remove()
       }
     }
 
@@ -549,65 +549,74 @@ export class PlayerBar extends BaseComponent {
       <canvas class="pex-ambient-canvas" id="pex-ambient-canvas"></canvas>
 
       <div class="player-expanded-body">
+        <div class="pex-inner">
 
-        <div class="pex-artwork-col">
-          <div class="pex-artwork">
-            ${station ? this.logoInnerHtml(station.favicon, station.name) : FALLBACK_HTML}
-          </div>
-          ${isPlaying ? `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>` : ''}
-        </div>
-
-        <div class="pex-info-col">
-          <div>
-            <div class="pex-station-name">${this.esc(station?.name ?? 'No station')}</div>
-            <div class="pex-station-meta">
-              ${station ? `
-                <span>${countryFlag(station.countryCode)} ${this.esc(station.country)}</span>
-                ${station.codec ? `<span class="pex-meta-sep">·</span><span>${this.esc(station.codec)}</span>` : ''}
-                ${station.bitrate ? `<span class="pex-meta-sep">·</span><span class="pex-bitrate">${station.bitrate} kbps</span>` : ''}
-              ` : ''}
-            </div>
-            ${station?.tags?.length ? `
-              <div class="pex-tags" style="margin-top:10px">
-                ${station.tags.slice(0, 6).map(t => `<span class="pex-tag">${this.esc(t)}</span>`).join('')}
-              </div>` : ''}
-          </div>
-
-          <div class="pex-controls">
-            <button class="pex-btn pex-btn-stop" id="pex-stop" title="Stop">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="4" y="4" width="16" height="16" rx="3"/>
-              </svg>
-            </button>
-            <button class="pex-btn pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
-              data-action="${isPlaying ? 'pause' : 'play'}" title="${isPlaying ? 'Pause' : 'Play'}">
-              ${isPlaying ? this.pauseIconLg() : this.playIconLg()}
-            </button>
-            <button class="pex-btn pex-btn-fav ${isFavorite ? 'active' : ''}" id="pex-fav"
-              title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                fill="${isFavorite ? 'currentColor' : 'none'}"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-              </svg>
-            </button>
-          </div>
-
-          <div class="pex-volume">
-            <button class="pex-btn pex-btn-mute" id="pex-mute" title="${volume === 0 ? 'Unmute' : 'Mute'}">
-              ${this.volumeIcon(volume)}
-            </button>
-            <div class="pex-volume-slider" id="pex-volume-slider" title="${volPct}%">
-              <div class="pex-volume-fill" id="pex-volume-fill" style="width:${volPct}%">
-                <div class="pex-volume-thumb"></div>
+          <!-- LEFT: Artwork -->
+          <div class="pex-artwork-col">
+            <div class="pex-artwork-wrap">
+              <div class="pex-artwork">
+                ${station ? this.logoInnerHtml(station.favicon, station.name) : FALLBACK_HTML}
+                ${isPlaying ? `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>` : ''}
               </div>
             </div>
           </div>
-        </div>
 
+          <!-- RIGHT: Info + Controls -->
+          <div class="pex-info-col">
+
+            <div class="pex-identity">
+              <div class="pex-station-name">${this.esc(station?.name ?? 'No station')}</div>
+              <div class="pex-station-meta">
+                ${station ? `
+                  <span>${countryFlag(station.countryCode)} ${this.esc(station.country)}</span>
+                  ${station.codec ? `<span class="pex-meta-sep">·</span><span>${this.esc(station.codec)}</span>` : ''}
+                  ${station.bitrate ? `<span class="pex-meta-sep">·</span><span class="pex-bitrate">${station.bitrate} kbps</span>` : ''}
+                ` : ''}
+              </div>
+              ${station?.tags?.length ? `
+                <div class="pex-tags">
+                  ${station.tags.slice(0, 5).map(t => `<span class="pex-tag">${this.esc(t)}</span>`).join('')}
+                </div>` : ''}
+            </div>
+
+            <div class="pex-controls-wrap">
+              <div class="pex-controls">
+                <button class="pex-btn pex-btn-stop" id="pex-stop" title="Stop">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="4" y="4" width="16" height="16" rx="3"/>
+                  </svg>
+                </button>
+                <button class="pex-btn pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
+                  data-action="${isPlaying ? 'pause' : 'play'}" title="${isPlaying ? 'Pause' : 'Play'}">
+                  ${isPlaying ? this.pauseIconLg() : this.playIconLg()}
+                </button>
+                <button class="pex-btn pex-btn-fav ${isFavorite ? 'active' : ''}" id="pex-fav"
+                  title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                    fill="${isFavorite ? 'currentColor' : 'none'}"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="pex-volume">
+                <button class="pex-btn pex-btn-mute" id="pex-mute" title="${volume === 0 ? 'Unmute' : 'Mute'}">
+                  ${this.volumeIcon(volume)}
+                </button>
+                <div class="pex-volume-slider" id="pex-volume-slider" title="${volPct}%">
+                  <div class="pex-volume-fill" id="pex-volume-fill" style="width:${volPct}%">
+                    <div class="pex-volume-thumb"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
 
-      <!-- Mini bar — always visible at bottom, contains the collapse button -->
+      <!-- Bottom bar — collapse button -->
       <div class="player-expanded-mini">
         <button class="pex-collapse-btn" id="pex-collapse-btn"
           title="Collapse player" aria-label="Collapse player">
@@ -735,17 +744,16 @@ export class PlayerBar extends BaseComponent {
       }
     }
 
-    const artworkCol = overlay.querySelector<HTMLElement>('.pex-artwork-col')
-    if (artworkCol) {
-      const existing = artworkCol.querySelector('.pex-live-badge')
+    const artworkEl = overlay.querySelector<HTMLElement>('.pex-artwork')
+    if (artworkEl) {
+      const existing = artworkEl.querySelector('.pex-live-badge')
       if (isPlaying && !existing) {
-        artworkCol.insertAdjacentHTML('beforeend', `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>`)
+        artworkEl.insertAdjacentHTML('beforeend', `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>`)
       } else if (!isPlaying && existing) {
         existing.remove()
       }
     }
 
-    const vizWrap = overlay.querySelector<HTMLElement>('.pex-visualizer-wrap')
     if (isPlaying) {
       const ambientCanvas = overlay.querySelector<HTMLCanvasElement>('#pex-ambient-canvas')
       if (ambientCanvas) {
@@ -754,7 +762,6 @@ export class PlayerBar extends BaseComponent {
       }
     } else {
       this._ambientVisualizer.stopVisualization()
-      if (vizWrap) vizWrap.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${this.idleBars()}</div>`
     }
   }
 
