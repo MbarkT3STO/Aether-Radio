@@ -716,31 +716,44 @@ export class MiniPlayer extends BaseComponent {
     return `<div class="rcm-stream-links">${items}</div>`
   }
 
-  /** Open a streaming link correctly depending on its scheme. */
+  /** Open a streaming link correctly depending on its scheme/host. */
   private async openStreamingLink(url: string): Promise<void> {
-    const { Browser } = await import('@capacitor/browser')
     const { Capacitor } = await import('@capacitor/core')
 
     if (!Capacitor.isNativePlatform()) {
-      // Web fallback
       window.open(url, '_blank', 'noopener')
       return
     }
 
-    if (url.startsWith('spotify:') || url.startsWith('deezer:')) {
-      // Deep-link scheme — open directly so the native app handles it.
-      // On Android this fires an Intent that launches Spotify/Deezer.
-      // If the app isn't installed Android shows the Play Store instead.
+    // Detect URLs that belong to streaming apps — these should be opened via
+    // a native ACTION_VIEW Intent so Android routes them to the installed app
+    // (or the Play Store if not installed). Using Browser.open() for these
+    // causes Chrome Custom Tab to open, immediately redirect to the app scheme,
+    // then close — leaving an invisible overlay that blocks the UI.
+    const isAppLink = (
+      url.startsWith('spotify:') ||
+      url.startsWith('deezer:') ||
+      url.includes('open.spotify.com') ||
+      url.includes('deezer.com') ||
+      url.includes('deezer.page.link')
+    )
+
+    if (isAppLink) {
+      // Use our native AudioPlayerPlugin.openUrl() — fires ACTION_VIEW Intent,
+      // no overlay, no stuck state, works for both deep-links and https app URLs.
       try {
-        await Browser.open({ url })
-      } catch {
-        // Some Capacitor versions reject non-http schemes; fall back to window.open
-        window.open(url, '_system')
+        const AudioPlayer = (await import('@capacitor/core')).registerPlugin<{
+          openUrl(o: { url: string }): Promise<void>
+        }>('AudioPlayer')
+        await AudioPlayer.openUrl({ url })
+      } catch (e) {
+        console.warn('[StreamingLink] openUrl failed:', e)
       }
       return
     }
 
-    // https:// links — open in Capacitor's in-app browser (has its own toolbar + close button)
+    // Plain https links (Shazam, Apple Music web, etc.) — open in in-app browser
+    const { Browser } = await import('@capacitor/browser')
     await Browser.open({
       url,
       presentationStyle: 'popover',

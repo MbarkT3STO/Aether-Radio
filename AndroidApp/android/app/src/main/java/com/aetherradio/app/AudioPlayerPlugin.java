@@ -93,6 +93,28 @@ public class AudioPlayerPlugin extends Plugin {
         call.resolve();
     }
 
+    /**
+     * Open a URL via Android's ACTION_VIEW Intent.
+     * Works for both https:// URLs and app deep-link schemes (spotify:, deezer://).
+     * Unlike Browser.open(), this never leaves a stuck overlay.
+     */
+    @PluginMethod
+    public void openUrl(PluginCall call) {
+        String url = call.getString("url");
+        if (url == null || url.isEmpty()) {
+            call.reject("url is required");
+            return;
+        }
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("openUrl failed: " + e.getMessage());
+        }
+    }
+
     // ── Notification button receiver ───────────────────────────────────────
 
     private void registerNotificationReceiver() {
