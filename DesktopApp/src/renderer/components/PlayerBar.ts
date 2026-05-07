@@ -990,13 +990,15 @@ export class PlayerBar extends BaseComponent {
     modal.className = 'rcm-overlay'
     modal.setAttribute('role', 'dialog')
     modal.setAttribute('aria-modal', 'true')
-    modal.setAttribute('aria-label', 'Song recognition')
+    // aria-labelledby points to the visible heading inside the dialog
+    modal.setAttribute('aria-labelledby', 'rcm-heading')
 
     modal.innerHTML = `
       <div class="rcm-backdrop"></div>
       <div class="rcm-dialog" id="rcm-dialog">
 
-        <button class="rcm-close" id="rcm-close" aria-label="Close" style="display:none">
+        <!-- Close button — hidden until result is ready -->
+        <button class="rcm-close" id="rcm-close" aria-label="Close recognition" style="display:none">
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
@@ -1005,11 +1007,11 @@ export class PlayerBar extends BaseComponent {
         </button>
 
         <!-- Listening state -->
-        <div class="rcm-listening" id="rcm-listening">
+        <div class="rcm-listening" id="rcm-listening" role="status" aria-live="polite">
           <div class="rcm-listen-inner">
 
             <!-- Icon ring with scanning pulse -->
-            <div class="rcm-scan-ring-wrap">
+            <div class="rcm-scan-ring-wrap" aria-hidden="true">
               <div class="rcm-scan-ring rcm-ring-1"></div>
               <div class="rcm-scan-ring rcm-ring-2"></div>
               <div class="rcm-scan-ring rcm-ring-3"></div>
@@ -1024,8 +1026,8 @@ export class PlayerBar extends BaseComponent {
               </div>
             </div>
 
-            <!-- Waveform bars -->
-            <div class="rcm-waveform">
+            <!-- Waveform bars (decorative) -->
+            <div class="rcm-waveform" aria-hidden="true">
               <span class="rcm-bar rcm-bar-1"></span>
               <span class="rcm-bar rcm-bar-2"></span>
               <span class="rcm-bar rcm-bar-3"></span>
@@ -1037,11 +1039,14 @@ export class PlayerBar extends BaseComponent {
               <span class="rcm-bar rcm-bar-9"></span>
             </div>
 
-            <!-- Text -->
+            <!-- Text — h2 for dialog label target -->
             <div class="rcm-listening-text">
-              <div class="rcm-listening-label">Identifying song…</div>
-              <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
+              <h2 class="rcm-listening-label" id="rcm-heading">Identifying song…</h2>
+              <p class="rcm-listening-sub">Analyzing audio fingerprint</p>
             </div>
+
+            <!-- Cancel — lets user dismiss during listening -->
+            <button class="rcm-cancel-btn" id="rcm-cancel">Cancel</button>
 
           </div>
         </div>
@@ -1054,8 +1059,13 @@ export class PlayerBar extends BaseComponent {
 
     document.body.appendChild(modal)
 
-    // Close only via the X button — no backdrop click
+    // Focus the dialog for keyboard users
+    const dialog = modal.querySelector<HTMLElement>('#rcm-dialog')
+    dialog?.setAttribute('tabindex', '-1')
+    requestAnimationFrame(() => dialog?.focus())
+
     modal.querySelector('#rcm-close')?.addEventListener('click', () => this.closeRecognitionModal())
+    modal.querySelector('#rcm-cancel')?.addEventListener('click', () => this.closeRecognitionModal())
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') { document.removeEventListener('keydown', onKey); this.closeRecognitionModal() }
@@ -1081,7 +1091,7 @@ export class PlayerBar extends BaseComponent {
       if (!result) {
         resultEl.innerHTML = `
           <div class="rcm-miss-wrap">
-            <div class="rcm-miss-icon">
+            <div class="rcm-miss-icon" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="1.5"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -1090,8 +1100,8 @@ export class PlayerBar extends BaseComponent {
                 <line x1="9" y1="9" x2="15" y2="15"/>
               </svg>
             </div>
-            <div class="rcm-miss-title">Song not recognized</div>
-            <div class="rcm-miss-sub">The stream may be playing speech or a less common track.<br>Try again in a few seconds.</div>
+            <h2 class="rcm-miss-title" id="rcm-heading">Song not recognized</h2>
+            <p class="rcm-miss-sub">The stream may be playing speech or a less common track.<br>Try again in a few seconds.</p>
             <div class="rcm-miss-actions">
               <button class="rcm-retry-btn" id="rcm-retry">Try again</button>
             </div>
@@ -1104,14 +1114,17 @@ export class PlayerBar extends BaseComponent {
 
       } else {
         // Build result HTML — modern full-bleed layout
-        const cover = result.coverArt?.replace(/"/g, '%22') ?? ''
+        // Fully encode the cover URL: escape both " and ' to prevent CSS/HTML injection
+        const cover = result.coverArt
+          ? result.coverArt.replace(/"/g, '%22').replace(/'/g, '%27')
+          : ''
         const coverSection = cover
           ? `<div class="rcm-hero">
-               <div class="rcm-hero-blur" style="background-image:url('${cover}')"></div>
-               <img class="rcm-hero-cover" src="${cover}" alt="${this.esc(result.title)}">
-               <div class="rcm-hero-gradient"></div>
+               <div class="rcm-hero-blur" style="background-image:url('${cover}')" aria-hidden="true"></div>
+               <img class="rcm-hero-cover" src="${cover}" alt="Album art for ${this.esc(result.title)}">
+               <div class="rcm-hero-gradient" aria-hidden="true"></div>
              </div>`
-          : `<div class="rcm-hero rcm-hero-nocov">
+          : `<div class="rcm-hero rcm-hero-nocov" aria-hidden="true">
                <div class="rcm-hero-nocov-orb">
                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                    fill="none" stroke="currentColor" stroke-width="1.5"
@@ -1129,22 +1142,22 @@ export class PlayerBar extends BaseComponent {
           <div class="rcm-body">
             <!-- Song identity -->
             <div class="rcm-identity">
-              <div class="rcm-identity-badge">
+              <div class="rcm-identity-badge" aria-hidden="true">
                 <span class="rcm-badge-dot"></span>Identified
               </div>
-              <div class="rcm-title">${this.esc(result.title)}</div>
-              <div class="rcm-artist">${this.esc(result.artist)}</div>
+              <h2 class="rcm-title" id="rcm-heading">${this.esc(result.title)}</h2>
+              <p class="rcm-artist">${this.esc(result.artist)}</p>
               ${result.album ? `
-                <div class="rcm-meta">
+                <p class="rcm-meta">
                   <span>${this.esc(result.album)}</span>
-                  ${result.releaseDate ? `<span class="rcm-meta-sep">·</span><span>${result.releaseDate.slice(0, 4)}</span>` : ''}
-                </div>` : ''}
+                  ${result.releaseDate ? `<span class="rcm-meta-sep" aria-hidden="true">·</span><span>${result.releaseDate.slice(0, 4)}</span>` : ''}
+                </p>` : ''}
             </div>
 
             <!-- Streaming services -->
             <div class="rcm-streams">
-              <div class="rcm-streams-label">Open in</div>
-              <div class="rcm-streams-grid">
+              <div class="rcm-streams-label" aria-hidden="true">Open in</div>
+              <div class="rcm-streams-grid" role="group" aria-label="Open in streaming service">
                 ${result.spotifyUrl    ? `<button class="rcm-stream-btn rcm-s-spotify"   id="rcm-spotify">${this.spotifyIcon()}<span>Spotify</span></button>`        : ''}
                 ${result.appleMusicUrl ? `<button class="rcm-stream-btn rcm-s-apple"     id="rcm-apple">${this.appleMusicIcon()}<span>Apple Music</span></button>`    : ''}
                 ${result.youtubeMusicUrl ? `<button class="rcm-stream-btn rcm-s-ytmusic" id="rcm-ytmusic">${this.youtubeMusicIcon()}<span>YT Music</span></button>`   : ''}
