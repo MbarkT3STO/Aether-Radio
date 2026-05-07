@@ -2,20 +2,8 @@
    EXPANDED PLAYER — Obsidian Design
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Expand toggle button ── */
-.player-expand-btn {
-  width: 28px;
-  height: 28px;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  transition: color var(--transition-fast), transform var(--transition-fast);
-}
-
-.player-expand-btn:hover  { color: var(--text-primary); transform: translateY(-1px); }
-.player-expand-btn:active { transform: translateY(0); }
-.player-expand-btn svg    { transition: transform var(--transition-slow); }
+/* ── Expand toggle (lives in player-extras) ── */
+.player-expand-btn svg { transition: transform var(--transition-slow); }
 .player-expand-btn.expanded svg { transform: rotate(180deg); }
 
 /* ── Expanded overlay ── */
@@ -33,10 +21,10 @@
 }
 
 .player-expanded-overlay.is-expanded {
-  height: calc(100% - 28px);
+  height: calc(100% - 28px); /* 28px = drag bar */
 }
 
-/* Accent line */
+/* Accent line at top */
 .player-expanded-overlay::before {
   content: '';
   position: absolute;
@@ -49,11 +37,12 @@
     var(--accent-secondary) 75%,
     transparent 100%
   );
-  opacity: 0.5;
-  z-index: 1;
+  opacity: 0.6;
+  z-index: 2;
+  pointer-events: none;
 }
 
-/* ── Mini bar row ── */
+/* ── Mini bar row (always visible at bottom) ── */
 .player-expanded-mini {
   height: var(--player-bar-height);
   flex-shrink: 0;
@@ -64,7 +53,7 @@
   order: 2;
 }
 
-/* ── Full expanded content ── */
+/* ── Full expanded content (above mini bar) ── */
 .player-expanded-body {
   flex: 1;
   min-height: 0;
@@ -82,7 +71,58 @@
 
 .player-expanded-overlay.is-expanded .player-expanded-body { opacity: 1; }
 
-/* ── LEFT: artwork ── */
+/* ── Ambient canvas — full-bleed background ── */
+.pex-ambient-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  filter: blur(70px) saturate(1.8) brightness(0.35);
+}
+
+.player-expanded-overlay.is-expanded .pex-ambient-canvas { opacity: 0.5; }
+
+/* ── Collapse button ── */
+.pex-collapse-btn {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.pex-collapse-btn svg { transform: rotate(180deg); }
+
+.pex-collapse-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
+}
+
+.pex-collapse-btn:active { transform: translateY(0) scale(0.95); }
+
+/* ═══════════════════════════════════════════════════════════════
+   LEFT — Artwork column
+   ═══════════════════════════════════════════════════════════════ */
 .pex-artwork-col {
   display: flex;
   flex-direction: column;
@@ -101,6 +141,7 @@
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
+  background: var(--bg-tertiary);
 }
 
 .pex-artwork img {
@@ -118,16 +159,18 @@
   justify-content: center;
   background: var(--bg-tertiary);
   color: var(--accent-primary);
+  opacity: 0.6;
 }
 
+/* Live badge */
 .pex-live-badge {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
   border-radius: var(--radius-full);
-  background: hsla(145, 80%, 40%, 0.12);
-  border: 1px solid hsla(145, 80%, 40%, 0.25);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-muted);
   font-size: 0.62rem;
   font-weight: 600;
   color: var(--status-live);
@@ -135,15 +178,23 @@
   text-transform: uppercase;
 }
 
+/* Override: use status-live tint for the badge bg */
+.pex-live-badge {
+  background: hsla(160, 70%, 50%, 0.1);
+  border-color: hsla(160, 70%, 50%, 0.25);
+}
+
 .pex-live-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--status-live);
-  animation: livePulse 2s ease-in-out infinite;
+  animation: playerLivePulse 2s ease-in-out infinite;
 }
 
-/* ── CENTER: info + controls ── */
+/* ═══════════════════════════════════════════════════════════════
+   CENTER — Info + Controls
+   ═══════════════════════════════════════════════════════════════ */
 .pex-info-col {
   flex: 1;
   min-width: 0;
@@ -197,13 +248,13 @@
   padding: 3px 10px;
   border-radius: var(--radius-full);
   background: var(--accent-soft);
-  border: 1px solid transparent;
+  border: 1px solid var(--accent-muted);
   color: var(--accent-primary);
   font-size: 0.68rem;
   font-weight: 500;
 }
 
-/* ── Controls ── */
+/* ── Controls row ── */
 .pex-controls {
   display: flex;
   align-items: center;
@@ -219,7 +270,12 @@
   cursor: pointer;
   background: var(--bg-tertiary);
   color: var(--text-tertiary);
-  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
   flex-shrink: 0;
   width: 40px;
   height: 40px;
@@ -231,11 +287,18 @@
   border-color: var(--border-medium);
 }
 
-.pex-btn:active { transform: scale(0.94); }
+.pex-btn:active { transform: scale(0.93); }
 
+/* Stop */
 .pex-btn-stop { color: var(--text-muted); }
-.pex-btn-stop:hover { color: var(--status-error); border-color: hsla(0, 90%, 60%, 0.3); }
 
+.pex-btn-stop:hover {
+  color: var(--status-error);
+  border-color: hsla(0, 80%, 55%, 0.3);
+  background: hsla(0, 80%, 55%, 0.08);
+}
+
+/* Play/Pause — hero */
 .pex-btn-play {
   width: 64px;
   height: 64px;
@@ -249,7 +312,7 @@
   background: var(--accent-hover);
   color: #fff;
   border-color: transparent;
-  transform: scale(1.04);
+  transform: scale(1.05);
   box-shadow: 0 8px 32px var(--accent-glow);
 }
 
@@ -262,15 +325,22 @@
   box-shadow: 0 2px 8px var(--accent-glow);
 }
 
+/* Favorite */
 .pex-btn-fav { color: var(--text-muted); }
-.pex-btn-fav:hover { color: var(--accent-secondary); border-color: hsla(calc(var(--h) + 35), var(--s), 70%, 0.3); }
-.pex-btn-fav.active {
+
+.pex-btn-fav:hover {
   color: var(--accent-secondary);
-  background: hsla(calc(var(--h) + 35), var(--s), 70%, 0.1);
-  border-color: hsla(calc(var(--h) + 35), var(--s), 70%, 0.3);
+  border-color: var(--accent-secondary);
+  background: var(--accent-soft);
 }
 
-/* ── Volume ── */
+.pex-btn-fav.active {
+  color: var(--accent-secondary);
+  background: var(--accent-soft);
+  border-color: var(--accent-muted);
+}
+
+/* ── Volume row ── */
 .pex-volume {
   display: flex;
   align-items: center;
@@ -285,23 +355,27 @@
   border: none;
   color: var(--text-muted);
   flex-shrink: 0;
+  box-shadow: none;
 }
 
-.pex-btn-mute:hover  { color: var(--text-primary); }
+.pex-btn-mute:hover  { color: var(--text-primary); background: transparent; border: none; box-shadow: none; }
 .pex-btn-mute:active { transform: scale(0.9); }
 
 .pex-volume-slider {
   flex: 1;
   height: 4px;
   border-radius: var(--radius-full);
-  background: var(--bg-tertiary);
+  background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   cursor: pointer;
   position: relative;
+  padding: 8px 0;
+  box-sizing: content-box;
+  margin: -8px 0;
 }
 
 .pex-volume-fill {
-  height: 100%;
+  height: 4px;
   border-radius: var(--radius-full);
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   position: relative;
@@ -317,16 +391,21 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--text-primary);
   box-shadow: var(--shadow-sm);
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
-.pex-volume-slider:hover .pex-volume-thumb { opacity: 1; }
+.pex-volume-slider:hover .pex-volume-thumb {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
 
-/* ── RIGHT: visualizer ── */
+/* ═══════════════════════════════════════════════════════════════
+   RIGHT — Visualizer column
+   ═══════════════════════════════════════════════════════════════ */
 .pex-viz-col {
   display: flex;
   flex-direction: column;
@@ -361,78 +440,116 @@
   letter-spacing: 0.08em;
 }
 
-/* ── Collapse button ── */
-.pex-collapse-btn {
-  position: absolute;
-  top: 14px;
-  left: 18px;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--border-subtle);
-  cursor: pointer;
-  background: var(--bg-tertiary);
-  color: var(--text-muted);
-  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE — explicit
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] .player-expanded-overlay {
+  background: var(--bg-secondary);
+  border-top-color: var(--border-subtle);
 }
 
-.pex-collapse-btn svg { transform: rotate(180deg); }
-
-.pex-collapse-btn:hover {
-  color: var(--text-primary);
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
-  transform: translateY(-1px);
+[data-theme="dark"] .pex-artwork {
+  border-color: var(--border-subtle);
+  box-shadow: 0 16px 52px rgba(0, 0, 0, 0.7);
 }
 
-.pex-collapse-btn:active { transform: translateY(0) scale(0.95); }
-
-/* ── Ambient canvas ── */
-.pex-ambient-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-  filter: blur(60px) saturate(1.4) brightness(0.5);
+[data-theme="dark"] .player-expanded-overlay.is-expanded .pex-ambient-canvas {
+  opacity: 0.4;
+  filter: blur(70px) saturate(1.8) brightness(0.3);
 }
 
-.player-expanded-overlay.is-expanded .pex-ambient-canvas { opacity: 0.3; }
+[data-theme="dark"] .pex-volume-thumb {
+  background: #fff;
+}
 
-[data-theme="dark"] .player-expanded-overlay.is-expanded .pex-ambient-canvas { opacity: 0.2; }
-
-/* ── Light Mode ── */
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE
+   ═══════════════════════════════════════════════════════════════ */
 :root:not([data-theme="dark"]) .player-expanded-overlay {
   background: var(--bg-elevated);
   border-top-color: var(--border-medium);
+  box-shadow: 0 -1px 0 var(--border-subtle);
 }
 
+:root:not([data-theme="dark"]) .player-expanded-overlay::before {
+  opacity: 0.45;
+}
+
+/* Artwork */
 :root:not([data-theme="dark"]) .pex-artwork {
   border-color: var(--border-medium);
   box-shadow: var(--shadow-lg);
+  background: var(--bg-secondary);
 }
 
+/* Text */
+:root:not([data-theme="dark"]) .pex-station-name   { color: var(--text-primary); }
+:root:not([data-theme="dark"]) .pex-station-meta   { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .pex-bitrate {
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
+  color: var(--text-tertiary);
+}
+
+/* Tags */
+:root:not([data-theme="dark"]) .pex-tag {
+  background: var(--accent-soft);
+  border-color: var(--accent-muted);
+  color: var(--accent-primary);
+}
+
+/* Live badge */
+:root:not([data-theme="dark"]) .pex-live-badge {
+  background: hsla(160, 70%, 40%, 0.08);
+  border-color: hsla(160, 70%, 40%, 0.2);
+  color: var(--status-live);
+}
+
+/* Buttons */
 :root:not([data-theme="dark"]) .pex-btn {
   background: var(--bg-secondary);
   border-color: var(--border-medium);
+  color: var(--text-secondary);
 }
 
 :root:not([data-theme="dark"]) .pex-btn:hover {
   background: var(--bg-tertiary);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
+:root:not([data-theme="dark"]) .pex-btn-play {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+:root:not([data-theme="dark"]) .pex-btn-play:hover {
+  background: var(--accent-hover);
+  color: #fff;
+  border-color: transparent;
+}
+
+:root:not([data-theme="dark"]) .pex-btn-fav.active {
+  color: var(--accent-secondary);
+  background: var(--accent-soft);
+  border-color: var(--accent-muted);
+}
+
+/* Collapse button */
 :root:not([data-theme="dark"]) .pex-collapse-btn {
   background: var(--bg-secondary);
   border-color: var(--border-medium);
+  color: var(--text-tertiary);
 }
 
+:root:not([data-theme="dark"]) .pex-collapse-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* Volume slider */
 :root:not([data-theme="dark"]) .pex-volume-slider {
   background: var(--bg-secondary);
   border-color: var(--border-medium);
@@ -442,6 +559,28 @@
   background: var(--text-primary);
 }
 
+/* Mute button */
+:root:not([data-theme="dark"]) .pex-btn-mute {
+  color: var(--text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .pex-btn-mute:hover {
+  color: var(--text-primary);
+}
+
+/* Visualizer wrap */
+:root:not([data-theme="dark"]) .pex-visualizer-wrap {
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
+}
+
+/* Sleep label */
+:root:not([data-theme="dark"]) .pex-sleep-label {
+  color: var(--text-tertiary);
+}
+
+/* Ambient — very subtle in light */
 :root:not([data-theme="dark"]) .player-expanded-overlay.is-expanded .pex-ambient-canvas {
-  opacity: 0.15;
+  opacity: 0.12;
+  filter: blur(70px) saturate(1.2) brightness(0.6);
 }
