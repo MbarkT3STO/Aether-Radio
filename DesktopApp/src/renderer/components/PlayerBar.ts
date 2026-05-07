@@ -998,7 +998,7 @@ export class PlayerBar extends BaseComponent {
       <div class="rcm-backdrop"></div>
       <div class="rcm-dialog" id="rcm-dialog">
 
-        <button class="rcm-close" id="rcm-close" aria-label="Close">
+        <button class="rcm-close" id="rcm-close" aria-label="Close" style="display:none">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
@@ -1067,6 +1067,10 @@ export class PlayerBar extends BaseComponent {
     setTimeout(() => {
       listening.style.display = 'none'
       resultEl.style.display  = 'flex'
+
+      // Show close button now that a result is available
+      const closeBtn = document.getElementById('rcm-close')
+      if (closeBtn) closeBtn.style.display = 'flex'
 
       if (!result) {
         resultEl.innerHTML = `
