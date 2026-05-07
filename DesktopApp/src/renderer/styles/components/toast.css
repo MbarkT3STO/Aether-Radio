@@ -103,7 +103,7 @@
    DARK MODE
    ═══════════════════════════════════════════════════════════════ */
 [data-theme="dark"] .toast {
-  background: rgba(44, 44, 46, 0.90);
+  background: rgba(44, 44, 46, 0.92);
   border-color: var(--border-medium);
   box-shadow: var(--shadow-xl);
 }

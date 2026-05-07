@@ -1,57 +1,92 @@
 /* ═══════════════════════════════════════════════════════════════════
    AETHER RADIO — APPLE DESIGN SYSTEM
-   Clean, refined, system-native aesthetic
+   Palette: Apple System Indigo — the ideal accent for a premium
+   audio app. Pure neutral surfaces, one vivid system accent.
+   Inspired by Apple Music, Podcasts, and SF Symbols guidelines.
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Accent Hue (Apple Blue) ── */
-  --h: 211;
-  --s: 100%;
+  /* ── Accent Hue (Apple System Indigo) ── */
+  --h: 245;
+  --s: 78%;
 
-  /* ── Light Mode (Apple-style warm white) ── */
-  --bg-primary:   #f2f2f7;
-  --bg-secondary: #ffffff;
-  --bg-tertiary:  #f2f2f7;
-  --bg-elevated:  #ffffff;
+  /* ── Semantic Palette (named, not themed) ── */
+  --palette-indigo:    #5856D6;   /* Apple System Indigo — light mode     */
+  --palette-indigo-dk: #5E5CE6;   /* Apple System Indigo — dark mode      */
+  --palette-violet:    #7B61FF;   /* Lighter violet for hover/glow        */
+  --palette-blue:      #007AFF;   /* Apple System Blue                    */
+  --palette-teal:      #32ADE6;   /* Apple System Teal                    */
+  --palette-pink:      #FF2D55;   /* Apple System Pink — favorites        */
+  --palette-orange:    #FF9500;   /* Apple System Orange — warnings       */
+  --palette-red:       #FF3B30;   /* Apple System Red — errors            */
+  --palette-green:     #34C759;   /* Apple System Green — live/success    */
+  --palette-mint:      #00C7BE;   /* Apple System Mint                    */
+  --palette-cyan:      #32ADE6;   /* Apple System Cyan                    */
+  --palette-yellow:    #FFCC00;   /* Apple System Yellow                  */
 
-  --text-primary:   #1c1c1e;
-  --text-secondary: #3a3a3c;
-  --text-tertiary:  #636366;
-  --text-muted:     #8e8e93;
+  /* ══════════════════════════════════════════════════════════════
+     LIGHT MODE — Apple Human Interface Guidelines
+     Pure white surfaces, warm gray backgrounds, system neutrals
+     ══════════════════════════════════════════════════════════════ */
 
-  --border-subtle:  rgba(60, 60, 67, 0.08);
-  --border-medium:  rgba(60, 60, 67, 0.14);
-  --border-strong:  rgba(60, 60, 67, 0.22);
+  /* Backgrounds — exact Apple HIG values */
+  --bg-primary:   #F2F2F7;   /* systemGroupedBackground    */
+  --bg-secondary: #FFFFFF;   /* secondarySystemGroupedBackground */
+  --bg-tertiary:  #F2F2F7;   /* tertiarySystemGroupedBackground  */
+  --bg-elevated:  #FFFFFF;   /* systemBackground           */
 
-  --surface-overlay: rgba(255, 255, 255, 0.82);
-  --surface-glass:   rgba(255, 255, 255, 0.72);
+  /* Text — Apple HIG label hierarchy */
+  --text-primary:   #000000;            /* label                  */
+  --text-secondary: rgba(60,60,67,0.78); /* secondaryLabel         */
+  --text-tertiary:  rgba(60,60,67,0.50); /* tertiaryLabel          */
+  --text-muted:     rgba(60,60,67,0.30); /* quaternaryLabel        */
 
-  /* ── Accent Colors (Apple Blue — Light Mode) ── */
-  --accent-primary:   #007aff;
-  --accent-secondary: #5856d6;
-  --accent-hover:     #0062cc;
-  --accent-soft:      rgba(0, 122, 255, 0.10);
-  --accent-glow:      rgba(0, 122, 255, 0.18);
-  --accent-muted:     rgba(0, 122, 255, 0.40);
+  /* Borders — Apple separator values */
+  --border-subtle:  rgba(60, 60, 67, 0.12);  /* separator          */
+  --border-medium:  rgba(60, 60, 67, 0.20);  /* opaqueSeparator    */
+  --border-strong:  rgba(60, 60, 67, 0.32);  /* strong separator   */
 
-  /* ── Status Colors (Apple Semantic) ── */
-  --status-live:    #34c759;
-  --status-warning: #ff9500;
-  --status-error:   #ff3b30;
-  --status-info:    #007aff;
+  /* Surfaces */
+  --surface-overlay: rgba(242, 242, 247, 0.96);
+  --surface-glass:   rgba(255, 255, 255, 0.92);
 
-  /* ── Shadows (Light Mode — very soft) ── */
-  --shadow-xs:     0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-sm:     0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-md:     0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
-  --shadow-lg:     0 8px 30px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-xl:     0 16px 56px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.07);
-  --shadow-glow:   0 0 24px var(--accent-glow);
-  --shadow-ambient: 0 0 80px rgba(0, 0, 0, 0.08);
+  /* Accent — Apple System Indigo, light mode */
+  --accent-primary:   #5856D6;
+  --accent-secondary: #007AFF;
+  --accent-tertiary:  #32ADE6;
+  --accent-hover:     #6E6CE8;
+  --accent-soft:      rgba(88, 86, 214, 0.10);
+  --accent-glow:      rgba(88, 86, 214, 0.20);
+  --accent-muted:     rgba(88, 86, 214, 0.40);
 
-  /* ── Typography (SF Pro stack) ── */
+  /* Gradients */
+  --gradient-accent:   linear-gradient(135deg, #5856D6, #007AFF);
+  --gradient-vivid:    linear-gradient(135deg, #5856D6, #7B61FF, #32ADE6);
+  --gradient-warm:     linear-gradient(135deg, #FF2D55, #FF9500);
+  --gradient-cool:     linear-gradient(135deg, #5856D6, #32ADE6, #00C7BE);
+  --gradient-spectrum: linear-gradient(135deg, #5856D6, #007AFF, #32ADE6);
+  --gradient-royal:    linear-gradient(135deg, #5856D6, #7B61FF);
+  --gradient-regal:    linear-gradient(135deg, #5856D6, #007AFF);
+  --gradient-logo:     linear-gradient(135deg, #5856D6, #32ADE6);
+
+  /* Status — exact Apple HIG semantic colors */
+  --status-live:    #34C759;   /* systemGreen  */
+  --status-warning: #FF9500;   /* systemOrange */
+  --status-error:   #FF3B30;   /* systemRed    */
+  --status-info:    #5856D6;   /* systemIndigo */
+
+  /* Shadows — very soft, Apple-style */
+  --shadow-xs:      0 1px 3px  rgba(0,0,0,0.04), 0 1px 2px  rgba(0,0,0,0.03);
+  --shadow-sm:      0 2px 8px  rgba(0,0,0,0.06), 0 1px 3px  rgba(0,0,0,0.04);
+  --shadow-md:      0 4px 16px rgba(0,0,0,0.08), 0 2px 6px  rgba(0,0,0,0.05);
+  --shadow-lg:      0 8px 30px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-xl:      0 16px 56px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.07);
+  --shadow-glow:    0 0 24px var(--accent-glow);
+  --shadow-ambient: 0 0 80px rgba(0,0,0,0.08);
+
+  /* Typography — SF Pro system stack */
   --font-display: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-  --font-body:    -apple-system, 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  --font-body:    -apple-system, 'SF Pro Text',    BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
   --font-mono:    'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', monospace;
 
   --text-2xs:  0.625rem;
@@ -64,7 +99,7 @@
   --text-3xl:  1.875rem;
   --text-4xl:  2.25rem;
 
-  /* ── Spacing Scale ── */
+  /* Spacing */
   --space-1:  0.25rem;
   --space-2:  0.5rem;
   --space-3:  0.75rem;
@@ -85,7 +120,7 @@
   --space-xl:  var(--space-12);
   --space-2xl: var(--space-16);
 
-  /* ── Border Radius (Apple-style generous curves) ── */
+  /* Border Radius */
   --radius-xs:   0.25rem;
   --radius-sm:   0.5rem;
   --radius-md:   0.75rem;
@@ -94,7 +129,7 @@
   --radius-2xl:  1.75rem;
   --radius-full: 9999px;
 
-  /* ── Transitions (Apple spring physics) ── */
+  /* Transitions */
   --transition-fast:   120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-base:   200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-slow:   320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -107,13 +142,13 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-  /* ── Layout ── */
+  /* Layout */
   --sidebar-width:           240px;
   --sidebar-width-collapsed: 64px;
   --player-bar-height:       88px;
   --header-height:           64px;
 
-  /* ── Z-Index Scale ── */
+  /* Z-Index */
   --z-base:     0;
   --z-dropdown: 100;
   --z-sticky:   200;
@@ -123,53 +158,66 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   DARK MODE (Apple Dark — true system dark)
+   DARK MODE — Apple HIG Dark
+   True black base, elevated gray layers, vivid indigo accent.
+   Mirrors exactly how Apple Music and Podcasts look on macOS.
    ═══════════════════════════════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  /* ── Backgrounds (Apple dark layering) ── */
-  --bg-primary:   #000000;
-  --bg-secondary: #1c1c1e;
-  --bg-tertiary:  #2c2c2e;
-  --bg-elevated:  #3a3a3c;
+  /* Backgrounds — Apple HIG dark values */
+  --bg-primary:   #000000;   /* systemBackground dark        */
+  --bg-secondary: #1C1C1E;   /* secondarySystemBackground    */
+  --bg-tertiary:  #2C2C2E;   /* tertiarySystemBackground     */
+  --bg-elevated:  #3A3A3C;   /* systemFill dark              */
 
-  /* ── Text (Apple dark text hierarchy) ── */
-  --text-primary:   rgba(255, 255, 255, 0.92);
-  --text-secondary: rgba(255, 255, 255, 0.60);
-  --text-tertiary:  rgba(255, 255, 255, 0.38);
-  --text-muted:     rgba(255, 255, 255, 0.24);
+  /* Text — Apple HIG dark label hierarchy */
+  --text-primary:   rgba(255, 255, 255, 0.92);  /* label dark           */
+  --text-secondary: rgba(235, 235, 245, 0.60);  /* secondaryLabel dark  */
+  --text-tertiary:  rgba(235, 235, 245, 0.38);  /* tertiaryLabel dark   */
+  --text-muted:     rgba(235, 235, 245, 0.22);  /* quaternaryLabel dark */
 
-  /* ── Borders ── */
+  /* Borders */
   --border-subtle:  rgba(255, 255, 255, 0.08);
-  --border-medium:  rgba(255, 255, 255, 0.13);
-  --border-strong:  rgba(255, 255, 255, 0.20);
+  --border-medium:  rgba(255, 255, 255, 0.14);
+  --border-strong:  rgba(255, 255, 255, 0.22);
 
-  /* ── Surfaces ── */
-  --surface-overlay: rgba(28, 28, 30, 0.88);
-  --surface-glass:   rgba(28, 28, 30, 0.72);
+  /* Surfaces */
+  --surface-overlay: rgba(28, 28, 30, 0.96);
+  --surface-glass:   rgba(44, 44, 46, 0.92);
 
-  /* ── Accent (Apple Blue on Dark) ── */
-  --accent-primary:   #0a84ff;
-  --accent-secondary: #5e5ce6;
-  --accent-hover:     #409cff;
-  --accent-soft:      rgba(10, 132, 255, 0.14);
-  --accent-glow:      rgba(10, 132, 255, 0.28);
-  --accent-muted:     rgba(10, 132, 255, 0.50);
+  /* Accent — Apple System Indigo, dark mode (slightly brighter) */
+  --accent-primary:   #5E5CE6;
+  --accent-secondary: #0A84FF;
+  --accent-tertiary:  #32ADE6;
+  --accent-hover:     #7B79F0;
+  --accent-soft:      rgba(94, 92, 230, 0.16);
+  --accent-glow:      rgba(94, 92, 230, 0.32);
+  --accent-muted:     rgba(94, 92, 230, 0.55);
 
-  /* ── Status Colors (Apple dark semantic) ── */
-  --status-live:    #30d158;
-  --status-warning: #ff9f0a;
-  --status-error:   #ff453a;
-  --status-info:    #0a84ff;
+  /* Gradients — dark mode, more vivid */
+  --gradient-accent:   linear-gradient(135deg, #5E5CE6, #0A84FF);
+  --gradient-vivid:    linear-gradient(135deg, #5E5CE6, #7B79F0, #32ADE6);
+  --gradient-warm:     linear-gradient(135deg, #FF375F, #FF9F0A);
+  --gradient-cool:     linear-gradient(135deg, #5E5CE6, #32ADE6, #00C7BE);
+  --gradient-spectrum: linear-gradient(135deg, #5E5CE6, #0A84FF, #32ADE6);
+  --gradient-royal:    linear-gradient(135deg, #5E5CE6, #7B79F0);
+  --gradient-regal:    linear-gradient(135deg, #5E5CE6, #0A84FF);
+  --gradient-logo:     linear-gradient(135deg, #5E5CE6, #32ADE6);
 
-  /* ── Shadows (Dark Mode — deeper, more diffuse) ── */
-  --shadow-xs:     0 1px 4px rgba(0, 0, 0, 0.30);
-  --shadow-sm:     0 2px 8px rgba(0, 0, 0, 0.40);
-  --shadow-md:     0 4px 16px rgba(0, 0, 0, 0.50);
-  --shadow-lg:     0 8px 32px rgba(0, 0, 0, 0.60);
-  --shadow-xl:     0 16px 56px rgba(0, 0, 0, 0.70);
-  --shadow-glow:   0 0 32px var(--accent-glow);
-  --shadow-ambient: 0 0 120px rgba(0, 0, 0, 0.80);
+  /* Status — Apple HIG dark semantic (slightly brighter) */
+  --status-live:    #30D158;   /* systemGreen dark  */
+  --status-warning: #FF9F0A;   /* systemOrange dark */
+  --status-error:   #FF453A;   /* systemRed dark    */
+  --status-info:    #5E5CE6;   /* systemIndigo dark */
+
+  /* Shadows — deeper on true black */
+  --shadow-xs:      0 1px 4px  rgba(0,0,0,0.30);
+  --shadow-sm:      0 2px 8px  rgba(0,0,0,0.40);
+  --shadow-md:      0 4px 16px rgba(0,0,0,0.50);
+  --shadow-lg:      0 8px 32px rgba(0,0,0,0.60);
+  --shadow-xl:      0 16px 56px rgba(0,0,0,0.70);
+  --shadow-glow:    0 0 32px var(--accent-glow);
+  --shadow-ambient: 0 0 120px rgba(0,0,0,0.80);
 }
 
 /* ═══════════════════════════════════════════════════════════════════

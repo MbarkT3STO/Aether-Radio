@@ -50,7 +50,7 @@
   right: 0;
   z-index: 200;
   width: 200px;
-  background: var(--surface-glass);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-2xl);
   padding: 14px;
@@ -63,8 +63,8 @@
 
 @supports (backdrop-filter: blur(20px)) {
   .sleep-timer-popover {
-    backdrop-filter: blur(20px) saturate(1.8);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
   }
 }
 
@@ -225,7 +225,7 @@
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .sleep-timer-popover {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.96);
   border-color: var(--border-subtle);
 }
 

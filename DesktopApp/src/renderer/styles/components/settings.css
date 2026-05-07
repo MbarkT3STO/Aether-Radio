@@ -246,11 +246,13 @@
 }
 
 .stg-action-btn:hover {
-  background: rgba(0, 122, 255, 0.16);
+  background: var(--accent-soft);
+  filter: brightness(1.1);
 }
 
 [data-theme="dark"] .stg-action-btn:hover {
-  background: rgba(10, 132, 255, 0.20);
+  background: var(--accent-soft);
+  filter: brightness(1.15);
 }
 
 .stg-action-btn:active { transform: scale(0.96); }

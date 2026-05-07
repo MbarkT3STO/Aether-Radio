@@ -293,6 +293,47 @@
 
 .home-quick-link:hover .home-quick-link-label { color: var(--text-primary); }
 
+/* ── Stat icon accent colors (Apple semantic palette) ── */
+.home-stat-card:nth-child(1) .home-stat-icon {
+  background: rgba(88, 86, 214, 0.10);
+  color: var(--palette-indigo);
+}
+.home-stat-card:nth-child(2) .home-stat-icon {
+  background: rgba(0, 122, 255, 0.10);
+  color: var(--palette-blue);
+}
+.home-stat-card:nth-child(3) .home-stat-icon {
+  background: rgba(255, 45, 85, 0.10);
+  color: var(--palette-pink);
+}
+.home-stat-card:nth-child(4) .home-stat-icon {
+  background: rgba(50, 173, 230, 0.10);
+  color: var(--palette-teal);
+}
+
+/* ── Quick link icon accent colors (Apple semantic palette) ── */
+.home-quick-link:nth-child(1) .home-quick-link-icon {
+  background: rgba(88, 86, 214, 0.10);
+  color: var(--palette-indigo);
+}
+.home-quick-link:nth-child(2) .home-quick-link-icon {
+  background: rgba(255, 45, 85, 0.10);
+  color: var(--palette-pink);
+}
+.home-quick-link:nth-child(3) .home-quick-link-icon {
+  background: rgba(255, 149, 0, 0.10);
+  color: var(--palette-orange);
+}
+.home-quick-link:nth-child(4) .home-quick-link-icon {
+  background: rgba(0, 122, 255, 0.10);
+  color: var(--palette-blue);
+}
+
+/* ── Now playing card — indigo left border ── */
+.home-now-playing-card {
+  border-left-color: var(--accent-primary);
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .home-stats       { grid-template-columns: repeat(2, 1fr); }

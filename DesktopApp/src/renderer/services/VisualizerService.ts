@@ -89,17 +89,17 @@ export class VisualizerService {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // CSS accent hue/sat
+    // CSS accent hue/sat — Apple System Indigo (245°, 78%)
     const style   = getComputedStyle(document.documentElement)
-    const h       = parseFloat(style.getPropertyValue('--h').trim()) || 258
-    const s       = style.getPropertyValue('--s').trim() || '85%'
+    const h       = parseFloat(style.getPropertyValue('--h').trim()) || 245
+    const s       = style.getPropertyValue('--s').trim() || '78%'
     const isDark  = document.documentElement.getAttribute('data-theme') === 'dark'
 
-    // Three blobs with different hue offsets, positions, and phase speeds
+    // Three blobs: indigo center, blue-shifted right, violet-shifted bottom
     const blobs = [
-      { hueOff: 0,   x: centered ? 0.40 : 0.25, y: 0.40, phase: 0,    speed: 0.0007, freqBin: 2  },
-      { hueOff: 40,  x: centered ? 0.60 : 0.72, y: 0.35, phase: 2.1,  speed: 0.0011, freqBin: 8  },
-      { hueOff: -20, x: 0.50,                   y: 0.70, phase: 4.3,  speed: 0.0009, freqBin: 14 },
+      { hueOff: 0,   x: centered ? 0.40 : 0.25, y: 0.40, phase: 0,   speed: 0.0007, freqBin: 2  },
+      { hueOff: 25,  x: centered ? 0.60 : 0.72, y: 0.35, phase: 2.1, speed: 0.0011, freqBin: 8  },
+      { hueOff: -20, x: 0.50,                   y: 0.70, phase: 4.3, speed: 0.0009, freqBin: 14 },
     ]
 
     let t = 0
@@ -174,12 +174,12 @@ export class VisualizerService {
 
     // Read accent color from CSS variables so it always matches the current theme
     const style = getComputedStyle(document.documentElement)
-    const h = style.getPropertyValue('--h').trim()
-    const s = style.getPropertyValue('--s').trim()
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-    const l = isDark ? '65%' : '55%'
-    const accentColor = `hsl(${h}, ${s}, ${l})`
-    const accentColorFaded = `hsla(${h}, ${s}, ${l}, 0.4)`
+
+    // Apple System Indigo spectrum: deep indigo → violet → blue
+    const spectrumColors = isDark
+      ? ['#5E5CE6', '#7B79F0', '#0A84FF', '#32ADE6']
+      : ['#5856D6', '#7B61FF', '#007AFF', '#32ADE6']
 
     const width    = canvas.width
     const height   = canvas.height
@@ -187,11 +187,16 @@ export class VisualizerService {
     const barWidth = width / barCount
     const gap      = 2
 
-    // Pre-compute a single full-height gradient — reused every frame
-    const gradient = ctx.createLinearGradient(0, 0, 0, height)
-    gradient.addColorStop(0, accentColor)
-    gradient.addColorStop(1, accentColorFaded)
+    // Spectrum gradient: bottom faded → vivid indigo → violet → blue at top
+    const gradient = ctx.createLinearGradient(0, height, 0, 0)
+    gradient.addColorStop(0,    isDark ? 'rgba(94, 92, 230, 0.28)' : 'rgba(88, 86, 214, 0.25)')
+    gradient.addColorStop(0.35, spectrumColors[0]!)
+    gradient.addColorStop(0.65, spectrumColors[1]!)
+    gradient.addColorStop(0.85, spectrumColors[2]!)
+    gradient.addColorStop(1,    spectrumColors[3]!)
     ctx.fillStyle = gradient
+
+    void style
 
     const draw = (): void => {
       this.animationId = requestAnimationFrame(draw)

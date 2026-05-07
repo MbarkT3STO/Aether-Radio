@@ -22,13 +22,13 @@
 /* macOS vibrancy-style sidebar */
 @supports (backdrop-filter: blur(20px)) {
   .app-sidebar {
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(242, 242, 247, 0.82);
     backdrop-filter: blur(20px) saturate(1.8);
     -webkit-backdrop-filter: blur(20px) saturate(1.8);
   }
 
   [data-theme="dark"] .app-sidebar {
-    background: rgba(28, 28, 30, 0.82);
+    background: rgba(28, 28, 30, 0.85);
     backdrop-filter: blur(20px) saturate(1.6);
     -webkit-backdrop-filter: blur(20px) saturate(1.6);
   }

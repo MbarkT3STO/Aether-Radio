@@ -24,7 +24,7 @@
 .am-dialog {
   position: relative;
   z-index: 1;
-  background: var(--surface-glass);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-2xl);
   padding: 36px 32px 28px;
@@ -42,8 +42,8 @@
 
 @supports (backdrop-filter: blur(20px)) {
   .am-dialog {
-    backdrop-filter: blur(20px) saturate(1.8);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
   }
 }
 
@@ -222,7 +222,7 @@
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .am-dialog {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.96);
   border-color: var(--border-subtle);
 }
 

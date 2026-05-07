@@ -78,10 +78,13 @@
 .sidebar-logo-tagline {
   font-size: 0.5625rem;
   font-weight: 600;
-  color: var(--accent-primary);
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  opacity: 0.75;
+  opacity: 0.9;
   white-space: nowrap;
 }
 
@@ -373,7 +376,6 @@
   pointer-events: none;
 }
 
-/* ── Light Mode ── */
 :root:not([data-theme="dark"]) .sidebar {
   background: rgba(255, 255, 255, 0.78);
   border-right: 1px solid var(--border-subtle);
@@ -404,8 +406,11 @@
 }
 
 :root:not([data-theme="dark"]) .sidebar-logo-tagline {
-  color: var(--accent-primary);
-  opacity: 0.85;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.95;
 }
 
 :root:not([data-theme="dark"]) .sidebar-collapse-btn {
