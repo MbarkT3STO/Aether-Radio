@@ -55,15 +55,6 @@
   50%       { box-shadow: 0 0 10px var(--status-live); }
 }
 
-@keyframes toastIn {
-  from { transform: translateX(110%) scale(0.9); opacity: 0; }
-  to   { transform: translateX(0) scale(1); opacity: 1; }
-}
-
-@keyframes toastOut {
-  to { transform: translateX(110%) scale(0.9); opacity: 0; }
-}
-
 @keyframes barDance {
   0%, 100% { transform: scaleY(0.3); }
   50%       { transform: scaleY(1); }
