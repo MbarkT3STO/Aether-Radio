@@ -1130,25 +1130,32 @@ export class PlayerBar extends BaseComponent {
           </div>
           ${(result.spotifyUrl || result.appleMusicUrl || result.youtubeMusicUrl || result.youtubeUrl || result.deezerUrl || result.shazamUrl) ? `
             <div class="rcm-result-divider"></div>
-            <div class="rcm-found-links">
-              ${result.spotifyUrl ? `<button class="rcm-platform-btn rcm-spotify" id="rcm-spotify">
-                ${this.spotifyIcon()} Spotify
-              </button>` : ''}
-              ${result.appleMusicUrl ? `<button class="rcm-platform-btn rcm-apple" id="rcm-apple">
-                ${this.appleMusicIcon()} Apple Music
-              </button>` : ''}
-              ${result.youtubeMusicUrl ? `<button class="rcm-platform-btn rcm-ytmusic" id="rcm-ytmusic">
-                ${this.youtubeMusicIcon()} YT Music
-              </button>` : ''}
-              ${result.youtubeUrl ? `<button class="rcm-platform-btn rcm-youtube" id="rcm-youtube">
-                ${this.youtubeIcon()} YouTube
-              </button>` : ''}
-              ${result.deezerUrl ? `<button class="rcm-platform-btn rcm-deezer" id="rcm-deezer">
-                ${this.deezerIcon()} Deezer
-              </button>` : ''}
-              ${result.shazamUrl ? `<button class="rcm-platform-btn rcm-shazam" id="rcm-shazam">
-                ${this.shazamIcon()} Shazam
-              </button>` : ''}
+            <div class="rcm-links-section">
+              <div class="rcm-links-label">Listen on</div>
+              <div class="rcm-found-links">
+                ${result.spotifyUrl ? `<button class="rcm-platform-btn rcm-spotify" id="rcm-spotify">
+                  ${this.spotifyIcon()}<span>Spotify</span>
+                </button>` : ''}
+                ${result.appleMusicUrl ? `<button class="rcm-platform-btn rcm-apple" id="rcm-apple">
+                  ${this.appleMusicIcon()}<span>Apple Music</span>
+                </button>` : ''}
+                ${result.youtubeMusicUrl ? `<button class="rcm-platform-btn rcm-ytmusic" id="rcm-ytmusic">
+                  ${this.youtubeMusicIcon()}<span>YouTube Music</span>
+                </button>` : ''}
+                ${result.deezerUrl ? `<button class="rcm-platform-btn rcm-deezer" id="rcm-deezer">
+                  ${this.deezerIcon()}<span>Deezer</span>
+                </button>` : ''}
+              </div>
+              ${(result.youtubeUrl || result.shazamUrl) ? `
+                <div class="rcm-links-secondary">
+                  ${result.youtubeUrl ? `<button class="rcm-link-btn" id="rcm-youtube">
+                    ${this.youtubeIcon()}<span>Watch on YouTube</span>
+                  </button>` : ''}
+                  ${result.shazamUrl ? `<button class="rcm-link-btn" id="rcm-shazam">
+                    ${this.shazamIcon()}<span>View on Shazam</span>
+                  </button>` : ''}
+                </div>
+              ` : ''}
             </div>
           ` : ''}
         `
