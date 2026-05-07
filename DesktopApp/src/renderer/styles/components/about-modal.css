@@ -15,16 +15,16 @@
 .am-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.40);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
 
 /* ── Dialog ── */
 .am-dialog {
   position: relative;
   z-index: 1;
-  background: var(--material-modal);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-3xl);
   padding: 36px 32px 28px;
@@ -38,13 +38,6 @@
   text-align: center;
   box-shadow: var(--shadow-2xl);
   animation: amDialogIn 0.38s var(--ease-spring) forwards;
-}
-
-@supports (backdrop-filter: blur(40px)) {
-  .am-dialog {
-    backdrop-filter: blur(40px) saturate(1.8);
-    -webkit-backdrop-filter: blur(40px) saturate(1.8);
-  }
 }
 
 /* ── Close button ── */

@@ -19,7 +19,7 @@
 .rcm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.44);
+  background: rgba(0,0,0,0.45);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
@@ -28,14 +28,14 @@
 .rcm-dialog {
   position: relative;
   z-index: 1;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border-radius: var(--radius-3xl);
   width: 420px;
   max-width: 90vw;
   overflow: hidden;
   box-shadow: var(--shadow-2xl);
   animation: rcmDialogIn 0.40s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-medium);
 }
 
 /* ── Close button ── */
@@ -47,22 +47,22 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.30);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: none;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
   cursor: pointer;
-  color: rgba(255,255,255,0.90);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   transition:
+    color var(--transition-fast),
     background var(--transition-fast),
     transform var(--transition-spring);
 }
 
 .rcm-close:hover {
-  background: rgba(0,0,0,0.52);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
   transform: scale(1.10);
 }
 
@@ -72,7 +72,7 @@
 }
 
 .rcm-close:focus-visible {
-  outline: 2px solid rgba(255,255,255,0.8);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 
@@ -127,7 +127,7 @@
   position: relative;
   overflow: hidden;
   transition: opacity 0.3s ease, transform 0.3s ease;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
 }
 
 .rcm-listening.rcm-fade-out {
@@ -306,7 +306,7 @@
   left: 0;
   right: 0;
   height: 64px;
-  background: linear-gradient(to bottom, transparent, var(--bg-primary));
+  background: linear-gradient(to bottom, transparent, var(--bg-secondary));
   z-index: 1;
 }
 
@@ -333,7 +333,7 @@
 /* ── Body Section ── */
 .rcm-body {
   padding: 24px 24px 28px;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
 }
 
 /* ── Song Identity ── */
