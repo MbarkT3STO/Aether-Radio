@@ -18,7 +18,7 @@
   display: flex;
   align-items: stretch;
   min-width: 300px;
-  max-width: 380px;
+  max-width: 400px;
   border-radius: var(--radius-2xl);
   overflow: hidden;
   pointer-events: all;

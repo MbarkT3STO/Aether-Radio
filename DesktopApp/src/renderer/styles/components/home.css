@@ -5,6 +5,28 @@
 /* ── Greeting ── */
 .home-greeting {
   margin-bottom: var(--space-8);
+  position: relative;
+}
+
+.home-greeting::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  right: -32px;
+  width: 320px;
+  height: 200px;
+  background: var(--gradient-hero);
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+.home-greeting h1,
+.home-greeting .view-subtitle {
+  position: relative;
+  z-index: 1;
 }
 
 .home-greeting h1 {
@@ -66,7 +88,21 @@
     transform var(--transition-spring);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
+
+.home-now-playing-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-glass);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+.home-now-playing-card:hover::after { opacity: 1; }
 
 .home-now-playing-card:hover {
   box-shadow: var(--shadow-md);
@@ -201,8 +237,8 @@
 
 .home-stat-card:hover {
   border-color: var(--border-medium);
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px) scale(1.008);
+  box-shadow: var(--shadow-md);
 }
 
 .home-stat-card:hover::after { opacity: 1; }
@@ -308,8 +344,8 @@
 
 .home-quick-link:hover {
   border-color: var(--border-medium);
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px) scale(1.008);
+  box-shadow: var(--shadow-md);
 }
 
 .home-quick-link:hover::after { opacity: 1; }
@@ -353,7 +389,7 @@
 
 /* ── Stat icon accent colors ── */
 .home-stat-card:nth-child(1) .home-stat-icon {
-  background: rgba(94,92,230,0.10);
+  background: rgba(88,86,214,0.10);
   color: var(--palette-indigo);
 }
 .home-stat-card:nth-child(2) .home-stat-icon {
@@ -371,20 +407,20 @@
 
 /* ── Quick link icon accent colors ── */
 .home-quick-link:nth-child(1) .home-quick-link-icon {
-  background: rgba(94,92,230,0.10);
+  background: rgba(88,86,214,0.10);
   color: var(--palette-indigo);
 }
 .home-quick-link:nth-child(2) .home-quick-link-icon {
-  background: rgba(255,45,85,0.10);
-  color: var(--palette-pink);
+  background: rgba(0,122,255,0.10);
+  color: var(--palette-blue);
 }
 .home-quick-link:nth-child(3) .home-quick-link-icon {
   background: rgba(255,149,0,0.10);
   color: var(--palette-orange);
 }
 .home-quick-link:nth-child(4) .home-quick-link-icon {
-  background: rgba(0,122,255,0.10);
-  color: var(--palette-blue);
+  background: rgba(255,45,85,0.10);
+  color: var(--palette-pink);
 }
 
 /* ── Responsive ── */

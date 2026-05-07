@@ -346,7 +346,7 @@
   background: var(--accent-primary);
   color: #fff;
   border: none;
-  box-shadow: 0 6px 28px var(--accent-glow), 0 3px 10px rgba(0,0,0,0.14);
+  box-shadow: 0 6px 24px var(--accent-glow), 0 3px 10px rgba(0,0,0,0.12);
 }
 
 .pex-btn-play:hover {
@@ -354,11 +354,11 @@
   color: #fff;
   border-color: transparent;
   transform: scale(1.06);
-  box-shadow: 0 8px 36px var(--accent-glow-lg), 0 4px 14px rgba(0,0,0,0.16);
+  box-shadow: 0 8px 32px var(--accent-glow-lg), 0 4px 14px rgba(0,0,0,0.14);
 }
 
 .pex-btn-play.playing {
-  box-shadow: 0 6px 32px var(--accent-glow), 0 0 0 1px var(--accent-border);
+  box-shadow: 0 6px 28px var(--accent-glow), 0 0 0 1px var(--accent-border);
 }
 
 .pex-btn-play:active {

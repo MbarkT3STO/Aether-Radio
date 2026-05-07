@@ -20,7 +20,7 @@
 
 .volume-slider-fill {
   height: 4px;
-  background: var(--accent-primary);
+  background: var(--gradient-accent);
   border-radius: var(--radius-full);
   position: relative;
   pointer-events: none;

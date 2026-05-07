@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .stg-content-wrap {
-  max-width: 580px;
+  max-width: 600px;
   width: 100%;
 }
 
@@ -15,7 +15,15 @@
   overflow: hidden;
   margin-bottom: var(--space-4);
   width: 100%;
+  box-shadow: var(--shadow-xs);
+  transition:
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.stg-card:hover {
   box-shadow: var(--shadow-sm);
+  border-color: var(--border-medium);
 }
 
 /* ── Card Header ── */
