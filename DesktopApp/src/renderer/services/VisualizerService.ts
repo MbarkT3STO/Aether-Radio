@@ -142,8 +142,8 @@ export class VisualizerService {
 
         const blobHue = (h + blob.hueOff + 360) % 360
         const alpha   = isDark
-          ? (large ? 0.30 + energy * 0.35 : 0.22 + energy * 0.28)
-          : (large ? 0.18 + energy * 0.22 : 0.12 + energy * 0.16)
+          ? (large ? 0.45 + energy * 0.40 : 0.28 + energy * 0.32)
+          : (large ? 0.30 + energy * 0.30 : 0.18 + energy * 0.22)
 
         // Use shadowBlur for the soft glow — no CSS filter needed
         ctx.save()

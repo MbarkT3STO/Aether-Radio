@@ -24,11 +24,12 @@
   z-index: 0;
   opacity: 0;
   transition: opacity 1.2s ease;
-  filter: blur(40px) saturate(1.6) brightness(0.45);
+  /* Removed brightness reduction — JS alpha controls intensity */
+  filter: blur(24px) saturate(2);
   clip-path: inset(0);
 }
 
-.player-bar-ambient.active { opacity: 0.3; }
+.player-bar-ambient.active { opacity: 0.7; }
 
 .player-bar > *:not(.player-bar-ambient) {
   position: relative;
@@ -391,7 +392,7 @@
 }
 
 [data-theme="dark"] .player-bar-ambient.active {
-  opacity: 0.25;
+  opacity: 0.6;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -480,8 +481,8 @@
   color: var(--accent-primary);
 }
 
-/* Ambient — very subtle in light */
+/* Ambient — subtle in light mode */
 :root:not([data-theme="dark"]) .player-bar-ambient.active {
-  opacity: 0.12;
-  filter: blur(40px) saturate(1.2) brightness(0.7);
+  opacity: 0.35;
+  filter: blur(24px) saturate(1.6);
 }
