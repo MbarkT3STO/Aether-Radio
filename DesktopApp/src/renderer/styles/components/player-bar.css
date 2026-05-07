@@ -12,7 +12,9 @@
   position: relative;
   z-index: 100;
   background: var(--material-bar);
-  border-top: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 28px 28px 0 0;
+  margin: 0 8px;
 }
 
 @supports (backdrop-filter: blur(48px)) {
@@ -44,16 +46,8 @@
 .player-bar-ambient.active { opacity: 0.38; }
 [data-theme="dark"] .player-bar-ambient.active { opacity: 0.32; }
 
-/* Top separator */
-.player-bar::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: var(--border-subtle);
-  z-index: 2;
-  pointer-events: none;
-}
+/* Top separator — removed, border is on the element itself */
+.player-bar::before { display: none; }
 
 .player-bar > *:not(.player-bar-ambient) {
   position: relative;
@@ -449,20 +443,20 @@
    DARK MODE
    ═══════════════════════════════════════════════════════════════ */
 [data-theme="dark"] .player-bar {
-  border-top-color: var(--border-subtle);
+  border-color: var(--border-subtle);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.28), var(--shadow-lg);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    LIGHT MODE
    ═══════════════════════════════════════════════════════════════ */
 :root:not([data-theme="dark"]) .player-bar {
-  background: rgba(255,255,255,0.82);
-  border-top-color: var(--border-subtle);
+  background: rgba(255,255,255,0.88);
+  border-color: var(--border-subtle);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.06), var(--shadow-lg);
 }
 
-:root:not([data-theme="dark"]) .player-bar::before {
-  background: var(--border-subtle);
-}
+:root:not([data-theme="dark"]) .player-bar::before { display: none; }
 
 :root:not([data-theme="dark"]) .player-station-logo-wrap {
   background: var(--bg-secondary);
