@@ -357,6 +357,13 @@
   background: rgba(255,255,255,0.12);
 }
 
+/* Prevent base hover from overriding play button */
+.pex-btn-play:hover,
+[data-theme="dark"] .pex-btn-play:hover {
+  background: var(--accent-hover);
+  color: #fff;
+}
+
 .pex-btn:active {
   transform: scale(0.88);
   transition-duration: 60ms;
@@ -391,6 +398,8 @@
 /* Shimmer sweep on hover — removed, keep hover clean */
 
 .pex-btn-play:hover {
+  background: var(--accent-hover);
+  color: #fff;
   transform: scale(1.06);
   box-shadow:
     0 8px 32px var(--accent-glow-lg),

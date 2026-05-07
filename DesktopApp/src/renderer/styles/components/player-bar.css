@@ -275,6 +275,13 @@
   background: rgba(255,255,255,0.10);
 }
 
+/* Prevent base hover from overriding play button */
+.player-btn-play:hover,
+[data-theme="dark"] .player-btn-play:hover {
+  background: var(--accent-hover);
+  color: #fff;
+}
+
 .player-btn:active {
   transform: scale(0.88);
   transition-duration: 60ms;
@@ -310,6 +317,8 @@
 /* Shimmer sweep on hover — removed, keep hover clean */
 
 .player-btn-play:hover {
+  background: var(--accent-hover);
+  color: #fff;
   transform: scale(1.08);
   box-shadow:
     0 6px 22px var(--accent-glow-lg),
