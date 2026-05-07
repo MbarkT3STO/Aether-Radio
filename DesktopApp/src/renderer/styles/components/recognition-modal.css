@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   SONG RECOGNITION MODAL — Keyra neumorphic design
+   SONG RECOGNITION MODAL — Modern Design
    ═══════════════════════════════════════════════════════════════ */
 
 .rcm-overlay {
@@ -19,9 +19,9 @@
 .rcm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* ── Dialog ── */
@@ -29,50 +29,56 @@
   position: relative;
   z-index: 1;
   background: var(--bg-primary);
-  box-shadow: var(--nm-raised), 0 24px 64px rgba(0, 0, 0, 0.35);
-  border-radius: var(--radius-xl);
-  width: 380px;
+  border-radius: 20px;
+  width: 420px;
+  max-width: 90vw;
   overflow: hidden;
-  animation: rcmDialogIn 0.3s var(--ease-spring) forwards;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1);
+  animation: rcmDialogIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 [data-theme="dark"] .rcm-dialog {
   background: var(--bg-secondary);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* ── Close ── */
 .rcm-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 10;
-  width: 32px;
-  height: 32px;
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: none;
   cursor: pointer;
-  color: var(--text-tertiary);
+  color: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .rcm-close:hover {
-  color: var(--accent-primary);
-  transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
+  background: rgba(0, 0, 0, 0.6);
+  transform: scale(1.1);
 }
 
 .rcm-close:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
+  transform: scale(0.95);
 }
 
 [data-theme="dark"] .rcm-close {
-  background: var(--bg-primary);
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .rcm-close:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -83,8 +89,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 var(--space-lg) var(--space-lg);
-  min-height: 320px;
+  padding: 0 var(--space-lg) 32px;
+  min-height: 300px;
   position: relative;
   overflow: hidden;
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -100,6 +106,27 @@
   transform: scale(0.97);
 }
 
+.rcm-listening-text {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+.rcm-listening-label {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  margin-bottom: 5px;
+}
+
+.rcm-listening-sub {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
 /* ── Central animation container ── */
 .rcm-viz-wrap {
   position: absolute;
@@ -108,7 +135,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  padding-bottom: 60px;
+  padding-bottom: 50px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -328,26 +355,6 @@
 .rcm-particle-4 { animation: rcmFloat4 2.6s ease-in-out infinite; animation-delay: 1.2s; }
 .rcm-particle-5 { animation: rcmFloat5 3.1s ease-in-out infinite; animation-delay: 1.6s; }
 .rcm-particle-6 { animation: rcmFloat6 2.9s ease-in-out infinite; animation-delay: 2s; }
-.rcm-listening-label {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: -0.3px;
-  margin-bottom: 6px;
-  position: relative;
-  z-index: 10;
-}
-
-.rcm-listening-sub {
-  font-size: 0.73rem;
-  color: var(--text-tertiary);
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.5;
-  position: relative;
-  z-index: 10;
-}
 
 /* ═══════════════════════════════════════════════════════════════
    AI VOICE ASSISTANT ANIMATIONS — Enhanced Siri-inspired
@@ -507,260 +514,260 @@
   50%       { opacity: 0.4; transform: scale(0.75); }
 }
 /* ═══════════════════════════════════════════════════════════════
-   RESULT STATE — FOUND
+   RESULT STATE — MODERN DESIGN
    ═══════════════════════════════════════════════════════════════ */
 .rcm-result {
+  display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 0;
   opacity: 0;
   overflow: hidden;
 }
 
 .rcm-result.rcm-result-in {
-  animation: rcmResultIn 0.4s var(--ease-spring) forwards;
+  animation: rcmResultIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ── Cover art hero section ── */
-.rcm-cover-hero {
+/* ── Hero Section (Full-bleed cover) ── */
+.rcm-hero {
   position: relative;
   width: 100%;
-  padding: var(--space-lg) 0;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-secondary);
-  flex-shrink: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
 }
 
-[data-theme="dark"] .rcm-cover-hero {
-  background: var(--bg-tertiary);
-}
-
-.rcm-cover-blur-bg {
+.rcm-hero-blur {
   position: absolute;
-  inset: 0;
+  inset: -20px;
   background-size: cover;
   background-position: center;
-  filter: blur(40px) saturate(1.5) brightness(0.4);
-  opacity: 0.3;
+  filter: blur(30px) saturate(1.8) brightness(0.7);
+  transform: scale(1.1);
 }
 
-.rcm-cover-wrap {
+.rcm-hero-cover {
   position: relative;
+  z-index: 2;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  animation: rcmCoverPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.rcm-hero-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--bg-primary));
   z-index: 1;
 }
 
-.rcm-cover {
-  width: 110px;
-  height: 110px;
-  border-radius: var(--radius-lg);
-  object-fit: cover;
-  display: block;
-  box-shadow: var(--nm-raised), 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: rcmCoverPop 0.5s var(--ease-spring) forwards;
+[data-theme="dark"] .rcm-hero-gradient {
+  background: linear-gradient(to bottom, transparent, var(--bg-secondary));
 }
 
-/* ── No cover fallback ── */
-.rcm-found-icon-hero {
-  width: 100%;
-  padding: var(--space-lg) 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  position: relative;
+/* No cover fallback */
+.rcm-hero-nocov {
+  background: linear-gradient(135deg, 
+    hsla(var(--h), 60%, 60%, 0.15) 0%, 
+    hsla(var(--h), 60%, 50%, 0.1) 100%
+  );
 }
 
-[data-theme="dark"] .rcm-found-icon-hero {
-  background: var(--bg-tertiary);
-}
-
-.rcm-found-icon-orb {
-  width: 72px;
-  height: 72px;
+.rcm-hero-nocov-orb {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--bg-primary);
-  box-shadow: var(--nm-raised), 0 0 28px var(--accent-glow);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-primary);
-  animation: rcmIconPop 0.5s var(--ease-spring) forwards;
+  animation: rcmIconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-[data-theme="dark"] .rcm-found-icon-orb {
+[data-theme="dark"] .rcm-hero-nocov-orb {
+  background: var(--bg-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Body Section ── */
+.rcm-body {
+  padding: 24px 24px 28px;
   background: var(--bg-primary);
 }
 
-/* ── Song info section ── */
-.rcm-found-info {
-  width: 100%;
-  padding: var(--space-md) var(--space-lg) var(--space-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+[data-theme="dark"] .rcm-body {
+  background: var(--bg-secondary);
 }
 
-.rcm-found-label {
+/* ── Song Identity ── */
+.rcm-identity {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.rcm-identity-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: var(--accent-primary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: hsla(var(--h), 60%, 55%, 0.12);
+  font-size: 0.65rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  margin-bottom: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent-primary);
+  margin-bottom: 14px;
 }
 
-.rcm-found-label-dot {
+.rcm-badge-dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: var(--accent-primary);
-  box-shadow: 0 0 6px var(--accent-glow);
   animation: rcmDotPulse 1.4s ease-in-out infinite;
 }
 
-.rcm-found-title {
+.rcm-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: var(--text-primary);
-  letter-spacing: -0.4px;
-  text-align: center;
+  letter-spacing: -0.5px;
   line-height: 1.2;
-  margin-bottom: 7px;
-  padding: 0 8px;
+  margin-bottom: 6px;
 }
 
-.rcm-found-artist {
-  font-size: 0.92rem;
-  font-weight: 700;
+.rcm-artist {
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text-secondary);
-  text-align: center;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
-.rcm-found-album {
-  font-size: 0.72rem;
+.rcm-meta {
+  font-size: 0.75rem;
   color: var(--text-tertiary);
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 0;
-}
-
-/* ── Streaming links ── */
-.rcm-result-divider {
-  width: calc(100% - 56px);
-  height: 1px;
-  background: var(--border-subtle);
-  margin: 20px 0 20px;
-}
-
-/* ── Links Section ── */
-.rcm-links-section {
-  width: 100%;
-  padding: 0 var(--space-lg) var(--space-lg);
-}
-
-.rcm-links-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.rcm-found-links {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.rcm-platform-btn {
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 11px 14px;
-  border-radius: var(--radius-lg);
-  border: none;
+  gap: 6px;
+}
+
+.rcm-meta-sep {
+  opacity: 0.5;
+}
+
+/* ── Streaming Section ── */
+.rcm-streams {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rcm-streams-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.rcm-streams-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.rcm-stream-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
   cursor: pointer;
   font-family: var(--font-body);
   font-size: 0.8rem;
   font-weight: 600;
   background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  transition: all var(--transition-fast);
+  color: var(--text-primary);
+  transition: all 0.18s ease;
   white-space: nowrap;
 }
 
-.rcm-platform-btn span {
-  display: inline-block;
+[data-theme="dark"] .rcm-stream-btn {
+  background: var(--bg-tertiary);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
-.rcm-platform-btn:hover {
+.rcm-stream-btn:hover {
   transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
-.rcm-platform-btn:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
+[data-theme="dark"] .rcm-stream-btn:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-.rcm-spotify  { color: #1db954; }
-.rcm-apple    { color: #fc3c44; }
-.rcm-ytmusic  { color: #ff0000; }
-.rcm-deezer   { color: #a238ff; }
+.rcm-stream-btn:active {
+  transform: translateY(0) scale(0.98);
+}
 
-/* ── Secondary Links ── */
-.rcm-links-secondary {
+.rcm-s-spotify:hover  { background: #1db954; color: #fff; }
+.rcm-s-apple:hover    { background: #fc3c44; color: #fff; }
+.rcm-s-ytmusic:hover  { background: #ff0000; color: #fff; }
+.rcm-s-deezer:hover   { background: #a238ff; color: #fff; }
+
+/* ── More links (YouTube / Shazam) ── */
+.rcm-streams-more {
   display: flex;
-  flex-direction: column;
   gap: 6px;
-  width: 100%;
 }
 
-.rcm-link-btn {
+.rcm-more-btn {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 9px 14px;
-  border-radius: var(--radius-md);
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   font-weight: 500;
   background: transparent;
-  color: var(--text-secondary);
-  transition: all var(--transition-fast);
-  white-space: nowrap;
+  color: var(--text-tertiary);
+  transition: all 0.18s ease;
 }
 
-.rcm-link-btn:hover {
-  color: var(--text-primary);
+.rcm-more-btn:hover {
   background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
-.rcm-link-btn:active {
-  transform: scale(0.98);
+[data-theme="dark"] .rcm-more-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.rcm-youtube { color: inherit; }
-.rcm-shazam  { color: inherit; }
-
-[data-theme="dark"] .rcm-platform-btn,
-[data-theme="dark"] .rcm-retry-btn {
-  background: var(--bg-primary);
+.rcm-more-btn:active {
+  transform: scale(0.97);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -770,30 +777,31 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  padding: 48px 28px 32px;
 }
 
 .rcm-miss-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--radius-lg);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-tertiary);
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   animation: rcmMissShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
 }
 
 [data-theme="dark"] .rcm-miss-icon {
-  background: var(--bg-primary);
+  background: var(--bg-tertiary);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .rcm-miss-title {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 8px;
@@ -801,9 +809,9 @@
 }
 
 .rcm-miss-sub {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--text-tertiary);
-  font-weight: 600;
+  font-weight: 500;
   text-align: center;
   line-height: 1.6;
   margin-bottom: 0;
@@ -812,33 +820,42 @@
 .rcm-miss-actions {
   display: flex;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 26px;
   width: 100%;
   justify-content: center;
 }
 
 .rcm-retry-btn {
-  padding: 10px 32px;
-  border-radius: var(--radius-full);
-  border: none;
+  padding: 11px 36px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--accent-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
   background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  transition: all var(--transition-fast);
+  transition: all 0.18s ease;
+}
+
+[data-theme="dark"] .rcm-retry-btn {
+  background: var(--bg-tertiary);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .rcm-retry-btn:hover {
   transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+[data-theme="dark"] .rcm-retry-btn:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .rcm-retry-btn:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -857,7 +874,7 @@
 @keyframes rcmDialogIn {
   from {
     opacity: 0;
-    transform: scale(0.88) translateY(16px);
+    transform: scale(0.88) translateY(20px);
   }
   to {
     opacity: 1;
@@ -868,80 +885,33 @@
 @keyframes rcmResultIn {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.97);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 @keyframes rcmCoverPop {
-  0% {
-    transform: scale(0.7);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(1.08);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0%   { transform: scale(0.75); opacity: 0; }
+  70%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
 }
 
 @keyframes rcmIconPop {
-  0% {
-    transform: scale(0.6);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0%   { transform: scale(0.6); opacity: 0; }
+  70%  { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
 }
 
 @keyframes rcmMissShake {
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-  20%, 40%, 60%, 80% { transform: translateX(4px); }
+  20%, 40%, 60%, 80%      { transform: translateX(4px); }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   LIGHT THEME
-   ═══════════════════════════════════════════════════════════════ */
-:root:not([data-theme="dark"]) .rcm-dialog {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised), 0 24px 64px rgba(163, 177, 198, 0.6);
-}
-
-:root:not([data-theme="dark"]) .rcm-backdrop {
-  background: rgba(30, 35, 40, 0.3);
-}
-
-:root:not([data-theme="dark"]) .rcm-close {
-  background: var(--bg-primary);
-}
-
-:root:not([data-theme="dark"]) .rcm-cover-hero,
-:root:not([data-theme="dark"]) .rcm-found-icon-hero {
-  background: var(--bg-secondary);
-}
-
-:root:not([data-theme="dark"]) .rcm-found-icon-orb {
-  background: var(--bg-primary);
-}
-
-:root:not([data-theme="dark"]) .rcm-miss-icon {
-  background: var(--bg-secondary);
-}
-
-:root:not([data-theme="dark"]) .rcm-platform-btn,
-:root:not([data-theme="dark"]) .rcm-retry-btn {
-  background: var(--bg-primary);
+@keyframes rcmDotPulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.4; transform: scale(0.75); }
 }

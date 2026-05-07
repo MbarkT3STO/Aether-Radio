@@ -999,7 +999,7 @@ export class PlayerBar extends BaseComponent {
       <div class="rcm-dialog" id="rcm-dialog">
 
         <button class="rcm-close" id="rcm-close" aria-label="Close" style="display:none">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -1009,25 +1009,20 @@ export class PlayerBar extends BaseComponent {
         <!-- Listening state -->
         <div class="rcm-listening" id="rcm-listening">
           <div class="rcm-viz-wrap">
-            <!-- Ambient blur points recognition animation -->
             <div class="rcm-ambient-container">
-              <!-- Central search orb -->
               <div class="rcm-search-orb"></div>
-              <!-- Inner ring of blur points (6 points) -->
               <div class="rcm-blur-point rcm-point-1"></div>
               <div class="rcm-blur-point rcm-point-2"></div>
               <div class="rcm-blur-point rcm-point-3"></div>
               <div class="rcm-blur-point rcm-point-4"></div>
               <div class="rcm-blur-point rcm-point-5"></div>
               <div class="rcm-blur-point rcm-point-6"></div>
-              <!-- Outer ring of blur points (6 more points) -->
               <div class="rcm-blur-point rcm-outer rcm-point-7"></div>
               <div class="rcm-blur-point rcm-outer rcm-point-8"></div>
               <div class="rcm-blur-point rcm-outer rcm-point-9"></div>
               <div class="rcm-blur-point rcm-outer rcm-point-10"></div>
               <div class="rcm-blur-point rcm-outer rcm-point-11"></div>
               <div class="rcm-blur-point rcm-outer rcm-point-12"></div>
-              <!-- Animated particles -->
               <div class="rcm-particle rcm-particle-1"></div>
               <div class="rcm-particle rcm-particle-2"></div>
               <div class="rcm-particle rcm-particle-3"></div>
@@ -1036,8 +1031,10 @@ export class PlayerBar extends BaseComponent {
               <div class="rcm-particle rcm-particle-6"></div>
             </div>
           </div>
-          <div class="rcm-listening-label">Identifying song…</div>
-          <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
+          <div class="rcm-listening-text">
+            <div class="rcm-listening-label">Identifying song…</div>
+            <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
+          </div>
         </div>
 
         <!-- Result state (hidden initially) -->
@@ -1097,67 +1094,60 @@ export class PlayerBar extends BaseComponent {
         })
 
       } else {
-        // Build result HTML with hero section
-        const coverHtml = result.coverArt
-          ? `<div class="rcm-cover-hero">
-              <div class="rcm-cover-blur-bg" style="background-image: url('${result.coverArt.replace(/"/g, '%22')}')"></div>
-              <div class="rcm-cover-wrap">
-                <img class="rcm-cover" src="${result.coverArt.replace(/"/g, '%22')}" alt="${this.esc(result.title)}">
-              </div>
-            </div>`
-          : `<div class="rcm-found-icon-hero">
-              <div class="rcm-found-icon-orb">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
-                  fill="none" stroke="currentColor" stroke-width="1.75"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 18V5l12-2v13"/>
-                  <circle cx="6" cy="18" r="3"/>
-                  <circle cx="18" cy="16" r="3"/>
-                </svg>
-              </div>
-            </div>`
+        // Build result HTML — modern full-bleed layout
+        const cover = result.coverArt?.replace(/"/g, '%22') ?? ''
+        const coverSection = cover
+          ? `<div class="rcm-hero">
+               <div class="rcm-hero-blur" style="background-image:url('${cover}')"></div>
+               <img class="rcm-hero-cover" src="${cover}" alt="${this.esc(result.title)}">
+               <div class="rcm-hero-gradient"></div>
+             </div>`
+          : `<div class="rcm-hero rcm-hero-nocov">
+               <div class="rcm-hero-nocov-orb">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                   <path d="M9 18V5l12-2v13"/>
+                   <circle cx="6" cy="18" r="3"/>
+                   <circle cx="18" cy="16" r="3"/>
+                 </svg>
+               </div>
+             </div>`
 
         resultEl.innerHTML = `
-          ${coverHtml}
-          <div class="rcm-found-info">
-            <div class="rcm-found-label">
-              <span class="rcm-found-label-dot"></span>
-              Now Playing
+          ${coverSection}
+
+          <div class="rcm-body">
+            <!-- Song identity -->
+            <div class="rcm-identity">
+              <div class="rcm-identity-badge">
+                <span class="rcm-badge-dot"></span>Identified
+              </div>
+              <div class="rcm-title">${this.esc(result.title)}</div>
+              <div class="rcm-artist">${this.esc(result.artist)}</div>
+              ${result.album ? `
+                <div class="rcm-meta">
+                  <span>${this.esc(result.album)}</span>
+                  ${result.releaseDate ? `<span class="rcm-meta-sep">·</span><span>${result.releaseDate.slice(0, 4)}</span>` : ''}
+                </div>` : ''}
             </div>
-            <div class="rcm-found-title">${this.esc(result.title)}</div>
-            <div class="rcm-found-artist">${this.esc(result.artist)}</div>
-            ${result.album ? `<div class="rcm-found-album">${this.esc(result.album)}${result.releaseDate ? ` · ${result.releaseDate.slice(0, 4)}` : ''}</div>` : ''}
-          </div>
-          ${(result.spotifyUrl || result.appleMusicUrl || result.youtubeMusicUrl || result.youtubeUrl || result.deezerUrl || result.shazamUrl) ? `
-            <div class="rcm-result-divider"></div>
-            <div class="rcm-links-section">
-              <div class="rcm-links-label">Listen on</div>
-              <div class="rcm-found-links">
-                ${result.spotifyUrl ? `<button class="rcm-platform-btn rcm-spotify" id="rcm-spotify">
-                  ${this.spotifyIcon()}<span>Spotify</span>
-                </button>` : ''}
-                ${result.appleMusicUrl ? `<button class="rcm-platform-btn rcm-apple" id="rcm-apple">
-                  ${this.appleMusicIcon()}<span>Apple Music</span>
-                </button>` : ''}
-                ${result.youtubeMusicUrl ? `<button class="rcm-platform-btn rcm-ytmusic" id="rcm-ytmusic">
-                  ${this.youtubeMusicIcon()}<span>YouTube Music</span>
-                </button>` : ''}
-                ${result.deezerUrl ? `<button class="rcm-platform-btn rcm-deezer" id="rcm-deezer">
-                  ${this.deezerIcon()}<span>Deezer</span>
-                </button>` : ''}
+
+            <!-- Streaming services -->
+            <div class="rcm-streams">
+              <div class="rcm-streams-label">Open in</div>
+              <div class="rcm-streams-grid">
+                ${result.spotifyUrl    ? `<button class="rcm-stream-btn rcm-s-spotify"   id="rcm-spotify">${this.spotifyIcon()}<span>Spotify</span></button>`        : ''}
+                ${result.appleMusicUrl ? `<button class="rcm-stream-btn rcm-s-apple"     id="rcm-apple">${this.appleMusicIcon()}<span>Apple Music</span></button>`    : ''}
+                ${result.youtubeMusicUrl ? `<button class="rcm-stream-btn rcm-s-ytmusic" id="rcm-ytmusic">${this.youtubeMusicIcon()}<span>YT Music</span></button>`   : ''}
+                ${result.deezerUrl     ? `<button class="rcm-stream-btn rcm-s-deezer"    id="rcm-deezer">${this.deezerIcon()}<span>Deezer</span></button>`            : ''}
               </div>
               ${(result.youtubeUrl || result.shazamUrl) ? `
-                <div class="rcm-links-secondary">
-                  ${result.youtubeUrl ? `<button class="rcm-link-btn" id="rcm-youtube">
-                    ${this.youtubeIcon()}<span>Watch on YouTube</span>
-                  </button>` : ''}
-                  ${result.shazamUrl ? `<button class="rcm-link-btn" id="rcm-shazam">
-                    ${this.shazamIcon()}<span>View on Shazam</span>
-                  </button>` : ''}
-                </div>
-              ` : ''}
+                <div class="rcm-streams-more">
+                  ${result.youtubeUrl ? `<button class="rcm-more-btn" id="rcm-youtube">${this.youtubeIcon()}<span>Watch on YouTube</span>${this.externalIcon()}</button>` : ''}
+                  ${result.shazamUrl  ? `<button class="rcm-more-btn" id="rcm-shazam">${this.shazamIcon()}<span>View on Shazam</span>${this.externalIcon()}</button>`     : ''}
+                </div>` : ''}
             </div>
-          ` : ''}
+          </div>
         `
 
         if (result.spotifyUrl) {
@@ -1250,6 +1240,16 @@ export class PlayerBar extends BaseComponent {
   private shazamIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.79 17.5c-1.18 0-2.21-.34-3.07-.93l4.3-4.3c.26.37.41.82.41 1.3 0 1.62-1.32 1.93-1.64 1.93zm4.13-2.57l-4.3 4.3c-.37-.26-.82-.41-1.3-.41-1.62 0-1.93-1.32-1.93-1.64 0-1.18.34-2.21.93-3.07l4.3-4.3c.26.37.41.82.41 1.3 0 1.62-1.32 1.93-1.64 1.93zm1.57-1.57c-.26-.37-.41-.82-.41-1.3 0-1.62 1.32-1.93 1.64-1.93 1.18 0 2.21.34 3.07.93l-4.3 4.3z"/>
+    </svg>`
+  }
+
+  private externalIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+      <polyline points="15 3 21 3 21 9"/>
+      <line x1="10" y1="14" x2="21" y2="3"/>
     </svg>`
   }
 
