@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   MY STATIONS VIEW — Obsidian Design
+   MY STATIONS VIEW — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 .cs-header {
@@ -74,24 +74,31 @@
 .cs-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: 10px;
   cursor: pointer;
-  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
   position: relative;
+  box-shadow: var(--shadow-xs);
 }
 
 .cs-card:hover {
   border-color: var(--border-medium);
-  background: var(--bg-tertiary);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.005);
   box-shadow: var(--shadow-md);
 }
 
-.cs-card:active { transform: translateY(0) scale(0.99); box-shadow: none; }
+.cs-card:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 80ms;
+}
 
 .cs-card--playing {
   border-color: var(--accent-primary);
@@ -115,7 +122,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   margin-bottom: 2px;
 }
 
@@ -126,6 +133,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
 /* ── Playing badge ── */
@@ -167,16 +175,19 @@
 
 /* ── URL ── */
 .cs-card-url {
-  font-size: 0.62rem;
+  font-size: 0.625rem;
   color: var(--text-muted);
   font-family: var(--font-mono);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 5px 10px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.04);
   border-radius: var(--radius-md);
+}
+
+[data-theme="dark"] .cs-card-url {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ── Card Actions ── */
@@ -211,39 +222,41 @@
 .cs-play-btn:hover  { background: var(--accent-primary); color: #fff; transform: translateY(-1px); }
 .cs-play-btn:active { transform: translateY(0); }
 
-/* Edit / Delete buttons */
 .cs-edit-btn,
 .cs-delete-btn {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
   color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .cs-edit-btn,
+[data-theme="dark"] .cs-delete-btn {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .cs-edit-btn:hover {
   color: var(--accent-primary);
   background: var(--accent-soft);
-  border-color: var(--accent-muted);
   transform: scale(1.05);
 }
 
 .cs-delete-btn:hover {
   color: var(--status-error);
-  background: hsla(0, 90%, 60%, 0.1);
-  border-color: hsla(0, 90%, 60%, 0.2);
+  background: rgba(255, 59, 48, 0.10);
   transform: scale(1.05);
 }
 
 .cs-edit-btn:active,
-.cs-delete-btn:active { transform: scale(0.97); }
+.cs-delete-btn:active { transform: scale(0.96); }
 
 /* ═══════════════════════════════════════════════════════════════
    EMPTY STATE

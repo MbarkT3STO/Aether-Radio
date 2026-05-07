@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   SONG RECOGNITION MODAL — Modern Design
+   SONG RECOGNITION MODAL — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 .rcm-overlay {
@@ -19,9 +19,9 @@
 .rcm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
 }
 
 /* ── Dialog ── */
@@ -29,17 +29,16 @@
   position: relative;
   z-index: 1;
   background: var(--bg-primary);
-  border-radius: 20px;
-  width: 420px;
+  border-radius: var(--radius-2xl);
+  width: 400px;
   max-width: 90vw;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1);
-  animation: rcmDialogIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: var(--shadow-xl);
+  animation: rcmDialogIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 [data-theme="dark"] .rcm-dialog {
   background: var(--bg-secondary);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* ── Close ── */
@@ -51,7 +50,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: none;
@@ -60,25 +59,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .rcm-close:hover {
-  background: rgba(0, 0, 0, 0.6);
-  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.55);
+  transform: scale(1.08);
 }
 
 .rcm-close:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
 }
 
 [data-theme="dark"] .rcm-close {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.95);
 }
 
 [data-theme="dark"] .rcm-close:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.22);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -416,7 +415,7 @@
   justify-content: center;
   gap: 8px;
   padding: 11px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
   cursor: pointer;
   font-family: var(--font-body);
@@ -424,27 +423,28 @@
   font-weight: 600;
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: all 0.18s ease;
+  transition: all var(--transition-fast);
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 [data-theme="dark"] .rcm-stream-btn {
   background: var(--bg-tertiary);
-  border-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-subtle);
 }
 
 .rcm-stream-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.01);
   border-color: transparent;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-md);
 }
 
 [data-theme="dark"] .rcm-stream-btn:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .rcm-stream-btn:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(0) scale(0.97);
 }
 
 .rcm-s-spotify:hover  { background: #1db954; color: #fff; }
@@ -546,35 +546,36 @@
 
 .rcm-retry-btn {
   padding: 11px 36px;
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary);
   background: var(--bg-primary);
-  transition: all 0.18s ease;
+  transition: all var(--transition-fast);
+  letter-spacing: -0.01em;
 }
 
 [data-theme="dark"] .rcm-retry-btn {
   background: var(--bg-tertiary);
-  border-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-subtle);
 }
 
 .rcm-retry-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-md);
   border-color: var(--accent-primary);
   color: var(--accent-primary);
 }
 
 [data-theme="dark"] .rcm-retry-btn:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .rcm-retry-btn:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(0) scale(0.97);
 }
 
 /* ═══════════════════════════════════════════════════════════════

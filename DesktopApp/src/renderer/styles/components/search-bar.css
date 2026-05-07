@@ -1,4 +1,4 @@
-/* ── Search Bar — Obsidian Design ── */
+/* ── Search Bar — Apple Design ── */
 
 .search-bar {
   position: relative;
@@ -8,22 +8,31 @@
 
 .search-bar-input {
   width: 100%;
-  padding: 10px var(--space-6) 10px 42px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  padding: 10px var(--space-6) 10px 40px;
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid transparent;
   border-radius: var(--radius-full);
   color: var(--text-primary);
   font-size: var(--text-sm);
   font-weight: 400;
   font-family: var(--font-body);
+  letter-spacing: -0.01em;
   transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+[data-theme="dark"] .search-bar-input {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .search-bar-input:focus {
   outline: none;
   border-color: var(--accent-primary);
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+[data-theme="dark"] .search-bar-input:focus {
+  background: var(--bg-tertiary);
 }
 
 .search-bar-input::placeholder {
@@ -33,11 +42,11 @@
 
 .search-bar-icon {
   position: absolute;
-  left: 14px;
+  left: 13px;
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   color: var(--text-muted);
   pointer-events: none;
   transition: color var(--transition-fast);
@@ -47,35 +56,41 @@
 
 .search-bar-clear {
   position: absolute;
-  right: 10px;
+  right: 9px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.08);
   transition: all var(--transition-fast);
   opacity: 0;
   pointer-events: none;
+}
+
+[data-theme="dark"] .search-bar-clear {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .search-bar-clear.visible { opacity: 1; pointer-events: all; }
 
 .search-bar-clear:hover {
   color: var(--text-primary);
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.14);
+}
+
+[data-theme="dark"] .search-bar-clear:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .search-bar-input {
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.06);
+  border-color: transparent;
 }
 
 :root:not([data-theme="dark"]) .search-bar-input:focus {

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   EXPANDED PLAYER — Obsidian Design
+   EXPANDED PLAYER — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Expand toggle (lives in player-extras) ── */
@@ -30,14 +30,7 @@
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--accent-primary) 25%,
-    var(--accent-secondary) 75%,
-    transparent 100%
-  );
-  opacity: 0.6;
+  background: var(--border-subtle);
   z-index: 2;
   pointer-events: none;
 }
@@ -135,8 +128,8 @@
 .pex-artwork {
   width: 210px;
   height: 210px;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  border: none;
   box-shadow: var(--shadow-xl);
   overflow: hidden;
   position: relative;
@@ -266,14 +259,13 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid var(--border-subtle);
+  border: none;
   cursor: pointer;
-  background: var(--bg-tertiary);
-  color: var(--text-tertiary);
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-secondary);
   transition:
     color var(--transition-fast),
     background var(--transition-fast),
-    border-color var(--transition-fast),
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
   flex-shrink: 0;
@@ -281,10 +273,17 @@
   height: 40px;
 }
 
+[data-theme="dark"] .pex-btn {
+  background: rgba(255, 255, 255, 0.10);
+}
+
 .pex-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.10);
+}
+
+[data-theme="dark"] .pex-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .pex-btn:active { transform: scale(0.93); }
@@ -294,8 +293,7 @@
 
 .pex-btn-stop:hover {
   color: var(--status-error);
-  border-color: hsla(0, 80%, 55%, 0.3);
-  background: hsla(0, 80%, 55%, 0.08);
+  background: rgba(255, 59, 48, 0.10);
 }
 
 /* Play/Pause — hero */
@@ -304,7 +302,7 @@
   height: 64px;
   background: var(--accent-primary);
   color: #fff;
-  border-color: transparent;
+  border: none;
   box-shadow: 0 6px 24px var(--accent-glow);
 }
 
@@ -329,15 +327,13 @@
 .pex-btn-fav { color: var(--text-muted); }
 
 .pex-btn-fav:hover {
-  color: var(--accent-secondary);
-  border-color: var(--accent-secondary);
-  background: var(--accent-soft);
+  color: #ff2d55;
+  background: rgba(255, 45, 85, 0.10);
 }
 
 .pex-btn-fav.active {
-  color: var(--accent-secondary);
-  background: var(--accent-soft);
-  border-color: var(--accent-muted);
+  color: #ff2d55;
+  background: rgba(255, 45, 85, 0.10);
 }
 
 /* ── Volume row ── */
@@ -505,35 +501,32 @@
   color: var(--status-live);
 }
 
-/* Buttons */
+/* ── Buttons ── */
 :root:not([data-theme="dark"]) .pex-btn {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.06);
   color: var(--text-secondary);
 }
 
 :root:not([data-theme="dark"]) .pex-btn:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--border-strong);
+  background: rgba(0, 0, 0, 0.10);
   color: var(--text-primary);
 }
 
 :root:not([data-theme="dark"]) .pex-btn-play {
   background: var(--accent-primary);
   color: #fff;
-  border-color: transparent;
+  border: none;
 }
 
 :root:not([data-theme="dark"]) .pex-btn-play:hover {
   background: var(--accent-hover);
   color: #fff;
-  border-color: transparent;
+  border: none;
 }
 
 :root:not([data-theme="dark"]) .pex-btn-fav.active {
-  color: var(--accent-secondary);
-  background: var(--accent-soft);
-  border-color: var(--accent-muted);
+  color: #ff2d55;
+  background: rgba(255, 45, 85, 0.10);
 }
 
 /* Collapse button */

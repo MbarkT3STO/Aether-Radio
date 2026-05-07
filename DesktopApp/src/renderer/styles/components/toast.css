@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   TOASTS — Obsidian Design
+   TOASTS — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 .toast-container {
@@ -8,11 +8,9 @@
   right: 20px;
   z-index: var(--z-toast);
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 8px;
   pointer-events: none;
-  /* Stack newest on top */
-  flex-direction: column-reverse;
 }
 
 /* ── Toast card ── */
@@ -20,15 +18,22 @@
   display: flex;
   align-items: stretch;
   min-width: 300px;
-  max-width: 380px;
-  border-radius: var(--radius-xl);
+  max-width: 360px;
+  border-radius: var(--radius-2xl);
   overflow: hidden;
   pointer-events: all;
   box-shadow: var(--shadow-xl);
-  border: 1px solid var(--border-medium);
-  background: var(--bg-elevated);
-  animation: toastIn 0.32s var(--ease-spring) both;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-glass);
+  animation: toastIn 0.36s var(--ease-spring) both;
   position: relative;
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .toast {
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  }
 }
 
 .toast.removing {
@@ -38,10 +43,9 @@
 /* ── Colored left stripe ── */
 .toast::before {
   content: '';
-  width: 4px;
+  width: 3px;
   flex-shrink: 0;
   display: block;
-  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
 }
 
 .toast.success::before { background: var(--status-live); }
@@ -60,8 +64,8 @@
 
 /* ── Icon circle ── */
 .toast-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -71,12 +75,12 @@
 
 .toast.success .toast-icon {
   color: var(--status-live);
-  background: hsla(160, 70%, 50%, 0.12);
+  background: rgba(52, 199, 89, 0.12);
 }
 
 .toast.error .toast-icon {
   color: var(--status-error);
-  background: hsla(0, 80%, 55%, 0.12);
+  background: rgba(255, 59, 48, 0.12);
 }
 
 .toast.info .toast-icon {
@@ -89,35 +93,28 @@
   flex: 1;
   font-size: var(--text-sm);
   font-weight: 500;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--text-primary);
   min-width: 0;
+  letter-spacing: -0.01em;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    DARK MODE
    ═══════════════════════════════════════════════════════════════ */
 [data-theme="dark"] .toast {
-  background: var(--bg-elevated);
+  background: rgba(44, 44, 46, 0.90);
   border-color: var(--border-medium);
-  box-shadow: var(--shadow-xl), 0 0 0 1px var(--border-subtle);
+  box-shadow: var(--shadow-xl);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    LIGHT MODE
    ═══════════════════════════════════════════════════════════════ */
 :root:not([data-theme="dark"]) .toast {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--border-subtle);
   box-shadow: var(--shadow-lg);
-}
-
-:root:not([data-theme="dark"]) .toast.success .toast-icon {
-  background: hsla(160, 70%, 40%, 0.1);
-}
-
-:root:not([data-theme="dark"]) .toast.error .toast-icon {
-  background: hsla(0, 80%, 50%, 0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -126,7 +123,7 @@
 @keyframes toastIn {
   from {
     opacity: 0;
-    transform: translateX(24px) scale(0.95);
+    transform: translateX(20px) scale(0.94);
   }
   to {
     opacity: 1;
@@ -141,6 +138,6 @@
   }
   to {
     opacity: 0;
-    transform: translateX(16px) scale(0.96);
+    transform: translateX(14px) scale(0.96);
   }
 }

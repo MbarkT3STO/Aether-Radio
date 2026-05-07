@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   SETTINGS VIEW — Obsidian Design
+   SETTINGS VIEW — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 .stg-content-wrap {
@@ -11,10 +11,11 @@
 .stg-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   overflow: hidden;
   margin-bottom: var(--space-4);
   width: 100%;
+  box-shadow: var(--shadow-xs);
 }
 
 /* ── Card Header ── */
@@ -27,8 +28,8 @@
 }
 
 .stg-card-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: var(--radius-md);
   background: var(--accent-soft);
   display: flex;
@@ -43,7 +44,7 @@
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
@@ -52,6 +53,7 @@
   color: var(--text-tertiary);
   font-weight: 400;
   margin-top: 1px;
+  letter-spacing: -0.01em;
 }
 
 /* ── Row ── */
@@ -60,7 +62,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 14px 18px;
+  padding: 13px 18px;
 }
 
 .stg-row + .stg-row {
@@ -74,23 +76,28 @@
   font-size: var(--text-sm);
   color: var(--text-primary);
   margin-bottom: 2px;
+  letter-spacing: -0.01em;
 }
 
 .stg-row-desc {
   font-size: var(--text-xs);
   color: var(--text-tertiary);
   line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
-/* ── Toggle Group ── */
+/* ── Toggle Group (Apple segmented control) ── */
 .stg-toggle-group {
   display: flex;
-  gap: 3px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.06);
   padding: 3px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .stg-toggle-group {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .stg-toggle-btn {
@@ -103,20 +110,26 @@
   font-weight: 500;
   color: var(--text-tertiary);
   cursor: pointer;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
   background: transparent;
   border: none;
   font-family: var(--font-body);
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 .stg-toggle-btn:hover { color: var(--text-primary); }
 
 .stg-toggle-btn.active {
   background: var(--bg-elevated);
-  border: 1px solid var(--border-medium);
-  color: var(--accent-primary);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
   font-weight: 600;
+}
+
+[data-theme="dark"] .stg-toggle-btn.active {
+  background: var(--bg-elevated);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* ── About section ── */
@@ -128,12 +141,12 @@
 }
 
 .stg-about-logo {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
   flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .stg-about-logo-img {
@@ -148,13 +161,14 @@
   font-size: var(--text-base);
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   margin-bottom: 2px;
 }
 
 .stg-about-version {
   font-size: var(--text-xs);
   color: var(--text-muted);
+  letter-spacing: -0.01em;
 }
 
 /* ── Divider ── */
@@ -171,6 +185,7 @@
   color: var(--accent-primary);
   white-space: nowrap;
   flex-shrink: 0;
+  letter-spacing: -0.01em;
 }
 
 /* ── Keyboard Shortcuts ── */
@@ -188,14 +203,18 @@
   align-items: center;
   justify-content: center;
   padding: 3px 8px;
-  background: var(--bg-tertiary);
+  background: rgba(0, 0, 0, 0.06);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   color: var(--text-secondary);
   white-space: nowrap;
+}
+
+[data-theme="dark"] .stg-kbd {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .stg-kbd-plus {
@@ -219,46 +238,49 @@
   font-family: var(--font-body);
   color: var(--accent-primary);
   background: var(--accent-soft);
-  border: 1px solid transparent;
+  border: none;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast);
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 .stg-action-btn:hover {
-  background: hsla(var(--h), var(--s), 65%, 0.18);
-  border-color: var(--accent-muted);
+  background: rgba(0, 122, 255, 0.16);
 }
 
-.stg-action-btn:active { transform: scale(0.97); }
+[data-theme="dark"] .stg-action-btn:hover {
+  background: rgba(10, 132, 255, 0.20);
+}
+
+.stg-action-btn:active { transform: scale(0.96); }
 
 .stg-action-btn--danger {
   color: var(--status-error);
-  background: hsla(0, 90%, 60%, 0.08);
+  background: rgba(255, 59, 48, 0.08);
 }
 
 .stg-action-btn--danger:hover {
-  background: hsla(0, 90%, 60%, 0.15);
-  border-color: hsla(0, 90%, 60%, 0.4);
+  background: rgba(255, 59, 48, 0.14);
 }
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .stg-card {
   background: var(--bg-elevated);
-  border-color: var(--border-medium);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
 :root:not([data-theme="dark"]) .stg-toggle-group {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.06);
 }
 
 :root:not([data-theme="dark"]) .stg-toggle-btn.active {
   background: var(--bg-elevated);
-  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 :root:not([data-theme="dark"]) .stg-kbd {
-  background: var(--bg-secondary);
-  border-color: var(--border-strong);
+  background: rgba(0, 0, 0, 0.05);
+  border-color: var(--border-medium);
 }

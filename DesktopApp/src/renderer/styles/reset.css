@@ -1,4 +1,4 @@
-/* ── Reset (Keyra-style) ── */
+/* ── Reset (Apple-style) ── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -12,11 +12,12 @@ html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.28s ease, color 0.28s ease;
 }
 
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
@@ -32,13 +33,13 @@ ul, ol { list-style: none; }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--text-primary);
 }
 
 :focus-visible {
   outline: 2px solid var(--accent-primary);
-  outline-offset: 3px;
+  outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 

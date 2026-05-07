@@ -1,4 +1,4 @@
-/* ── Empty State — Obsidian Design ── */
+/* ── Empty State — Apple Design ── */
 
 .empty-state {
   display: flex;
@@ -11,39 +11,43 @@
 }
 
 .empty-state-icon {
-  width: 80px;
-  height: 80px;
+  width: 76px;
+  height: 76px;
   border-radius: var(--radius-2xl);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-primary);
   margin-bottom: var(--space-6);
-  opacity: 0.7;
+  opacity: 0.65;
   flex-shrink: 0;
 }
 
-.empty-state-icon svg { width: 36px; height: 36px; }
+[data-theme="dark"] .empty-state-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.empty-state-icon svg { width: 34px; height: 34px; }
+
 .empty-state-title {
   font-family: var(--font-display);
   font-size: var(--text-lg);
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .empty-state-message {
   font-size: var(--text-sm);
   color: var(--text-tertiary);
   max-width: 340px;
-  line-height: 1.6;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .empty-state-icon {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.04);
 }

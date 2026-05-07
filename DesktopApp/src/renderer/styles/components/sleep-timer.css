@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   SLEEP TIMER — Obsidian Design
+   SLEEP TIMER — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 .sleep-timer {
@@ -50,15 +50,22 @@
   right: 0;
   z-index: 200;
   width: 200px;
-  background: var(--bg-elevated);
+  background: var(--surface-glass);
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   box-shadow: var(--shadow-lg);
-  animation: sleepTimerFadeIn 0.15s var(--ease-out) both;
+  animation: sleepTimerFadeIn 0.18s var(--ease-out) both;
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .sleep-timer-popover {
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  }
 }
 
 @keyframes sleepTimerFadeIn {
@@ -88,7 +95,7 @@
   padding: 0 10px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
+  background: rgba(0, 0, 0, 0.05);
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--text-sm);
@@ -96,6 +103,11 @@
   outline: none;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   -moz-appearance: textfield;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .sleep-timer-input {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .sleep-timer-input::-webkit-outer-spin-button,
@@ -158,17 +170,22 @@
   flex: 1;
   padding: 5px 0;
   border-radius: var(--radius-full);
-  border: 1px solid var(--border-subtle);
+  border: none;
   cursor: pointer;
-  background: var(--bg-tertiary);
+  background: rgba(0, 0, 0, 0.05);
   color: var(--text-tertiary);
   font-family: var(--font-body);
-  font-size: 0.68rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  letter-spacing: -0.01em;
 }
 
-.sleep-timer-preset:hover  { background: var(--accent-primary); color: #fff; border-color: transparent; transform: translateY(-1px); }
+[data-theme="dark"] .sleep-timer-preset {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sleep-timer-preset:hover  { background: var(--accent-primary); color: #fff; transform: translateY(-1px); }
 .sleep-timer-preset:active { transform: translateY(0); }
 
 /* ── Active timer row ── */
@@ -208,11 +225,11 @@
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .sleep-timer-popover {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--border-subtle);
 }
 
 :root:not([data-theme="dark"]) .sleep-timer-input {
-  background: var(--bg-secondary);
-  border-color: var(--border-strong);
+  background: rgba(0, 0, 0, 0.05);
+  border-color: var(--border-medium);
 }

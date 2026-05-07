@@ -1,59 +1,58 @@
 /* ═══════════════════════════════════════════════════════════════════
-   AETHER RADIO — OBSIDIAN DESIGN SYSTEM
-   Dark-first, content-forward, premium
+   AETHER RADIO — APPLE DESIGN SYSTEM
+   Clean, refined, system-native aesthetic
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Accent Hue (Electric Violet) ── */
-  --h: 258;
-  --s: 90%;
+  /* ── Accent Hue (Apple Blue) ── */
+  --h: 211;
+  --s: 100%;
 
-  /* ── Light Mode (Warm Neutral) ── */
-  --bg-primary:   #fafaf9;
-  --bg-secondary: #f4f4f3;
-  --bg-tertiary:  #eaeae8;
+  /* ── Light Mode (Apple-style warm white) ── */
+  --bg-primary:   #f2f2f7;
+  --bg-secondary: #ffffff;
+  --bg-tertiary:  #f2f2f7;
   --bg-elevated:  #ffffff;
 
-  --text-primary:   #111111;
-  --text-secondary: #444444;
-  --text-tertiary:  #666666;
-  --text-muted:     #888888;
+  --text-primary:   #1c1c1e;
+  --text-secondary: #3a3a3c;
+  --text-tertiary:  #636366;
+  --text-muted:     #8e8e93;
 
-  --border-subtle:  rgba(0, 0, 0, 0.07);
-  --border-medium:  rgba(0, 0, 0, 0.12);
-  --border-strong:  rgba(0, 0, 0, 0.18);
+  --border-subtle:  rgba(60, 60, 67, 0.08);
+  --border-medium:  rgba(60, 60, 67, 0.14);
+  --border-strong:  rgba(60, 60, 67, 0.22);
 
-  --surface-overlay: rgba(255, 255, 255, 0.85);
-  --surface-glass:   rgba(255, 255, 255, 0.65);
+  --surface-overlay: rgba(255, 255, 255, 0.82);
+  --surface-glass:   rgba(255, 255, 255, 0.72);
 
-  /* ── Accent Colors (Light Mode — darker for contrast) ── */
-  /* hsl(258, 75%, 52%) = ~4.6:1 on white — passes WCAG AA */
-  --accent-primary:   hsl(var(--h), 75%, 52%);
-  --accent-secondary: hsl(calc(var(--h) + 35), 75%, 58%);
-  --accent-hover:     hsl(var(--h), 75%, 42%);
-  --accent-soft:      hsla(var(--h), 75%, 52%, 0.1);
-  --accent-glow:      hsla(var(--h), 75%, 52%, 0.2);
-  --accent-muted:     hsla(var(--h), 75%, 52%, 0.5);
+  /* ── Accent Colors (Apple Blue — Light Mode) ── */
+  --accent-primary:   #007aff;
+  --accent-secondary: #5856d6;
+  --accent-hover:     #0062cc;
+  --accent-soft:      rgba(0, 122, 255, 0.10);
+  --accent-glow:      rgba(0, 122, 255, 0.18);
+  --accent-muted:     rgba(0, 122, 255, 0.40);
 
-  /* ── Status Colors ── */
-  --status-live:    #059669;
-  --status-warning: #d97706;
-  --status-error:   #dc2626;
-  --status-info:    #2563eb;
+  /* ── Status Colors (Apple Semantic) ── */
+  --status-live:    #34c759;
+  --status-warning: #ff9500;
+  --status-error:   #ff3b30;
+  --status-info:    #007aff;
 
-  /* ── Shadows (Light Mode) ── */
-  --shadow-xs:     0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm:     0 2px 6px rgba(0, 0, 0, 0.07);
-  --shadow-md:     0 4px 14px rgba(0, 0, 0, 0.09);
-  --shadow-lg:     0 8px 28px rgba(0, 0, 0, 0.11);
-  --shadow-xl:     0 16px 52px rgba(0, 0, 0, 0.13);
-  --shadow-glow:   0 0 28px var(--accent-glow);
-  --shadow-ambient: 0 0 80px rgba(0, 0, 0, 0.12);
+  /* ── Shadows (Light Mode — very soft) ── */
+  --shadow-xs:     0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm:     0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md:     0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg:     0 8px 30px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-xl:     0 16px 56px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.07);
+  --shadow-glow:   0 0 24px var(--accent-glow);
+  --shadow-ambient: 0 0 80px rgba(0, 0, 0, 0.08);
 
-  /* ── Typography ── */
-  --font-display: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-body:    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-mono:    'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  /* ── Typography (SF Pro stack) ── */
+  --font-display: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  --font-body:    -apple-system, 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:    'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', monospace;
 
   --text-2xs:  0.625rem;
   --text-xs:   0.75rem;
@@ -79,7 +78,6 @@
   --space-20: 5rem;
   --space-24: 6rem;
 
-  /* Named spacing aliases */
   --space-xs:  var(--space-2);
   --space-sm:  var(--space-4);
   --space-md:  var(--space-6);
@@ -87,34 +85,32 @@
   --space-xl:  var(--space-12);
   --space-2xl: var(--space-16);
 
-  /* ── Border Radius ── */
+  /* ── Border Radius (Apple-style generous curves) ── */
   --radius-xs:   0.25rem;
   --radius-sm:   0.5rem;
   --radius-md:   0.75rem;
   --radius-lg:   1rem;
   --radius-xl:   1.25rem;
-  --radius-2xl:  1.5rem;
+  --radius-2xl:  1.75rem;
   --radius-full: 9999px;
 
-  /* ── Transitions ── */
-  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base:   200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow:   300ms cubic-bezier(0.4, 0, 0.2, 1);
-  /* Keep --transition-medium as alias for backward compat */
-  --transition-medium: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ── Transitions (Apple spring physics) ── */
+  --transition-fast:   120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-base:   200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-slow:   320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-medium: 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --ease-in:     cubic-bezier(0.4, 0, 1, 1);
   --ease-out:    cubic-bezier(0, 0, 0.2, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  /* Keep --ease-smooth as alias */
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   /* ── Layout ── */
   --sidebar-width:           240px;
   --sidebar-width-collapsed: 64px;
-  --player-bar-height:       96px;
+  --player-bar-height:       88px;
   --header-height:           64px;
 
   /* ── Z-Index Scale ── */
@@ -127,54 +123,53 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   DARK MODE (Obsidian — Primary Theme)
+   DARK MODE (Apple Dark — true system dark)
    ═══════════════════════════════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  /* ── Backgrounds (Warm Black) ── */
-  --bg-primary:   #0d0d0f;
-  --bg-secondary: #111113;
-  --bg-tertiary:  #161618;
-  --bg-elevated:  #1c1c1f;
+  /* ── Backgrounds (Apple dark layering) ── */
+  --bg-primary:   #000000;
+  --bg-secondary: #1c1c1e;
+  --bg-tertiary:  #2c2c2e;
+  --bg-elevated:  #3a3a3c;
 
-  /* ── Text ── */
-  --text-primary:   #f5f5f5;
-  --text-secondary: #a0a0a0;
-  --text-tertiary:  #6b6b6b;
-  --text-muted:     #4a4a4a;
+  /* ── Text (Apple dark text hierarchy) ── */
+  --text-primary:   rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.60);
+  --text-tertiary:  rgba(255, 255, 255, 0.38);
+  --text-muted:     rgba(255, 255, 255, 0.24);
 
   /* ── Borders ── */
-  --border-subtle:  rgba(255, 255, 255, 0.06);
-  --border-medium:  rgba(255, 255, 255, 0.1);
-  --border-strong:  rgba(255, 255, 255, 0.16);
+  --border-subtle:  rgba(255, 255, 255, 0.08);
+  --border-medium:  rgba(255, 255, 255, 0.13);
+  --border-strong:  rgba(255, 255, 255, 0.20);
 
   /* ── Surfaces ── */
-  --surface-overlay: rgba(0, 0, 0, 0.85);
-  --surface-glass:   rgba(0, 0, 0, 0.65);
+  --surface-overlay: rgba(28, 28, 30, 0.88);
+  --surface-glass:   rgba(28, 28, 30, 0.72);
 
-  /* ── Accent (Electric Violet on Dark — bright & vivid) ── */
-  /* hsl(258, 90%, 72%) on #111 = ~7:1 contrast — excellent */
-  --accent-primary:   hsl(var(--h), 90%, 72%);
-  --accent-secondary: hsl(calc(var(--h) + 35), 90%, 76%);
-  --accent-hover:     hsl(var(--h), 90%, 82%);
-  --accent-soft:      hsla(var(--h), 90%, 72%, 0.12);
-  --accent-glow:      hsla(var(--h), 90%, 72%, 0.3);
-  --accent-muted:     hsla(var(--h), 90%, 72%, 0.55);
+  /* ── Accent (Apple Blue on Dark) ── */
+  --accent-primary:   #0a84ff;
+  --accent-secondary: #5e5ce6;
+  --accent-hover:     #409cff;
+  --accent-soft:      rgba(10, 132, 255, 0.14);
+  --accent-glow:      rgba(10, 132, 255, 0.28);
+  --accent-muted:     rgba(10, 132, 255, 0.50);
 
-  /* ── Status Colors (Vivid on Dark) ── */
-  --status-live:    #34d399;
-  --status-warning: #fbbf24;
-  --status-error:   #f87171;
-  --status-info:    #60a5fa;
+  /* ── Status Colors (Apple dark semantic) ── */
+  --status-live:    #30d158;
+  --status-warning: #ff9f0a;
+  --status-error:   #ff453a;
+  --status-info:    #0a84ff;
 
-  /* ── Shadows (Dark Mode — deeper) ── */
-  --shadow-xs:     0 1px 3px rgba(0, 0, 0, 0.35);
-  --shadow-sm:     0 2px 6px rgba(0, 0, 0, 0.45);
-  --shadow-md:     0 4px 14px rgba(0, 0, 0, 0.55);
-  --shadow-lg:     0 8px 28px rgba(0, 0, 0, 0.65);
-  --shadow-xl:     0 16px 52px rgba(0, 0, 0, 0.75);
+  /* ── Shadows (Dark Mode — deeper, more diffuse) ── */
+  --shadow-xs:     0 1px 4px rgba(0, 0, 0, 0.30);
+  --shadow-sm:     0 2px 8px rgba(0, 0, 0, 0.40);
+  --shadow-md:     0 4px 16px rgba(0, 0, 0, 0.50);
+  --shadow-lg:     0 8px 32px rgba(0, 0, 0, 0.60);
+  --shadow-xl:     0 16px 56px rgba(0, 0, 0, 0.70);
   --shadow-glow:   0 0 32px var(--accent-glow);
-  --shadow-ambient: 0 0 120px rgba(0, 0, 0, 0.85);
+  --shadow-ambient: 0 0 120px rgba(0, 0, 0, 0.80);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -199,7 +194,7 @@ body,
 .am-dialog,
 .toast {
   transition:
-    background-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
-    border-color     250ms cubic-bezier(0.4, 0, 0.2, 1),
-    color            250ms cubic-bezier(0.4, 0, 0.2, 1);
+    background-color 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color     250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color            250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }

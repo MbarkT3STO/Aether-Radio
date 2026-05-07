@@ -1,16 +1,16 @@
 /* ═══════════════════════════════════════════════════
-   STATION LOGO — Obsidian Design
+   STATION LOGO — Apple Design
    ═══════════════════════════════════════════════════ */
 
 .station-logo-wrap {
   width: 46px;
   height: 46px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   flex-shrink: 0;
   overflow: hidden;
   position: relative;
   background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
 .station-logo-wrap img {
@@ -28,19 +28,19 @@
   justify-content: center;
   background: var(--bg-tertiary);
   color: var(--accent-primary);
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 /* ── Card logo ── */
 .station-card-logo-wrap {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-md);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
   flex-shrink: 0;
   overflow: hidden;
   position: relative;
   background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
 .station-card-logo-wrap img {
@@ -57,17 +57,16 @@
 
 /* ── Custom station logo ── */
 .station-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-md);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .station-logo-wrap,
 :root:not([data-theme="dark"]) .station-card-logo-wrap {
   background: var(--bg-secondary);
-  border-color: var(--border-medium);
 }

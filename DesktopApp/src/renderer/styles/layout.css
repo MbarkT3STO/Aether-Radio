@@ -19,6 +19,21 @@
   transition: width var(--transition-slow);
 }
 
+/* macOS vibrancy-style sidebar */
+@supports (backdrop-filter: blur(20px)) {
+  .app-sidebar {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  }
+
+  [data-theme="dark"] .app-sidebar {
+    background: rgba(28, 28, 30, 0.82);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  }
+}
+
 .app-sidebar.sidebar-collapsed {
   width: var(--sidebar-width-collapsed);
 }
@@ -54,12 +69,15 @@
   position: relative;
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* ── Scrollbar (Apple-style minimal) ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: var(--radius-full);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
 
@@ -99,6 +117,7 @@
   color: var(--text-tertiary);
   font-size: var(--text-sm);
   margin-top: 4px;
+  letter-spacing: -0.01em;
 }
 
 .view-header-row {
@@ -109,9 +128,9 @@
 }
 
 .view-header-row h1 {
-  font-size: 1.5rem;
+  font-size: 1.625rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
 }
 
@@ -125,8 +144,8 @@
   height: 36px;
   min-width: 36px;
   border-radius: var(--radius-md);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  background: var(--accent-soft);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -138,11 +157,11 @@
 .section { margin-bottom: var(--space-10); }
 
 .section-title {
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: 0.6875rem;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   margin-bottom: var(--space-4);
   display: flex;
   align-items: center;
@@ -165,12 +184,12 @@
   letter-spacing: 0;
 }
 
-/* ── Results count — shared across History, Search, Favorites ── */
+/* ── Results count ── */
 .results-count {
-  font-size: 0.62rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   margin-bottom: var(--space-4);
   display: flex;

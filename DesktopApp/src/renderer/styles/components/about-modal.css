@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   ABOUT MODAL — Obsidian Design
+   ABOUT MODAL — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 .am-overlay {
@@ -15,21 +15,21 @@
 .am-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
 }
 
 /* ── Dialog ── */
 .am-dialog {
   position: relative;
   z-index: 1;
-  background: var(--bg-secondary);
+  background: var(--surface-glass);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-2xl);
   padding: 36px 32px 28px;
   width: 100%;
-  max-width: 340px;
+  max-width: 320px;
   margin: var(--space-6);
   display: flex;
   flex-direction: column;
@@ -37,7 +37,14 @@
   gap: 0;
   text-align: center;
   box-shadow: var(--shadow-xl);
-  animation: amDialogIn 0.32s var(--ease-spring) forwards;
+  animation: amDialogIn 0.36s var(--ease-spring) forwards;
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .am-dialog {
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  }
 }
 
 /* ── Close button ── */
@@ -215,20 +222,20 @@
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .am-dialog {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--border-subtle);
 }
 
 :root:not([data-theme="dark"]) .am-backdrop {
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.28);
 }
 
 :root:not([data-theme="dark"]) .am-info-row {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--border-subtle);
 }
 
 :root:not([data-theme="dark"]) .am-close {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.06);
+  border-color: transparent;
 }

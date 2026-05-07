@@ -1,13 +1,17 @@
 /* ═══════════════════════════════════════════════════════════════
-   STATION CARD — Obsidian Design
+   STATION CARD — Apple Design
    ═══════════════════════════════════════════════════════════════ */
 
 .station-card {
   background: var(--bg-secondary);
-  border-radius: var(--radius-xl);
-  padding: var(--space-5);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border-subtle);
-  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -15,21 +19,21 @@
 
 .station-card:hover {
   border-color: var(--border-medium);
-  background: var(--bg-tertiary);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.005);
   box-shadow: var(--shadow-md);
 }
 
 .station-card:active {
-  transform: translateY(0) scale(0.99);
+  transform: translateY(0) scale(0.98);
   box-shadow: none;
+  transition-duration: 80ms;
 }
 
 /* Playing state */
 .station-card.playing {
   border-color: var(--accent-primary);
   background: var(--accent-soft);
-  box-shadow: 0 0 0 1px var(--accent-primary), var(--shadow-glow);
+  box-shadow: 0 0 0 1px var(--accent-primary), var(--shadow-md);
 }
 
 .station-card.playing::before {
@@ -37,11 +41,11 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   background: var(--status-live);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--status-live);
+  box-shadow: 0 0 6px var(--status-live);
   animation: dotPulse 2s infinite;
   z-index: 2;
 }
@@ -57,13 +61,14 @@
 .station-card-logo-wrap { flex-shrink: 0; }
 
 .station-card-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-md);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
   background: var(--bg-tertiary);
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid var(--border-subtle);
+  border: none;
+  box-shadow: var(--shadow-xs);
 }
 
 .station-card-info { flex: 1; min-width: 0; }
@@ -72,12 +77,12 @@
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 600;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .station-card-country {
@@ -86,30 +91,34 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  letter-spacing: -0.01em;
 }
 
 /* ── Tags ── */
 .station-card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
   margin-bottom: var(--space-3);
 }
 
 .station-card-tag {
   padding: 2px 8px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: var(--radius-full);
-  font-size: 0.65rem;
+  font-size: 0.625rem;
   font-weight: 500;
   color: var(--text-tertiary);
   white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .station-card-tag {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .station-card.playing .station-card-tag {
   background: var(--accent-soft);
-  border-color: var(--accent-soft);
   color: var(--accent-primary);
 }
 
@@ -125,11 +134,12 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.65rem;
+  font-size: 0.625rem;
   color: var(--text-muted);
   flex-wrap: nowrap;
   overflow: hidden;
   min-width: 0;
+  letter-spacing: -0.01em;
 }
 
 .station-card-meta-sep { opacity: 0.4; }
@@ -148,8 +158,8 @@
 
 /* ── Favorite button ── */
 .station-card-favorite {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: none;
   background: transparent;
@@ -163,38 +173,38 @@
 }
 
 .station-card-favorite:hover {
-  color: var(--accent-secondary);
-  transform: scale(1.15);
+  color: #ff2d55;
+  transform: scale(1.18);
 }
 
 .station-card-favorite.active {
-  color: var(--accent-secondary);
-  animation: heartBeat 0.4s ease;
+  color: #ff2d55;
+  animation: heartBeat 0.38s ease;
 }
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .station-card {
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
+  background: var(--bg-secondary);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
 :root:not([data-theme="dark"]) .station-card:hover {
-  background: var(--bg-secondary);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-md);
 }
 
 :root:not([data-theme="dark"]) .station-card.playing {
   background: var(--accent-soft);
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 1px var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary), var(--shadow-sm);
 }
 
 :root:not([data-theme="dark"]) .station-card-tag {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 :root:not([data-theme="dark"]) .station-card-logo {
-  border-color: var(--border-medium);
+  box-shadow: var(--shadow-xs);
 }
