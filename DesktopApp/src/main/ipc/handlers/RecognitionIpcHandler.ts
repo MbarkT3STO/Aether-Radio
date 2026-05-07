@@ -9,6 +9,10 @@ export interface RecognitionResult {
   releaseDate?: string
   spotifyUrl?: string
   appleMusicUrl?: string
+  youtubeMusicUrl?: string
+  youtubeUrl?: string
+  deezerUrl?: string
+  shazamUrl?: string
   coverArt?: string
 }
 
@@ -64,21 +68,37 @@ async function recognizeStream(streamUrl: string): Promise<RecognitionResult | n
     // Cover art
     const coverArt = track.images?.coverarthq ?? track.images?.coverart
 
-    // Streaming links from hub.options (providername = 'SPOTIFY' | 'APPLEMUSIC')
+    // Streaming links from hub.options
     const spotifyOption    = track.hub?.options?.find(o => o.providername?.toUpperCase() === 'SPOTIFY')
     const appleMusicOption = track.hub?.options?.find(o => o.providername?.toUpperCase() === 'APPLEMUSIC')
 
     const spotifyUrl    = spotifyOption?.actions?.find(a => a.type === 'uri')?.uri
     const appleMusicUrl = appleMusicOption?.actions?.find(a => a.type === 'uri')?.uri
 
+    // YouTube URL from sections
+    const videoSection  = track.sections?.find(s => s.youtubeurl)
+    const youtubeUrl    = videoSection?.youtubeurl ?? undefined
+
+    // YouTube Music & Deezer — construct search URLs from title + artist
+    const searchQuery       = encodeURIComponent(`${title} ${artist}`)
+    const youtubeMusicUrl   = `https://music.youtube.com/search?q=${searchQuery}`
+    const deezerUrl         = `https://www.deezer.com/search/${searchQuery}`
+
+    // Shazam track page
+    const shazamUrl = track.url ?? undefined
+
     return {
       title,
       artist,
-      album:         album       ?? undefined,
-      releaseDate:   releaseDate ?? undefined,
-      coverArt:      coverArt    ?? undefined,
-      spotifyUrl:    spotifyUrl    ?? undefined,
-      appleMusicUrl: appleMusicUrl ?? undefined,
+      album:          album          ?? undefined,
+      releaseDate:    releaseDate    ?? undefined,
+      coverArt:       coverArt       ?? undefined,
+      spotifyUrl:     spotifyUrl     ?? undefined,
+      appleMusicUrl:  appleMusicUrl  ?? undefined,
+      youtubeMusicUrl,
+      youtubeUrl,
+      deezerUrl,
+      shazamUrl,
     }
   } finally {
     await fs.unlink(tmpFile).catch(() => {})

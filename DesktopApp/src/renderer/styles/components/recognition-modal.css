@@ -661,24 +661,26 @@
 
 .rcm-found-links {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
   width: 100%;
   justify-content: center;
   padding: 0 var(--space-lg) var(--space-lg);
 }
 
 .rcm-platform-btn {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 90px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 6px;
+  padding: 9px 12px;
   border-radius: var(--radius-full);
   border: none;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   background: var(--bg-primary);
   box-shadow: var(--nm-raised);
@@ -696,8 +698,12 @@
   transform: translateY(0);
 }
 
-.rcm-spotify { color: #1db954; }
-.rcm-apple   { color: #fc3c44; }
+.rcm-spotify  { color: #1db954; }
+.rcm-apple    { color: #fc3c44; }
+.rcm-ytmusic  { color: #ff0000; }
+.rcm-youtube  { color: #ff0000; }
+.rcm-deezer   { color: #a238ff; }
+.rcm-shazam   { color: #0088ff; }
 
 [data-theme="dark"] .rcm-platform-btn {
   background: var(--bg-primary);

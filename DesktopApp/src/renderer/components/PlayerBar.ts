@@ -1128,7 +1128,7 @@ export class PlayerBar extends BaseComponent {
             <div class="rcm-found-artist">${this.esc(result.artist)}</div>
             ${result.album ? `<div class="rcm-found-album">${this.esc(result.album)}${result.releaseDate ? ` · ${result.releaseDate.slice(0, 4)}` : ''}</div>` : ''}
           </div>
-          ${(result.spotifyUrl || result.appleMusicUrl) ? `
+          ${(result.spotifyUrl || result.appleMusicUrl || result.youtubeMusicUrl || result.youtubeUrl || result.deezerUrl || result.shazamUrl) ? `
             <div class="rcm-result-divider"></div>
             <div class="rcm-found-links">
               ${result.spotifyUrl ? `<button class="rcm-platform-btn rcm-spotify" id="rcm-spotify">
@@ -1136,6 +1136,18 @@ export class PlayerBar extends BaseComponent {
               </button>` : ''}
               ${result.appleMusicUrl ? `<button class="rcm-platform-btn rcm-apple" id="rcm-apple">
                 ${this.appleMusicIcon()} Apple Music
+              </button>` : ''}
+              ${result.youtubeMusicUrl ? `<button class="rcm-platform-btn rcm-ytmusic" id="rcm-ytmusic">
+                ${this.youtubeMusicIcon()} YT Music
+              </button>` : ''}
+              ${result.youtubeUrl ? `<button class="rcm-platform-btn rcm-youtube" id="rcm-youtube">
+                ${this.youtubeIcon()} YouTube
+              </button>` : ''}
+              ${result.deezerUrl ? `<button class="rcm-platform-btn rcm-deezer" id="rcm-deezer">
+                ${this.deezerIcon()} Deezer
+              </button>` : ''}
+              ${result.shazamUrl ? `<button class="rcm-platform-btn rcm-shazam" id="rcm-shazam">
+                ${this.shazamIcon()} Shazam
               </button>` : ''}
             </div>
           ` : ''}
@@ -1149,6 +1161,26 @@ export class PlayerBar extends BaseComponent {
         if (result.appleMusicUrl) {
           resultEl.querySelector('#rcm-apple')?.addEventListener('click', () => {
             window.electronAPI.openExternal(result.appleMusicUrl!)
+          })
+        }
+        if (result.youtubeMusicUrl) {
+          resultEl.querySelector('#rcm-ytmusic')?.addEventListener('click', () => {
+            window.electronAPI.openExternal(result.youtubeMusicUrl!)
+          })
+        }
+        if (result.youtubeUrl) {
+          resultEl.querySelector('#rcm-youtube')?.addEventListener('click', () => {
+            window.electronAPI.openExternal(result.youtubeUrl!)
+          })
+        }
+        if (result.deezerUrl) {
+          resultEl.querySelector('#rcm-deezer')?.addEventListener('click', () => {
+            window.electronAPI.openExternal(result.deezerUrl!)
+          })
+        }
+        if (result.shazamUrl) {
+          resultEl.querySelector('#rcm-shazam')?.addEventListener('click', () => {
+            window.electronAPI.openExternal(result.shazamUrl!)
           })
         }
       }
@@ -1187,6 +1219,30 @@ export class PlayerBar extends BaseComponent {
   private appleMusicIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
       <path d="M23.994 6.124a9.23 9.23 0 0 0-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 0 0-1.877-.726 10.496 10.496 0 0 0-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026C4.786.07 4.043.15 3.34.428 2.004.958 1.04 1.88.475 3.208a5.494 5.494 0 0 0-.39 1.548c-.06.34-.087.686-.09 1.03-.002.05-.007.1-.01.15v12.128c.01.15.017.302.027.453.063.97.24 1.914.724 2.782.35.627.8 1.162 1.38 1.583.98.706 2.1 1.02 3.28 1.077.45.02.9.03 1.35.03h11.28c.45 0 .9-.01 1.35-.03 1.18-.057 2.3-.37 3.28-1.077.58-.42 1.03-.956 1.38-1.583.484-.868.66-1.812.724-2.782.01-.15.017-.302.027-.453V6.124zm-6.985 1.23v7.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V9.854l-4.5 1.5v5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5v-7.5c0-.69.47-1.29 1.14-1.45l6-2c.47-.12.96-.01 1.32.3.36.31.54.76.54 1.15z"/>
+    </svg>`
+  }
+
+  private youtubeMusicIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.104c-3.924 0-7.104-3.18-7.104-7.104S8.076 4.896 12 4.896s7.104 3.18 7.104 7.104-3.18 7.104-7.104 7.104zm0-13.332c-3.432 0-6.228 2.796-6.228 6.228S8.568 18.228 12 18.228s6.228-2.796 6.228-6.228S15.432 5.772 12 5.772zM9.684 15.54V8.46L15.816 12l-6.132 3.54z"/>
+    </svg>`
+  }
+
+  private youtubeIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+    </svg>`
+  }
+
+  private deezerIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.944 17.773h4.112v1.217h-4.112zm0-2.77h4.112v1.217h-4.112zm0-2.77h4.112v1.218h-4.112zm0-2.77h4.112v1.217h-4.112zM12.862 17.773h4.11v1.217h-4.11zm0-2.77h4.11v1.217h-4.11zm0-2.77h4.11v1.218h-4.11zm0-2.77h4.11v1.217h-4.11zM6.78 17.773h4.11v1.217H6.78zm0-2.77h4.11v1.217H6.78zm0-2.77h4.11v1.218H6.78zM.697 17.773h4.11v1.217H.697zm0-2.77h4.11v1.217H.697z"/>
+    </svg>`
+  }
+
+  private shazamIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.79 17.5c-1.18 0-2.21-.34-3.07-.93l4.3-4.3c.26.37.41.82.41 1.3 0 1.62-1.32 1.93-1.64 1.93zm4.13-2.57l-4.3 4.3c-.37-.26-.82-.41-1.3-.41-1.62 0-1.93-1.32-1.93-1.64 0-1.18.34-2.21.93-3.07l4.3-4.3c.26.37.41.82.41 1.3 0 1.62-1.32 1.93-1.64 1.93zm1.57-1.57c-.26-.37-.41-.82-.41-1.3 0-1.62 1.32-1.93 1.64-1.93 1.18 0 2.21.34 3.07.93l-4.3 4.3z"/>
     </svg>`
   }
 

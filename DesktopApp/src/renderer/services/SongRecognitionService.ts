@@ -11,6 +11,10 @@ export interface RecognitionResult {
   releaseDate?: string
   spotifyUrl?: string
   appleMusicUrl?: string
+  youtubeMusicUrl?: string
+  youtubeUrl?: string
+  deezerUrl?: string
+  shazamUrl?: string
   coverArt?: string
 }
 
