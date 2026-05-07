@@ -130,18 +130,17 @@ class App {
       }
     })
 
-    // Pause visualizer and suspend AudioContext when app goes to background (battery fix)
+    // Stop canvas rendering when app goes to background (battery fix)
+    // NOTE: We do NOT suspend the AudioContext — that would kill the audio stream.
     CapApp.addListener('appStateChange', ({ isActive }) => {
       const visualizer = this.audioService.getVisualizer()
       if (!isActive) {
-        // App went to background — stop canvas rendering and suspend Web Audio
+        // App went to background — stop canvas rendering only
         visualizer.stopVisualization()
-        void visualizer.suspendContext()
         const ambCanvas = document.querySelector<HTMLElement>('#mp-ambient-canvas')
         if (ambCanvas) ambCanvas.classList.remove('active')
       } else {
-        // App came to foreground — resume AudioContext and restart visualizer if playing
-        void visualizer.resumeContext()
+        // App came to foreground — restart visualizer if playing
         if (this.playerStore.isPlaying) {
           setTimeout(() => {
             const canvas = document.querySelector<HTMLCanvasElement>('#mp-ambient-canvas')

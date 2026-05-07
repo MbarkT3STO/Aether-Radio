@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(NativeHttpPlugin.class);
+        registerPlugin(AudioPlayerPlugin.class);
         super.onCreate(savedInstanceState);
 
         // Acquire WifiLock to prevent stream drops when screen turns off on OEM devices
