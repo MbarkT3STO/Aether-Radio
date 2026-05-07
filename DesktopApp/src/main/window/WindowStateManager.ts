@@ -14,6 +14,7 @@ const DEFAULT: WindowState = { width: 1400, height: 900, maximized: false }
 export class WindowStateManager {
   private store: Store
   private state: WindowState
+  private saveTimer: ReturnType<typeof setTimeout> | null = null
 
   constructor() {
     this.store = new Store({ name: 'window-state' }) as Store
@@ -33,11 +34,20 @@ export class WindowStateManager {
       } else {
         this.state = { ...this.state, maximized: win.isMaximized() }
       }
-      this.store.set('state', this.state)
+      // Debounce: only write to disk 300ms after the last resize/move event
+      if (this.saveTimer) clearTimeout(this.saveTimer)
+      this.saveTimer = setTimeout(() => {
+        this.store.set('state', this.state)
+        this.saveTimer = null
+      }, 300)
     }
 
     win.on('resize', save)
     win.on('move', save)
-    win.on('close', save)
+    // On close, flush immediately — no debounce
+    win.on('close', () => {
+      if (this.saveTimer) clearTimeout(this.saveTimer)
+      this.store.set('state', this.state)
+    })
   }
 }

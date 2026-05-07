@@ -25,7 +25,7 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
+      sandbox: true,
     },
   })
 
@@ -57,19 +57,34 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  // Allow radio stream CORS — only inject the header if the response
-  // doesn't already include one, to avoid duplicate '*, *' values.
+  // Inject CORS header only for audio/stream responses — not for API JSON calls.
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const headers = details.responseHeaders ?? {}
-    const alreadySet = Object.keys(headers).some(
+
+    const contentType =
+      Object.entries(headers).find(([k]) => k.toLowerCase() === 'content-type')?.[1]?.[0] ?? ''
+
+    const isAudioStream =
+      contentType.startsWith('audio/') ||
+      contentType.includes('application/ogg') ||
+      contentType.includes('application/octet-stream') ||
+      details.url.includes('/stream') ||
+      details.url.match(/\.(mp3|aac|ogg|m3u8|pls)(\?|$)/i) !== null
+
+    const alreadyHasCors = Object.keys(headers).some(
       k => k.toLowerCase() === 'access-control-allow-origin'
     )
-    callback({
-      responseHeaders: alreadySet ? headers : {
-        ...headers,
-        'Access-Control-Allow-Origin': ['*'],
-      },
-    })
+
+    if (isAudioStream && !alreadyHasCors) {
+      callback({
+        responseHeaders: {
+          ...headers,
+          'Access-Control-Allow-Origin': ['*'],
+        },
+      })
+    } else {
+      callback({ responseHeaders: headers })
+    }
   })
 
   createWindow()

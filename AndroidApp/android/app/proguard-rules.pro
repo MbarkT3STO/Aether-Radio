@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Capacitor core — keep all classes and members
+-keep class com.getcapacitor.** { *; }
+
+# App-specific classes
+-keep class com.aetherradio.app.** { *; }
+
+# Preserve Capacitor plugin methods annotated with @PluginMethod
+-keepclassmembers class * extends com.getcapacitor.Plugin {
+    @com.getcapacitor.PluginMethod public *;
+}

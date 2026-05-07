@@ -48,6 +48,29 @@ export class AudioService {
         await this._onPlayStarted(this.audio)
       }
       this.playerStore.setLoading(false)
+
+      // Update OS Now Playing widget (macOS menu bar, Linux MPRIS)
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: station.name,
+          artist: station.country || 'Live Radio',
+          album: 'Aether Radio',
+          artwork: station.favicon
+            ? [{ src: station.favicon, sizes: '512x512', type: 'image/png' }]
+            : [],
+        })
+        navigator.mediaSession.playbackState = 'playing'
+
+        navigator.mediaSession.setActionHandler('play', () => {
+          this.playerStore.play(this.playerStore.currentStation!)
+        })
+        navigator.mediaSession.setActionHandler('pause', () => {
+          this.playerStore.pause()
+        })
+        navigator.mediaSession.setActionHandler('stop', () => {
+          this.playerStore.stop()
+        })
+      }
     } catch (error) {
       console.error('Playback error:', error)
       await this.handlePlaybackError(station)
@@ -56,12 +79,19 @@ export class AudioService {
 
   pause(): void {
     this.audio.pause()
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'paused'
+    }
   }
 
   stop(): void {
     this.audio.pause()
     this.audio.src = ''
     this.currentStationId = null
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = null
+      navigator.mediaSession.playbackState = 'none'
+    }
   }
 
   setVolume(volume: number): void {

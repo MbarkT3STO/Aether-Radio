@@ -68,6 +68,13 @@ export class TrayManager {
     this.tray?.setContextMenu(menu)
   }
 
+  clearStation(mainWindow: BrowserWindow): void {
+    this.currentStationName = 'No station playing'
+    this.isPlaying = false
+    this.updateMenu(mainWindow)
+    this.tray?.setToolTip('Aether Radio')
+  }
+
   destroy(): void {
     this.tray?.destroy()
     this.tray = null

@@ -14,6 +14,10 @@ export class WindowIpcHandler {
     // ── Tray state update from renderer ──────────────────────────────────
     ipcMain.on(IpcChannel.TRAY_UPDATE, (_, payload: TrayUpdatePayload) => {
       trayManager.updatePlaybackState(mainWindow, payload.name, payload.playing)
+      // When the player stops (not playing and no station name), clear tray state
+      if (!payload.playing && !payload.name) {
+        trayManager.clearStation(mainWindow)
+      }
     })
 
     // ── Window controls ───────────────────────────────────────────────────
