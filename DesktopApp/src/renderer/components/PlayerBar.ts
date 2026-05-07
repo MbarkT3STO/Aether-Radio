@@ -132,7 +132,7 @@ export class PlayerBar extends BaseComponent {
             data-action="${isPlaying ? 'pause' : 'play'}"
             title="${isPlaying ? 'Pause' : 'Play'}">
             ${isLoading
-              ? `<span class="loading-spinner loading-spinner--md"></span>`
+              ? `<span class="loading-spinner loading-spinner--btn"></span>`
               : (isPlaying ? this.pauseIcon() : this.playIcon())
             }
           </button>
@@ -305,7 +305,7 @@ export class PlayerBar extends BaseComponent {
     const playBtn = this.querySelector<HTMLElement>('#player-play-btn')
     if (playBtn) {
       playBtn.innerHTML = loading
-        ? `<span class="loading-spinner loading-spinner--md"></span>`
+        ? `<span class="loading-spinner loading-spinner--btn"></span>`
         : (isPlaying ? this.pauseIcon() : this.playIcon())
     }
 
@@ -759,7 +759,7 @@ export class PlayerBar extends BaseComponent {
     if (!playBtn) return
     const isPlaying = this.playerStore.isPlaying
     playBtn.innerHTML = loading
-      ? `<span class="loading-spinner loading-spinner--md"></span>`
+      ? `<span class="loading-spinner loading-spinner--btn"></span>`
       : (isPlaying ? this.pauseIconLg() : this.playIconLg())
   }
 
@@ -855,7 +855,6 @@ export class PlayerBar extends BaseComponent {
         ? `<span class="meta-sep">·</span>
            <span class="player-connecting">
              <span class="loading-spinner loading-spinner--sm"></span>
-             Connecting…
            </span>`
         : ''
       }

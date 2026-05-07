@@ -13,20 +13,41 @@
 .loading-spinner.small { width: 18px; height: 18px; border-width: 2px; }
 .loading-spinner.large { width: 52px; height: 52px; border-width: 3px; }
 
+/* Small inline spinner (meta line) */
 .loading-spinner--sm {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-width: 1.5px;
   border-color: var(--border-medium);
   border-top-color: var(--accent-primary);
 }
 
+/* Medium standalone spinner */
 .loading-spinner--md {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-width: 2px;
   border-color: var(--border-medium);
   border-top-color: var(--accent-primary);
+}
+
+/* Spinner inside the accent-filled play button — always white */
+.loading-spinner--btn {
+  width: 20px;
+  height: 20px;
+  border-width: 2.5px;
+  /* Track: semi-transparent white so it blends with the accent bg */
+  border-color: rgba(255, 255, 255, 0.3);
+  /* Spinning arc: solid white */
+  border-top-color: #ffffff;
+  flex-shrink: 0;
+}
+
+/* Larger variant for the expanded player's 64px play button */
+.pex-btn-play .loading-spinner--btn {
+  width: 26px;
+  height: 26px;
+  border-width: 3px;
 }
 
 .loading-container {
