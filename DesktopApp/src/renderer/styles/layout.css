@@ -75,10 +75,7 @@
   position: relative;
 }
 
-/* ── Content inner max-width — prevents over-stretching on ultrawide ── */
-.app-content > * {
-  max-width: 1400px;
-}
+
 
 /* ── Player bar slot ── */
 .app-player-bar {
