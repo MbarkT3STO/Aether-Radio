@@ -18,7 +18,7 @@
 }
 
 .platform-darwin .sidebar-header {
-  padding-top: 46px;
+  padding-top: 40px;
 }
 
 /* ── Logo icon ── */
@@ -309,7 +309,7 @@
 
 /* ── Footer ── */
 .sidebar-footer {
-  padding: 0 14px 16px;
+  padding: 0 14px 18px;
   flex-shrink: 0;
   -webkit-app-region: no-drag;
 }
@@ -369,7 +369,7 @@
 }
 
 .platform-darwin .sidebar.collapsed .sidebar-header {
-  padding-top: 46px;
+  padding-top: 40px;
 }
 
 .sidebar.collapsed .sidebar-logo {
@@ -456,7 +456,6 @@
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .sidebar {
   background: transparent;
-  border-right: 1px solid var(--border-subtle);
 }
 
 :root:not([data-theme="dark"]) .sidebar-nav-item {

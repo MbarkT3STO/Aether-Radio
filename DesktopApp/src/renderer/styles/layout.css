@@ -16,13 +16,16 @@
 .app-sidebar {
   width: var(--sidebar-width);
   background: var(--material-sidebar);
-  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   position: relative;
   z-index: 200;
   transition: width var(--transition-slow);
+  margin: 10px 0 10px 10px;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
 }
 
 /* Apple Liquid Glass sidebar — vibrancy effect */
@@ -34,9 +37,11 @@
   }
 
   [data-theme="dark"] .app-sidebar {
-    background: rgba(22,22,24,0.88);
+    background: rgba(22,22,24,0.92);
     backdrop-filter: blur(40px) saturate(1.6);
     -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    border-color: var(--border-medium);
+    box-shadow: var(--shadow-lg);
   }
 }
 
@@ -119,7 +124,7 @@
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: var(--bg-secondary);
-    border-right: 2px solid var(--border-strong);
+    border: 2px solid var(--border-strong);
   }
 }
 
