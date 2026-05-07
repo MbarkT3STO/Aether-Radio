@@ -37,11 +37,7 @@
   box-shadow: 0 0 0 1px var(--accent-border), var(--shadow-sm);
 }
 
-[data-theme="dark"] .station-card.playing {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  box-shadow: 0 0 0 1px var(--accent-border), var(--shadow-sm);
-}
+
 
 /* Live dot — top right */
 .station-card.playing::before {
@@ -113,7 +109,7 @@
 
 .station-card-tag {
   padding: 2px 8px;
-  background: rgba(0,0,0,0.05);
+  background: var(--bg-tertiary);
   border-radius: var(--radius-full);
   font-size: 0.625rem;
   font-weight: 500;
@@ -121,10 +117,6 @@
   white-space: nowrap;
   letter-spacing: -0.01em;
   border: 1px solid transparent;
-}
-
-[data-theme="dark"] .station-card-tag {
-  background: rgba(255,255,255,0.08);
 }
 
 .station-card.playing .station-card-tag {
@@ -197,29 +189,4 @@
   animation: heartBeat 0.42s ease;
 }
 
-/* ── Light Mode ── */
-:root:not([data-theme="dark"]) .station-card {
-  background: var(--bg-secondary);
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-xs);
-}
 
-:root:not([data-theme="dark"]) .station-card:hover {
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
-  box-shadow: var(--shadow-lg);
-}
-
-:root:not([data-theme="dark"]) .station-card.playing {
-  background: var(--accent-soft);
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 1px var(--accent-border), var(--shadow-sm);
-}
-
-:root:not([data-theme="dark"]) .station-card-tag {
-  background: rgba(0,0,0,0.05);
-}
-
-:root:not([data-theme="dark"]) .station-card-logo {
-  box-shadow: var(--shadow-sm);
-}

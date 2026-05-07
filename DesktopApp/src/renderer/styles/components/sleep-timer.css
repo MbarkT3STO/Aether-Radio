@@ -144,11 +144,6 @@
   letter-spacing: -0.01em;
 }
 
-[data-theme="dark"] .sleep-timer-input {
-  background: rgba(255,255,255,0.08);
-  border-color: var(--border-medium);
-}
-
 .sleep-timer-input::-webkit-outer-spin-button,
 .sleep-timer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
@@ -243,11 +238,6 @@
   letter-spacing: -0.01em;
 }
 
-[data-theme="dark"] .sleep-timer-preset {
-  background: rgba(255,255,255,0.07);
-  border-color: var(--border-subtle);
-}
-
 .sleep-timer-preset:hover {
   background: var(--gradient-accent);
   color: #fff;
@@ -316,19 +306,4 @@
   outline-offset: 2px;
 }
 
-/* ── Light Mode ── */
-:root:not([data-theme="dark"]) .sleep-timer-popover {
-  background: #FFFFFF;
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-lg);
-}
 
-:root:not([data-theme="dark"]) .sleep-timer-input {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
-}
-
-:root:not([data-theme="dark"]) .sleep-timer-preset {
-  background: var(--bg-secondary);
-  border-color: var(--border-subtle);
-}

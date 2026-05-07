@@ -75,7 +75,7 @@
   font-size: 0.5625rem;
   font-weight: 700;
   color: var(--text-muted);
-  background: rgba(0,0,0,0.05);
+  background: var(--bg-tertiary);
   padding: 2px 7px;
   border-radius: var(--radius-full);
   white-space: nowrap;
@@ -84,10 +84,6 @@
   position: relative;
   z-index: 1;
   border: 1px solid var(--border-subtle);
-}
-
-[data-theme="dark"] .genre-card-count {
-  background: rgba(255,255,255,0.08);
 }
 
 .genre-show-more {
@@ -126,21 +122,7 @@
   transition-duration: 60ms;
 }
 
-/* ── Light Mode ── */
-:root:not([data-theme="dark"]) .genre-card {
-  background: var(--bg-elevated);
-  border-color: var(--border-subtle);
-}
 
-:root:not([data-theme="dark"]) .genre-card:hover {
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
-  box-shadow: var(--shadow-md);
-}
-
-:root:not([data-theme="dark"]) .genre-card-count {
-  background: rgba(0,0,0,0.05);
-}
 
 /* ═══════════════════════════════════════════════════════════════
    COUNTRY CARDS
@@ -220,14 +202,4 @@
   z-index: 1;
 }
 
-/* ── Light Mode ── */
-:root:not([data-theme="dark"]) .country-card {
-  background: var(--bg-elevated);
-  border-color: var(--border-subtle);
-}
 
-:root:not([data-theme="dark"]) .country-card:hover {
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
-  box-shadow: var(--shadow-lg);
-}

@@ -38,11 +38,6 @@
   border: 1px solid var(--border-subtle);
 }
 
-[data-theme="dark"] .rcm-dialog {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
-}
-
 /* ── Close button ── */
 .rcm-close {
   position: absolute;
@@ -79,14 +74,6 @@
 .rcm-close:focus-visible {
   outline: 2px solid rgba(255,255,255,0.8);
   outline-offset: 2px;
-}
-
-[data-theme="dark"] .rcm-close {
-  background: rgba(255,255,255,0.12);
-}
-
-[data-theme="dark"] .rcm-close:hover {
-  background: rgba(255,255,255,0.20);
 }
 
 /* ── Cancel button ── */
@@ -141,10 +128,6 @@
   overflow: hidden;
   transition: opacity 0.3s ease, transform 0.3s ease;
   background: var(--bg-primary);
-}
-
-[data-theme="dark"] .rcm-listening {
-  background: var(--bg-secondary);
 }
 
 .rcm-listening.rcm-fade-out {
@@ -327,10 +310,6 @@
   z-index: 1;
 }
 
-[data-theme="dark"] .rcm-hero-gradient {
-  background: linear-gradient(to bottom, transparent, var(--bg-secondary));
-}
-
 .rcm-hero-nocov {
   background: linear-gradient(135deg,
     hsla(var(--h), 60%, 60%, 0.14) 0%,
@@ -355,10 +334,6 @@
 .rcm-body {
   padding: 24px 24px 28px;
   background: var(--bg-primary);
-}
-
-[data-theme="dark"] .rcm-body {
-  background: var(--bg-secondary);
 }
 
 /* ── Song Identity ── */
@@ -479,11 +454,6 @@
   letter-spacing: -0.015em;
 }
 
-[data-theme="dark"] .rcm-stream-btn {
-  background: var(--bg-tertiary);
-  border-color: var(--border-subtle);
-}
-
 .rcm-stream-btn:hover {
   transform: translateY(-2px) scale(1.01);
   border-color: transparent;
@@ -542,10 +512,6 @@
   transform: translateY(-1px);
 }
 
-[data-theme="dark"] .rcm-more-btn:hover {
-  background: rgba(255,255,255,0.06);
-}
-
 .rcm-more-btn:active {
   transform: scale(0.97);
   transition-duration: 60ms;
@@ -580,10 +546,6 @@
   margin-bottom: 20px;
   animation: rcmMissShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
   box-shadow: var(--shadow-sm);
-}
-
-[data-theme="dark"] .rcm-miss-icon {
-  background: var(--bg-tertiary);
 }
 
 .rcm-miss-title {
@@ -630,11 +592,6 @@
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
   letter-spacing: -0.015em;
-}
-
-[data-theme="dark"] .rcm-retry-btn {
-  background: var(--bg-tertiary);
-  border-color: var(--border-medium);
 }
 
 .rcm-retry-btn:hover {

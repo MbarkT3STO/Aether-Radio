@@ -213,15 +213,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 5px 10px;
-  background: rgba(0,0,0,0.04);
+  background: var(--bg-tertiary);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
   position: relative;
   z-index: 1;
-}
-
-[data-theme="dark"] .cs-card-url {
-  background: rgba(255,255,255,0.06);
 }
 
 /* ── Card Actions ── */
@@ -277,7 +273,7 @@
   width: 34px;
   height: 34px;
   border-radius: var(--radius-lg);
-  background: rgba(0,0,0,0.05);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
   display: flex;
@@ -289,11 +285,6 @@
     background var(--transition-fast),
     transform var(--transition-spring);
   flex-shrink: 0;
-}
-
-[data-theme="dark"] .cs-edit-btn,
-[data-theme="dark"] .cs-delete-btn {
-  background: rgba(255,255,255,0.08);
 }
 
 .cs-edit-btn:hover {
@@ -665,28 +656,4 @@
   transform: scale(1.06);
 }
 
-/* ── Light Mode ── */
-:root:not([data-theme="dark"]) .cs-card {
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
-}
 
-:root:not([data-theme="dark"]) .cs-card:hover {
-  background: var(--bg-secondary);
-}
-
-:root:not([data-theme="dark"]) .cs-form-card {
-  background: var(--bg-elevated);
-  border-color: var(--border-medium);
-}
-
-:root:not([data-theme="dark"]) .cs-form-group input,
-:root:not([data-theme="dark"]) .cs-form-group textarea {
-  background: var(--bg-secondary);
-  border-color: var(--border-strong);
-}
-
-:root:not([data-theme="dark"]) .cs-card-url {
-  background: var(--bg-secondary);
-  border-color: var(--border-medium);
-}

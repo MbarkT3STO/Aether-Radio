@@ -28,10 +28,6 @@
   box-shadow: var(--shadow-xs);
 }
 
-[data-theme="dark"] .empty-state-icon {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-}
 
 .empty-state-icon svg { width: 36px; height: 36px; }
 
@@ -52,9 +48,4 @@
   letter-spacing: -0.01em;
 }
 
-/* ── Light Mode ── */
-:root:not([data-theme="dark"]) .empty-state-icon {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  opacity: 0.85;
-}
+

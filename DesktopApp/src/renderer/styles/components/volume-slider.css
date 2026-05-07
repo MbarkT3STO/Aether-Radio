@@ -16,11 +16,7 @@
   flex-shrink: 0;
 }
 
-[data-theme="dark"] .player-volume {
-  background: rgba(255,255,255,0.06);
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-md);
-}
+
 
 /* Mute button inside the pill */
 .player-btn-mute {
@@ -68,9 +64,7 @@
   margin: -9px 0;
 }
 
-[data-theme="dark"] .volume-slider {
-  background: rgba(255,255,255,0.16);
-}
+
 
 /* Fill */
 .volume-slider-fill {
@@ -105,17 +99,4 @@
   transform: translateY(-50%) scale(1);
 }
 
-/* ── Light Mode ── */
-:root:not([data-theme="dark"]) .player-volume {
-  background: var(--bg-elevated);
-  border-color: var(--border-subtle);
-}
 
-:root:not([data-theme="dark"]) .volume-slider {
-  background: rgba(0,0,0,0.12);
-}
-
-:root:not([data-theme="dark"]) .volume-slider-thumb {
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.18), 0 0 0 1.5px var(--accent-primary);
-}
