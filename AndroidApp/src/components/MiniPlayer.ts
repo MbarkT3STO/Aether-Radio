@@ -533,7 +533,7 @@ export class MiniPlayer extends BaseComponent {
       <div class="rcm-dialog" id="rcm-dialog">
 
         <button class="rcm-close" id="rcm-close" aria-label="Close" style="opacity:0;pointer-events:none">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -565,8 +565,10 @@ export class MiniPlayer extends BaseComponent {
               <div class="rcm-particle rcm-particle-6"></div>
             </div>
           </div>
-          <div class="rcm-listening-label">Identifying song…</div>
-          <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
+          <div class="rcm-listening-text">
+            <div class="rcm-listening-label">Identifying song…</div>
+            <div class="rcm-listening-sub">Analyzing audio fingerprint</div>
+          </div>
         </div>
 
         <!-- Result state (hidden initially) -->
@@ -626,18 +628,18 @@ export class MiniPlayer extends BaseComponent {
         // ── Found ──
         const titleText  = this.esc(result.title)
         const artistText = result.artist ? this.esc(result.artist) : ''
+        const cover      = result.coverArt?.replace(/"/g, '%22') ?? ''
 
-        const coverHtml = result.coverArt
-          ? `<div class="rcm-cover-hero">
-               <div class="rcm-cover-blur-bg" style="background-image:url('${result.coverArt.replace(/"/g, '%22')}')"></div>
-               <div class="rcm-cover-wrap">
-                 <img class="rcm-cover" src="${result.coverArt.replace(/"/g, '%22')}" alt="${titleText}">
-               </div>
+        const coverSection = cover
+          ? `<div class="rcm-hero">
+               <div class="rcm-hero-blur" style="background-image:url('${cover}')"></div>
+               <img class="rcm-hero-cover" src="${cover}" alt="${titleText}">
+               <div class="rcm-hero-gradient"></div>
              </div>`
-          : `<div class="rcm-found-icon-hero">
-               <div class="rcm-found-icon-orb">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.75"
+          : `<div class="rcm-hero rcm-hero-nocov">
+               <div class="rcm-hero-nocov-orb">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1.5"
                    stroke-linecap="round" stroke-linejoin="round">
                    <path d="M9 18V5l12-2v13"/>
                    <circle cx="6" cy="18" r="3"/>
@@ -647,17 +649,21 @@ export class MiniPlayer extends BaseComponent {
              </div>`
 
         resultEl.innerHTML = `
-          ${coverHtml}
-          <div class="rcm-found-info">
-            <div class="rcm-found-label">
-              <span class="rcm-found-label-dot"></span>
-              Now Playing
+          ${coverSection}
+          <div class="rcm-body">
+            <div class="rcm-identity">
+              <div class="rcm-identity-badge">
+                <span class="rcm-badge-dot"></span>Identified
+              </div>
+              <div class="rcm-title">${titleText}</div>
+              ${artistText ? `<div class="rcm-artist">${artistText}</div>` : ''}
+              ${result.album
+                ? `<div class="rcm-meta">
+                     <span>${this.esc(result.album)}</span>
+                     ${result.releaseDate ? `<span class="rcm-meta-sep">·</span><span>${result.releaseDate.slice(0, 4)}</span>` : ''}
+                   </div>`
+                : ''}
             </div>
-            <div class="rcm-found-title">${titleText}</div>
-            ${artistText ? `<div class="rcm-found-artist">${artistText}</div>` : ''}
-            ${result.album
-              ? `<div class="rcm-found-album">${this.esc(result.album)}${result.releaseDate ? ` · ${result.releaseDate.slice(0, 4)}` : ''}</div>`
-              : ''}
             ${this.renderStreamingLinks(result.streamingLinks ?? [])}
           </div>
         `
@@ -666,7 +672,7 @@ export class MiniPlayer extends BaseComponent {
       resultEl.classList.add('rcm-result-in')
 
       // Wire up streaming link buttons (use Capacitor Browser, not raw href)
-      resultEl.querySelectorAll<HTMLButtonElement>('.rcm-stream-btn[data-stream-url]').forEach(btn => {
+      resultEl.querySelectorAll<HTMLButtonElement>('.rcm-stream-btn[data-stream-url], .rcm-more-btn[data-stream-url]').forEach(btn => {
         btn.addEventListener('click', () => {
           const url = btn.dataset.streamUrl
           if (url) void this.openStreamingLink(url)
@@ -714,6 +720,73 @@ export class MiniPlayer extends BaseComponent {
     }).join('')
 
     return `<div class="rcm-stream-links">${items}</div>`
+  }
+
+  private renderStreamingLinks(links: StreamingLink[]): string {
+    if (!links.length) return ''
+
+    const externalIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`
+
+    const providerMeta: Record<string, { label: string; color: string; icon: string; secondary?: boolean }> = {
+      spotify: {
+        label: 'Spotify',
+        color: '#1DB954',
+        icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.622.622 0 0 1-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 0 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.857zm1.223-2.722a.78.78 0 0 1-1.072.257c-2.687-1.652-6.785-2.131-9.965-1.166a.78.78 0 0 1-.973-.519.781.781 0 0 1 .52-.973c3.632-1.102 8.147-.568 11.233 1.329a.78.78 0 0 1 .257 1.072zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71a.937.937 0 1 1-.543-1.793c3.563-1.08 9.484-.87 13.22 1.37a.937.937 0 0 1-.96 1.58z"/></svg>`,
+      },
+      applemusic: {
+        label: 'Apple Music',
+        color: '#fc3c44',
+        icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.994 6.124a9.23 9.23 0 0 0-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 0 0-1.877-.726 10.496 10.496 0 0 0-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026C4.786.07 4.043.15 3.34.428 2.004.958 1.04 1.88.475 3.208c-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.802.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03c.525 0 1.048-.034 1.57-.1.823-.106 1.597-.35 2.296-.81 1.268-.834 2.032-1.99 2.253-3.485.076-.51.108-1.03.109-1.543.003-4.013.001-8.025.001-12.037zm-6.427 3.98v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536a1.88 1.88 0 0 1 1.038-2.022c.323-.16.67-.25 1.018-.324.378-.082.758-.153 1.134-.24.274-.063.457-.23.51-.516a.904.904 0 0 0 .016-.193c0-1.815 0-3.63-.002-5.443a.725.725 0 0 0-.026-.185c-.04-.15-.15-.243-.304-.234-.16.01-.318.035-.475.066-.76.15-1.52.303-2.28.456l-2.326.47-1.374.278c-.016.003-.032.01-.048.013-.277.077-.377.203-.39.49-.002.042 0 .086 0 .13v7.96c0 .418-.06.826-.246 1.205-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536a1.88 1.88 0 0 1 1.038-2.022c.323-.16.67-.25 1.018-.324.378-.082.758-.153 1.134-.24.274-.063.457-.23.51-.516a.904.904 0 0 0 .016-.193c0-2.95-.001-5.9.002-8.85 0-.232.033-.46.17-.656.148-.21.354-.32.595-.376.76-.18 1.52-.36 2.28-.53l2.326-.47 2.325-.47c.17-.033.34-.07.51-.09.28-.03.502.135.554.41.023.12.03.245.03.368.002.96 0 1.92 0 2.88z"/></svg>`,
+      },
+      deezer: {
+        label: 'Deezer',
+        color: '#a238ff',
+        icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.944 17.773h4.112v1.217h-4.112zm0-2.77h4.112v1.217h-4.112zm0-2.77h4.112v1.218h-4.112zm0-2.77h4.112v1.217h-4.112zM12.862 17.773h4.11v1.217h-4.11zm0-2.77h4.11v1.217h-4.11zm0-2.77h4.11v1.218h-4.11zm0-2.77h4.11v1.217h-4.11zM6.78 17.773h4.11v1.217H6.78zm0-2.77h4.11v1.217H6.78zm0-2.77h4.11v1.218H6.78zM.697 17.773h4.11v1.217H.697zm0-2.77h4.11v1.217H.697z"/></svg>`,
+      },
+      shazam: {
+        label: 'View on Shazam',
+        color: '#0088ff',
+        secondary: true,
+        icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.004 0C5.374 0 0 5.374 0 12.004 0 18.63 5.374 24 12.004 24 18.63 24 24 18.63 24 12.004 24 5.374 18.63 0 12.004 0zm-.317 18.692c-1.996 0-3.808-.744-5.188-1.964l1.43-1.43a5.07 5.07 0 0 0 3.758 1.664c2.808 0 5.09-2.282 5.09-5.09 0-1.404-.57-2.674-1.494-3.598l1.43-1.43a7.1 7.1 0 0 1 2.094 5.028c0 3.924-3.196 7.82-7.12 7.82zm.63-5.35c-.55.55-1.44.55-1.99 0l-2.83-2.83c-.55-.55-.55-1.44 0-1.99l2.83-2.83c.55-.55 1.44-.55 1.99 0l2.83 2.83c.55.55.55 1.44 0 1.99l-2.83 2.83z"/></svg>`,
+      },
+    }
+
+    const primary: string[]   = []
+    const secondary: string[] = []
+
+    for (const link of links) {
+      const meta = providerMeta[link.provider] ?? {
+        label: link.provider.charAt(0).toUpperCase() + link.provider.slice(1),
+        color: 'var(--accent-primary)',
+        secondary: false,
+        icon: externalIcon,
+      }
+      const safeUrl = link.url.replace(/"/g, '&quot;')
+
+      if (meta.secondary) {
+        secondary.push(
+          `<button class="rcm-more-btn" data-stream-url="${safeUrl}" style="--stream-color:${meta.color}">
+            ${meta.icon}<span>${meta.label}</span>${externalIcon}
+          </button>`
+        )
+      } else {
+        primary.push(
+          `<button class="rcm-stream-btn" data-stream-url="${safeUrl}" style="--stream-color:${meta.color}">
+            ${meta.icon}<span>${meta.label}</span>
+          </button>`
+        )
+      }
+    }
+
+    if (!primary.length && !secondary.length) return ''
+
+    return `
+      <div class="rcm-streams">
+        <div class="rcm-streams-label">Open in</div>
+        ${primary.length ? `<div class="rcm-streams-grid">${primary.join('')}</div>` : ''}
+        ${secondary.length ? `<div class="rcm-streams-more">${secondary.join('')}</div>` : ''}
+      </div>
+    `
   }
 
   /** Open a streaming link correctly depending on its scheme/host. */
