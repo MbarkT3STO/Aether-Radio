@@ -30,7 +30,7 @@
   }
 }
 
-/* ── Ambient canvas — color bleed from artwork ── */
+/* ── Ambient canvas ── */
 .player-bar-ambient {
   position: absolute;
   inset: 0;
@@ -47,7 +47,6 @@
 .player-bar-ambient.active { opacity: 0.38; }
 [data-theme="dark"] .player-bar-ambient.active { opacity: 0.32; }
 
-/* Top separator — removed, border is on the element itself */
 .player-bar::before { display: none; }
 
 .player-bar > *:not(.player-bar-ambient) {
@@ -66,7 +65,6 @@
   min-width: 0;
 }
 
-/* ── Logo wrap ── */
 .player-station-logo-wrap {
   position: relative;
   width: 48px;
@@ -104,7 +102,6 @@
   opacity: 0.5;
 }
 
-/* Live ring — replaces the dot, wraps the logo */
 .player-live-ring {
   position: absolute;
   inset: -3px;
@@ -121,7 +118,6 @@
   50%       { opacity: 0.55; box-shadow: 0 0 14px var(--status-live); }
 }
 
-/* ── Station text ── */
 .player-station-details {
   flex: 1;
   min-width: 0;
@@ -179,7 +175,6 @@
   font-weight: 500;
 }
 
-/* ── Empty state ── */
 .player-empty-icon {
   width: 48px;
   height: 48px;
@@ -220,7 +215,6 @@
   padding: 0 28px;
 }
 
-/* ── Controls pill — groups all three buttons ── */
 .player-controls-pill {
   display: flex;
   align-items: center;
@@ -238,7 +232,7 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ── Base button ── */
+/* ── Secondary buttons (stop, favorite, etc) ── */
 .player-btn {
   display: flex;
   align-items: center;
@@ -251,7 +245,6 @@
   color: var(--text-tertiary);
   transition:
     color var(--transition-fast),
-    background var(--transition-fast),
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
   width: 34px;
@@ -265,21 +258,9 @@
   border-radius: 50%;
 }
 
-.player-btn:not(.player-btn-play):hover {
+.player-btn:hover {
   color: var(--text-primary);
-  background: rgba(0,0,0,0.07);
   transform: scale(1.10);
-}
-
-[data-theme="dark"] .player-btn:not(.player-btn-play):hover {
-  background: rgba(255,255,255,0.10);
-}
-
-/* Prevent base hover from overriding play button */
-.player-btn-play:hover,
-[data-theme="dark"] .player-btn-play:hover {
-  background: var(--accent-hover);
-  color: #fff;
 }
 
 .player-btn:active {
@@ -296,28 +277,32 @@
 
 .player-btn-stop:hover {
   color: var(--status-error);
-  background: rgba(255,59,48,0.12);
 }
 
-/* ── Play/Pause — hero ── */
+/* ═══════════════════════════════════════════════════════════════
+   PLAY BUTTON — completely isolated, no inheritance issues
+   ═══════════════════════════════════════════════════════════════ */
 .player-btn-play {
   width: 48px;
   height: 48px;
-  background: var(--gradient-accent);
+  background: var(--accent-primary);
   color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
   box-shadow:
     0 4px 14px var(--accent-glow),
     0 2px 6px rgba(0,0,0,0.12),
     inset 0 1px 0 rgba(255,255,255,0.20);
-  border: none;
-  position: relative;
-  overflow: hidden;
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-fast);
 }
 
-/* Shimmer sweep on hover — removed, keep hover clean */
-
 .player-btn-play:hover {
-  background: var(--accent-hover);
+  background: var(--accent-primary);
   color: #fff;
   transform: scale(1.08);
   box-shadow:
@@ -327,12 +312,19 @@
 }
 
 .player-btn-play:active {
+  background: var(--accent-pressed);
+  color: #fff;
   transform: scale(0.92);
   box-shadow: 0 2px 8px var(--accent-glow);
   transition-duration: 60ms;
 }
 
-/* Pulsing ring when playing */
+.player-btn-play:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
 .player-btn-play.playing::after {
   content: '';
   position: absolute;
@@ -355,6 +347,8 @@
   box-shadow: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════ */
+
 /* ── Favorite ── */
 .player-card-favorite {
   color: var(--text-muted);
@@ -362,12 +356,10 @@
 
 .player-card-favorite:hover {
   color: var(--palette-pink);
-  background: rgba(255,45,85,0.12);
 }
 
 .player-card-favorite.active {
   color: var(--palette-pink);
-  background: rgba(255,45,85,0.10);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -382,9 +374,6 @@
   min-width: 0;
 }
 
-/* ── Volume — see volume-slider.css for pill + track styles ── */
-
-/* Flat icon buttons — recognize + expand */
 .player-recognize-btn,
 .player-expand-btn {
   background: transparent;
@@ -402,18 +391,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
 }
 
 .player-recognize-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
-  border-radius: 50%;
 }
 
 .player-recognize-btn:hover {
   color: var(--accent-primary);
-  background: var(--accent-soft);
   transform: scale(1.10);
 }
 
@@ -424,25 +410,21 @@
   pointer-events: none;
 }
 
-/* ── Expand ── */
 .player-expand-btn {
   width: 34px;
   height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
 }
 
 .player-expand-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
-  border-radius: 50%;
 }
 
 .player-expand-btn:hover {
   color: var(--text-primary);
-  background: rgba(0,0,0,0.07);
   transform: scale(1.10);
 }
 
@@ -457,6 +439,10 @@
   box-shadow: 0 4px 32px rgba(0,0,0,0.40), 0 1px 4px rgba(0,0,0,0.20);
 }
 
+[data-theme="dark"] .player-bar-ambient.active {
+  opacity: 0.32;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    LIGHT MODE
    ═══════════════════════════════════════════════════════════════ */
@@ -466,8 +452,6 @@
   box-shadow: 0 4px 32px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
 }
 
-:root:not([data-theme="dark"]) .player-bar::before { display: none; }
-
 :root:not([data-theme="dark"]) .player-station-logo-wrap {
   background: var(--bg-secondary);
 }
@@ -476,34 +460,6 @@
   background: var(--bg-elevated);
   border-color: var(--border-subtle);
   box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-
-:root:not([data-theme="dark"]) .player-btn:not(.player-btn-play):hover {
-  background: rgba(0,0,0,0.06);
-  color: var(--text-primary);
-}
-
-:root:not([data-theme="dark"]) .player-btn-play {
-  background: var(--gradient-accent);
-  color: #fff;
-}
-
-:root:not([data-theme="dark"]) .player-btn-play:hover {
-  background: var(--gradient-accent);
-  color: #fff;
-}
-
-:root:not([data-theme="dark"]) .player-recognize-btn,
-:root:not([data-theme="dark"]) .player-expand-btn {
-  color: var(--text-tertiary);
-}
-
-:root:not([data-theme="dark"]) .player-expand-btn:hover {
-  color: var(--text-primary);
-}
-
-:root:not([data-theme="dark"]) .player-recognize-btn:hover {
-  color: var(--accent-primary);
 }
 
 :root:not([data-theme="dark"]) .player-bar-ambient.active {
