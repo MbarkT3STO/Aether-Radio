@@ -680,3 +680,42 @@
 :root:not([data-theme="dark"]) .rcm-found-icon-hero {
   background: var(--bg-secondary);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   STREAMING LINKS
+   ═══════════════════════════════════════════════════════════════ */
+.rcm-stream-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+  width: 100%;
+}
+
+.rcm-stream-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  box-shadow: var(--nm-raised);
+  color: var(--stream-color, var(--accent-primary));
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.rcm-stream-btn:active {
+  box-shadow: var(--nm-pressed);
+  transform: scale(0.95);
+  opacity: 0.85;
+}
+
+[data-theme="dark"] .rcm-stream-btn {
+  background: var(--bg-primary);
+}

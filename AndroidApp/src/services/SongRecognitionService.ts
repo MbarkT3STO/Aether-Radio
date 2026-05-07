@@ -29,13 +29,37 @@ export interface RecognitionResult {
   album?: string
   releaseDate?: string
   coverArt?: string
+  shazamUrl?: string
+  streamingLinks?: StreamingLink[]
+}
+
+export interface StreamingLink {
+  provider: 'spotify' | 'applemusic' | 'shazam' | string
+  url: string
+}
+
+interface ShazamHubAction {
+  type?: string
+  uri?: string
+}
+
+interface ShazamHubProvider {
+  type?: string
+  actions?: ShazamHubAction[]
+}
+
+interface ShazamHub {
+  providers?: ShazamHubProvider[]
+  actions?: ShazamHubAction[]
 }
 
 interface ShazamTrack {
   title?: string
   subtitle?: string
+  url?: string
   images?: { coverart?: string; coverarthq?: string }
   sections?: { type: string; metadata?: { title: string; text: string }[] }[]
+  hub?: ShazamHub
 }
 
 interface ShazamResponse {
@@ -288,7 +312,30 @@ export class SongRecognitionService {
     const releaseDate = songSection?.metadata?.find(m => m.title === 'Released')?.text
     const coverArt    = track.images?.coverarthq ?? track.images?.coverart
 
-    dbg(`MATCH: "${title}" — ${artist}`)
-    return { title, artist, album, releaseDate, coverArt }
+    // ── Streaming links from hub ──────────────────────────────────────────────
+    const streamingLinks: StreamingLink[] = []
+
+    // Shazam page link
+    if (track.url) {
+      streamingLinks.push({ provider: 'shazam', url: track.url })
+    }
+
+    // Provider links (Spotify, Apple Music, etc.)
+    if (track.hub?.providers) {
+      for (const provider of track.hub.providers) {
+        const type = provider.type?.toLowerCase() ?? ''
+        // The "uri" action holds the deep-link (spotify://, music://, etc.)
+        // The "open" action holds the https web URL — prefer that
+        const openAction = provider.actions?.find(a => a.type === 'open')
+        const uriAction  = provider.actions?.find(a => a.type === 'uri')
+        const url = openAction?.uri ?? uriAction?.uri
+        if (url) {
+          streamingLinks.push({ provider: type, url })
+        }
+      }
+    }
+
+    dbg(`MATCH: "${title}" — ${artist} (${streamingLinks.length} links)`)
+    return { title, artist, album, releaseDate, coverArt, shazamUrl: track.url, streamingLinks }
   }
 }
