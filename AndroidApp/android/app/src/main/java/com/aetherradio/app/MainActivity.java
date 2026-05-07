@@ -3,9 +3,13 @@ package com.aetherradio.app;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import com.getcapacitor.Bridge;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
+
+    /** Static reference so AudioForegroundService can reach the Capacitor bridge. */
+    static Bridge capacitorBridge = null;
 
     private WifiManager.WifiLock wifiLock;
 
@@ -14,6 +18,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(NativeHttpPlugin.class);
         registerPlugin(AudioPlayerPlugin.class);
         super.onCreate(savedInstanceState);
+        capacitorBridge = getBridge();
 
         // Acquire WifiLock to prevent stream drops when screen turns off on OEM devices
         WifiManager wifiManager = (WifiManager) getApplicationContext()

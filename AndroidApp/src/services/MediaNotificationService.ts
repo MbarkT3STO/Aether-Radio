@@ -26,10 +26,6 @@ interface AudioPlayerPlugin {
   startForeground(options: { track: string; artist: string; cover: string }): Promise<void>
   pauseForeground(): Promise<void>
   stopForeground(): Promise<void>
-  addListener(
-    event: 'notificationAction',
-    handler: (data: { action: 'play' | 'pause' | 'stop' }) => void
-  ): Promise<{ remove: () => void }>
 }
 
 const AudioPlayer = registerPlugin<AudioPlayerPlugin>('AudioPlayer')
@@ -166,10 +162,14 @@ export class MediaNotificationService {
     if (this._listenerRegistered) return
     this._listenerRegistered = true
 
-    // Listen to our own AudioPlayerPlugin notification buttons
-    AudioPlayer.addListener('notificationAction', ({ action }) => {
-      void this.handleAction(action)
-    }).catch(() => { /* plugin not available on web */ })
+    // Our AudioForegroundService fires triggerJSEvent("audioPlayerAction", "document", json)
+    // which arrives here as a document-level CustomEvent — works even when app is backgrounded.
+    document.addEventListener('audioPlayerAction', (event: Event) => {
+      const action = (event as CustomEvent).detail?.action as string | undefined
+      if (action === 'play' || action === 'pause' || action === 'stop') {
+        void this.handleAction(action)
+      }
+    })
 
     // Also listen to music controls plugin events (Android 13+ uses document event)
     document.addEventListener('controlsNotification', (event: Event) => {

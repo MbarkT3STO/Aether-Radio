@@ -5,8 +5,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -28,22 +30,28 @@ import java.net.URL;
  * A proper Android foreground service that:
  *  1. Keeps the process alive when the app is backgrounded / screen locked
  *  2. Posts a media-style notification to the notification shade
- *  3. Survives battery optimisation on OEM devices (Samsung, Xiaomi, etc.)
+ *  3. Receives notification button broadcasts INSIDE the service (always alive)
+ *     and forwards them to JS via the Capacitor bridge
  *
- * Started via startForegroundService() from AudioPlayerPlugin (JS → native).
- * Uses START_STICKY so Android restarts it if killed under memory pressure.
+ * The BroadcastReceiver lives here — NOT in the plugin — so it works even
+ * when the activity is paused/stopped.
  */
 public class AudioForegroundService extends Service {
 
-    private static final String TAG          = "AudioForegroundService";
-    public  static final String CHANNEL_ID   = "aether_radio_playback";
-    public  static final int    NOTIF_ID     = 1001;
+    private static final String TAG        = "AudioForegroundService";
+    public static final String CHANNEL_ID  = "aether_radio_playback";
+    public static final int    NOTIF_ID    = 1001;
 
-    // Intent actions sent from AudioPlayerPlugin
-    public static final String ACTION_START   = "com.aetherradio.app.ACTION_START";
-    public static final String ACTION_STOP    = "com.aetherradio.app.ACTION_STOP";
-    public static final String ACTION_PAUSE   = "com.aetherradio.app.ACTION_PAUSE";
-    public static final String ACTION_RESUME  = "com.aetherradio.app.ACTION_RESUME";
+    // Intent actions from AudioPlayerPlugin (JS → service)
+    public static final String ACTION_START  = "com.aetherradio.app.ACTION_START";
+    public static final String ACTION_STOP   = "com.aetherradio.app.ACTION_STOP";
+    public static final String ACTION_PAUSE  = "com.aetherradio.app.ACTION_PAUSE";
+    public static final String ACTION_RESUME = "com.aetherradio.app.ACTION_RESUME";
+
+    // Broadcast actions from notification buttons (service → JS)
+    public static final String ACTION_BTN_PLAY  = "com.aetherradio.BTN_PLAY";
+    public static final String ACTION_BTN_PAUSE = "com.aetherradio.BTN_PAUSE";
+    public static final String ACTION_BTN_STOP  = "com.aetherradio.BTN_STOP";
 
     // Intent extras
     public static final String EXTRA_TRACK   = "track";
@@ -51,8 +59,10 @@ public class AudioForegroundService extends Service {
     public static final String EXTRA_COVER   = "cover";
     public static final String EXTRA_PLAYING = "isPlaying";
 
-    private MediaSessionCompat mediaSession;
+    private MediaSessionCompat  mediaSession;
     private NotificationManager notifManager;
+    private BroadcastReceiver   btnReceiver;
+    private Bitmap              cachedArt;
 
     // Current state
     private String  currentTrack  = "Aether Radio";
@@ -69,22 +79,15 @@ public class AudioForegroundService extends Service {
 
         notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         createNotificationChannel();
-
-        // Set up MediaSession so the notification is recognised as a media notification
-        mediaSession = new MediaSessionCompat(this, "AetherRadioSession");
-        mediaSession.setFlags(
-            MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-            MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
-        );
-        mediaSession.setActive(true);
-        updatePlaybackState(true);
+        setupMediaSession();
+        registerButtonReceiver();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
-            // Restarted by Android after kill — re-post notification with last known state
-            startForegroundWithNotification();
+            // Restarted by Android after kill — re-post with last known state
+            startForegroundNow(cachedArt);
             return START_STICKY;
         }
 
@@ -92,18 +95,20 @@ public class AudioForegroundService extends Service {
         Log.i(TAG, "onStartCommand action=" + action);
 
         if (ACTION_START.equals(action) || ACTION_RESUME.equals(action)) {
-            currentTrack  = intent.getStringExtra(EXTRA_TRACK)  != null ? intent.getStringExtra(EXTRA_TRACK)  : currentTrack;
-            currentArtist = intent.getStringExtra(EXTRA_ARTIST) != null ? intent.getStringExtra(EXTRA_ARTIST) : currentArtist;
-            currentCover  = intent.getStringExtra(EXTRA_COVER)  != null ? intent.getStringExtra(EXTRA_COVER)  : currentCover;
-            isPlaying     = intent.getBooleanExtra(EXTRA_PLAYING, true);
+            String t = intent.getStringExtra(EXTRA_TRACK);
+            String a = intent.getStringExtra(EXTRA_ARTIST);
+            String c = intent.getStringExtra(EXTRA_COVER);
+            if (t != null) currentTrack  = t;
+            if (a != null) currentArtist = a;
+            if (c != null) currentCover  = c;
+            isPlaying = intent.getBooleanExtra(EXTRA_PLAYING, true);
             updatePlaybackState(isPlaying);
-            startForegroundWithNotification();
+            fetchArtAndStart();
 
         } else if (ACTION_PAUSE.equals(action)) {
             isPlaying = false;
             updatePlaybackState(false);
-            // Update notification to show paused state but keep foreground alive
-            notifManager.notify(NOTIF_ID, buildNotification(null));
+            notifManager.notify(NOTIF_ID, buildNotification(cachedArt));
 
         } else if (ACTION_STOP.equals(action)) {
             stopForeground(true);
@@ -114,13 +119,12 @@ public class AudioForegroundService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null; // Not a bound service
-    }
+    public IBinder onBind(Intent intent) { return null; }
 
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy");
+        unregisterButtonReceiver();
         if (mediaSession != null) {
             mediaSession.setActive(false);
             mediaSession.release();
@@ -128,82 +132,16 @@ public class AudioForegroundService extends Service {
         super.onDestroy();
     }
 
-    // ── Notification ───────────────────────────────────────────────────────
+    // ── MediaSession ───────────────────────────────────────────────────────
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                "Aether Radio Playback",
-                NotificationManager.IMPORTANCE_LOW  // silent, no sound/vibration
-            );
-            channel.setDescription("Shows what's playing in Aether Radio");
-            channel.setShowBadge(false);
-            notifManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void startForegroundWithNotification() {
-        if (!currentCover.isEmpty() && currentCover.startsWith("http")) {
-            // Fetch cover art on a background thread, then update notification
-            new Thread(() -> {
-                Bitmap art = fetchBitmap(currentCover);
-                startForeground(NOTIF_ID, buildNotification(art));
-            }).start();
-            // Post immediately with no art so startForeground() is called within 5 s
-            startForeground(NOTIF_ID, buildNotification(null));
-        } else {
-            startForeground(NOTIF_ID, buildNotification(getLocalArt()));
-        }
-    }
-
-    private Notification buildNotification(Bitmap art) {
-        Context ctx = getApplicationContext();
-
-        // Tap notification → open app
-        Intent openIntent = new Intent(ctx, MainActivity.class);
-        openIntent.setAction(Intent.ACTION_MAIN);
-        openIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        openIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        int piFlags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-            : PendingIntent.FLAG_UPDATE_CURRENT;
-        PendingIntent openPi = PendingIntent.getActivity(ctx, 0, openIntent, piFlags);
-
-        // Play/Pause action
-        String ppAction  = isPlaying ? "com.aetherradio.PAUSE" : "com.aetherradio.PLAY";
-        int    ppIcon    = isPlaying ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play;
-        String ppLabel   = isPlaying ? "Pause" : "Play";
-        Intent ppIntent  = new Intent(ppAction);
-        PendingIntent ppPi = PendingIntent.getBroadcast(ctx, 1, ppIntent, piFlags);
-
-        // Stop action
-        Intent stopIntent = new Intent("com.aetherradio.STOP");
-        PendingIntent stopPi = PendingIntent.getBroadcast(ctx, 2, stopIntent, piFlags);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_ID)
-            .setSmallIcon(R.drawable.notification)
-            .setContentTitle(currentTrack)
-            .setContentText(currentArtist)
-            .setContentIntent(openPi)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .addAction(ppIcon, ppLabel, ppPi)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopPi);
-
-        if (art != null) {
-            builder.setLargeIcon(art);
-        }
-
-        // MediaStyle makes it appear as a proper media notification
-        MediaStyle style = new MediaStyle()
-            .setMediaSession(mediaSession.getSessionToken())
-            .setShowActionsInCompactView(0, 1); // show play/pause + stop in compact view
-        builder.setStyle(style);
-
-        return builder.build();
+    private void setupMediaSession() {
+        mediaSession = new MediaSessionCompat(this, "AetherRadioSession");
+        mediaSession.setFlags(
+            MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+            MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+        );
+        mediaSession.setActive(true);
+        updatePlaybackState(true);
     }
 
     private void updatePlaybackState(boolean playing) {
@@ -224,13 +162,166 @@ public class AudioForegroundService extends Service {
         mediaSession.setPlaybackState(state);
     }
 
+    // ── Notification button BroadcastReceiver (lives in the service) ───────
+
+    private void registerButtonReceiver() {
+        btnReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                Log.i(TAG, "btnReceiver: " + action);
+
+                if (ACTION_BTN_PAUSE.equals(action)) {
+                    // Update notification immediately so the button flips to Play
+                    isPlaying = false;
+                    updatePlaybackState(false);
+                    notifManager.notify(NOTIF_ID, buildNotification(cachedArt));
+                    // Forward to JS
+                    forwardToJS("pause");
+
+                } else if (ACTION_BTN_PLAY.equals(action)) {
+                    isPlaying = true;
+                    updatePlaybackState(true);
+                    notifManager.notify(NOTIF_ID, buildNotification(cachedArt));
+                    forwardToJS("play");
+
+                } else if (ACTION_BTN_STOP.equals(action)) {
+                    forwardToJS("stop");
+                    stopForeground(true);
+                    stopSelf();
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_BTN_PLAY);
+        filter.addAction(ACTION_BTN_PAUSE);
+        filter.addAction(ACTION_BTN_STOP);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(btnReceiver, filter, RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(btnReceiver, filter);
+        }
+    }
+
+    private void unregisterButtonReceiver() {
+        if (btnReceiver != null) {
+            try { unregisterReceiver(btnReceiver); } catch (Exception ignored) {}
+            btnReceiver = null;
+        }
+    }
+
+    /**
+     * Forward a button action to JS via Capacitor's triggerJSEvent.
+     * This works even when the activity is paused — same mechanism used by
+     * capacitor-music-controls-plugin-v3 for Android 13+.
+     */
+    private void forwardToJS(String action) {
+        try {
+            // Build a JSON payload matching what AudioPlayerPlugin.notifyListeners sends
+            String json = "{\"action\":\"" + action + "\"}";
+            // triggerJSEvent fires a document-level CustomEvent in the WebView
+            com.getcapacitor.Bridge bridge = getBridge();
+            if (bridge != null) {
+                bridge.triggerJSEvent("audioPlayerAction", "document", json);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "forwardToJS failed: " + e.getMessage());
+        }
+    }
+
+    /** Get the Capacitor Bridge from the static holder set by MainActivity. */
+    private com.getcapacitor.Bridge getBridge() {
+        return MainActivity.capacitorBridge;
+    }
+
+    // ── Notification ───────────────────────────────────────────────────────
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel ch = new NotificationChannel(
+                CHANNEL_ID,
+                "Aether Radio Playback",
+                NotificationManager.IMPORTANCE_LOW
+            );
+            ch.setDescription("Shows what's playing in Aether Radio");
+            ch.setShowBadge(false);
+            notifManager.createNotificationChannel(ch);
+        }
+    }
+
+    private void fetchArtAndStart() {
+        // Post immediately (required within 5 s of startForegroundService)
+        startForegroundNow(cachedArt);
+
+        if (!currentCover.isEmpty() && currentCover.startsWith("http")) {
+            new Thread(() -> {
+                Bitmap art = fetchBitmap(currentCover);
+                if (art != null) {
+                    cachedArt = art;
+                    notifManager.notify(NOTIF_ID, buildNotification(art));
+                }
+            }).start();
+        } else {
+            if (cachedArt == null) cachedArt = getLocalArt();
+            notifManager.notify(NOTIF_ID, buildNotification(cachedArt));
+        }
+    }
+
+    private void startForegroundNow(Bitmap art) {
+        startForeground(NOTIF_ID, buildNotification(art));
+    }
+
+    private Notification buildNotification(Bitmap art) {
+        Context ctx = getApplicationContext();
+
+        int piFlags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            : PendingIntent.FLAG_UPDATE_CURRENT;
+
+        // Tap → open app
+        Intent openIntent = new Intent(ctx, MainActivity.class);
+        openIntent.setAction(Intent.ACTION_MAIN);
+        openIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        openIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent openPi = PendingIntent.getActivity(ctx, 0, openIntent, piFlags);
+
+        // Play / Pause toggle
+        String btnAction = isPlaying ? ACTION_BTN_PAUSE : ACTION_BTN_PLAY;
+        int    btnIcon   = isPlaying ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play;
+        String btnLabel  = isPlaying ? "Pause" : "Play";
+        PendingIntent ppPi = PendingIntent.getBroadcast(ctx, 1, new Intent(btnAction), piFlags);
+
+        // Stop
+        PendingIntent stopPi = PendingIntent.getBroadcast(ctx, 2, new Intent(ACTION_BTN_STOP), piFlags);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, CHANNEL_ID)
+            .setSmallIcon(R.drawable.notification)
+            .setContentTitle(currentTrack)
+            .setContentText(currentArtist)
+            .setContentIntent(openPi)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .addAction(btnIcon, btnLabel, ppPi)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopPi);
+
+        if (art != null) builder.setLargeIcon(art);
+
+        builder.setStyle(new MediaStyle()
+            .setMediaSession(mediaSession.getSessionToken())
+            .setShowActionsInCompactView(0, 1));
+
+        return builder.build();
+    }
+
     private Bitmap getLocalArt() {
         try {
             InputStream is = getAssets().open("public/assets/logo.png");
             return BitmapFactory.decodeStream(is);
-        } catch (Exception e) {
-            return null;
-        }
+        } catch (Exception e) { return null; }
     }
 
     private Bitmap fetchBitmap(String urlStr) {
