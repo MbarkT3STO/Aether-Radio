@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   SLEEP TIMER — Apple Design
+   SLEEP TIMER — Apple Liquid Glass Design
    ═══════════════════════════════════════════════════════════════ */
 
 .sleep-timer {
@@ -14,14 +14,18 @@
   width: 32px;
   height: 32px;
   color: var(--text-muted);
+  transition: color var(--transition-fast), transform var(--transition-spring);
 }
 
-.sleep-timer-btn:hover { color: var(--accent-primary); }
+.sleep-timer-btn:hover {
+  color: var(--accent-primary);
+  transform: scale(1.08);
+}
 
 .sleep-timer-btn--active {
   color: var(--accent-primary);
   background: var(--accent-soft);
-  border-color: var(--accent-muted);
+  border-color: var(--accent-border);
 }
 
 /* ── Countdown badge ── */
@@ -41,41 +45,42 @@
   line-height: 13px;
   text-align: center;
   pointer-events: none;
+  box-shadow: 0 1px 4px var(--accent-glow);
 }
 
 /* ── Popover ── */
 .sleep-timer-popover {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 12px);
   right: 0;
   z-index: 200;
-  width: 200px;
-  background: var(--bg-secondary);
+  width: 210px;
+  background: var(--material-overlay);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-2xl);
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: var(--shadow-lg);
-  animation: sleepTimerFadeIn 0.18s var(--ease-out) both;
+  box-shadow: var(--shadow-xl);
+  animation: sleepTimerFadeIn 0.20s var(--ease-out) both;
 }
 
-@supports (backdrop-filter: blur(20px)) {
+@supports (backdrop-filter: blur(40px)) {
   .sleep-timer-popover {
-    backdrop-filter: blur(40px) saturate(1.4);
-    -webkit-backdrop-filter: blur(40px) saturate(1.4);
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
   }
 }
 
 @keyframes sleepTimerFadeIn {
-  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .sleep-timer-popover-header {
-  font-size: 0.62rem;
-  font-weight: 600;
+  font-size: 0.6rem;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -91,29 +96,31 @@
 .sleep-timer-input {
   flex: 1;
   min-width: 0;
-  height: 32px;
+  height: 34px;
   padding: 0 10px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-medium);
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0,0,0,0.05);
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 400;
   outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   -moz-appearance: textfield;
   letter-spacing: -0.01em;
 }
 
 [data-theme="dark"] .sleep-timer-input {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
 }
 
 .sleep-timer-input::-webkit-outer-spin-button,
 .sleep-timer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-.sleep-timer-input::placeholder { color: var(--text-muted); }
+.sleep-timer-input::placeholder { color: var(--text-placeholder); }
 
 .sleep-timer-input:focus {
   border-color: var(--accent-primary);
@@ -134,27 +141,36 @@
 }
 
 .sleep-timer-set-btn {
-  height: 32px;
+  height: 34px;
   padding: 0 12px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   border: none;
   cursor: pointer;
   background: var(--accent-primary);
   color: #fff;
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 700;
   flex-shrink: 0;
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-spring);
 }
 
-.sleep-timer-set-btn:hover  { background: var(--accent-hover); transform: translateY(-1px); }
-.sleep-timer-set-btn:active { transform: translateY(0); }
+.sleep-timer-set-btn:hover  {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.sleep-timer-set-btn:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 60ms;
+}
 
 /* ── Presets ── */
 .sleep-timer-presets-label {
   font-size: 0.58rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -170,23 +186,36 @@
   flex: 1;
   padding: 5px 0;
   border-radius: var(--radius-full);
-  border: none;
+  border: 1px solid var(--border-subtle);
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0,0,0,0.05);
   color: var(--text-tertiary);
   font-family: var(--font-body);
   font-size: 0.6875rem;
-  font-weight: 500;
-  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  font-weight: 600;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-spring),
+    border-color var(--transition-fast);
   letter-spacing: -0.01em;
 }
 
 [data-theme="dark"] .sleep-timer-preset {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
 }
 
-.sleep-timer-preset:hover  { background: var(--accent-primary); color: #fff; transform: translateY(-1px); }
-.sleep-timer-preset:active { transform: translateY(0); }
+.sleep-timer-preset:hover  {
+  background: var(--accent-primary);
+  color: #fff;
+  transform: translateY(-1px);
+  border-color: transparent;
+}
+
+.sleep-timer-preset:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 60ms;
+}
 
 /* ── Active timer row ── */
 .sleep-timer-active-row {
@@ -203,7 +232,7 @@
   align-items: center;
   gap: 4px;
   font-size: 0.7rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--accent-primary);
 }
 
@@ -216,20 +245,19 @@
   color: var(--status-error);
   font-family: var(--font-body);
   font-size: 0.7rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: background var(--transition-fast);
-  flex-shrink: 0;
 }
 
-.sleep-timer-cancel:hover { background: hsla(0, 90%, 60%, 0.1); }
+.sleep-timer-cancel:hover { background: rgba(255,59,48,0.10); }
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .sleep-timer-popover {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255,255,255,0.96);
   border-color: var(--border-subtle);
 }
 
 :root:not([data-theme="dark"]) .sleep-timer-input {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0,0,0,0.05);
   border-color: var(--border-medium);
 }

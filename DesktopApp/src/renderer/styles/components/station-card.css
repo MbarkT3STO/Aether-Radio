@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   STATION CARD — Apple Design
+   STATION CARD — Apple Liquid Glass Design
    ═══════════════════════════════════════════════════════════════ */
 
 .station-card {
@@ -10,47 +10,55 @@
   transition:
     border-color var(--transition-fast),
     background var(--transition-fast),
-    transform var(--transition-fast),
+    transform var(--transition-spring),
     box-shadow var(--transition-fast);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-xs);
 }
 
 .station-card:hover {
   border-color: var(--border-medium);
-  transform: translateY(-2px) scale(1.005);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-3px) scale(1.008);
+  box-shadow: var(--shadow-lg);
 }
 
 .station-card:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: none;
-  transition-duration: 80ms;
+  transform: translateY(0) scale(0.97);
+  box-shadow: var(--shadow-xs);
+  transition-duration: 60ms;
 }
 
-/* Playing state — uses both color AND shape indicator for accessibility */
+/* Playing state */
 .station-card.playing {
   border-color: var(--accent-primary);
   background: var(--accent-soft);
-  box-shadow: 0 0 0 1px var(--accent-primary), var(--shadow-md);
+  box-shadow: 0 0 0 1px var(--accent-border);
 }
 
+[data-theme="dark"] .station-card.playing {
+  background: rgba(125,122,255,0.08);
+  border-color: rgba(125,122,255,0.45);
+  box-shadow: 0 0 0 1px rgba(125,122,255,0.25);
+}
+
+/* Live dot — top right */
 .station-card.playing::before {
   content: '';
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   width: 8px;
   height: 8px;
   background: var(--status-live);
   border-radius: 50%;
-  box-shadow: 0 0 6px var(--status-live);
+  box-shadow: 0 0 8px var(--status-live);
   animation: dotPulse 2s infinite;
   z-index: 2;
 }
 
-/* Accessible: add a left accent bar as a non-color shape indicator */
+/* Left accent bar — non-color shape indicator */
 .station-card.playing::after {
   content: '';
   position: absolute;
@@ -58,9 +66,11 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: var(--accent-primary);
+  background: var(--gradient-accent);
   border-radius: var(--radius-2xl) 0 0 var(--radius-2xl);
-  z-index: 2;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 1;
 }
 
 /* ── Header ── */
@@ -74,14 +84,14 @@
 .station-card-logo-wrap { flex-shrink: 0; }
 
 .station-card-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-lg);
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-xl);
   background: var(--bg-tertiary);
   object-fit: cover;
   flex-shrink: 0;
   border: none;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
 }
 
 .station-card-info { flex: 1; min-width: 0; }
@@ -89,13 +99,14 @@
 .station-card-name {
   font-family: var(--font-display);
   font-size: var(--text-sm);
-  font-weight: 600;
-  margin-bottom: 2px;
+  font-weight: 700;
+  margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
 }
 
 .station-card-country {
@@ -117,22 +128,24 @@
 
 .station-card-tag {
   padding: 2px 8px;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0,0,0,0.05);
   border-radius: var(--radius-full);
   font-size: 0.625rem;
   font-weight: 500;
   color: var(--text-tertiary);
   white-space: nowrap;
   letter-spacing: -0.01em;
+  border: 1px solid transparent;
 }
 
 [data-theme="dark"] .station-card-tag {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
 }
 
 .station-card.playing .station-card-tag {
   background: var(--accent-soft);
   color: var(--accent-primary);
+  border-color: var(--accent-border);
 }
 
 /* ── Footer ── */
@@ -155,7 +168,7 @@
   letter-spacing: -0.01em;
 }
 
-.station-card-meta-sep { opacity: 0.4; }
+.station-card-meta-sep { opacity: 0.35; }
 
 .station-card-bitrate {
   font-weight: 600;
@@ -171,8 +184,8 @@
 
 /* ── Favorite button ── */
 .station-card-favorite {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
   background: transparent;
@@ -182,17 +195,21 @@
   justify-content: center;
   color: var(--text-muted);
   flex-shrink: 0;
-  transition: color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-spring),
+    background var(--transition-fast);
 }
 
 .station-card-favorite:hover {
-  color: #ff2d55;
-  transform: scale(1.18);
+  color: var(--palette-pink);
+  transform: scale(1.22);
+  background: rgba(255,45,85,0.08);
 }
 
 .station-card-favorite.active {
-  color: #ff2d55;
-  animation: heartBeat 0.38s ease;
+  color: var(--palette-pink);
+  animation: heartBeat 0.42s ease;
 }
 
 /* ── Light Mode ── */
@@ -205,19 +222,19 @@
 :root:not([data-theme="dark"]) .station-card:hover {
   background: var(--bg-elevated);
   border-color: var(--border-medium);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
 }
 
 :root:not([data-theme="dark"]) .station-card.playing {
   background: var(--accent-soft);
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 1px var(--accent-primary), var(--shadow-sm);
+  box-shadow: 0 0 0 1px var(--accent-border), var(--shadow-sm);
 }
 
 :root:not([data-theme="dark"]) .station-card-tag {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0,0,0,0.05);
 }
 
 :root:not([data-theme="dark"]) .station-card-logo {
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm);
 }

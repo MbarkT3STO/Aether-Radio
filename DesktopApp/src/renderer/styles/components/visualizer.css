@@ -1,4 +1,6 @@
-/* ── Visualizer ── */
+/* ═══════════════════════════════════════════════════════════════
+   VISUALIZER — Apple Liquid Glass Design
+   ═══════════════════════════════════════════════════════════════ */
 
 .visualizer {
   width: 100%;
@@ -13,7 +15,7 @@
   display: block;
 }
 
-/* ── Idle bars (shown when no audio data yet) ── */
+/* ── Idle bars ── */
 .visualizer-idle {
   display: flex;
   align-items: flex-end;
@@ -27,19 +29,19 @@
   flex: 1;
   background: var(--accent-primary);
   border-radius: 2px 2px 0 0;
-  opacity: 0.25;
-  animation: barDance 1.4s ease-in-out infinite;
+  opacity: 0.22;
+  animation: barDance 1.5s ease-in-out infinite;
 }
 
 [data-theme="dark"] .visualizer-idle-bar {
-  opacity: 0.35;
+  opacity: 0.32;
 }
 
-.visualizer-idle-bar:nth-child(1) { animation-delay: 0s;    height: 30%; }
-.visualizer-idle-bar:nth-child(2) { animation-delay: 0.1s;  height: 60%; }
-.visualizer-idle-bar:nth-child(3) { animation-delay: 0.2s;  height: 45%; }
-.visualizer-idle-bar:nth-child(4) { animation-delay: 0.3s;  height: 80%; }
-.visualizer-idle-bar:nth-child(5) { animation-delay: 0.4s;  height: 55%; }
-.visualizer-idle-bar:nth-child(6) { animation-delay: 0.5s;  height: 35%; }
-.visualizer-idle-bar:nth-child(7) { animation-delay: 0.6s;  height: 70%; }
-.visualizer-idle-bar:nth-child(8) { animation-delay: 0.7s;  height: 40%; }
+.visualizer-idle-bar:nth-child(1) { animation-delay: 0s;    height: 28%; }
+.visualizer-idle-bar:nth-child(2) { animation-delay: 0.12s; height: 58%; }
+.visualizer-idle-bar:nth-child(3) { animation-delay: 0.24s; height: 42%; }
+.visualizer-idle-bar:nth-child(4) { animation-delay: 0.36s; height: 78%; }
+.visualizer-idle-bar:nth-child(5) { animation-delay: 0.48s; height: 52%; }
+.visualizer-idle-bar:nth-child(6) { animation-delay: 0.60s; height: 32%; }
+.visualizer-idle-bar:nth-child(7) { animation-delay: 0.72s; height: 68%; }
+.visualizer-idle-bar:nth-child(8) { animation-delay: 0.84s; height: 38%; }

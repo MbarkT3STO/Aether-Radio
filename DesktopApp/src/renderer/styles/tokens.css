@@ -1,9 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════
-   AETHER RADIO — APPLE DESIGN SYSTEM
-   Palette: Apple System Indigo — the ideal accent for a premium
-   audio app. Pure neutral surfaces, one vivid system accent.
-   Inspired by Apple Music, Podcasts, and SF Symbols guidelines.
-   Updated to Apple HIG 2024/2025 color specifications.
+   AETHER RADIO — APPLE DESIGN SYSTEM v2
+   Inspired by Apple's Liquid Glass design language (macOS Tahoe / iOS 26)
+   True Apple HIG 2025 color values, materials, and depth system.
+   Accent: Apple System Indigo — premium audio app identity.
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -11,86 +10,113 @@
   --h: 249;
   --s: 90%;
 
-  /* ── Semantic Palette (named, not themed) ── */
-  /* Updated to 2024/2025 Apple HIG specification values */
-  --palette-indigo:    #6155F5;   /* Apple System Indigo — light (R97,G85,B245) */
-  --palette-indigo-dk: #6D7CFF;   /* Apple System Indigo — dark  (R109,G124,B255) */
-  --palette-violet:    #8B7FFF;   /* Lighter violet for hover/glow               */
-  --palette-blue:      #0088FF;   /* Apple System Blue — light (R0,G136,B255)    */
-  --palette-blue-dk:   #0091FF;   /* Apple System Blue — dark  (R0,G145,B255)    */
-  --palette-teal:      #00C3D0;   /* Apple System Teal — light (R0,G195,B208)    */
-  --palette-pink:      #FF2D55;   /* Apple System Pink — favorites               */
-  --palette-orange:    #FF8D28;   /* Apple System Orange — light (R255,G141,B40) */
-  --palette-red:       #FF3830;   /* Apple System Red — light (R255,G56,B60)     */
-  --palette-green:     #34C759;   /* Apple System Green — live/success           */
-  --palette-mint:      #00C8B3;   /* Apple System Mint — light (R0,G200,B179)    */
-  --palette-cyan:      #00C0E8;   /* Apple System Cyan — light (R0,G192,B232)    */
-  --palette-yellow:    #FFCC00;   /* Apple System Yellow                         */
+  /* ── Apple System Color Palette ── */
+  --palette-indigo:    #5E5CE6;   /* Apple System Indigo — light  */
+  --palette-indigo-dk: #7D7AFF;   /* Apple System Indigo — dark   */
+  --palette-blue:      #007AFF;   /* Apple System Blue — light    */
+  --palette-blue-dk:   #0A84FF;   /* Apple System Blue — dark     */
+  --palette-purple:    #AF52DE;   /* Apple System Purple — light  */
+  --palette-purple-dk: #BF5AF2;   /* Apple System Purple — dark   */
+  --palette-pink:      #FF2D55;   /* Apple System Pink            */
+  --palette-pink-dk:   #FF375F;   /* Apple System Pink — dark     */
+  --palette-red:       #FF3B30;   /* Apple System Red — light     */
+  --palette-red-dk:    #FF453A;   /* Apple System Red — dark      */
+  --palette-orange:    #FF9500;   /* Apple System Orange — light  */
+  --palette-orange-dk: #FF9F0A;   /* Apple System Orange — dark   */
+  --palette-yellow:    #FFCC00;   /* Apple System Yellow — light  */
+  --palette-yellow-dk: #FFD60A;   /* Apple System Yellow — dark   */
+  --palette-green:     #34C759;   /* Apple System Green — light   */
+  --palette-green-dk:  #30D158;   /* Apple System Green — dark    */
+  --palette-teal:      #5AC8FA;   /* Apple System Teal — light    */
+  --palette-teal-dk:   #64D2FF;   /* Apple System Teal — dark     */
+  --palette-mint:      #00C7BE;   /* Apple System Mint — light    */
+  --palette-mint-dk:   #63E6E2;   /* Apple System Mint — dark     */
+  --palette-cyan:      #32ADE6;   /* Apple System Cyan — light    */
+  --palette-cyan-dk:   #5AC8FA;   /* Apple System Cyan — dark     */
 
   /* ══════════════════════════════════════════════════════════════
-     LIGHT MODE — Apple Human Interface Guidelines
-     Pure white surfaces, warm gray backgrounds, system neutrals
+     LIGHT MODE — Apple HIG 2025
+     systemBackground: #FFFFFF
+     secondarySystemBackground: #F2F2F7
+     tertiarySystemBackground: #FFFFFF
+     systemGroupedBackground: #F2F2F7
      ══════════════════════════════════════════════════════════════ */
 
-  /* Backgrounds — exact Apple HIG values */
-  --bg-primary:   #F2F2F7;   /* systemGroupedBackground                  */
-  --bg-secondary: #FFFFFF;   /* secondarySystemGroupedBackground         */
-  --bg-tertiary:  #F2F2F7;   /* tertiarySystemGroupedBackground          */
-  --bg-elevated:  #FFFFFF;   /* systemBackground                         */
+  /* Backgrounds */
+  --bg-primary:   #F2F2F7;   /* systemGroupedBackground          */
+  --bg-secondary: #FFFFFF;   /* secondarySystemGroupedBackground */
+  --bg-tertiary:  #F2F2F7;   /* tertiarySystemGroupedBackground  */
+  --bg-elevated:  #FFFFFF;   /* systemBackground                 */
+  --bg-base:      #F2F2F7;   /* base canvas                      */
 
   /* Text — Apple HIG label hierarchy */
-  --text-primary:   #000000;             /* label                         */
-  --text-secondary: rgba(60,60,67,0.78); /* secondaryLabel                */
-  --text-tertiary:  rgba(60,60,67,0.50); /* tertiaryLabel                 */
-  --text-muted:     rgba(60,60,67,0.36); /* quaternaryLabel — raised from 0.30
-                                            for WCAG AA compliance on white */
+  --text-primary:   #000000;               /* label                */
+  --text-secondary: rgba(60,60,67,0.78);   /* secondaryLabel       */
+  --text-tertiary:  rgba(60,60,67,0.50);   /* tertiaryLabel        */
+  --text-muted:     rgba(60,60,67,0.36);   /* quaternaryLabel      */
+  --text-placeholder: rgba(60,60,67,0.30); /* placeholderText      */
 
   /* Borders — Apple separator values */
-  --border-subtle:  rgba(60, 60, 67, 0.12);  /* separator                */
-  --border-medium:  rgba(60, 60, 67, 0.20);  /* opaqueSeparator          */
-  --border-strong:  rgba(60, 60, 67, 0.32);  /* strong separator         */
+  --border-subtle:  rgba(60,60,67,0.10);   /* separator            */
+  --border-medium:  rgba(60,60,67,0.18);   /* opaqueSeparator      */
+  --border-strong:  rgba(60,60,67,0.28);   /* strong separator     */
 
-  /* Surfaces */
-  --surface-overlay: rgba(242, 242, 247, 0.96);
-  --surface-glass:   rgba(255, 255, 255, 0.92);
+  /* Materials — Apple Liquid Glass */
+  --material-thin:       rgba(255,255,255,0.55);
+  --material-regular:    rgba(255,255,255,0.72);
+  --material-thick:      rgba(255,255,255,0.85);
+  --material-chrome:     rgba(246,246,246,0.82);
+  --material-sidebar:    rgba(242,242,247,0.80);
+  --material-bar:        rgba(255,255,255,0.78);
+  --material-overlay:    rgba(255,255,255,0.92);
+  --material-modal:      rgba(255,255,255,0.94);
 
-  /* Accent — Apple System Indigo, light mode (2024/2025 HIG values) */
-  --accent-primary:   #6155F5;   /* R97,G85,B245  */
-  --accent-secondary: #0088FF;   /* R0,G136,B255  */
-  --accent-tertiary:  #00C0E8;   /* R0,G192,B232  */
-  --accent-hover:     #7B70FF;
-  --accent-soft:      rgba(97, 85, 245, 0.10);
-  --accent-glow:      rgba(97, 85, 245, 0.22);
-  --accent-muted:     rgba(97, 85, 245, 0.40);
+  /* Accent — Apple System Indigo, light mode */
+  --accent-primary:   #5E5CE6;
+  --accent-secondary: #007AFF;
+  --accent-tertiary:  #32ADE6;
+  --accent-hover:     #6E6CF6;
+  --accent-pressed:   #4E4CD6;
+  --accent-soft:      rgba(94,92,230,0.10);
+  --accent-soft-md:   rgba(94,92,230,0.16);
+  --accent-glow:      rgba(94,92,230,0.24);
+  --accent-glow-lg:   rgba(94,92,230,0.36);
+  --accent-muted:     rgba(94,92,230,0.38);
+  --accent-border:    rgba(94,92,230,0.28);
 
   /* Gradients */
-  --gradient-accent:   linear-gradient(135deg, #6155F5, #0088FF);
-  --gradient-vivid:    linear-gradient(135deg, #6155F5, #8B7FFF, #00C0E8);
-  --gradient-warm:     linear-gradient(135deg, #FF2D55, #FF8D28);
-  --gradient-cool:     linear-gradient(135deg, #6155F5, #00C0E8, #00C8B3);
-  --gradient-spectrum: linear-gradient(135deg, #6155F5, #0088FF, #00C0E8);
-  --gradient-royal:    linear-gradient(135deg, #6155F5, #8B7FFF);
-  --gradient-regal:    linear-gradient(135deg, #6155F5, #0088FF);
-  --gradient-logo:     linear-gradient(135deg, #6155F5, #00C0E8);
+  --gradient-accent:    linear-gradient(135deg, #5E5CE6 0%, #007AFF 100%);
+  --gradient-vivid:     linear-gradient(135deg, #5E5CE6 0%, #AF52DE 50%, #007AFF 100%);
+  --gradient-warm:      linear-gradient(135deg, #FF2D55 0%, #FF9500 100%);
+  --gradient-cool:      linear-gradient(135deg, #5E5CE6 0%, #32ADE6 50%, #00C7BE 100%);
+  --gradient-spectrum:  linear-gradient(135deg, #5E5CE6 0%, #007AFF 50%, #32ADE6 100%);
+  --gradient-royal:     linear-gradient(135deg, #5E5CE6 0%, #AF52DE 100%);
+  --gradient-logo:      linear-gradient(135deg, #5E5CE6 0%, #32ADE6 100%);
+  --gradient-hero:      linear-gradient(160deg, rgba(94,92,230,0.08) 0%, rgba(0,122,255,0.04) 100%);
+  --gradient-card:      linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
 
-  /* Status — exact Apple HIG 2024/2025 semantic colors */
-  --status-live:    #34C759;   /* systemGreen  — R52,G199,B89   */
-  --status-warning: #FF8D28;   /* systemOrange — R255,G141,B40  */
-  --status-error:   #FF3830;   /* systemRed    — R255,G56,B60   */
-  --status-info:    #6155F5;   /* systemIndigo                  */
+  /* Status — Apple HIG 2025 semantic colors */
+  --status-live:    #34C759;   /* systemGreen  */
+  --status-warning: #FF9500;   /* systemOrange */
+  --status-error:   #FF3B30;   /* systemRed    */
+  --status-info:    #5E5CE6;   /* systemIndigo */
 
-  /* Shadows — very soft, Apple-style */
-  --shadow-xs:      0 1px 3px  rgba(0,0,0,0.04), 0 1px 2px  rgba(0,0,0,0.03);
-  --shadow-sm:      0 2px 8px  rgba(0,0,0,0.06), 0 1px 3px  rgba(0,0,0,0.04);
-  --shadow-md:      0 4px 16px rgba(0,0,0,0.08), 0 2px 6px  rgba(0,0,0,0.05);
-  --shadow-lg:      0 8px 30px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-xl:      0 16px 56px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.07);
-  --shadow-glow:    0 0 24px var(--accent-glow);
-  --shadow-ambient: 0 0 80px rgba(0,0,0,0.08);
+  /* Shadows — Apple-style layered depth */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-xl:  0 16px 56px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.07);
+  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.14), 0 12px 28px rgba(0,0,0,0.08);
+  --shadow-glow:    0 0 20px var(--accent-glow), 0 0 40px rgba(94,92,230,0.12);
+  --shadow-glow-lg: 0 0 32px var(--accent-glow-lg), 0 0 64px rgba(94,92,230,0.16);
+  --shadow-ambient: 0 0 80px rgba(0,0,0,0.06);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.04);
 
-  /* Typography — SF Pro system stack with DM Sans as primary loaded font */
-  --font-display: 'DM Sans', -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-  --font-body:    'DM Sans', -apple-system, 'SF Pro Text',    BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  /* Typography */
+  --font-display: 'DM Sans', -apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+  --font-body:    'DM Sans', -apple-system, 'SF Pro Text',    BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
   --font-mono:    'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', monospace;
 
   --text-2xs:  0.625rem;
@@ -102,6 +128,7 @@
   --text-2xl:  1.5rem;
   --text-3xl:  1.875rem;
   --text-4xl:  2.25rem;
+  --text-5xl:  3rem;
 
   /* Spacing */
   --space-1:  0.25rem;
@@ -124,27 +151,30 @@
   --space-xl:  var(--space-12);
   --space-2xl: var(--space-16);
 
-  /* Border Radius */
+  /* Border Radius — Apple's rounded language */
   --radius-xs:   0.25rem;
   --radius-sm:   0.5rem;
   --radius-md:   0.75rem;
   --radius-lg:   1rem;
   --radius-xl:   1.25rem;
-  --radius-2xl:  1.75rem;
+  --radius-2xl:  1.5rem;
+  --radius-3xl:  2rem;
   --radius-full: 9999px;
 
-  /* Transitions */
+  /* Transitions — Apple spring physics */
   --transition-fast:   120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-base:   200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-slow:   320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-medium: 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-medium: 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-spring: 480ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-bounce: 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --ease-in:     cubic-bezier(0.4, 0, 1, 1);
   --ease-out:    cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-expo:   cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Layout */
   --sidebar-width:           240px;
@@ -162,74 +192,88 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   DARK MODE — Apple HIG Dark
-   True black base, elevated gray layers, vivid indigo accent.
-   Mirrors exactly how Apple Music and Podcasts look on macOS.
-   Updated to Apple HIG 2024/2025 color specifications.
+   DARK MODE — Apple HIG 2025
+   systemBackground: #000000
+   secondarySystemBackground: #1C1C1E
+   tertiarySystemBackground: #2C2C2E
    ═══════════════════════════════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  /* Backgrounds — Apple HIG dark values */
-  --bg-primary:   #000000;   /* systemBackground dark                    */
-  --bg-secondary: #1C1C1E;   /* secondarySystemBackground                */
-  --bg-tertiary:  #2C2C2E;   /* tertiarySystemBackground                 */
-  --bg-elevated:  #2C2C2E;   /* elevated surface — tertiarySystemBackground
-                                (was #3A3A3C which is too bright/flat)    */
+  /* Backgrounds */
+  --bg-primary:   #000000;   /* systemBackground dark            */
+  --bg-secondary: #1C1C1E;   /* secondarySystemBackground dark   */
+  --bg-tertiary:  #2C2C2E;   /* tertiarySystemBackground dark    */
+  --bg-elevated:  #2C2C2E;   /* elevated surface                 */
+  --bg-base:      #000000;
 
-  /* Text — Apple HIG dark label hierarchy */
-  --text-primary:   #FFFFFF;                /* label dark — pure white    */
-  --text-secondary: rgba(235, 235, 245, 0.60);  /* secondaryLabel dark    */
-  --text-tertiary:  rgba(235, 235, 245, 0.38);  /* tertiaryLabel dark     */
-  --text-muted:     rgba(235, 235, 245, 0.28);  /* quaternaryLabel dark
-                                                   raised from 0.22 for
-                                                   WCAG compliance        */
+  /* Text */
+  --text-primary:   #FFFFFF;
+  --text-secondary: rgba(235,235,245,0.60);
+  --text-tertiary:  rgba(235,235,245,0.38);
+  --text-muted:     rgba(235,235,245,0.26);
+  --text-placeholder: rgba(235,235,245,0.22);
 
   /* Borders */
-  --border-subtle:  rgba(255, 255, 255, 0.08);
-  --border-medium:  rgba(255, 255, 255, 0.14);
-  --border-strong:  rgba(255, 255, 255, 0.22);
+  --border-subtle:  rgba(255,255,255,0.08);
+  --border-medium:  rgba(255,255,255,0.14);
+  --border-strong:  rgba(255,255,255,0.22);
 
-  /* Surfaces */
-  --surface-overlay: rgba(28, 28, 30, 0.96);
-  --surface-glass:   rgba(44, 44, 46, 0.92);
+  /* Materials — dark Liquid Glass */
+  --material-thin:       rgba(28,28,30,0.55);
+  --material-regular:    rgba(28,28,30,0.72);
+  --material-thick:      rgba(28,28,30,0.88);
+  --material-chrome:     rgba(28,28,30,0.82);
+  --material-sidebar:    rgba(28,28,30,0.85);
+  --material-bar:        rgba(28,28,30,0.88);
+  --material-overlay:    rgba(28,28,30,0.94);
+  --material-modal:      rgba(44,44,46,0.96);
 
-  /* Accent — Apple System Indigo, dark mode (2024/2025 HIG: R109,G124,B255) */
-  --accent-primary:   #6D7CFF;
-  --accent-secondary: #0091FF;   /* R0,G145,B255  */
-  --accent-tertiary:  #3CD9FE;   /* R60,G211,B254 */
-  --accent-hover:     #8A97FF;
-  --accent-soft:      rgba(109, 124, 255, 0.16);
-  --accent-glow:      rgba(109, 124, 255, 0.32);
-  --accent-muted:     rgba(109, 124, 255, 0.55);
+  /* Accent — Apple System Indigo, dark mode */
+  --accent-primary:   #7D7AFF;
+  --accent-secondary: #0A84FF;
+  --accent-tertiary:  #5AC8FA;
+  --accent-hover:     #9290FF;
+  --accent-pressed:   #6D6AEF;
+  --accent-soft:      rgba(125,122,255,0.14);
+  --accent-soft-md:   rgba(125,122,255,0.22);
+  --accent-glow:      rgba(125,122,255,0.32);
+  --accent-glow-lg:   rgba(125,122,255,0.48);
+  --accent-muted:     rgba(125,122,255,0.50);
+  --accent-border:    rgba(125,122,255,0.35);
 
   /* Gradients — dark mode, more vivid */
-  --gradient-accent:   linear-gradient(135deg, #6D7CFF, #0091FF);
-  --gradient-vivid:    linear-gradient(135deg, #6D7CFF, #8A97FF, #3CD9FE);
-  --gradient-warm:     linear-gradient(135deg, #FF375F, #FF9F0A);
-  --gradient-cool:     linear-gradient(135deg, #6D7CFF, #3CD9FE, #00DBD0);
-  --gradient-spectrum: linear-gradient(135deg, #6D7CFF, #0091FF, #3CD9FE);
-  --gradient-royal:    linear-gradient(135deg, #6D7CFF, #8A97FF);
-  --gradient-regal:    linear-gradient(135deg, #6D7CFF, #0091FF);
-  --gradient-logo:     linear-gradient(135deg, #6D7CFF, #3CD9FE);
+  --gradient-accent:    linear-gradient(135deg, #7D7AFF 0%, #0A84FF 100%);
+  --gradient-vivid:     linear-gradient(135deg, #7D7AFF 0%, #BF5AF2 50%, #0A84FF 100%);
+  --gradient-warm:      linear-gradient(135deg, #FF375F 0%, #FF9F0A 100%);
+  --gradient-cool:      linear-gradient(135deg, #7D7AFF 0%, #5AC8FA 50%, #63E6E2 100%);
+  --gradient-spectrum:  linear-gradient(135deg, #7D7AFF 0%, #0A84FF 50%, #5AC8FA 100%);
+  --gradient-royal:     linear-gradient(135deg, #7D7AFF 0%, #BF5AF2 100%);
+  --gradient-logo:      linear-gradient(135deg, #7D7AFF 0%, #5AC8FA 100%);
+  --gradient-hero:      linear-gradient(160deg, rgba(125,122,255,0.12) 0%, rgba(10,132,255,0.06) 100%);
+  --gradient-card:      linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
 
-  /* Status — Apple HIG dark semantic (2024/2025 values) */
-  --status-live:    #30D158;   /* systemGreen dark  — R48,G209,B88   */
-  --status-warning: #FF9F0A;   /* systemOrange dark — R255,G159,B10  */
-  --status-error:   #FF453A;   /* systemRed dark    — R255,G69,B58   */
-  --status-info:    #6D7CFF;   /* systemIndigo dark                  */
+  /* Status */
+  --status-live:    #30D158;
+  --status-warning: #FF9F0A;
+  --status-error:   #FF453A;
+  --status-info:    #7D7AFF;
 
   /* Shadows — deeper on true black */
-  --shadow-xs:      0 1px 4px  rgba(0,0,0,0.30);
-  --shadow-sm:      0 2px 8px  rgba(0,0,0,0.40);
-  --shadow-md:      0 4px 16px rgba(0,0,0,0.50);
-  --shadow-lg:      0 8px 32px rgba(0,0,0,0.60);
-  --shadow-xl:      0 16px 56px rgba(0,0,0,0.70);
-  --shadow-glow:    0 0 32px var(--accent-glow);
+  --shadow-xs:  0 1px 3px  rgba(0,0,0,0.30);
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.40);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.50);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.60);
+  --shadow-xl:  0 16px 56px rgba(0,0,0,0.70);
+  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.80);
+  --shadow-glow:    0 0 24px var(--accent-glow), 0 0 48px rgba(125,122,255,0.16);
+  --shadow-glow-lg: 0 0 40px var(--accent-glow-lg), 0 0 80px rgba(125,122,255,0.20);
   --shadow-ambient: 0 0 120px rgba(0,0,0,0.80);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.20);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   THEME TRANSITION — scoped to color properties only
+   THEME TRANSITION — smooth color morphing
    ═══════════════════════════════════════════════════════════════════ */
 
 body,
@@ -248,7 +292,9 @@ body,
 .sidebar-nav-item,
 .cm-dialog,
 .am-dialog,
-.toast {
+.toast,
+.genre-card,
+.country-card {
   transition:
     background-color 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
     border-color     250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
