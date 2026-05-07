@@ -113,12 +113,17 @@
   flex: 1;
   padding: 4px 8px;
   overflow-y: auto;
-  overflow-x: visible;
+  overflow-x: clip;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   -webkit-app-region: no-drag;
   gap: 1px;
+}
+
+/* In collapsed mode, allow tooltips to escape */
+.sidebar.collapsed .sidebar-nav {
+  overflow: visible;
 }
 
 .sidebar-nav-section-label {
@@ -218,27 +223,30 @@
   transition: max-width var(--transition-slow), opacity 200ms ease;
 }
 
-/* ── Tooltip (fixed position, escapes overflow) ── */
+/* ── Tooltip (fixed position, aligned to button) ── */
+.sidebar.collapsed .sidebar-nav-item {
+  position: relative;
+}
+
 .sidebar-nav-item::after {
   content: attr(data-tooltip);
-  position: fixed;
-  left: 74px;
-  top: var(--tooltip-y, 50vh);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
   transform: translateY(-50%);
   background: var(--bg-elevated);
   border: 1px solid var(--border-medium);
   color: var(--text-primary);
   font-size: var(--text-xs);
   font-weight: 600;
-  padding: 5px 12px;
-  border-radius: var(--radius-lg);
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   z-index: 99999;
-  box-shadow: var(--shadow-lg);
-  /* Delay appearance slightly so it doesn't flash on quick passes */
-  transition: opacity 120ms ease 80ms;
+  box-shadow: var(--shadow-md);
+  transition: opacity 100ms ease 60ms;
   letter-spacing: -0.01em;
 }
 
