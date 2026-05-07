@@ -18,7 +18,7 @@
 }
 
 .platform-darwin .sidebar-header {
-  padding-top: 40px;
+  padding-top: 16px;
 }
 
 /* ── Logo icon ── */
@@ -369,7 +369,7 @@
 }
 
 .platform-darwin .sidebar.collapsed .sidebar-header {
-  padding-top: 40px;
+  padding-top: 16px;
 }
 
 .sidebar.collapsed .sidebar-logo {

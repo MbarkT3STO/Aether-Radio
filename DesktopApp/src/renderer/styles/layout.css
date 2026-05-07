@@ -22,7 +22,7 @@
   position: relative;
   z-index: 200;
   transition: width var(--transition-slow);
-  margin: 10px 0 10px 10px;
+  margin: 38px 0 10px 10px;
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-md);
