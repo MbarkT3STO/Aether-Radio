@@ -265,13 +265,13 @@
   border-radius: 50%;
 }
 
-.player-btn:hover {
+.player-btn:not(.player-btn-play):hover {
   color: var(--text-primary);
   background: rgba(0,0,0,0.07);
   transform: scale(1.10);
 }
 
-[data-theme="dark"] .player-btn:hover {
+[data-theme="dark"] .player-btn:not(.player-btn-play):hover {
   background: rgba(255,255,255,0.10);
 }
 
@@ -478,7 +478,7 @@
   box-shadow: var(--shadow-sm), var(--shadow-inset);
 }
 
-:root:not([data-theme="dark"]) .player-btn:hover {
+:root:not([data-theme="dark"]) .player-btn:not(.player-btn-play):hover {
   background: rgba(0,0,0,0.06);
   color: var(--text-primary);
 }

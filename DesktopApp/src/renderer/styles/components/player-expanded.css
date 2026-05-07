@@ -347,13 +347,13 @@
   color: var(--text-secondary);
 }
 
-.pex-btn:hover {
+.pex-btn:not(.pex-btn-play):hover {
   color: var(--text-primary);
   background: rgba(0,0,0,0.08);
   transform: scale(1.10);
 }
 
-[data-theme="dark"] .pex-btn:hover {
+[data-theme="dark"] .pex-btn:not(.pex-btn-play):hover {
   background: rgba(255,255,255,0.12);
 }
 
@@ -658,7 +658,7 @@
   color: var(--text-secondary);
 }
 
-:root:not([data-theme="dark"]) .pex-btn:hover {
+:root:not([data-theme="dark"]) .pex-btn:not(.pex-btn-play):hover {
   background: rgba(0,0,0,0.07);
   color: var(--text-primary);
 }
