@@ -63,7 +63,7 @@ class App {
       // Apply dark status bar for dark theme
       try {
         await StatusBar.setStyle({ style: theme === 'dark' ? Style.Dark : Style.Light })
-        await StatusBar.setBackgroundColor({ color: theme === 'dark' ? '#121214' : '#e0e5ec' })
+        await StatusBar.setBackgroundColor({ color: theme === 'dark' ? '#000000' : '#f2f2f7' })
       } catch { /* not on native */ }
     }
   }
@@ -108,7 +108,7 @@ class App {
     this.eventBus.on('theme:changed', async ({ theme }) => {
       try {
         await StatusBar.setStyle({ style: theme === 'dark' ? Style.Dark : Style.Light })
-        await StatusBar.setBackgroundColor({ color: theme === 'dark' ? '#121214' : '#e0e5ec' })
+        await StatusBar.setBackgroundColor({ color: theme === 'dark' ? '#000000' : '#f2f2f7' })
       } catch { /* not on native */ }
     })
   }

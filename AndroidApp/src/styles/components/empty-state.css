@@ -1,63 +1,51 @@
-/* ── Empty State (Keyra neumorphic) ── */
+/* ── Empty State — Apple Design ── */
 
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-xl) var(--space-lg);
+  padding: 48px 24px;
   text-align: center;
-  animation: fadeIn var(--transition-medium);
+  animation: fadeIn 300ms ease both;
 }
 
-/* Neumorphic icon container — recessed/inset look */
 .empty-state-icon {
-  width: 96px;
-  height: 96px;
-  border-radius: var(--radius-xl);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-pressed);
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  background: rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-primary);
-  margin-bottom: var(--space-lg);
-  opacity: 0.7;
+  margin-bottom: 24px;
+  opacity: 0.65;
   flex-shrink: 0;
 }
 
+[data-theme="dark"] .empty-state-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .empty-state-icon svg {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 
 .empty-state-title {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 8px;
   color: var(--text-primary);
-  letter-spacing: -0.3px;
+  letter-spacing: -0.03em;
 }
 
 .empty-state-message {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  color: var(--text-tertiary);
   max-width: 360px;
-  line-height: 1.6;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
-
-/* ── Light theme ── */
-:root:not([data-theme="dark"]) .empty-state-icon {
-  background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
-  color: var(--accent-primary);
-  opacity: 0.75;
-}
-
-:root:not([data-theme="dark"]) .empty-state-title   { color: var(--text-primary); }
-:root:not([data-theme="dark"]) .empty-state-message { color: var(--text-secondary); }
-
-/* ── Dark theme ── */
-[data-theme="dark"] .empty-state-icon   { background: var(--bg-secondary); }
-[data-theme="dark"] .empty-state-message { color: var(--text-secondary); }

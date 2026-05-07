@@ -1,86 +1,82 @@
-/* ── Search Bar (Keyra nm-inset style) ── */
+/* ── Search Bar — Apple Design ── */
 
 .search-bar {
   position: relative;
   width: 100%;
-  max-width: 600px;
 }
 
 .search-bar-input {
   width: 100%;
-  padding: 10px var(--space-md) 10px 44px;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-pressed);
-  border: none;
+  padding: 11px 40px 11px 40px;
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid transparent;
   border-radius: var(--radius-full);
   color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 400;
   font-family: var(--font-body);
-  transition: all var(--transition-fast);
+  letter-spacing: -0.01em;
+  transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+  /* Prevent zoom on focus in iOS/Android */
+  font-size: max(16px, 1rem);
+}
+
+[data-theme="dark"] .search-bar-input {
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .search-bar-input:focus {
   outline: none;
-  box-shadow: var(--nm-pressed), 0 0 0 2px var(--accent-soft);
+  border-color: var(--accent-primary);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+[data-theme="dark"] .search-bar-input:focus {
+  background: var(--bg-tertiary);
 }
 
 .search-bar-input::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   font-weight: 400;
 }
 
 .search-bar-icon {
   position: absolute;
-  left: 16px;
+  left: 13px;
   top: 50%;
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   pointer-events: none;
   transition: color var(--transition-fast);
 }
 
-.search-bar:focus-within .search-bar-icon {
-  color: var(--accent-primary);
-}
+.search-bar:focus-within .search-bar-icon { color: var(--accent-primary); }
 
 .search-bar-clear {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-tertiary);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.08);
   transition: all var(--transition-fast);
   opacity: 0;
   pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.search-bar-clear.visible {
-  opacity: 1;
-  pointer-events: all;
+[data-theme="dark"] .search-bar-clear {
+  background: rgba(255, 255, 255, 0.12);
 }
 
-.search-bar-clear:hover {
-  color: var(--text-primary);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.search-bar-clear:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(-50%) scale(1);
-}
-
-/* ── Light theme overrides ── */
-:root:not([data-theme="dark"]) .search-bar-input          { background: var(--bg-secondary); color: var(--text-primary); }
-:root:not([data-theme="dark"]) .search-bar-input::placeholder { color: var(--text-tertiary); }
-:root:not([data-theme="dark"]) .volume-slider             { background: var(--bg-secondary); }
+.search-bar-clear.visible { opacity: 1; pointer-events: all; }
+.search-bar-clear:active { opacity: 0.6; }

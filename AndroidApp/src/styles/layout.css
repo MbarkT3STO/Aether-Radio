@@ -1,4 +1,4 @@
-/* ── Mobile App Shell ── */
+/* ── Mobile App Shell (Apple Design) ── */
 
 * { box-sizing: border-box; }
 
@@ -68,9 +68,10 @@ html, body {
 .view-header { margin-bottom: 20px; }
 
 .view-subtitle {
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   font-size: 0.875rem;
   margin-top: 4px;
+  letter-spacing: -0.01em;
 }
 
 .view-header-row {
@@ -81,9 +82,9 @@ html, body {
 }
 
 .view-header-row h1 {
-  font-size: 1.4rem;
-  font-weight: 900;
-  letter-spacing: -0.5px;
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
 }
 
@@ -92,8 +93,7 @@ html, body {
   height: 34px;
   min-width: 34px;
   border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
+  background: var(--accent-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,11 +105,11 @@ html, body {
 .section { margin-bottom: 28px; }
 
 .section-title {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--text-tertiary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -125,38 +125,83 @@ html, body {
 
 /* ── Results count ── */
 .results-count {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-tertiary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
   margin-bottom: 12px;
+  letter-spacing: -0.01em;
 }
 
 /* ── Meta ── */
-.meta-dot { color: var(--text-tertiary); opacity: 0.6; }
-.meta-sep { color: var(--text-tertiary); opacity: 0.5; }
+.meta-dot { color: var(--text-muted); opacity: 0.6; }
+.meta-sep { color: var(--text-muted); opacity: 0.5; }
 
-/* ── Neumorphic helpers ── */
-.nm-flat   { background: var(--bg-primary); box-shadow: var(--nm-raised); border-radius: var(--radius-md); }
-.nm-inset  { background: var(--bg-primary); box-shadow: var(--nm-pressed); border-radius: var(--radius-md); }
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 18px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { opacity: 0.75; transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .btn-secondary {
+  background: rgba(255, 255, 255, 0.10);
+}
 
 /* ── Load more ── */
 .load-more-wrap { display: flex; justify-content: center; margin-top: 16px; }
 .load-more-btn {
-  display: flex; align-items: center; gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 10px 20px;
   border-radius: var(--radius-full);
-  border: 1px solid var(--border-medium);
-  background: var(--bg-secondary);
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
   color: var(--text-secondary);
-  font-size: 0.85rem; font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
+  letter-spacing: -0.01em;
+  -webkit-tap-highlight-color: transparent;
 }
+
+[data-theme="dark"] .load-more-btn {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.load-more-btn:active { opacity: 0.7; }
+
+/* ── Neumorphic helpers (now just flat) ── */
+.nm-flat  { background: var(--bg-secondary); border-radius: var(--radius-md); }
+.nm-inset { background: var(--bg-tertiary);  border-radius: var(--radius-md); }
 
 /* ── Theme transitions ── */
 body, .station-card, .mini-player, .bottom-nav, .stg-card, h1, h2, h3 {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color     250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color            250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-
-/* ── Light mode ── */
-:root:not([data-theme="dark"]) .view-header-icon { background: var(--bg-primary); }
-:root:not([data-theme="dark"]) h1 { color: var(--text-primary); }

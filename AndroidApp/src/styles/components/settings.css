@@ -1,20 +1,21 @@
-/* ═══════════════════════════════════════════════════════════════
-   SETTINGS VIEW — Keyra neumorphic design
-   ═══════════════════════════════════════════════════════════════ */
+/* ── Settings View — Apple Design ── */
 
-.settings-view {
-  /* no max-width here — controlled by the inner wrapper div */
+.settings-view { }
+
+.stg-content-wrap {
+  max-width: 560px;
+  width: 100%;
 }
 
 /* ── Section Card ── */
 .stg-card {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: var(--space-md);
-  /* ensure card doesn't stretch beyond its container */
+  margin-bottom: 16px;
   width: 100%;
+  box-shadow: var(--shadow-xs);
 }
 
 /* ── Card Header ── */
@@ -22,16 +23,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 20px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .stg-card-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-pressed);
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,104 +41,114 @@
 
 .stg-card-title {
   font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: 0.9375rem;
+  font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 .stg-card-sub {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-tertiary);
-  font-weight: 600;
+  font-weight: 400;
   margin-top: 1px;
+  letter-spacing: -0.01em;
 }
 
-/* ── Row inside card ── */
+/* ── Row ── */
 .stg-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 16px 20px;
+  gap: 20px;
+  padding: 14px 18px;
+  /* Minimum 44px touch target */
+  min-height: 44px;
 }
 
 .stg-row + .stg-row {
   border-top: 1px solid var(--border-subtle);
 }
 
-.stg-row-info {
-  flex: 1;
-  min-width: 0;
-}
+.stg-row-info { flex: 1; min-width: 0; }
 
 .stg-row-label {
-  font-weight: 700;
-  font-size: 0.875rem;
+  font-weight: 500;
+  font-size: 0.9375rem;
   color: var(--text-primary);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
 }
 
 .stg-row-desc {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
-/* ── Toggle Group ── */
+/* ── Toggle Group (Apple segmented control) ── */
 .stg-toggle-group {
   display: flex;
-  gap: 4px;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-pressed);
-  padding: 4px;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 3px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .stg-toggle-group {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .stg-toggle-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 16px;
+  gap: 5px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 500;
   color: var(--text-tertiary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
   background: transparent;
   border: none;
   font-family: var(--font-body);
   white-space: nowrap;
-}
-
-.stg-toggle-btn:hover {
-  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 36px;
 }
 
 .stg-toggle-btn.active {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--accent-primary);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .stg-toggle-btn.active {
+  background: var(--bg-elevated);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* ── About section ── */
 .stg-about {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  gap: 14px;
+  padding: 16px 18px;
 }
 
 .stg-about-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  box-shadow: var(--nm-raised);
   flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .stg-about-logo-img {
@@ -146,86 +156,47 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: var(--radius-md);
 }
 
 .stg-about-name {
   font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.3px;
-  margin-bottom: 3px;
+  letter-spacing: -0.03em;
+  margin-bottom: 2px;
 }
 
 .stg-about-version {
   font-size: 0.75rem;
-  color: var(--text-tertiary);
-  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
 }
 
-/* ── Divider inside card ── */
+/* ── Divider ── */
 .stg-divider {
   height: 1px;
   background: var(--border-subtle);
-  margin: 0 20px;
-}
-
-/* ── Settings content wrapper ── */
-.stg-content-wrap {
-  max-width: 560px;
-  width: 100%;
+  margin: 0 18px;
 }
 
 /* ── Data source link ── */
 .stg-data-source-link {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 500;
   color: var(--accent-primary);
   white-space: nowrap;
   flex-shrink: 0;
+  letter-spacing: -0.01em;
 }
-
-/* ── Light theme ── */
-:root:not([data-theme="dark"]) .stg-card {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-}
-
-:root:not([data-theme="dark"]) .stg-card-icon {
-  background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
-}
-
-:root:not([data-theme="dark"]) .stg-toggle-group {
-  background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
-}
-
-:root:not([data-theme="dark"]) .stg-toggle-btn.active {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-}
-
-/* ── Light theme overrides (from theme-fixes) ── */
-:root:not([data-theme="dark"]) .stg-row-label             { color: var(--text-primary); }
-:root:not([data-theme="dark"]) .stg-row-desc              { color: var(--text-secondary); }
-:root:not([data-theme="dark"]) .stg-card-title            { color: var(--text-primary); }
-:root:not([data-theme="dark"]) .stg-card-sub              { color: var(--text-tertiary); }
-:root:not([data-theme="dark"]) .stg-about-logo            { background: var(--bg-primary); }
-
-/* ── Dark theme overrides (from theme-fixes) ── */
-[data-theme="dark"] .stg-card-sub              { color: var(--text-tertiary); }
 
 /* ── Keyboard Shortcuts ── */
-.stg-row--kbd {
-  padding: 10px 20px;
-}
+.stg-row--kbd { padding: 10px 18px; }
 
 .stg-kbd-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   flex-shrink: 0;
 }
 
@@ -233,24 +204,28 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 8px;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 700;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
   color: var(--text-secondary);
   white-space: nowrap;
 }
 
+[data-theme="dark"] .stg-kbd {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .stg-kbd-plus {
-  font-size: 0.65rem;
-  color: var(--text-tertiary);
+  font-size: 0.6rem;
+  color: var(--text-muted);
   padding: 0 1px;
 }
 
-/* ── Data Card Buttons ── */
+/* ── Action Buttons ── */
 .stg-btn-group {
   display: flex;
   gap: 6px;
@@ -258,40 +233,40 @@
 }
 
 .stg-action-btn {
-  padding: 7px 16px;
+  padding: 8px 16px;
   border-radius: var(--radius-full);
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 500;
   font-family: var(--font-body);
   color: var(--accent-primary);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  background: var(--accent-soft);
   border: none;
   cursor: pointer;
-  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast);
   white-space: nowrap;
+  letter-spacing: -0.01em;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 36px;
 }
 
-.stg-action-btn:hover {
-  box-shadow: var(--neu-shadow-hover);
-  transform: translateY(-1px);
-}
-
-.stg-action-btn:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
-}
+.stg-action-btn:active { opacity: 0.7; transform: scale(0.96); }
 
 .stg-action-btn--danger {
-  color: #ff453a;
+  color: var(--status-error);
+  background: rgba(255, 59, 48, 0.08);
 }
 
-/* ── Light theme overrides for new elements ── */
-:root:not([data-theme="dark"]) .stg-kbd {
-  background: var(--bg-primary);
-  color: var(--text-secondary);
+/* ── Light theme ── */
+:root:not([data-theme="dark"]) .stg-card {
+  background: var(--bg-elevated);
+  border-color: var(--border-subtle);
 }
 
-:root:not([data-theme="dark"]) .stg-action-btn {
-  background: var(--bg-primary);
+:root:not([data-theme="dark"]) .stg-toggle-group {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:root:not([data-theme="dark"]) .stg-toggle-btn.active {
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-sm);
 }

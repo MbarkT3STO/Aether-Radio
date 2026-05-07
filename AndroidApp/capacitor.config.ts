@@ -15,12 +15,12 @@ const config: CapacitorConfig = {
     // Disable WebContents debugging in production — re-enable manually for development
     webContentsDebuggingEnabled: false,
     // Keep WebView alive when app goes to background
-    backgroundColor: '#121214',
+    backgroundColor: '#000000',
   },
   plugins: {
     StatusBar: {
       style: 'Dark',
-      backgroundColor: '#121214',
+      backgroundColor: '#000000',
     },
   },
 }
