@@ -38,9 +38,9 @@
 }
 
 [data-theme="dark"] .station-card.playing {
-  background: rgba(123,121,255,0.08);
-  border-color: rgba(123,121,255,0.42);
-  box-shadow: 0 0 0 1px rgba(123,121,255,0.22), var(--shadow-sm);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 1px var(--accent-border), var(--shadow-sm);
 }
 
 /* Live dot — top right */

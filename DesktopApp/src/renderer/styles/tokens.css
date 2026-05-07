@@ -1,118 +1,114 @@
 /* ═══════════════════════════════════════════════════════════════════
-   AETHER RADIO — APPLE DESIGN SYSTEM v2
-   Inspired by Apple's Liquid Glass design language (macOS Tahoe / iOS 26)
-   True Apple HIG 2025 color values, materials, and depth system.
-   Accent: Apple System Indigo — premium audio app identity.
+   AETHER RADIO — DESIGN SYSTEM v3
+   Modern warm palette with violet-blue accent.
+   Sophisticated, lovable, and clean.
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Accent Hue (Apple System Indigo) ── */
-  --h: 249;
-  --s: 88%;
+  /* ── Accent Hue ── */
+  --h: 252;
+  --s: 85%;
 
-  /* ── Apple System Color Palette ── */
-  --palette-indigo:    #5E5CE6;   /* Apple System Indigo — light  */
-  --palette-indigo-dk: #7D7AFF;   /* Apple System Indigo — dark   */
-  --palette-blue:      #007AFF;   /* Apple System Blue — light    */
-  --palette-blue-dk:   #0A84FF;   /* Apple System Blue — dark     */
-  --palette-purple:    #AF52DE;   /* Apple System Purple — light  */
-  --palette-purple-dk: #BF5AF2;   /* Apple System Purple — dark   */
-  --palette-pink:      #FF2D55;   /* Apple System Pink            */
-  --palette-pink-dk:   #FF375F;   /* Apple System Pink — dark     */
-  --palette-red:       #FF3B30;   /* Apple System Red — light     */
-  --palette-red-dk:    #FF453A;   /* Apple System Red — dark      */
-  --palette-orange:    #FF9500;   /* Apple System Orange — light  */
-  --palette-orange-dk: #FF9F0A;   /* Apple System Orange — dark   */
-  --palette-yellow:    #FFCC00;   /* Apple System Yellow — light  */
-  --palette-yellow-dk: #FFD60A;   /* Apple System Yellow — dark   */
-  --palette-green:     #34C759;   /* Apple System Green — light   */
-  --palette-green-dk:  #30D158;   /* Apple System Green — dark    */
-  --palette-teal:      #5AC8FA;   /* Apple System Teal — light    */
-  --palette-teal-dk:   #64D2FF;   /* Apple System Teal — dark     */
-  --palette-mint:      #00C7BE;   /* Apple System Mint — light    */
-  --palette-mint-dk:   #63E6E2;   /* Apple System Mint — dark     */
-  --palette-cyan:      #32ADE6;   /* Apple System Cyan — light    */
-  --palette-cyan-dk:   #5AC8FA;   /* Apple System Cyan — dark     */
+  /* ── Color Palette ── */
+  --palette-indigo:    #6C63FF;   /* Primary violet          */
+  --palette-indigo-dk: #8B83FF;   /* Primary violet — dark   */
+  --palette-blue:      #3B82F6;   /* Bright blue             */
+  --palette-blue-dk:   #60A5FA;   /* Bright blue — dark      */
+  --palette-purple:    #A855F7;   /* Rich purple             */
+  --palette-purple-dk: #C084FC;   /* Rich purple — dark      */
+  --palette-pink:      #EC4899;   /* Warm pink               */
+  --palette-pink-dk:   #F472B6;   /* Warm pink — dark        */
+  --palette-red:       #EF4444;   /* Clean red               */
+  --palette-red-dk:    #F87171;   /* Clean red — dark        */
+  --palette-orange:    #F59E0B;   /* Amber orange            */
+  --palette-orange-dk: #FBBF24;   /* Amber orange — dark     */
+  --palette-yellow:    #EAB308;   /* Golden yellow           */
+  --palette-yellow-dk: #FACC15;   /* Golden yellow — dark    */
+  --palette-green:     #22C55E;   /* Fresh green             */
+  --palette-green-dk:  #4ADE80;   /* Fresh green — dark      */
+  --palette-teal:      #06B6D4;   /* Ocean teal              */
+  --palette-teal-dk:   #22D3EE;   /* Ocean teal — dark       */
+  --palette-mint:      #14B8A6;   /* Soft mint               */
+  --palette-mint-dk:   #2DD4BF;   /* Soft mint — dark        */
+  --palette-cyan:      #0EA5E9;   /* Sky cyan                */
+  --palette-cyan-dk:   #38BDF8;   /* Sky cyan — dark         */
 
   /* ══════════════════════════════════════════════════════════════
-     LIGHT MODE — Apple HIG 2025
-     systemBackground: #FFFFFF
-     secondarySystemBackground: #F2F2F7
-     tertiarySystemBackground: #FFFFFF
-     systemGroupedBackground: #F2F2F7
+     LIGHT MODE — Warm & Clean
+     Cream-tinted whites, soft lavender undertones
      ══════════════════════════════════════════════════════════════ */
 
-  /* Backgrounds */
-  --bg-primary:   #F2F2F7;   /* systemGroupedBackground          */
-  --bg-secondary: #FFFFFF;   /* secondarySystemGroupedBackground */
-  --bg-tertiary:  #F2F2F7;   /* tertiarySystemGroupedBackground  */
-  --bg-elevated:  #FFFFFF;   /* systemBackground                 */
-  --bg-base:      #F2F2F7;   /* base canvas                      */
+  /* Backgrounds — warm off-whites */
+  --bg-primary:   #F8F7FC;   /* Lavender-tinted canvas           */
+  --bg-secondary: #FFFFFF;   /* Pure white cards                  */
+  --bg-tertiary:  #F3F2F8;   /* Subtle lavender fill             */
+  --bg-elevated:  #FFFFFF;   /* Elevated surfaces                */
+  --bg-base:      #F8F7FC;   /* Base canvas                      */
 
-  /* Text — Apple HIG label hierarchy */
-  --text-primary:   #000000;               /* label                */
-  --text-secondary: rgba(60,60,67,0.78);   /* secondaryLabel       */
-  --text-tertiary:  rgba(60,60,67,0.50);   /* tertiaryLabel        */
-  --text-muted:     rgba(60,60,67,0.36);   /* quaternaryLabel      */
-  --text-placeholder: rgba(60,60,67,0.30); /* placeholderText      */
+  /* Text — warm grays with depth */
+  --text-primary:   #1A1625;               /* Deep warm black      */
+  --text-secondary: rgba(26,22,37,0.72);   /* Secondary            */
+  --text-tertiary:  rgba(26,22,37,0.48);   /* Tertiary             */
+  --text-muted:     rgba(26,22,37,0.32);   /* Muted                */
+  --text-placeholder: rgba(26,22,37,0.28); /* Placeholder          */
 
-  /* Borders — Apple separator values */
-  --border-subtle:  rgba(60,60,67,0.12);   /* separator            */
-  --border-medium:  rgba(60,60,67,0.20);   /* opaqueSeparator      */
-  --border-strong:  rgba(60,60,67,0.30);   /* strong separator     */
+  /* Borders — soft lavender-gray */
+  --border-subtle:  rgba(26,22,37,0.08);   /* Subtle separator     */
+  --border-medium:  rgba(26,22,37,0.14);   /* Medium separator     */
+  --border-strong:  rgba(26,22,37,0.24);   /* Strong separator     */
 
-  /* Materials — Apple Liquid Glass */
+  /* Materials — frosted glass with warmth */
   --material-thin:       rgba(255,255,255,0.55);
   --material-regular:    rgba(255,255,255,0.72);
-  --material-thick:      rgba(255,255,255,0.85);
-  --material-chrome:     rgba(246,246,246,0.82);
-  --material-sidebar:    rgba(242,242,247,0.80);
-  --material-bar:        rgba(255,255,255,0.78);
-  --material-overlay:    rgba(255,255,255,0.92);
-  --material-modal:      rgba(255,255,255,0.94);
+  --material-thick:      rgba(255,255,255,0.88);
+  --material-chrome:     rgba(248,247,252,0.85);
+  --material-sidebar:    rgba(248,247,252,0.82);
+  --material-bar:        rgba(255,255,255,0.82);
+  --material-overlay:    rgba(255,255,255,0.94);
+  --material-modal:      rgba(255,255,255,0.96);
 
-  /* Accent — Apple System Indigo, light mode */
-  --accent-primary:   #5856D6;
-  --accent-secondary: #007AFF;
-  --accent-tertiary:  #32ADE6;
-  --accent-hover:     #6A68E8;
-  --accent-pressed:   #4A48C4;
-  --accent-soft:      rgba(88,86,214,0.10);
-  --accent-soft-md:   rgba(88,86,214,0.16);
-  --accent-glow:      rgba(88,86,214,0.22);
-  --accent-glow-lg:   rgba(88,86,214,0.34);
-  --accent-muted:     rgba(88,86,214,0.38);
-  --accent-border:    rgba(88,86,214,0.26);
+  /* Accent — Violet-blue, warm and sophisticated */
+  --accent-primary:   #6C63FF;
+  --accent-secondary: #3B82F6;
+  --accent-tertiary:  #0EA5E9;
+  --accent-hover:     #7E76FF;
+  --accent-pressed:   #5A52E8;
+  --accent-soft:      rgba(108,99,255,0.09);
+  --accent-soft-md:   rgba(108,99,255,0.15);
+  --accent-glow:      rgba(108,99,255,0.20);
+  --accent-glow-lg:   rgba(108,99,255,0.32);
+  --accent-muted:     rgba(108,99,255,0.36);
+  --accent-border:    rgba(108,99,255,0.22);
 
-  /* Gradients */
-  --gradient-accent:    linear-gradient(135deg, #5856D6 0%, #007AFF 100%);
-  --gradient-vivid:     linear-gradient(135deg, #5856D6 0%, #AF52DE 50%, #007AFF 100%);
-  --gradient-warm:      linear-gradient(135deg, #FF2D55 0%, #FF9500 100%);
-  --gradient-cool:      linear-gradient(135deg, #5856D6 0%, #32ADE6 50%, #00C7BE 100%);
-  --gradient-spectrum:  linear-gradient(135deg, #5856D6 0%, #007AFF 50%, #32ADE6 100%);
-  --gradient-royal:     linear-gradient(135deg, #5856D6 0%, #AF52DE 100%);
-  --gradient-logo:      linear-gradient(135deg, #5856D6 0%, #32ADE6 100%);
-  --gradient-hero:      linear-gradient(160deg, rgba(88,86,214,0.08) 0%, rgba(0,122,255,0.04) 100%);
+  /* Gradients — violet to blue, warm to cool */
+  --gradient-accent:    linear-gradient(135deg, #6C63FF 0%, #3B82F6 100%);
+  --gradient-vivid:     linear-gradient(135deg, #6C63FF 0%, #A855F7 50%, #3B82F6 100%);
+  --gradient-warm:      linear-gradient(135deg, #EC4899 0%, #F59E0B 100%);
+  --gradient-cool:      linear-gradient(135deg, #6C63FF 0%, #0EA5E9 50%, #14B8A6 100%);
+  --gradient-spectrum:  linear-gradient(135deg, #6C63FF 0%, #3B82F6 50%, #0EA5E9 100%);
+  --gradient-royal:     linear-gradient(135deg, #6C63FF 0%, #A855F7 100%);
+  --gradient-logo:      linear-gradient(135deg, #6C63FF 0%, #0EA5E9 100%);
+  --gradient-hero:      linear-gradient(160deg, rgba(108,99,255,0.07) 0%, rgba(59,130,246,0.04) 100%);
   --gradient-card:      linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
-  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.15) 100%);
 
-  /* Status — Apple HIG 2025 semantic colors */
-  --status-live:    #34C759;   /* systemGreen  */
-  --status-warning: #FF9500;   /* systemOrange */
-  --status-error:   #FF3B30;   /* systemRed    */
-  --status-info:    #5E5CE6;   /* systemIndigo */
+  /* Status — vibrant semantic colors */
+  --status-live:    #22C55E;
+  --status-warning: #F59E0B;
+  --status-error:   #EF4444;
+  --status-info:    #6C63FF;
 
-  /* Shadows — Apple-style layered depth */
-  --shadow-xs:  0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
-  --shadow-sm:  0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-md:  0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-xl:  0 16px 56px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.07);
-  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.14), 0 12px 28px rgba(0,0,0,0.08);
-  --shadow-glow:    0 0 20px var(--accent-glow), 0 0 40px rgba(94,92,230,0.12);
-  --shadow-glow-lg: 0 0 32px var(--accent-glow-lg), 0 0 64px rgba(94,92,230,0.16);
-  --shadow-ambient: 0 0 80px rgba(0,0,0,0.06);
-  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.04);
+  /* Shadows — soft and warm */
+  --shadow-xs:  0 1px 2px rgba(26,22,37,0.04), 0 1px 1px rgba(26,22,37,0.02);
+  --shadow-sm:  0 2px 8px rgba(26,22,37,0.05), 0 1px 3px rgba(26,22,37,0.03);
+  --shadow-md:  0 4px 16px rgba(26,22,37,0.07), 0 2px 6px rgba(26,22,37,0.04);
+  --shadow-lg:  0 8px 32px rgba(26,22,37,0.09), 0 4px 12px rgba(26,22,37,0.05);
+  --shadow-xl:  0 16px 56px rgba(26,22,37,0.11), 0 8px 20px rgba(26,22,37,0.06);
+  --shadow-2xl: 0 24px 80px rgba(26,22,37,0.13), 0 12px 28px rgba(26,22,37,0.07);
+  --shadow-glow:    0 0 20px var(--accent-glow), 0 0 40px rgba(108,99,255,0.10);
+  --shadow-glow-lg: 0 0 32px var(--accent-glow-lg), 0 0 64px rgba(108,99,255,0.14);
+  --shadow-ambient: 0 0 80px rgba(26,22,37,0.05);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(26,22,37,0.03);
 
   /* Typography */
   --font-display: 'DM Sans', -apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
@@ -151,7 +147,7 @@
   --space-xl:  var(--space-12);
   --space-2xl: var(--space-16);
 
-  /* Border Radius — Apple's rounded language */
+  /* Border Radius */
   --radius-xs:   0.25rem;
   --radius-sm:   0.5rem;
   --radius-md:   0.75rem;
@@ -161,7 +157,7 @@
   --radius-3xl:  2rem;
   --radius-full: 9999px;
 
-  /* Transitions — Apple spring physics */
+  /* Transitions */
   --transition-fast:   120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-base:   200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-slow:   320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -192,84 +188,82 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   DARK MODE — Apple HIG 2025
-   systemBackground: #000000
-   secondarySystemBackground: #1C1C1E
-   tertiarySystemBackground: #2C2C2E
+   DARK MODE — Rich & Immersive
+   Deep charcoal (not pure black), warm undertones
    ═══════════════════════════════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  /* Backgrounds */
-  --bg-primary:   #000000;   /* systemBackground dark            */
-  --bg-secondary: #1C1C1E;   /* secondarySystemBackground dark   */
-  --bg-tertiary:  #2C2C2E;   /* tertiarySystemBackground dark    */
-  --bg-elevated:  #2C2C2E;   /* elevated surface                 */
-  --bg-base:      #000000;
+  /* Backgrounds — rich charcoal with warmth */
+  --bg-primary:   #0F0E14;   /* Deep warm charcoal               */
+  --bg-secondary: #1A1820;   /* Card surfaces                    */
+  --bg-tertiary:  #242230;   /* Tertiary fills                   */
+  --bg-elevated:  #242230;   /* Elevated surfaces                */
+  --bg-base:      #0F0E14;   /* Base canvas                      */
 
-  /* Text */
-  --text-primary:   #FFFFFF;
-  --text-secondary: rgba(235,235,245,0.60);
-  --text-tertiary:  rgba(235,235,245,0.38);
-  --text-muted:     rgba(235,235,245,0.26);
-  --text-placeholder: rgba(235,235,245,0.22);
+  /* Text — clean whites with warmth */
+  --text-primary:   #F5F3FF;
+  --text-secondary: rgba(245,243,255,0.68);
+  --text-tertiary:  rgba(245,243,255,0.42);
+  --text-muted:     rgba(245,243,255,0.28);
+  --text-placeholder: rgba(245,243,255,0.22);
 
-  /* Borders */
-  --border-subtle:  rgba(255,255,255,0.08);
-  --border-medium:  rgba(255,255,255,0.14);
-  --border-strong:  rgba(255,255,255,0.22);
+  /* Borders — subtle violet-gray */
+  --border-subtle:  rgba(245,243,255,0.07);
+  --border-medium:  rgba(245,243,255,0.12);
+  --border-strong:  rgba(245,243,255,0.20);
 
-  /* Materials — dark Liquid Glass */
-  --material-thin:       rgba(28,28,30,0.55);
-  --material-regular:    rgba(28,28,30,0.72);
-  --material-thick:      rgba(28,28,30,0.88);
-  --material-chrome:     rgba(28,28,30,0.82);
-  --material-sidebar:    rgba(28,28,30,0.85);
-  --material-bar:        rgba(28,28,30,0.88);
-  --material-overlay:    rgba(28,28,30,0.94);
-  --material-modal:      rgba(44,44,46,0.96);
+  /* Materials — dark glass with depth */
+  --material-thin:       rgba(26,24,32,0.55);
+  --material-regular:    rgba(26,24,32,0.72);
+  --material-thick:      rgba(26,24,32,0.90);
+  --material-chrome:     rgba(26,24,32,0.85);
+  --material-sidebar:    rgba(20,18,26,0.90);
+  --material-bar:        rgba(22,20,28,0.92);
+  --material-overlay:    rgba(26,24,32,0.95);
+  --material-modal:      rgba(36,34,48,0.97);
 
-  /* Accent — Apple System Indigo, dark mode */
-  --accent-primary:   #7B79FF;
-  --accent-secondary: #0A84FF;
-  --accent-tertiary:  #5AC8FA;
-  --accent-hover:     #8E8CFF;
-  --accent-pressed:   #6B69EF;
-  --accent-soft:      rgba(123,121,255,0.14);
-  --accent-soft-md:   rgba(123,121,255,0.22);
-  --accent-glow:      rgba(123,121,255,0.30);
-  --accent-glow-lg:   rgba(123,121,255,0.46);
-  --accent-muted:     rgba(123,121,255,0.50);
-  --accent-border:    rgba(123,121,255,0.34);
+  /* Accent — brighter violet for dark backgrounds */
+  --accent-primary:   #8B83FF;
+  --accent-secondary: #60A5FA;
+  --accent-tertiary:  #38BDF8;
+  --accent-hover:     #9D96FF;
+  --accent-pressed:   #7A72F0;
+  --accent-soft:      rgba(139,131,255,0.12);
+  --accent-soft-md:   rgba(139,131,255,0.20);
+  --accent-glow:      rgba(139,131,255,0.28);
+  --accent-glow-lg:   rgba(139,131,255,0.42);
+  --accent-muted:     rgba(139,131,255,0.48);
+  --accent-border:    rgba(139,131,255,0.30);
 
-  /* Gradients — dark mode, more vivid */
-  --gradient-accent:    linear-gradient(135deg, #7B79FF 0%, #0A84FF 100%);
-  --gradient-vivid:     linear-gradient(135deg, #7B79FF 0%, #BF5AF2 50%, #0A84FF 100%);
-  --gradient-warm:      linear-gradient(135deg, #FF375F 0%, #FF9F0A 100%);
-  --gradient-cool:      linear-gradient(135deg, #7B79FF 0%, #5AC8FA 50%, #63E6E2 100%);
-  --gradient-spectrum:  linear-gradient(135deg, #7B79FF 0%, #0A84FF 50%, #5AC8FA 100%);
-  --gradient-royal:     linear-gradient(135deg, #7B79FF 0%, #BF5AF2 100%);
-  --gradient-logo:      linear-gradient(135deg, #7B79FF 0%, #5AC8FA 100%);
-  --gradient-hero:      linear-gradient(160deg, rgba(123,121,255,0.12) 0%, rgba(10,132,255,0.06) 100%);
-  --gradient-card:      linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  /* Gradients — vivid on dark */
+  --gradient-accent:    linear-gradient(135deg, #8B83FF 0%, #60A5FA 100%);
+  --gradient-vivid:     linear-gradient(135deg, #8B83FF 0%, #C084FC 50%, #60A5FA 100%);
+  --gradient-warm:      linear-gradient(135deg, #F472B6 0%, #FBBF24 100%);
+  --gradient-cool:      linear-gradient(135deg, #8B83FF 0%, #38BDF8 50%, #2DD4BF 100%);
+  --gradient-spectrum:  linear-gradient(135deg, #8B83FF 0%, #60A5FA 50%, #38BDF8 100%);
+  --gradient-royal:     linear-gradient(135deg, #8B83FF 0%, #C084FC 100%);
+  --gradient-logo:      linear-gradient(135deg, #8B83FF 0%, #38BDF8 100%);
+  --gradient-hero:      linear-gradient(160deg, rgba(139,131,255,0.10) 0%, rgba(96,165,250,0.05) 100%);
+  --gradient-card:      linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
 
   /* Status */
-  --status-live:    #30D158;
-  --status-warning: #FF9F0A;
-  --status-error:   #FF453A;
-  --status-info:    #7D7AFF;
+  --status-live:    #4ADE80;
+  --status-warning: #FBBF24;
+  --status-error:   #F87171;
+  --status-info:    #8B83FF;
 
-  /* Shadows — deeper on true black */
-  --shadow-xs:  0 1px 3px  rgba(0,0,0,0.32);
-  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.42);
-  --shadow-md:  0 4px 16px rgba(0,0,0,0.52);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.62);
-  --shadow-xl:  0 16px 56px rgba(0,0,0,0.72);
-  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.82);
-  --shadow-glow:    0 0 24px var(--accent-glow), 0 0 48px rgba(123,121,255,0.14);
-  --shadow-glow-lg: 0 0 40px var(--accent-glow-lg), 0 0 80px rgba(123,121,255,0.18);
-  --shadow-ambient: 0 0 120px rgba(0,0,0,0.80);
-  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.20);
+  /* Shadows — deep and rich */
+  --shadow-xs:  0 1px 3px  rgba(0,0,0,0.35);
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.45);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.55);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.65);
+  --shadow-xl:  0 16px 56px rgba(0,0,0,0.75);
+  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.85);
+  --shadow-glow:    0 0 24px var(--accent-glow), 0 0 48px rgba(139,131,255,0.12);
+  --shadow-glow-lg: 0 0 40px var(--accent-glow-lg), 0 0 80px rgba(139,131,255,0.16);
+  --shadow-ambient: 0 0 120px rgba(0,0,0,0.85);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.25);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -305,7 +299,8 @@ body,
 .stg-card-icon,
 .cs-empty-icon-wrap {
   transition:
-    background-color 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    border-color     250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    color            250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background-color 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color     280ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color            280ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow       280ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }

@@ -595,7 +595,7 @@
    DARK MODE
    ═══════════════════════════════════════════════════════════════ */
 [data-theme="dark"] .player-expanded-overlay {
-  background: #000000;
+  background: var(--bg-primary);
 }
 
 [data-theme="dark"] .pex-artwork {
