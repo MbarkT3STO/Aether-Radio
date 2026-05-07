@@ -27,8 +27,9 @@
 
         <!-- Music controls foreground service (background audio + media notification) -->
         <service
-            android:name="com.example.capacitormusiccontrols.MusicControlsNotification"
+            android:name="com.ingageco.capacitormusiccontrols.MusicControlsNotificationKiller"
             android:exported="false"
+            android:stopWithTask="true"
             android:foregroundServiceType="mediaPlayback" />
 
         <provider

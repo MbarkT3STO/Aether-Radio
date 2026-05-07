@@ -91,10 +91,11 @@ export class MediaNotificationService {
     if (!plugin) return
 
     // Use station favicon if it's a valid https URL, otherwise fall back to app logo.
-    // On Android, BitmapFactory cannot resolve relative paths — use the absolute asset URI.
+    // The plugin's getBitmapFromLocal() falls back to assets.open("public/" + path),
+    // so a bare relative path like "assets/logo.png" resolves to public/assets/logo.png.
     const cover = station.favicon?.startsWith('https://')
       ? station.favicon
-      : 'file:///android_asset/public/assets/logo.png'
+      : 'assets/logo.png'
 
     try {
       await plugin.create({
