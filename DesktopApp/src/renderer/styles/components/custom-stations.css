@@ -1,56 +1,46 @@
 /* ═══════════════════════════════════════════════════════════════
-   MY STATIONS VIEW — Keyra neumorphic design
+   MY STATIONS VIEW — Obsidian Design
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Header ── */
 .cs-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--space-lg);
-  gap: var(--space-md);
+  margin-bottom: var(--space-8);
+  gap: var(--space-6);
 }
 
 /* ── Add Station Button ── */
 .cs-add-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 20px;
-  height: 42px;
+  gap: 7px;
+  padding: 0 18px;
+  height: 38px;
   border-radius: var(--radius-full);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--accent-primary);
+  background: var(--accent-primary);
+  color: #fff;
   font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
   white-space: nowrap;
-  margin-top: 4px;
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.cs-add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
-  color: var(--accent-hover);
-}
-
-.cs-add-btn:active {
-  transform: translateY(0);
-  box-shadow: var(--nm-pressed);
-}
+.cs-add-btn:hover  { background: var(--accent-hover); transform: translateY(-1px); }
+.cs-add-btn:active { transform: translateY(0); box-shadow: none; }
 
 /* ── Count label ── */
 .cs-count {
-  font-size: 0.68rem;
-  font-weight: 800;
+  font-size: 0.62rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-tertiary);
-  margin-bottom: var(--space-md);
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -59,11 +49,10 @@
 .cs-count::before {
   content: '';
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--accent-primary);
-  box-shadow: 0 0 6px var(--accent-glow);
   flex-shrink: 0;
 }
 
@@ -78,36 +67,35 @@
 .cs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-4);
 }
 
 /* ── Card ── */
 .cs-card {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: 10px;
   cursor: pointer;
-  transition: all var(--transition-medium);
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
   position: relative;
-  border: 2px solid transparent;
 }
 
 .cs-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--neu-shadow-hover);
+  border-color: var(--border-medium);
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.cs-card:active {
-  transform: translateY(0);
-  box-shadow: var(--nm-pressed);
-}
+.cs-card:active { transform: translateY(0) scale(0.99); box-shadow: none; }
 
 .cs-card--playing {
   border-color: var(--accent-primary);
+  background: var(--accent-soft);
 }
 
 /* ── Card Header ── */
@@ -117,27 +105,24 @@
   gap: 12px;
 }
 
-.cs-card-info {
-  flex: 1;
-  min-width: 0;
-}
+.cs-card-info { flex: 1; min-width: 0; }
 
 .cs-card-name {
   font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.3px;
-  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
 }
 
 .cs-card-meta {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: 400;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -148,31 +133,30 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 10px;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-pressed);
+  padding: 3px 8px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-muted);
   border-radius: var(--radius-full);
-  font-size: 0.65rem;
-  font-weight: 800;
+  font-size: 0.6rem;
+  font-weight: 600;
   color: var(--accent-primary);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   flex-shrink: 0;
 }
 
 .cs-playing-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: #34c759;
-  box-shadow: 0 0 6px #34c759;
+  background: var(--status-live);
   animation: dotPulse 2s infinite;
 }
 
 /* ── Description ── */
 .cs-card-desc {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -183,23 +167,23 @@
 
 /* ── URL ── */
 .cs-card-url {
-  font-size: 0.65rem;
-  color: var(--text-tertiary);
-  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 6px 10px;
-  background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
-  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
 }
 
 /* ── Card Actions ── */
 .cs-card-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding-top: 10px;
   border-top: 1px solid var(--border-subtle);
   margin-top: auto;
@@ -209,90 +193,60 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 16px;
-  height: 34px;
+  padding: 0 14px;
+  height: 32px;
   border-radius: var(--radius-full);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  background: var(--accent-soft);
   color: var(--accent-primary);
   font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: var(--text-xs);
+  font-weight: 500;
   cursor: pointer;
-  border: none;
-  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
   flex: 1;
   justify-content: center;
 }
 
-.cs-play-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--neu-shadow-hover);
-}
+.cs-play-btn:hover  { background: var(--accent-primary); color: #fff; transform: translateY(-1px); }
+.cs-play-btn:active { transform: translateY(0); }
 
-.cs-play-btn:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
-}
-
-/* Edit button */
-.cs-edit-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--text-tertiary);
+/* Edit / Delete buttons */
+.cs-edit-btn,
+.cs-delete-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: none;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
   flex-shrink: 0;
 }
 
 .cs-edit-btn:hover {
   color: var(--accent-primary);
-  transform: scale(1.08);
-  box-shadow: var(--neu-shadow-hover);
-}
-
-.cs-edit-btn:active {
-  box-shadow: var(--nm-pressed);
-  transform: scale(1);
-}
-
-/* Delete button */
-.cs-delete-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--text-tertiary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: none;
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
+  background: var(--accent-soft);
+  border-color: var(--accent-muted);
+  transform: scale(1.05);
 }
 
 .cs-delete-btn:hover {
-  color: #ff3b30;
-  transform: scale(1.08);
-  box-shadow: var(--neu-shadow-hover);
+  color: var(--status-error);
+  background: hsla(0, 90%, 60%, 0.1);
+  border-color: hsla(0, 90%, 60%, 0.2);
+  transform: scale(1.05);
 }
 
-.cs-delete-btn:active {
-  box-shadow: var(--nm-pressed);
-  transform: scale(1);
-}
+.cs-edit-btn:active,
+.cs-delete-btn:active { transform: scale(0.97); }
 
 /* ═══════════════════════════════════════════════════════════════
-   EMPTY STATE — My Stations specific
+   EMPTY STATE
    ═══════════════════════════════════════════════════════════════ */
 
 .cs-empty {
@@ -300,91 +254,74 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-12) var(--space-8);
   text-align: center;
-  animation: fadeIn var(--transition-medium);
+  animation: fadeIn var(--transition-slow);
 }
 
 .cs-empty-icon-wrap {
-  width: 96px;
-  height: 96px;
-  border-radius: var(--radius-xl);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-2xl);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-primary);
-  margin-bottom: var(--space-lg);
-  position: relative;
+  margin-bottom: var(--space-6);
   flex-shrink: 0;
-}
-
-.cs-empty-icon-wrap::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: calc(var(--radius-xl) + 4px);
-  border: 2px solid var(--accent-soft);
-  pointer-events: none;
 }
 
 .cs-empty-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 900;
+  font-size: var(--text-xl);
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.4px;
+  letter-spacing: -0.02em;
   margin-bottom: 8px;
 }
 
 .cs-empty-subtitle {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  max-width: 340px;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  max-width: 320px;
   line-height: 1.6;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-8);
 }
 
 .cs-empty-cta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0 24px;
-  height: 44px;
+  padding: 0 22px;
+  height: 40px;
   border-radius: var(--radius-full);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--accent-primary);
+  background: var(--accent-primary);
+  color: #fff;
   font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.cs-empty-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
-}
-
-.cs-empty-cta:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
-}
+.cs-empty-cta:hover  { background: var(--accent-hover); transform: translateY(-1px); }
+.cs-empty-cta:active { transform: translateY(0); box-shadow: none; }
 
 /* ═══════════════════════════════════════════════════════════════
-   ADD / EDIT STATION FORM
+   ADD / EDIT FORM
    ═══════════════════════════════════════════════════════════════ */
 
 .cs-form-card {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  border-radius: var(--radius-xl);
-  padding: var(--space-lg);
-  margin-bottom: var(--space-lg);
-  animation: slideDown var(--transition-medium);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+  animation: slideDown var(--transition-slow);
 }
 
 .cs-form-title {
@@ -392,16 +329,14 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-base);
+  font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-md);
-  letter-spacing: -0.3px;
+  margin-bottom: var(--space-6);
+  letter-spacing: -0.01em;
 }
 
-.cs-form-title svg {
-  color: var(--accent-primary);
-}
+.cs-form-title svg { color: var(--accent-primary); }
 
 .cs-form {
   display: flex;
@@ -422,9 +357,9 @@
 }
 
 .cs-form-group label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   display: flex;
@@ -432,42 +367,30 @@
   gap: 4px;
 }
 
-.cs-required {
-  color: var(--accent-primary);
-  font-size: 0.75rem;
-}
-
-.cs-optional {
-  color: var(--text-tertiary);
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.65rem;
-}
+.cs-required { color: var(--accent-primary); font-size: 0.75rem; }
+.cs-optional  { color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 0.62rem; }
 
 .cs-form-group input,
 .cs-form-group textarea {
-  padding: 10px 14px;
-  border: none;
+  padding: 9px 12px;
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
-  background: var(--bg-secondary);
-  box-shadow: var(--nm-pressed);
+  background: var(--bg-tertiary);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 0.875rem;
-  transition: box-shadow var(--transition-fast);
+  font-size: var(--text-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   outline: none;
 }
 
 .cs-form-group input:focus,
 .cs-form-group textarea:focus {
-  box-shadow: var(--nm-pressed), 0 0 0 2px var(--accent-soft);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .cs-form-group input::placeholder,
-.cs-form-group textarea::placeholder {
-  color: var(--text-tertiary);
-}
+.cs-form-group textarea::placeholder { color: var(--text-muted); }
 
 .cs-form-group textarea {
   resize: vertical;
@@ -477,180 +400,133 @@
 
 .cs-form-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-top: 4px;
 }
 
 .cs-btn-submit {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 24px;
-  height: 42px;
+  gap: 7px;
+  padding: 0 22px;
+  height: 38px;
   border-radius: var(--radius-full);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--accent-primary);
+  background: var(--accent-primary);
+  color: #fff;
   font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.cs-btn-submit:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
-}
-
+.cs-btn-submit:hover  { background: var(--accent-hover); transform: translateY(-1px); }
 .cs-btn-submit:active,
-.cs-btn-submit:disabled {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+.cs-btn-submit:disabled { transform: translateY(0); box-shadow: none; opacity: 0.6; cursor: not-allowed; }
 
 .cs-btn-cancel {
   display: inline-flex;
   align-items: center;
-  padding: 0 20px;
-  height: 42px;
+  padding: 0 18px;
+  height: 38px;
   border-radius: var(--radius-full);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-medium);
   color: var(--text-secondary);
   font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: 400;
   cursor: pointer;
-  border: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
-.cs-btn-cancel:hover {
-  color: var(--text-primary);
-  transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
-}
-
-.cs-btn-cancel:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
-}
+.cs-btn-cancel:hover  { background: var(--bg-elevated); color: var(--text-primary); transform: translateY(-1px); }
+.cs-btn-cancel:active { transform: translateY(0); }
 
 /* ═══════════════════════════════════════════════════════════════
-   DARK THEME
-   ═══════════════════════════════════════════════════════════════ */
-
-[data-theme="dark"] .cs-card,
-[data-theme="dark"] .cs-form-card {
-  background: var(--bg-secondary);
-}
-
-[data-theme="dark"] .cs-card-url {
-  background: var(--bg-primary);
-}
-
-[data-theme="dark"] .cs-empty-icon-wrap {
-  background: var(--bg-secondary);
-}
-
-[data-theme="dark"] .cs-play-btn,
-[data-theme="dark"] .cs-edit-btn,
-[data-theme="dark"] .cs-delete-btn,
-[data-theme="dark"] .cs-add-btn,
-[data-theme="dark"] .cs-btn-submit,
-[data-theme="dark"] .cs-btn-cancel,
-[data-theme="dark"] .cs-empty-cta {
-  background: var(--bg-primary);
-}
-
-[data-theme="dark"] .cs-playing-badge {
-  background: var(--bg-primary);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   LEGACY BUTTON CLASSES (used by other views)
+   SHARED BUTTON CLASSES
    ═══════════════════════════════════════════════════════════════ */
 
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 20px;
-  height: 42px;
+  gap: 7px;
+  padding: 0 18px;
+  height: 38px;
   border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
-  border: none;
+  border: 1px solid var(--border-medium);
   font-family: var(--font-body);
-  transition: all var(--transition-fast);
-}
-
-.btn-primary {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--accent-primary);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
-}
-
-.btn-primary:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  background: var(--bg-tertiary);
   color: var(--text-secondary);
 }
 
-.btn-secondary:hover {
-  color: var(--text-primary);
-  transform: translateY(-2px);
-  box-shadow: var(--neu-shadow-hover);
+.btn:hover  { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-strong); }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.btn-secondary:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(0);
+.btn-primary:hover  { background: var(--accent-hover); color: #fff; border-color: transparent; }
+.btn-primary:active { box-shadow: none; }
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .btn-icon {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   padding: 0;
-  border-radius: 50%;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  color: var(--text-tertiary);
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: none;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .btn-icon:hover {
-  color: #ff3b30;
-  transform: scale(1.08);
-  box-shadow: var(--neu-shadow-hover);
+  color: var(--status-error);
+  background: hsla(0, 90%, 60%, 0.1);
+  border-color: hsla(0, 90%, 60%, 0.2);
 }
 
-/* ── Light theme overrides (from theme-fixes) ── */
-:root:not([data-theme="dark"]) .cs-card-url               { background: var(--bg-secondary); color: var(--text-secondary); }
-:root:not([data-theme="dark"]) .cs-form-group input       { background: var(--bg-secondary); color: var(--text-primary); }
-:root:not([data-theme="dark"]) .cs-form-group textarea    { background: var(--bg-secondary); color: var(--text-primary); }
-:root:not([data-theme="dark"]) .cs-form-group input::placeholder   { color: var(--text-tertiary); }
-:root:not([data-theme="dark"]) .cs-form-group textarea::placeholder { color: var(--text-tertiary); }
+/* ── Light Mode ── */
+:root:not([data-theme="dark"]) .cs-card {
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
+}
 
-/* ── Dark theme overrides (from theme-fixes) ── */
-[data-theme="dark"] .cs-card-meta              { color: var(--text-secondary); }
+:root:not([data-theme="dark"]) .cs-card:hover {
+  background: var(--bg-secondary);
+}
+
+:root:not([data-theme="dark"]) .cs-form-card {
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
+}
+
+:root:not([data-theme="dark"]) .cs-form-group input,
+:root:not([data-theme="dark"]) .cs-form-group textarea {
+  background: var(--bg-secondary);
+  border-color: var(--border-strong);
+}
+
+:root:not([data-theme="dark"]) .cs-card-url {
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
+}

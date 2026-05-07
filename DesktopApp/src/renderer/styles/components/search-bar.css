@@ -1,4 +1,4 @@
-/* ── Search Bar (Keyra nm-inset style) ── */
+/* ── Search Bar — Obsidian Design ── */
 
 .search-bar {
   position: relative;
@@ -8,79 +8,77 @@
 
 .search-bar-input {
   width: 100%;
-  padding: 10px var(--space-md) 10px 44px;
-  background: var(--bg-primary);
-  box-shadow: var(--nm-pressed);
-  border: none;
+  padding: 10px var(--space-6) 10px 42px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: var(--text-sm);
+  font-weight: 400;
   font-family: var(--font-body);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .search-bar-input:focus {
   outline: none;
-  box-shadow: var(--nm-pressed), 0 0 0 2px var(--accent-soft);
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .search-bar-input::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   font-weight: 400;
 }
 
 .search-bar-icon {
   position: absolute;
-  left: 16px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   pointer-events: none;
   transition: color var(--transition-fast);
 }
 
-.search-bar:focus-within .search-bar-icon {
-  color: var(--accent-primary);
-}
+.search-bar:focus-within .search-bar-icon { color: var(--accent-primary); }
 
 .search-bar-clear {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-tertiary);
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
   transition: all var(--transition-fast);
   opacity: 0;
   pointer-events: none;
 }
 
-.search-bar-clear.visible {
-  opacity: 1;
-  pointer-events: all;
-}
+.search-bar-clear.visible { opacity: 1; pointer-events: all; }
 
 .search-bar-clear:hover {
   color: var(--text-primary);
-  transform: translateY(-50%) scale(1.1);
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
 }
 
-.search-bar-clear:active {
-  box-shadow: var(--nm-pressed);
-  transform: translateY(-50%) scale(1);
+/* ── Light Mode ── */
+:root:not([data-theme="dark"]) .search-bar-input {
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
 }
 
-/* ── Light theme overrides ── */
-:root:not([data-theme="dark"]) .search-bar-input          { background: var(--bg-secondary); color: var(--text-primary); }
-:root:not([data-theme="dark"]) .search-bar-input::placeholder { color: var(--text-tertiary); }
-:root:not([data-theme="dark"]) .volume-slider             { background: var(--bg-secondary); }
+:root:not([data-theme="dark"]) .search-bar-input:focus {
+  background: var(--bg-elevated);
+  border-color: var(--accent-primary);
+}

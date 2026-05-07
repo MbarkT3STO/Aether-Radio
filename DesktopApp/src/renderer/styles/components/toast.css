@@ -1,44 +1,42 @@
-/* ── Toast (Keyra nm-flat style) ── */
+/* ── Toast — Obsidian Design ── */
 
 .toast-container {
   position: fixed;
-  top: var(--space-md);
-  right: var(--space-md);
+  top: var(--space-6);
+  right: var(--space-6);
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   pointer-events: none;
 }
 
 .toast {
-  background: var(--bg-primary);
-  box-shadow: var(--nm-raised);
-  border-radius: var(--radius-lg);
-  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl);
+  padding: 12px 16px;
   min-width: 280px;
-  max-width: 380px;
+  max-width: 360px;
   pointer-events: all;
-  animation: toastIn 0.35s var(--transition-spring) forwards;
+  animation: toastIn 0.3s var(--ease-spring) forwards;
   position: relative;
   overflow: hidden;
-  border: none;
+  box-shadow: var(--shadow-lg);
 }
 
-/* Colored left accent */
 .toast::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 3px;
-  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
 }
 
-.toast.success::before { background: #34c759; }
-.toast.error::before   { background: #ff3b30; }
+.toast.success::before { background: var(--status-live); }
+.toast.error::before   { background: var(--status-error); }
 .toast.info::before    { background: var(--accent-primary); }
 
-.toast.removing { animation: toastOut 0.25s ease-in forwards; }
+.toast.removing { animation: toastOut 0.2s ease-in forwards; }
 
 .toast-content {
   display: flex;
@@ -47,19 +45,22 @@
   padding-left: 6px;
 }
 
-.toast-icon { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
-.toast.success .toast-icon { color: #34c759; }
-.toast.error   .toast-icon { color: #ff3b30; }
+.toast-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+.toast.success .toast-icon { color: var(--status-live); }
+.toast.error   .toast-icon { color: var(--status-error); }
 .toast.info    .toast-icon { color: var(--accent-primary); }
 
 .toast-message {
   flex: 1;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: 500;
   line-height: 1.5;
   color: var(--text-primary);
 }
 
-/* ── Light theme overrides ── */
-:root:not([data-theme="dark"]) .toast                     { background: var(--bg-primary); }
-:root:not([data-theme="dark"]) .toast-message             { color: var(--text-primary); }
+/* ── Light Mode ── */
+:root:not([data-theme="dark"]) .toast {
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
