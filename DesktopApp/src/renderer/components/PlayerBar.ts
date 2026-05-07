@@ -599,7 +599,7 @@ export class PlayerBar extends BaseComponent {
                     <rect x="4" y="4" width="16" height="16" rx="3"/>
                   </svg>
                 </button>
-                <button class="pex-btn pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
+                <button class="pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
                   data-action="${isPlaying ? 'pause' : 'play'}"
                   title="${isPlaying ? 'Pause' : 'Play'}"
                   aria-label="${isPlaying ? 'Pause' : 'Play'}"

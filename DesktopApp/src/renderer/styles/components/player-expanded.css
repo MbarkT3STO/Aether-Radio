@@ -316,7 +316,6 @@
   box-shadow: var(--shadow-lg);
 }
 
-/* Base button */
 /* Base button — secondary controls only */
 .pex-btn {
   display: flex;
