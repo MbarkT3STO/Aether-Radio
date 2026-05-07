@@ -20,9 +20,9 @@ export class HistoryView extends BaseComponent {
           <div>
             <div class="view-header-row">
               <div class="view-header-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                  <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+                  <path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/>
                 </svg>
               </div>
               <h1>History</h1>
@@ -65,9 +65,10 @@ export class HistoryView extends BaseComponent {
     if (clearContainer) {
       clearContainer.innerHTML = this.history.length > 0 ? `
         <button id="clear-history" class="btn btn-secondary btn-secondary--top">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/><path d="M8 6V4h8v2"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
           </svg>
           Clear All
         </button>` : ''
@@ -84,8 +85,9 @@ export class HistoryView extends BaseComponent {
             icon: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="1.75"
               stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-              <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+              <path d="M3 6h18"/><path d="M8 6V4h8v2"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
             </svg>`
           })
           if (!confirmed) return
@@ -102,9 +104,9 @@ export class HistoryView extends BaseComponent {
       content.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-              <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+              <path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/>
             </svg>
           </div>
           <div class="empty-state-title">No history yet</div>
@@ -120,7 +122,7 @@ export class HistoryView extends BaseComponent {
           station:     item.station,
           isPlaying:   this.playerStore.currentStation?.id === item.station.id && this.playerStore.isPlaying,
           isFavorite:  false,
-          metaOverride: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>${this.getTimeAgo(new Date(item.playedAt))}</span>`
+          metaOverride: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3.5 2"/></svg><span>${this.getTimeAgo(new Date(item.playedAt))}</span>`
         })).join('')}
       </div>
     `

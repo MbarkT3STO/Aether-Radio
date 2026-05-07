@@ -123,7 +123,7 @@ export class PlayerBar extends BaseComponent {
 
           <button class="player-btn player-btn-stop" data-action="stop" title="Stop">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="5" y="5" width="14" height="14" rx="2"/>
+              <rect x="4" y="4" width="16" height="16" rx="3"/>
             </svg>
           </button>
 
@@ -550,9 +550,9 @@ export class PlayerBar extends BaseComponent {
 
       <button class="pex-collapse-btn" id="pex-collapse-btn" title="Collapse player" aria-label="Collapse player">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2.5"
+          fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="18 15 12 9 6 15"/>
+          <path d="m18 15-6-6-6 6"/>
         </svg>
       </button>
 
@@ -584,7 +584,7 @@ export class PlayerBar extends BaseComponent {
           <div class="pex-controls">
             <button class="pex-btn pex-btn-stop" id="pex-stop" title="Stop">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="5" y="5" width="14" height="14" rx="2"/>
+                <rect x="4" y="4" width="16" height="16" rx="3"/>
               </svg>
             </button>
             <button class="pex-btn pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
@@ -867,11 +867,11 @@ export class PlayerBar extends BaseComponent {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" stroke-width="1.75"
       stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/>
+      <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
       <circle cx="12" cy="12" r="2"/>
-      <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
-      <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-      <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
+      <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/>
+      <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/>
     </svg>`
   }
 
@@ -900,8 +900,8 @@ export class PlayerBar extends BaseComponent {
   private chevronIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
       viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="18 15 12 9 6 15"/>
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m18 15-6-6-6 6"/>
     </svg>`
   }
 
@@ -916,27 +916,26 @@ export class PlayerBar extends BaseComponent {
   private volumeIcon(volume: number): string {
     if (volume === 0) {
       return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-        fill="none" stroke="currentColor" stroke-width="2"
+        fill="none" stroke="currentColor" stroke-width="1.75"
         stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-        <line x1="23" y1="9" x2="17" y2="15"/>
-        <line x1="17" y1="9" x2="23" y2="15"/>
+        <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+        <path d="m22 9-6 6"/><path d="m16 9 6 6"/>
       </svg>`
     }
     if (volume < 0.5) {
       return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-        fill="none" stroke="currentColor" stroke-width="2"
+        fill="none" stroke="currentColor" stroke-width="1.75"
         stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+        <path d="M16 9a5 5 0 0 1 0 6"/>
       </svg>`
     }
     return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" stroke-width="2"
+      fill="none" stroke="currentColor" stroke-width="1.75"
       stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+      <path d="M16 9a5 5 0 0 1 0 6"/>
+      <path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
     </svg>`
   }
 
@@ -1207,13 +1206,10 @@ export class PlayerBar extends BaseComponent {
 
   private recognizeIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" stroke-width="2"
+      fill="none" stroke="currentColor" stroke-width="1.75"
       stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 2v20"/>
-      <path d="M5 6v12"/>
-      <path d="M13 4v16"/>
-      <path d="M17 7v10"/>
-      <path d="M21 10v4"/>
+      <path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/>
+      <path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/>
     </svg>`
   }
 
@@ -1255,11 +1251,9 @@ export class PlayerBar extends BaseComponent {
 
   private externalIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" stroke-width="2.5"
+      fill="none" stroke="currentColor" stroke-width="2"
       stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-      <polyline points="15 3 21 3 21 9"/>
-      <line x1="10" y1="14" x2="21" y2="3"/>
+      <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
     </svg>`
   }
 

@@ -36,13 +36,13 @@ export class SearchView extends BaseComponent {
           <h1 class="search-hero-title" id="search-title">Search</h1>
           <p class="search-hero-sub">Find stations by name, country, or genre</p>
           <div class="search-bar search-bar--hero">
-            <svg class="search-bar-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            <svg class="search-bar-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.35-4.35"/>
             </svg>
             <input type="text" class="search-bar-input" placeholder="Search by name, country, or genre…" id="search-input" autocomplete="off">
             <button class="search-bar-clear" id="search-clear" title="Clear">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
               </svg>
             </button>
           </div>
@@ -137,7 +137,7 @@ export class SearchView extends BaseComponent {
       <div class="search-idle">
         <div class="search-idle-icon-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            <circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.35-4.35"/>
           </svg>
         </div>
         <div class="search-idle-title">Find your station</div>
@@ -246,8 +246,8 @@ export class SearchView extends BaseComponent {
         <div class="search-no-results">
           <div class="search-no-results-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-              <line x1="8" y1="11" x2="14" y2="11"/>
+              <circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.35-4.35"/>
+              <path d="M8 11h6"/>
             </svg>
           </div>
           <div class="search-no-results-title">No stations found</div>
@@ -289,8 +289,8 @@ export class SearchView extends BaseComponent {
       ${this.hasMore ? `
         <div class="load-more-wrap">
           <button class="load-more-btn" id="load-more-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"/>
             </svg>
             Load more stations
           </button>

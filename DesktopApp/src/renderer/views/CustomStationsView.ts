@@ -40,13 +40,11 @@ export class CustomStationsView extends BaseComponent {
             <div class="view-header-row">
               <div class="view-header-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                  fill="none" stroke="currentColor" stroke-width="2"
+                  fill="none" stroke="currentColor" stroke-width="1.75"
                   stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
                   <circle cx="12" cy="12" r="2"/>
-                  <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
-                  <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
-                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-                  <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
+                  <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/>
                 </svg>
               </div>
               <h1>My Stations</h1>
@@ -140,10 +138,9 @@ export class CustomStationsView extends BaseComponent {
     slot.innerHTML = this.showAddForm ? '' : `
       <button id="add-station-btn" class="cs-add-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2.5"
+          fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
+          <path d="M5 12h14"/><path d="M12 5v14"/>
         </svg>
         Add Station
       </button>
@@ -186,10 +183,9 @@ export class CustomStationsView extends BaseComponent {
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             ${isEdit
-              ? `<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>`
-              : `<line x1="12" y1="5" x2="12" y2="19"/>
-                 <line x1="5" y1="12" x2="19" y2="12"/>`
+              ? `<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                 <path d="m15 5 4 4"/>`
+              : `<path d="M5 12h14"/><path d="M12 5v14"/>`
             }
           </svg>
           ${isEdit ? `Edit "${this.esc(prefill!.name)}"` : 'Add New Station'}
@@ -250,8 +246,8 @@ export class CustomStationsView extends BaseComponent {
           <div class="cs-form-actions">
             <button type="submit" class="cs-btn-submit">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"/>
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5"/>
               </svg>
               ${isEdit ? 'Save Changes' : 'Add Station'}
             </button>
@@ -297,20 +293,17 @@ export class CustomStationsView extends BaseComponent {
           <div class="cs-empty-icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
               <circle cx="12" cy="12" r="2"/>
-              <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
-              <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-              <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
+              <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/>
             </svg>
           </div>
           <div class="cs-empty-title">No custom stations yet</div>
           <div class="cs-empty-subtitle">Add your own radio streams to listen alongside stations from Radio Browser</div>
           <button class="cs-empty-cta" id="cs-empty-add-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/><path d="M12 5v14"/>
             </svg>
             Add Your First Station
           </button>
@@ -405,18 +398,19 @@ export class CustomStationsView extends BaseComponent {
           </button>
           <button class="cs-edit-btn" data-id="${station.id}" title="Edit station">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
+              fill="none" stroke="currentColor" stroke-width="1.75"
               stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+              <path d="m15 5 4 4"/>
             </svg>
           </button>
           <button class="cs-delete-btn" data-id="${station.id}" title="Delete station">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2"
+              fill="none" stroke="currentColor" stroke-width="1.75"
               stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <path d="M3 6h18"/><path d="M8 6V4h8v2"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
             </svg>
           </button>
         </div>
@@ -645,10 +639,9 @@ export class CustomStationsView extends BaseComponent {
       icon: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
         fill="none" stroke="currentColor" stroke-width="1.75"
         stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="3 6 5 6 21 6"/>
-        <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-        <line x1="10" y1="11" x2="10" y2="17"/>
-        <line x1="14" y1="11" x2="14" y2="17"/>
+        <path d="M3 6h18"/><path d="M8 6V4h8v2"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/>
       </svg>`
     })
 

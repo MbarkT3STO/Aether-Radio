@@ -49,9 +49,9 @@ export class ExploreView extends BaseComponent {
           <div class="view-header-row">
             <div class="view-header-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2">
+                fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                <path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"/>
               </svg>
             </div>
             <h1>Explore</h1>
@@ -83,9 +83,9 @@ export class ExploreView extends BaseComponent {
       <section class="section">
         <div class="section-title">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2">
+            fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M2 12h20"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
           Countries
@@ -103,8 +103,8 @@ export class ExploreView extends BaseComponent {
         ${hasMoreCountries ? `
           <button class="genre-show-more" id="country-toggle">
             ${this.showAllCountries
-              ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg> Show less`
-              : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> Show all ${this.countries.length} countries`
+              ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg> Show less`
+              : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg> Show all ${this.countries.length} countries`
             }
           </button>
         ` : ''}
@@ -114,7 +114,7 @@ export class ExploreView extends BaseComponent {
       <section class="section">
         <div class="section-title">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2">
+            fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 18V5l12-2v13"/>
             <circle cx="6" cy="18" r="3"/>
             <circle cx="18" cy="16" r="3"/>
@@ -135,8 +135,8 @@ export class ExploreView extends BaseComponent {
         ${hasMoreGenres ? `
           <button class="genre-show-more" id="genre-toggle">
             ${this.showAllGenres
-              ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg> Show less`
-              : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> Show all ${this.genres.length} genres`
+              ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg> Show less`
+              : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg> Show all ${this.genres.length} genres`
             }
           </button>
         ` : ''}
