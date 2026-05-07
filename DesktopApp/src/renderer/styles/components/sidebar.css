@@ -363,6 +363,10 @@
   border-right: 1px solid var(--border-medium);
 }
 
+:root:not([data-theme="dark"]) .sidebar-nav-item {
+  color: var(--text-tertiary);
+}
+
 :root:not([data-theme="dark"]) .sidebar-nav-item:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
@@ -381,4 +385,19 @@
 
 :root:not([data-theme="dark"]) .sidebar-version-badge {
   background: var(--accent-soft);
+}
+
+:root:not([data-theme="dark"]) .sidebar-logo-tagline {
+  color: var(--accent-primary);
+  opacity: 1;
+}
+
+:root:not([data-theme="dark"]) .sidebar-collapse-btn {
+  border-color: var(--border-medium);
+  color: var(--text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .sidebar-collapse-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }

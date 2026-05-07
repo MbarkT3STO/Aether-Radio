@@ -187,6 +187,7 @@
 :root:not([data-theme="dark"]) .station-card.playing {
   background: var(--accent-soft);
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 :root:not([data-theme="dark"]) .station-card-tag {

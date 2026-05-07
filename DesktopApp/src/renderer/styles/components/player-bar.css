@@ -365,7 +365,8 @@
 }
 
 :root:not([data-theme="dark"]) .player-bar-ambient.active {
-  opacity: 0.2;
+  opacity: 0.15;
+  filter: blur(40px) saturate(1.2) brightness(0.8);
 }
 
 :root:not([data-theme="dark"]) .player-bar::before {

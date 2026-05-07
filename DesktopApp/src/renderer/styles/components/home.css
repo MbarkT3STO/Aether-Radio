@@ -288,6 +288,7 @@
 :root:not([data-theme="dark"]) .home-now-playing-card {
   background: var(--bg-elevated);
   border-color: var(--border-medium);
+  border-left-color: var(--accent-primary);
 }
 
 :root:not([data-theme="dark"]) .home-stat-card,
@@ -299,4 +300,11 @@
 :root:not([data-theme="dark"]) .home-stat-card:hover,
 :root:not([data-theme="dark"]) .home-quick-link:hover {
   background: var(--bg-secondary);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+:root:not([data-theme="dark"]) .home-empty-section {
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
 }
