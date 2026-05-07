@@ -108,7 +108,7 @@
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .toast {
-  background: rgba(255,255,255,0.90);
+  background: #FFFFFF;
   border-color: var(--border-subtle);
   box-shadow: var(--shadow-lg);
 }

@@ -245,7 +245,7 @@
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .am-dialog {
-  background: rgba(255,255,255,0.96);
+  background: #FFFFFF;
   border-color: var(--border-subtle);
 }
 

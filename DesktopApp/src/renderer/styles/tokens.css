@@ -64,8 +64,8 @@
   --material-chrome:     rgba(248,247,252,0.85);
   --material-sidebar:    rgba(248,247,252,0.82);
   --material-bar:        rgba(255,255,255,0.82);
-  --material-overlay:    rgba(255,255,255,0.94);
-  --material-modal:      rgba(255,255,255,0.96);
+  --material-overlay:    #FFFFFF;
+  --material-modal:      #FFFFFF;
 
   /* Accent — Violet-blue, warm and sophisticated */
   --accent-primary:   #6C63FF;
@@ -219,8 +219,8 @@
   --material-chrome:     rgba(26,24,32,0.85);
   --material-sidebar:    rgba(20,18,26,0.90);
   --material-bar:        rgba(22,20,28,0.92);
-  --material-overlay:    rgba(26,24,32,0.95);
-  --material-modal:      rgba(36,34,48,0.97);
+  --material-overlay:    #1A1820;
+  --material-modal:      #242230;
 
   /* Accent — brighter violet for dark backgrounds */
   --accent-primary:   #8B83FF;

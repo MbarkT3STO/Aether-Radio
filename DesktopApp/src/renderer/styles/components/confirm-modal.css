@@ -190,7 +190,7 @@
 
 /* ── Light Mode ── */
 :root:not([data-theme="dark"]) .cm-dialog {
-  background: rgba(255,255,255,0.96);
+  background: #FFFFFF;
   border-color: var(--border-subtle);
   box-shadow: var(--shadow-xl);
 }
