@@ -79,12 +79,11 @@
 
 /* ── Player bar slot ── */
 .app-player-bar {
-  height: calc(var(--player-bar-height) + 8px);
+  height: calc(var(--player-bar-height) + 20px);
   flex-shrink: 0;
   position: relative;
   z-index: 100;
-  background: var(--bg-primary);
-  padding-top: 8px;
+  padding: 10px 0;
 }
 
 /* ── Scrollbar — Apple minimal style ── */
