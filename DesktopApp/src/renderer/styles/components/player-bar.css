@@ -220,9 +220,27 @@
 .player-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   flex-shrink: 0;
   padding: 0 28px;
+}
+
+/* ── Controls pill — groups all three buttons ── */
+.player-controls-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 5px 6px;
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+}
+
+[data-theme="dark"] .player-controls-pill {
+  background: rgba(255,255,255,0.06);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md);
 }
 
 /* ── Base button ── */
@@ -241,19 +259,21 @@
     background var(--transition-fast),
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
+  position: relative;
 }
 
 .player-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
-  outline-offset: 3px;
+  outline-offset: 2px;
+  border-radius: 50%;
 }
 
 .player-btn:hover {
   color: var(--text-primary);
   background: rgba(0,0,0,0.07);
-  transform: scale(1.08);
+  transform: scale(1.10);
 }
 
 [data-theme="dark"] .player-btn:hover {
@@ -261,7 +281,7 @@
 }
 
 .player-btn:active {
-  transform: scale(0.90);
+  transform: scale(0.88);
   transition-duration: 60ms;
 }
 
@@ -274,34 +294,54 @@
 
 .player-btn-stop:hover {
   color: var(--status-error);
-  background: rgba(255,59,48,0.10);
+  background: rgba(255,59,48,0.12);
 }
 
 /* ── Play/Pause — hero ── */
 .player-btn-play {
-  width: 50px;
-  height: 50px;
-  background: var(--accent-primary);
+  width: 48px;
+  height: 48px;
+  background: var(--gradient-accent);
   color: #fff;
-  box-shadow: 0 4px 14px var(--accent-glow), 0 2px 6px rgba(0,0,0,0.10);
+  box-shadow:
+    0 4px 14px var(--accent-glow),
+    0 2px 6px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.20);
   border: none;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Shimmer sweep on hover — removed, keep hover clean */
+
 .player-btn-play:hover {
-  background: var(--accent-hover);
-  color: #fff;
-  transform: scale(1.07);
-  box-shadow: 0 6px 22px var(--accent-glow-lg), 0 3px 8px rgba(0,0,0,0.12);
+  transform: scale(1.08);
+  box-shadow:
+    0 6px 22px var(--accent-glow-lg),
+    0 3px 8px rgba(0,0,0,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.22);
 }
 
 .player-btn-play:active {
-  transform: scale(0.93);
+  transform: scale(0.92);
   box-shadow: 0 2px 8px var(--accent-glow);
   transition-duration: 60ms;
 }
 
-.player-btn-play.playing {
-  box-shadow: 0 4px 18px var(--accent-glow), 0 0 0 1px var(--accent-border);
+/* Pulsing ring when playing */
+.player-btn-play.playing::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-muted);
+  animation: playRingPulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes playRingPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 0; transform: scale(1.18); }
 }
 
 .player-btn-play.player-btn-disabled {
@@ -318,7 +358,7 @@
 
 .player-card-favorite:hover {
   color: var(--palette-pink);
-  background: rgba(255,45,85,0.10);
+  background: rgba(255,45,85,0.12);
 }
 
 .player-card-favorite.active {
@@ -338,42 +378,20 @@
   min-width: 0;
 }
 
-/* ── Volume ── */
-.player-volume {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  width: 152px;
-  flex-shrink: 0;
-}
+/* ── Volume — see volume-slider.css for pill + track styles ── */
 
-/* Flat icon buttons */
-.player-btn-mute,
+/* Flat icon buttons — recognize + expand */
 .player-recognize-btn,
 .player-expand-btn {
   background: transparent;
   border: none;
   color: var(--text-muted);
-  box-shadow: none;
+  border-radius: 50%;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-spring);
 }
 
-.player-btn-mute {
-  width: 26px;
-  height: 26px;
-  padding: 9px;
-  box-sizing: content-box;
-}
-
-.player-btn-mute:hover {
-  color: var(--text-primary);
-  background: transparent;
-  box-shadow: none;
-  transform: scale(1.1);
-}
-
-.player-btn-mute:active { transform: scale(0.88); }
-
-/* ── Song recognition ── */
 .player-recognize-btn {
   width: 28px;
   height: 28px;
@@ -381,11 +399,15 @@
   box-sizing: content-box;
 }
 
+.player-recognize-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
 .player-recognize-btn:hover {
   color: var(--accent-primary);
-  background: transparent;
-  box-shadow: none;
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
 .player-recognize-btn.player-btn-disabled,
@@ -403,11 +425,15 @@
   box-sizing: content-box;
 }
 
+.player-expand-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
 .player-expand-btn:hover {
   color: var(--text-primary);
-  background: transparent;
-  box-shadow: none;
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
 .player-expand-btn svg { transition: transform var(--transition-slow); }
@@ -436,40 +462,37 @@
   background: var(--bg-secondary);
 }
 
+:root:not([data-theme="dark"]) .player-controls-pill {
+  background: var(--bg-elevated);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+}
+
 :root:not([data-theme="dark"]) .player-btn:hover {
   background: rgba(0,0,0,0.06);
   color: var(--text-primary);
 }
 
 :root:not([data-theme="dark"]) .player-btn-play {
-  background: var(--accent-primary);
+  background: var(--gradient-accent);
   color: #fff;
 }
 
 :root:not([data-theme="dark"]) .player-btn-play:hover {
-  background: var(--accent-hover);
+  background: var(--gradient-accent);
   color: #fff;
 }
 
-:root:not([data-theme="dark"]) .player-btn-mute,
 :root:not([data-theme="dark"]) .player-recognize-btn,
 :root:not([data-theme="dark"]) .player-expand-btn {
-  background: transparent;
-  border: none;
   color: var(--text-tertiary);
-  box-shadow: none;
 }
 
-:root:not([data-theme="dark"]) .player-btn-mute:hover,
 :root:not([data-theme="dark"]) .player-expand-btn:hover {
-  background: transparent;
-  box-shadow: none;
   color: var(--text-primary);
 }
 
 :root:not([data-theme="dark"]) .player-recognize-btn:hover {
-  background: transparent;
-  box-shadow: none;
   color: var(--accent-primary);
 }
 

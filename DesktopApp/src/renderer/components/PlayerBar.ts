@@ -120,35 +120,43 @@ export class PlayerBar extends BaseComponent {
 
         <!-- CENTER: Controls -->
         <div class="player-controls">
+          <div class="player-controls-pill">
 
-          <button class="player-btn player-btn-stop" data-action="stop" title="Stop">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="4" y="4" width="16" height="16" rx="3"/>
-            </svg>
-          </button>
+            <button class="player-btn player-btn-stop" data-action="stop"
+              title="Stop" aria-label="Stop playback">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="3"/>
+              </svg>
+            </button>
 
-          <button class="player-btn player-btn-play ${isPlaying ? 'playing' : ''}"
-            id="player-play-btn"
-            data-action="${isPlaying ? 'pause' : 'play'}"
-            title="${isPlaying ? 'Pause' : 'Play'}">
-            ${isLoading
-              ? `<span class="loading-spinner loading-spinner--btn"></span>`
-              : (isPlaying ? this.pauseIcon() : this.playIcon())
-            }
-          </button>
+            <button class="player-btn player-btn-play ${isPlaying ? 'playing' : ''}"
+              id="player-play-btn"
+              data-action="${isPlaying ? 'pause' : 'play'}"
+              title="${isPlaying ? 'Pause' : 'Play'}"
+              aria-label="${isPlaying ? 'Pause' : 'Play'}"
+              aria-pressed="${isPlaying}">
+              ${isLoading
+                ? `<span class="loading-spinner loading-spinner--btn" role="status" aria-label="Loading"></span>`
+                : (isPlaying ? this.pauseIcon() : this.playIcon())
+              }
+            </button>
 
-          <button class="player-btn player-card-favorite ${isFavorite ? 'active' : ''}"
-            id="player-favorite-btn"
-            data-action="favorite"
-            title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-              fill="${isFavorite ? 'currentColor' : 'none'}"
-              stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-            </svg>
-          </button>
+            <button class="player-btn player-card-favorite ${isFavorite ? 'active' : ''}"
+              id="player-favorite-btn"
+              data-action="favorite"
+              title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+              aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+              aria-pressed="${isFavorite}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                fill="${isFavorite ? 'currentColor' : 'none'}"
+                stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+              </svg>
+            </button>
 
+          </div>
         </div>
 
         <!-- RIGHT: Volume + Visualizer -->
@@ -246,6 +254,8 @@ export class PlayerBar extends BaseComponent {
       playBtn.classList.toggle('playing', isPlaying)
       playBtn.setAttribute('data-action', isPlaying ? 'pause' : 'play')
       playBtn.title = isPlaying ? 'Pause' : 'Play'
+      playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play')
+      playBtn.setAttribute('aria-pressed', String(isPlaying))
       if (!isLoading) {
         playBtn.innerHTML = isPlaying ? this.pauseIcon() : this.playIcon()
       }
@@ -330,10 +340,12 @@ export class PlayerBar extends BaseComponent {
     if (!btn) return
     btn.classList.toggle('active', isFavorite)
     btn.title = isFavorite ? 'Remove from favorites' : 'Add to favorites'
+    btn.setAttribute('aria-label', isFavorite ? 'Remove from favorites' : 'Add to favorites')
+    btn.setAttribute('aria-pressed', String(isFavorite))
     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
       fill="${isFavorite ? 'currentColor' : 'none'}"
       stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round">
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
     </svg>`
   }
@@ -581,20 +593,27 @@ export class PlayerBar extends BaseComponent {
 
             <div class="pex-controls-wrap">
               <div class="pex-controls">
-                <button class="pex-btn pex-btn-stop" id="pex-stop" title="Stop">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <button class="pex-btn pex-btn-stop" id="pex-stop"
+                  title="Stop" aria-label="Stop playback">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <rect x="4" y="4" width="16" height="16" rx="3"/>
                   </svg>
                 </button>
                 <button class="pex-btn pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
-                  data-action="${isPlaying ? 'pause' : 'play'}" title="${isPlaying ? 'Pause' : 'Play'}">
+                  data-action="${isPlaying ? 'pause' : 'play'}"
+                  title="${isPlaying ? 'Pause' : 'Play'}"
+                  aria-label="${isPlaying ? 'Pause' : 'Play'}"
+                  aria-pressed="${isPlaying}">
                   ${isPlaying ? this.pauseIconLg() : this.playIconLg()}
                 </button>
                 <button class="pex-btn pex-btn-fav ${isFavorite ? 'active' : ''}" id="pex-fav"
-                  title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                  title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                  aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                  aria-pressed="${isFavorite}">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                     fill="${isFavorite ? 'currentColor' : 'none'}"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                   </svg>
                 </button>
@@ -739,6 +758,8 @@ export class PlayerBar extends BaseComponent {
       playBtn.classList.toggle('playing', isPlaying)
       playBtn.setAttribute('data-action', isPlaying ? 'pause' : 'play')
       playBtn.title = isPlaying ? 'Pause' : 'Play'
+      playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play')
+      playBtn.setAttribute('aria-pressed', String(isPlaying))
       if (!isLoading) {
         playBtn.innerHTML = isPlaying ? this.pauseIconLg() : this.playIconLg()
       }
@@ -782,9 +803,11 @@ export class PlayerBar extends BaseComponent {
     if (!btn) return
     btn.classList.toggle('active', isFav)
     btn.title = isFav ? 'Remove from favorites' : 'Add to favorites'
+    btn.setAttribute('aria-label', isFav ? 'Remove from favorites' : 'Add to favorites')
+    btn.setAttribute('aria-pressed', String(isFav))
     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
       fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round">
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
     </svg>`
   }

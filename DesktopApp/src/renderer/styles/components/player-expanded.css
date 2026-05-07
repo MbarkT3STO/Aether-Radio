@@ -297,10 +297,23 @@
   gap: 24px;
 }
 
+/* Pill container */
 .pex-controls {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 7px 8px;
+  box-shadow: var(--shadow-md), var(--shadow-inset);
+  align-self: flex-start;
+}
+
+[data-theme="dark"] .pex-controls {
+  background: rgba(255,255,255,0.07);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Base button */
@@ -311,73 +324,89 @@
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  background: rgba(0,0,0,0.06);
-  color: var(--text-secondary);
+  background: transparent;
+  color: var(--text-tertiary);
   transition:
     color var(--transition-fast),
     background var(--transition-fast),
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
+  position: relative;
 }
 
 .pex-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
-  outline-offset: 3px;
+  outline-offset: 2px;
+  border-radius: 50%;
 }
 
 [data-theme="dark"] .pex-btn {
-  background: rgba(255,255,255,0.10);
+  color: var(--text-secondary);
 }
 
 .pex-btn:hover {
   color: var(--text-primary);
-  background: rgba(0,0,0,0.10);
-  transform: scale(1.08);
+  background: rgba(0,0,0,0.08);
+  transform: scale(1.10);
 }
 
 [data-theme="dark"] .pex-btn:hover {
-  background: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.12);
 }
 
 .pex-btn:active {
-  transform: scale(0.90);
+  transform: scale(0.88);
   transition-duration: 60ms;
 }
 
 /* Stop */
 .pex-btn-stop {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   color: var(--text-muted);
 }
 
 .pex-btn-stop:hover {
   color: var(--status-error);
-  background: rgba(255,59,48,0.10);
+  background: rgba(255,59,48,0.12);
 }
 
 /* Play/Pause — hero */
 .pex-btn-play {
-  width: 72px;
-  height: 72px;
-  background: var(--accent-primary);
+  width: 68px;
+  height: 68px;
+  background: var(--gradient-accent);
   color: #fff;
   border: none;
-  box-shadow: 0 6px 24px var(--accent-glow), 0 3px 10px rgba(0,0,0,0.12);
+  box-shadow:
+    0 6px 24px var(--accent-glow),
+    0 3px 10px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+  overflow: hidden;
 }
+
+/* Shimmer sweep on hover — removed, keep hover clean */
 
 .pex-btn-play:hover {
-  background: var(--accent-hover);
-  color: #fff;
   transform: scale(1.06);
-  box-shadow: 0 8px 32px var(--accent-glow-lg), 0 4px 14px rgba(0,0,0,0.14);
+  box-shadow:
+    0 8px 32px var(--accent-glow-lg),
+    0 4px 14px rgba(0,0,0,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.24);
 }
 
-.pex-btn-play.playing {
-  box-shadow: 0 6px 28px var(--accent-glow), 0 0 0 1px var(--accent-border);
+/* Pulsing ring when playing */
+.pex-btn-play.playing::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-muted);
+  animation: playRingPulse 2.4s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .pex-btn-play:active {
@@ -387,11 +416,13 @@
 }
 
 /* Favorite */
-.pex-btn-fav { color: var(--text-muted); }
+.pex-btn-fav {
+  color: var(--text-muted);
+}
 
 .pex-btn-fav:hover {
   color: var(--palette-pink);
-  background: rgba(255,45,85,0.10);
+  background: rgba(255,45,85,0.12);
 }
 
 .pex-btn-fav.active {
@@ -399,32 +430,47 @@
   background: rgba(255,45,85,0.10);
 }
 
-/* ── Volume row ── */
+/* ── Volume row — pill matching the controls pill ── */
 .pex-volume {
   display: flex;
   align-items: center;
   gap: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 7px 16px 7px 8px;
+  box-shadow: var(--shadow-md), var(--shadow-inset);
   max-width: 320px;
 }
 
+[data-theme="dark"] .pex-volume {
+  background: rgba(255,255,255,0.07);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-lg);
+}
+
 .pex-btn-mute {
-  width: 26px;
-  height: 26px;
-  padding: 8px;
-  box-sizing: content-box;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
   color: var(--text-muted);
   flex-shrink: 0;
-  box-shadow: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-spring);
 }
 
 .pex-btn-mute:hover {
   color: var(--text-primary);
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .pex-btn-mute:active { transform: scale(0.88); }
@@ -435,12 +481,12 @@
   border-radius: 50%;
 }
 
-/* Volume slider */
+/* Volume slider track */
 .pex-volume-slider {
   flex: 1;
-  height: 4px;
+  height: 3px;
   border-radius: var(--radius-full);
-  background: rgba(0,0,0,0.10);
+  background: var(--border-medium);
   border: none;
   cursor: pointer;
   position: relative;
@@ -450,11 +496,11 @@
 }
 
 [data-theme="dark"] .pex-volume-slider {
-  background: rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.16);
 }
 
 .pex-volume-fill {
-  height: 4px;
+  height: 3px;
   border-radius: var(--radius-full);
   background: var(--gradient-accent);
   position: relative;
@@ -464,14 +510,14 @@
 
 .pex-volume-thumb {
   position: absolute;
-  right: -6px;
+  right: -5px;
   top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
+  transform: translateY(-50%) scale(0);
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22), 0 0 0 1.5px var(--accent-primary);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--transition-fast), transform var(--transition-spring);
@@ -479,11 +525,7 @@
 
 .pex-volume-slider:hover .pex-volume-thumb {
   opacity: 1;
-  transform: translateY(-50%) scale(1.12);
-}
-
-[data-theme="dark"] .pex-volume-thumb {
-  background: #fff;
+  transform: translateY(-50%) scale(1);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -570,10 +612,6 @@
     0 0 0 1px rgba(255,255,255,0.08);
 }
 
-[data-theme="dark"] .pex-volume-slider {
-  background: rgba(255,255,255,0.14);
-}
-
 /* ═══════════════════════════════════════════════════════════════
    LIGHT MODE
    ═══════════════════════════════════════════════════════════════ */
@@ -601,24 +639,29 @@
   color: var(--text-tertiary);
 }
 
+:root:not([data-theme="dark"]) .pex-controls {
+  background: var(--bg-elevated);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md), var(--shadow-inset);
+}
+
 :root:not([data-theme="dark"]) .pex-btn {
-  background: rgba(0,0,0,0.06);
   color: var(--text-secondary);
 }
 
 :root:not([data-theme="dark"]) .pex-btn:hover {
-  background: rgba(0,0,0,0.10);
+  background: rgba(0,0,0,0.07);
   color: var(--text-primary);
 }
 
 :root:not([data-theme="dark"]) .pex-btn-play {
-  background: var(--accent-primary);
+  background: var(--gradient-accent);
   color: #fff;
   border: none;
 }
 
 :root:not([data-theme="dark"]) .pex-btn-play:hover {
-  background: var(--accent-hover);
+  background: var(--gradient-accent);
   color: #fff;
   border: none;
 }
@@ -638,12 +681,18 @@
   color: var(--text-primary);
 }
 
+:root:not([data-theme="dark"]) .pex-volume {
+  background: var(--bg-elevated);
+  border-color: var(--border-subtle);
+}
+
 :root:not([data-theme="dark"]) .pex-volume-slider {
-  background: rgba(0,0,0,0.10);
+  background: rgba(0,0,0,0.12);
 }
 
 :root:not([data-theme="dark"]) .pex-volume-thumb {
-  background: var(--text-primary);
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18), 0 0 0 1.5px var(--accent-primary);
 }
 
 :root:not([data-theme="dark"]) .pex-btn-mute {

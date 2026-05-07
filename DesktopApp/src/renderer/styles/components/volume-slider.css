@@ -1,25 +1,80 @@
 /* ═══════════════════════════════════════════════════════════════
-   VOLUME SLIDER — Apple Liquid Glass Design
+   VOLUME SLIDER — Redesigned to match pill controls
    ═══════════════════════════════════════════════════════════════ */
 
+/* ── Volume row wrapper ── */
+.player-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 5px 12px 5px 6px;
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+  width: 160px;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .player-volume {
+  background: rgba(255,255,255,0.06);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md);
+}
+
+/* Mute button inside the pill */
+.player-btn-mute {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-spring);
+  padding: 0;
+}
+
+.player-btn-mute:hover {
+  color: var(--text-primary);
+  transform: scale(1.15);
+}
+
+.player-btn-mute:active { transform: scale(0.88); }
+
+.player-btn-mute:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Track */
 .volume-slider {
   position: relative;
-  width: 100%;
-  height: 4px;
-  background: rgba(0,0,0,0.10);
+  flex: 1;
+  height: 3px;
+  background: var(--border-medium);
   border-radius: var(--radius-full);
   cursor: pointer;
-  padding: 10px 0;
+  padding: 9px 0;
   box-sizing: content-box;
-  margin: -10px 0;
+  margin: -9px 0;
 }
 
 [data-theme="dark"] .volume-slider {
-  background: rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.16);
 }
 
+/* Fill */
 .volume-slider-fill {
-  height: 4px;
+  height: 3px;
   background: var(--gradient-accent);
   border-radius: var(--radius-full);
   position: relative;
@@ -27,17 +82,17 @@
   transition: width 0.05s linear;
 }
 
+/* Thumb */
 .volume-slider-thumb {
   position: absolute;
-  right: -6px;
+  right: -5px;
   top: 50%;
-  transform: translateY(-50%);
-  width: 13px;
-  height: 13px;
+  transform: translateY(-50%) scale(0);
+  width: 12px;
+  height: 12px;
   background: #fff;
-  border: 1.5px solid var(--border-medium);
   border-radius: 50%;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22), 0 0 0 1.5px var(--accent-primary);
   opacity: 0;
   transition:
     opacity var(--transition-fast),
@@ -47,22 +102,20 @@
 
 .volume-slider:hover .volume-slider-thumb {
   opacity: 1;
-  transform: translateY(-50%) scale(1.18);
+  transform: translateY(-50%) scale(1);
 }
 
 /* ── Light Mode ── */
+:root:not([data-theme="dark"]) .player-volume {
+  background: var(--bg-elevated);
+  border-color: var(--border-subtle);
+}
+
 :root:not([data-theme="dark"]) .volume-slider {
-  background: rgba(0,0,0,0.10);
+  background: rgba(0,0,0,0.12);
 }
 
 :root:not([data-theme="dark"]) .volume-slider-thumb {
   background: #ffffff;
-  border-color: var(--border-medium);
-  box-shadow: var(--shadow-md);
-}
-
-/* ── Dark Mode ── */
-[data-theme="dark"] .volume-slider-thumb {
-  background: #ffffff;
-  border-color: rgba(255,255,255,0.20);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18), 0 0 0 1.5px var(--accent-primary);
 }
