@@ -72,17 +72,18 @@ async function recognizeStream(streamUrl: string): Promise<RecognitionResult | n
     const spotifyOption    = track.hub?.options?.find(o => o.providername?.toUpperCase() === 'SPOTIFY')
     const appleMusicOption = track.hub?.options?.find(o => o.providername?.toUpperCase() === 'APPLEMUSIC')
 
-    const spotifyUrl    = spotifyOption?.actions?.find(a => a.type === 'uri')?.uri
-    const appleMusicUrl = appleMusicOption?.actions?.find(a => a.type === 'uri')?.uri
+    const spotifyDirect    = spotifyOption?.actions?.find(a => a.type === 'uri')?.uri
+    const appleMusicUrl    = appleMusicOption?.actions?.find(a => a.type === 'uri')?.uri
 
     // YouTube URL from sections
     const videoSection  = track.sections?.find(s => s.youtubeurl)
     const youtubeUrl    = videoSection?.youtubeurl ?? undefined
 
-    // YouTube Music & Deezer — construct search URLs from title + artist
-    const searchQuery       = encodeURIComponent(`${title} ${artist}`)
-    const youtubeMusicUrl   = `https://music.youtube.com/search?q=${searchQuery}`
-    const deezerUrl         = `https://www.deezer.com/search/${searchQuery}`
+    // Search-based URLs — always available as fallback
+    const searchQuery     = encodeURIComponent(`${title} ${artist}`)
+    const spotifyUrl      = spotifyDirect ?? `https://open.spotify.com/search/${searchQuery}`
+    const youtubeMusicUrl = `https://music.youtube.com/search?q=${searchQuery}`
+    const deezerUrl       = `https://www.deezer.com/search/${searchQuery}`
 
     // Shazam track page
     const shazamUrl = track.url ?? undefined
