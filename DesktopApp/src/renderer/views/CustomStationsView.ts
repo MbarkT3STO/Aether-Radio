@@ -195,45 +195,51 @@ export class CustomStationsView extends BaseComponent {
           ${isEdit ? `Edit "${this.esc(prefill!.name)}"` : 'Add New Station'}
         </div>
 
-        <form id="add-station-form" class="cs-form" autocomplete="off">
+        <form id="add-station-form" class="cs-form" autocomplete="off" novalidate>
 
           <div class="cs-form-row">
             <div class="cs-form-group">
               <label for="cs-name">Station Name <span class="cs-required">*</span></label>
-              <input type="text" id="cs-name" name="name" required placeholder="e.g., My Radio Station"
+              <input type="text" id="cs-name" name="name" placeholder="e.g., My Radio Station"
                 value="${prefill ? this.esc(prefill.name) : ''}">
+              <span class="cs-field-error" id="err-name"></span>
             </div>
             <div class="cs-form-group">
               <label for="cs-genre">Genre <span class="cs-required">*</span></label>
-              <input type="text" id="cs-genre" name="genre" required placeholder="e.g., Pop, Rock, News"
+              <input type="text" id="cs-genre" name="genre" placeholder="e.g., Pop, Rock, News"
                 value="${prefill ? this.esc(prefill.genre) : ''}">
+              <span class="cs-field-error" id="err-genre"></span>
             </div>
           </div>
 
           <div class="cs-form-group">
             <label for="cs-url">Stream URL <span class="cs-required">*</span></label>
-            <input type="url" id="cs-url" name="url" required placeholder="https://example.com/stream"
+            <input type="text" id="cs-url" name="url" placeholder="https://example.com/stream"
               value="${prefill ? this.esc(prefill.url) : ''}">
+            <span class="cs-field-error" id="err-url"></span>
           </div>
 
           <div class="cs-form-row">
             <div class="cs-form-group">
               <label for="cs-country">Country <span class="cs-required">*</span></label>
-              <input type="text" id="cs-country" name="country" required placeholder="e.g., Morocco"
+              <input type="text" id="cs-country" name="country" placeholder="e.g., Morocco"
                 value="${prefill ? this.esc(prefill.country) : ''}">
+              <span class="cs-field-error" id="err-country"></span>
             </div>
             <div class="cs-form-group">
               <label for="cs-code">Country Code <span class="cs-required">*</span></label>
-              <input type="text" id="cs-code" name="countryCode" required placeholder="MA" maxlength="2"
+              <input type="text" id="cs-code" name="countryCode" placeholder="MA" maxlength="2"
                 style="text-transform:uppercase"
                 value="${prefill ? this.esc(prefill.countryCode) : ''}">
+              <span class="cs-field-error" id="err-code"></span>
             </div>
           </div>
 
           <div class="cs-form-group">
             <label for="cs-favicon">Logo URL <span class="cs-optional">(optional)</span></label>
-            <input type="url" id="cs-favicon" name="favicon" placeholder="https://example.com/logo.png"
+            <input type="text" id="cs-favicon" name="favicon" placeholder="https://example.com/logo.png"
               value="${prefill?.favicon ? this.esc(prefill.favicon) : ''}">
+            <span class="cs-field-error" id="err-favicon"></span>
           </div>
 
           <div class="cs-form-group">
@@ -258,6 +264,11 @@ export class CustomStationsView extends BaseComponent {
 
     const form = this.querySelector<HTMLFormElement>('#add-station-form')
     const cancelBtn = this.querySelector('#cs-cancel-btn')
+
+    // Clear error on input so feedback is immediate
+    form?.querySelectorAll('input').forEach(input => {
+      this.on(input, 'input', () => this.clearFieldError(input.name))
+    })
 
     if (form) {
       this.on(form, 'submit', async (e) => {
@@ -414,6 +425,106 @@ export class CustomStationsView extends BaseComponent {
     `
   }
 
+  // ── Validation ────────────────────────────────────────────
+
+  private isValidUrl(value: string): boolean {
+    try {
+      const url = new URL(value)
+      return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+      return false
+    }
+  }
+
+  private setFieldError(fieldName: string, message: string): void {
+    const errEl = this.querySelector(`#err-${fieldName}`)
+    const input = this.querySelector<HTMLInputElement>(`[name="${fieldName}"]`)
+    if (errEl) {
+      errEl.textContent = message
+      errEl.classList.add('visible')
+    }
+    if (input) input.classList.add('cs-input--error')
+  }
+
+  private clearFieldError(fieldName: string): void {
+    const errEl = this.querySelector(`#err-${fieldName}`)
+    const input = this.querySelector<HTMLInputElement>(`[name="${fieldName}"]`)
+    if (errEl) {
+      errEl.textContent = ''
+      errEl.classList.remove('visible')
+    }
+    if (input) input.classList.remove('cs-input--error')
+  }
+
+  private clearAllErrors(): void {
+    this.querySelectorAll('.cs-field-error').forEach(el => {
+      el.textContent = ''
+      el.classList.remove('visible')
+    })
+    this.querySelectorAll('.cs-input--error').forEach(el => {
+      el.classList.remove('cs-input--error')
+    })
+  }
+
+  private validateForm(data: FormData): boolean {
+    this.clearAllErrors()
+    let valid = true
+
+    const name        = (data.get('name') as string).trim()
+    const genre       = (data.get('genre') as string).trim()
+    const url         = (data.get('url') as string).trim()
+    const country     = (data.get('country') as string).trim()
+    const countryCode = (data.get('countryCode') as string).trim()
+    const favicon     = (data.get('favicon') as string).trim()
+
+    if (!name) {
+      this.setFieldError('name', 'Station name is required')
+      valid = false
+    } else if (name.length < 2) {
+      this.setFieldError('name', 'Name must be at least 2 characters')
+      valid = false
+    }
+
+    if (!genre) {
+      this.setFieldError('genre', 'Genre is required')
+      valid = false
+    }
+
+    if (!url) {
+      this.setFieldError('url', 'Stream URL is required')
+      valid = false
+    } else if (!this.isValidUrl(url)) {
+      this.setFieldError('url', 'Must be a valid URL starting with http:// or https://')
+      valid = false
+    }
+
+    if (!country) {
+      this.setFieldError('country', 'Country is required')
+      valid = false
+    }
+
+    if (!countryCode) {
+      this.setFieldError('code', 'Country code is required')
+      valid = false
+    } else if (countryCode.length !== 2 || !/^[A-Za-z]{2}$/.test(countryCode)) {
+      this.setFieldError('code', 'Must be a 2-letter code (e.g. US)')
+      valid = false
+    }
+
+    if (favicon && !this.isValidUrl(favicon)) {
+      this.setFieldError('favicon', 'Must be a valid URL or leave empty')
+      valid = false
+    }
+
+    // Focus the first invalid field
+    if (!valid) {
+      const firstError = this.querySelector<HTMLInputElement>('.cs-input--error')
+      firstError?.focus()
+    }
+
+    return valid
+  }
+
   // ── Actions ───────────────────────────────────────────────
 
   private playStation(station: CustomStation): void {
@@ -448,8 +559,11 @@ export class CustomStationsView extends BaseComponent {
 
   private async handleAddStation(form: HTMLFormElement): Promise<void> {
     const data = new FormData(form)
+
+    if (!this.validateForm(data)) return
+
     const station: Omit<CustomStation, 'addedAt' | 'source'> = {
-      id: `custom-${Date.now()}`,
+      id:          `custom-${Date.now()}`,
       name:        (data.get('name') as string).trim(),
       url:         (data.get('url') as string).trim(),
       country:     (data.get('country') as string).trim(),
@@ -457,12 +571,6 @@ export class CustomStationsView extends BaseComponent {
       genre:       (data.get('genre') as string).trim(),
       description: (data.get('description') as string)?.trim() || undefined,
       favicon:     (data.get('favicon') as string)?.trim() || undefined
-    }
-
-    // Basic validation
-    if (!station.name || !station.url || !station.country || !station.countryCode || !station.genre) {
-      Toast.show('Please fill in all required fields', 'error')
-      return
     }
 
     const submitBtn = this.querySelector<HTMLButtonElement>('.cs-btn-submit')
@@ -476,7 +584,10 @@ export class CustomStationsView extends BaseComponent {
         await this.loadStations()
       } else {
         Toast.show(result.error?.message || 'Failed to add station', 'error')
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Add Station` }
+        if (submitBtn) {
+          submitBtn.disabled = false
+          submitBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Add Station`
+        }
       }
     } catch {
       Toast.show('Failed to add station', 'error')
@@ -486,6 +597,9 @@ export class CustomStationsView extends BaseComponent {
 
   private async handleEditStation(form: HTMLFormElement, stationId: string): Promise<void> {
     const data = new FormData(form)
+
+    if (!this.validateForm(data)) return
+
     const updates: Partial<CustomStation> = {
       name:        (data.get('name') as string).trim(),
       url:         (data.get('url') as string).trim(),
@@ -494,12 +608,6 @@ export class CustomStationsView extends BaseComponent {
       genre:       (data.get('genre') as string).trim(),
       description: (data.get('description') as string)?.trim() || undefined,
       favicon:     (data.get('favicon') as string)?.trim() || undefined
-    }
-
-    // Basic validation
-    if (!updates.name || !updates.url || !updates.country || !updates.countryCode || !updates.genre) {
-      Toast.show('Please fill in all required fields', 'error')
-      return
     }
 
     const submitBtn = this.querySelector<HTMLButtonElement>('.cs-btn-submit')
@@ -513,7 +621,10 @@ export class CustomStationsView extends BaseComponent {
         await this.loadStations()
       } else {
         Toast.show(result.error?.message || 'Failed to update station', 'error')
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Save Changes` }
+        if (submitBtn) {
+          submitBtn.disabled = false
+          submitBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Save Changes`
+        }
       }
     } catch {
       Toast.show('Failed to update station', 'error')
