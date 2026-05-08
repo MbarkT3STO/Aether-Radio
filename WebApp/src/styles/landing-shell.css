@@ -494,36 +494,9 @@ html[data-theme="dark"] .app-topbar-theme .icon-moon { display: none; }
 }
 
 
-/* ═══ 11 · Expanded player — full-viewport on web ═══════════════
+/* ═══ 11 · (Reserved) ═══════════════════════════════════════════
 
-   On desktop (Electron) the overlay is absolutely positioned inside
-   .app-main, which itself fills the BrowserWindow. On the web we've
-   turned .app-main into a rounded floating card with margins, which
-   clips the overlay to a sub-rectangle of the viewport (see Issue
-   "expanded player not covering all the space vertically").
-
-   Fix: on web only, promote the overlay to fixed-position covering
-   the whole viewport. Also ignore the card's border-radius and
-   overflow:hidden so the overlay can escape.
+   The expanded player was removed on web. The mini player stays
+   floating at the bottom, with a lightweight ambient canvas
+   behind it — see web-perf.css for its sizing.
 */
-.platform-web .player-expanded-overlay {
-  position: fixed;
-  /* Anchor to the bottom so the collapse animation shrinks into the
-     player bar position — not into the top of the viewport. */
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: auto;
-  height: var(--player-bar-height);
-  /* Sit above the sidebar (z:200), top bar (z:50), player bar (z:100) */
-  z-index: 400;
-  border-radius: 0;
-  /* Respect safe areas on mobile browsers with notches / home bars */
-  padding-bottom: env(safe-area-inset-bottom, 0);
-}
-
-.platform-web .player-expanded-overlay.is-expanded {
-  height: 100vh;
-  /* 100dvh is better on mobile browsers with dynamic URL/tab bars */
-  height: 100dvh;
-}

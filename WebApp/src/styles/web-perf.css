@@ -109,34 +109,21 @@
 /* ═══════════════════════════════════════════════════════════════
    Ambient player-bar canvas
 
-   The mini player bar has an HTMLCanvasElement that draws three
-   shadow-blurred radial gradients per frame, then the CSS adds a
-   40 px filter: blur on top. Stacked behind the 50 px backdrop-
-   filter, the visual payoff is negligible but the compositor cost
-   is huge.
+   Lightweight ambient visualization behind the mini player bar.
+   Three slow-moving gradient blobs driven by the audio analyser,
+   running at 30 fps with a capped DPR (see VisualizerService).
 
-   Hide it entirely on the web. The expanded player still shows
-   its ambient canvas — that one is meant to be visible and the
-   user explicitly opted into it by expanding the player.
+   Kept fairly subtle — low opacity, modest CSS blur on the GPU —
+   so it layers over the pill's own backdrop-filter without
+   stacking blurs too aggressively.
    ═══════════════════════════════════════════════════════════════ */
 
 .platform-web .player-bar-ambient {
-  display: none !important;
+  filter: blur(24px) saturate(1.3);
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   Expanded player ambient — keep it, but cheaper
-
-   The expanded player's full-bleed ambient canvas is a feature,
-   not an accident. We keep the canvas running but ask the browser
-   to treat it as an isolated compositor layer so ancestor
-   repaints don't have to re-rasterize it.
-   ═══════════════════════════════════════════════════════════════ */
-
-.pex-ambient-canvas {
-  will-change: opacity;
-  contain: strict;
+.platform-web .player-bar-ambient.active {
+  opacity: 0.34;
 }
 
 
@@ -144,7 +131,6 @@
    Users with reduce-motion get no visualizer animation at all.
 */
 @media (prefers-reduced-motion: reduce) {
-  .pex-ambient-canvas,
   .player-bar-ambient,
   .home-np-bars,
   .visualizer-idle {

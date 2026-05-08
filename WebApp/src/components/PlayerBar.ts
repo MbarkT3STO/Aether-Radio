@@ -10,6 +10,13 @@ import { SongRecognitionService } from '../services/SongRecognitionService'
 import { FALLBACK_HTML } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
 
+/**
+ * PlayerBar — the mini player at the bottom of the app.
+ *
+ * Web edition: no expanded-player overlay. A single lightweight ambient
+ * canvas behind the bar pulses gently with the live audio. All other
+ * controls (play/stop/favorite/volume/recognize/sleep) stay on the bar.
+ */
 export class PlayerBar extends BaseComponent {
   private eventBus       = EventBus.getInstance()
   private playerStore    = PlayerStore.getInstance()
@@ -20,23 +27,15 @@ export class PlayerBar extends BaseComponent {
   private sleepTimer     = new SleepTimer()
   private recognition    = SongRecognitionService.getInstance()
 
-  // Document-level drag listeners — kept so we can remove them on unmount
+  /** Ambient blob visualizer behind the bar — borrows the shared analyser */
+  private barAmbient = new VisualizerService()
+
+  /** Document-level drag listeners (volume slider) */
   private _onMouseMove: ((e: Event) => void) | null = null
   private _onMouseUp:   (() => void) | null = null
 
-  // Track which station is currently rendered so we can detect station changes
+  /** Which station id is rendered, so we know when to full-render */
   private _renderedStationId: string | null = null
-  // Expanded player state
-  private _isExpanded = false
-  // Ambient background visualizer (expanded player)
-  private _ambientVisualizer  = new VisualizerService()
-  // Ambient background visualizer (mini player bar)
-  private _barAmbientVisualizer = new VisualizerService()
-  // Expanded volume drag listeners
-  private _pexOnMouseMove: ((e: Event) => void) | null = null
-  private _pexOnMouseUp: (() => void) | null = null
-  // Expanded player EventBus unsubscribers — cleaned up on overlay destroy
-  private _pexUnsubscribers: Array<() => void> = []
 
   constructor(props: Record<string, never>) {
     super(props)
@@ -46,12 +45,9 @@ export class PlayerBar extends BaseComponent {
     this.eventBus.on('player:volume',     ({ volume }) => this.updateVolumeUI(volume))
     this.eventBus.on('player:loading',    ({ loading }) => this.updateLoadingUI(loading))
     this.eventBus.on('favorites:changed', () => this.updateFavoriteUI())
-    this.eventBus.on('route:changed', () => {
-      if (this._isExpanded) {
-        this.destroyExpandedOverlay()
-      }
-    })
   }
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   render(): string {
     const station   = this.playerStore.currentStation
@@ -59,7 +55,7 @@ export class PlayerBar extends BaseComponent {
     const isLoading = this.playerStore.isLoading
     const volume    = this.playerStore.volume
 
-    // ── Empty state ──────────────────────────────────────────
+    // ── Empty state ──
     if (!station) {
       return `
         <div class="player-bar">
@@ -96,7 +92,7 @@ export class PlayerBar extends BaseComponent {
       `
     }
 
-    // ── Active state ─────────────────────────────────────────
+    // ── Active state ──
     const isFavorite = this.favoritesStore.isFavorite(station.id)
     const volPct     = Math.round(volume * 100)
 
@@ -107,7 +103,7 @@ export class PlayerBar extends BaseComponent {
 
         <!-- LEFT: Station info -->
         <div class="player-station-info">
-          <div class="player-station-logo-wrap" id="player-logo-wrap" style="cursor:pointer" title="${this._isExpanded ? 'Collapse player' : 'Expand player'}">
+          <div class="player-station-logo-wrap">
             ${this.logoInnerHtml(station.favicon, station.name)}
             ${isPlaying ? `<span class="player-live-ring" id="player-live-ring"></span>` : ''}
           </div>
@@ -160,7 +156,7 @@ export class PlayerBar extends BaseComponent {
           </div>
         </div>
 
-        <!-- RIGHT: Volume + Visualizer -->
+        <!-- RIGHT: Volume + Recognize + Sleep timer -->
         <div class="player-extras">
 
           <div class="player-volume">
@@ -183,59 +179,44 @@ export class PlayerBar extends BaseComponent {
             ${this.recognizeIcon()}
           </button>
 
-          <button class="player-btn player-expand-btn ${this._isExpanded ? 'expanded' : ''}"
-            id="player-expand-btn"
-            title="${this._isExpanded ? 'Collapse player' : 'Expand player'}"
-            aria-label="${this._isExpanded ? 'Collapse player' : 'Expand player'}">
-            ${this.chevronIcon()}
-          </button>
-
         </div>
 
       </div>
     `
   }
 
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+
   protected afterMount(): void {
     this.attachEventListeners()
     this.initializeVisualizer()
+    // Wire the shared analyser the first time play() kicks off audio
     this.audioService.setOnPlayStarted(async (audioEl) => {
       await this.visualizer.initialize(audioEl)
-      const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
-      if (barCanvas) {
-        this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
-        requestAnimationFrame(() => barCanvas.classList.add('active'))
-      }
+      this.startBarAmbient()
     })
     const sleepTimerContainer = this.querySelector<HTMLElement>('#player-sleep-timer')
     if (sleepTimerContainer) {
       void this.sleepTimer.mount(sleepTimerContainer)
     }
-    this.attachExpandListener()
   }
 
   protected beforeUnmount(): void {
     this.visualizer.stopVisualization()
-    this._ambientVisualizer.stopVisualization()
-    this._barAmbientVisualizer.stopVisualization()
+    this.barAmbient.stopVisualization()
     this.removeDragListeners()
-    this.removePexDragListeners()
     this.sleepTimer.unmount()
-    this.destroyExpandedOverlay()
   }
 
-  // ── Surgical DOM update methods ───────────────────────────────────────────
+  // ── Surgical DOM updates ──────────────────────────────────────────────────
 
   /**
-   * Called on player:play and player:pause.
-   * - Empty→active transition: full render (no #player-play-btn yet)
-   * - Station changed: full render to update name, logo, meta
-   * - Same station play/pause: surgical update only
+   * Called on play/pause. If the rendered DOM matches the current station,
+   * we swap a few nodes in place. Otherwise we do a full re-render.
    */
   private onPlayStateChange(): void {
     const station = this.playerStore.currentStation
 
-    // No station, active DOM not rendered yet, or station changed → full render
     if (
       !station ||
       !this.element ||
@@ -249,7 +230,6 @@ export class PlayerBar extends BaseComponent {
     const isPlaying = this.playerStore.isPlaying
     const isLoading = this.playerStore.isLoading
 
-    // Play button
     const playBtn = this.querySelector<HTMLElement>('#player-play-btn')
     if (playBtn) {
       playBtn.classList.toggle('playing', isPlaying)
@@ -262,54 +242,41 @@ export class PlayerBar extends BaseComponent {
       }
     }
 
-    // Live dot
+    // Live pulse ring on the logo
     const logoWrap = this.querySelector<HTMLElement>('.player-station-logo-wrap')
     if (logoWrap) {
-      const existingRing = logoWrap.querySelector('#player-live-ring')
-      if (isPlaying && !existingRing) {
+      const existing = logoWrap.querySelector('#player-live-ring')
+      if (isPlaying && !existing) {
         logoWrap.insertAdjacentHTML('beforeend', `<span class="player-live-ring" id="player-live-ring"></span>`)
-      } else if (!isPlaying && existingRing) {
-        existingRing.remove()
+      } else if (!isPlaying && existing) {
+        existing.remove()
       }
     }
 
-    // Sync favorite button in case it changed while paused
     this.updateFavoriteUI()
 
-    // Sync recognize button enabled state
     const recognizeBtn = this.querySelector<HTMLElement>('#player-recognize-btn')
     if (recognizeBtn) {
       recognizeBtn.classList.toggle('player-btn-disabled', !isPlaying)
       recognizeBtn.toggleAttribute('disabled', !isPlaying)
     }
 
-    // Visualizer
-    this.syncVisualizer(isPlaying)
+    this.syncBarAmbient(isPlaying)
   }
 
-  /**
-   * Called on player:stop — station becomes null, need full re-render to
-   * switch to the empty state template.
-   */
   private onStopChange(): void {
-    this._barAmbientVisualizer.stopVisualization()
-    const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
-    if (barCanvas) barCanvas.classList.remove('active')
+    this.barAmbient.stopVisualization()
+    const canvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+    if (canvas) canvas.classList.remove('active')
     this._renderedStationId = null
     this.fullRender()
   }
 
-  /**
-   * Updates only the loading spinner inside the play button and the
-   * "Connecting…" text in the meta line.
-   */
   private updateLoadingUI(loading: boolean): void {
-    // If the active-state DOM isn't rendered yet, do a full render instead
     if (!this.querySelector('#player-play-btn')) {
       this.fullRender()
       return
     }
-
     const isPlaying = this.playerStore.isPlaying
     const station   = this.playerStore.currentStation
 
@@ -330,9 +297,6 @@ export class PlayerBar extends BaseComponent {
     }
   }
 
-  /**
-   * Updates only the favorite button icon/state.
-   */
   private updateFavoriteUI(): void {
     const station = this.playerStore.currentStation
     if (!station) return
@@ -351,42 +315,65 @@ export class PlayerBar extends BaseComponent {
     </svg>`
   }
 
-  /**
-   * Full re-render — used when the station changes or on empty→active transition.
-   * Records the rendered station ID so subsequent play/pause events can take
-   * the fast surgical path.
-   */
-  private fullRender(): void {
-    if (this.element && this.element.parentNode) {
-      this.visualizer.stopVisualization()
-      this._barAmbientVisualizer.stopVisualization()
-      this.removeDragListeners()
-      this.removePexDragListeners()
-      this.sleepTimer.unmount()
-      this.destroyExpandedOverlay()
-      const parent = this.element.parentNode as HTMLElement
-      parent.innerHTML = this.render()
-      this.element = parent.firstElementChild as HTMLElement
-      this._renderedStationId = this.playerStore.currentStation?.id ?? null
-      this.setupImageErrorHandlers()
-      this.afterMount()
-      this.updateFavoriteUI()
+  private updateVolumeUI(volume: number): void {
+    const fill    = this.querySelector<HTMLElement>('#player-volume-fill')
+    const slider  = this.querySelector<HTMLElement>('#player-volume-slider')
+    const muteBtn = this.querySelector<HTMLElement>('#player-mute-btn')
+    const volPct  = Math.round(volume * 100)
+
+    if (fill)    fill.style.width = `${volPct}%`
+    if (slider)  slider.title = `${volPct}%`
+    if (muteBtn) {
+      muteBtn.title     = volume === 0 ? 'Unmute' : 'Mute'
+      muteBtn.innerHTML = this.volumeIcon(volume)
     }
   }
 
-  private syncVisualizer(isPlaying: boolean): void {
-    const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+  private fullRender(): void {
+    if (!this.element || !this.element.parentNode) return
+    this.visualizer.stopVisualization()
+    this.barAmbient.stopVisualization()
+    this.removeDragListeners()
+    this.sleepTimer.unmount()
+    const parent = this.element.parentNode as HTMLElement
+    parent.innerHTML = this.render()
+    this.element = parent.firstElementChild as HTMLElement
+    this._renderedStationId = this.playerStore.currentStation?.id ?? null
+    this.setupImageErrorHandlers()
+    this.afterMount()
+    this.updateFavoriteUI()
+  }
+
+  // ── Ambient visualizer (mini bar) ────────────────────────────────────────
+
+  private async initializeVisualizer(): Promise<void> {
+    if (!this.playerStore.isPlaying) return
+    await this.visualizer.initialize(this.audioService.getAudioElement())
+    this.startBarAmbient()
+  }
+
+  private startBarAmbient(): void {
+    const canvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
+    if (!canvas) return
+    this.barAmbient.startAmbientVisualization(canvas, this.visualizer, true, true)
+    requestAnimationFrame(() => canvas.classList.add('active'))
+  }
+
+  private syncBarAmbient(isPlaying: boolean): void {
+    const canvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
     if (!isPlaying) {
       this.visualizer.stopVisualization()
-      this._barAmbientVisualizer.stopVisualization()
-      if (barCanvas) barCanvas.classList.remove('active')
-    } else if (barCanvas && !barCanvas.classList.contains('active')) {
-      this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
-      requestAnimationFrame(() => barCanvas.classList.add('active'))
+      this.barAmbient.stopVisualization()
+      if (canvas) canvas.classList.remove('active')
+      return
+    }
+    if (canvas && !canvas.classList.contains('active')) {
+      this.barAmbient.startAmbientVisualization(canvas, this.visualizer, true, true)
+      requestAnimationFrame(() => canvas.classList.add('active'))
     }
   }
 
-  // ── Event listeners ───────────────────────────────────────────────────────
+  // ── Event listeners ──────────────────────────────────────────────────────
 
   private attachEventListeners(): void {
     const playBtn      = this.querySelector('[data-action="play"], [data-action="pause"]')
@@ -394,14 +381,6 @@ export class PlayerBar extends BaseComponent {
     const muteBtn      = this.querySelector('[data-action="mute"]')
     const favoriteBtn  = this.querySelector('[data-action="favorite"]')
     const volumeSlider = this.querySelector('#player-volume-slider')
-    const logoWrap     = this.querySelector<HTMLElement>('#player-logo-wrap')
-
-    if (logoWrap) {
-      this.on(logoWrap, 'click', () => {
-        const expandBtn = this.querySelector<HTMLElement>('#player-expand-btn')
-        if (expandBtn) expandBtn.click()
-      })
-    }
 
     const recognizeBtn = this.querySelector<HTMLElement>('#player-recognize-btn')
     if (recognizeBtn) {
@@ -448,7 +427,7 @@ export class PlayerBar extends BaseComponent {
     }
 
     if (volumeSlider) {
-      const updateVolume = (e: MouseEvent) => {
+      const updateVolume = (e: MouseEvent): void => {
         const rect = (volumeSlider as HTMLElement).getBoundingClientRect()
         const vol  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
         this.playerStore.setVolume(vol)
@@ -462,9 +441,8 @@ export class PlayerBar extends BaseComponent {
         updateVolume(e as MouseEvent)
       })
 
-      // Store document listeners so we can remove them on unmount
-      this._onMouseMove = (e: Event) => { if (dragging) updateVolume(e as MouseEvent) }
-      this._onMouseUp   = () => {
+      this._onMouseMove = (e: Event): void => { if (dragging) updateVolume(e as MouseEvent) }
+      this._onMouseUp   = (): void => {
         if (dragging) {
           dragging = false
           const fill = this.querySelector<HTMLElement>('#player-volume-fill')
@@ -481,404 +459,7 @@ export class PlayerBar extends BaseComponent {
     if (this._onMouseUp)   { document.removeEventListener('mouseup',   this._onMouseUp);   this._onMouseUp   = null }
   }
 
-  private removePexDragListeners(): void {
-    if (this._pexOnMouseMove) { document.removeEventListener('mousemove', this._pexOnMouseMove); this._pexOnMouseMove = null }
-    if (this._pexOnMouseUp)   { document.removeEventListener('mouseup',   this._pexOnMouseUp);   this._pexOnMouseUp   = null }
-  }
-
-  // ── Expanded player ───────────────────────────────────────────────────────
-
-  private attachExpandListener(): void {
-    const btn = this.querySelector<HTMLElement>('#player-expand-btn')
-    if (!btn) return
-    this.on(btn, 'click', () => {
-      if (this._isExpanded) {
-        // Update state and button immediately
-        this._isExpanded = false
-        btn.classList.remove('expanded')
-        btn.title = 'Expand player'
-        btn.setAttribute('aria-label', 'Expand player')
-        // Animate out, then destroy
-        this.animateCollapseAndDestroy()
-      } else {
-        this._isExpanded = true
-        btn.classList.add('expanded')
-        btn.title = 'Collapse player'
-        btn.setAttribute('aria-label', 'Collapse player')
-        this.mountExpandedOverlay()
-      }
-    })
-  }
-
-  private animateCollapseAndDestroy(): void {
-    const overlay = document.getElementById('player-expanded-overlay')
-    if (!overlay) return
-    // Trigger the CSS collapse (height → player-bar-height)
-    overlay.classList.remove('is-expanded')
-    // Stop ambient immediately so it doesn't keep running during animation
-    this._ambientVisualizer.stopVisualization()
-    this.removePexDragListeners()
-    // Unsubscribe expanded player EventBus listeners
-    this._pexUnsubscribers.forEach(unsub => unsub())
-    this._pexUnsubscribers = []
-    // Wait for height transition to finish, then remove
-    let done = false
-    const finish = (): void => {
-      if (done) return
-      done = true
-      overlay.remove()
-      // Restore the mini player bar
-      const appPlayerBar = document.querySelector<HTMLElement>('.app-player-bar')
-      if (appPlayerBar) appPlayerBar.style.visibility = ''
-    }
-    overlay.addEventListener('transitionend', (e: TransitionEvent) => {
-      if (e.propertyName === 'height') finish()
-    })
-    // Fallback in case transitionend doesn't fire
-    setTimeout(finish, 500)
-  }
-
-  private getAppMain(): HTMLElement | null {
-    return document.querySelector<HTMLElement>('.app-main')
-  }
-
-  private mountExpandedOverlay(): void {
-    const appMain = this.getAppMain()
-    if (!appMain) return
-    // Remove any stale overlay without touching _isExpanded
-    this._ambientVisualizer.stopVisualization()
-    this.removePexDragListeners()
-    // Clean up any stale EventBus listeners from a previous overlay
-    this._pexUnsubscribers.forEach(unsub => unsub())
-    this._pexUnsubscribers = []
-    const stale = document.getElementById('player-expanded-overlay')
-    if (stale) stale.remove()
-
-    const station    = this.playerStore.currentStation
-    const isPlaying  = this.playerStore.isPlaying
-    const volume     = this.playerStore.volume
-    const volPct     = Math.round(volume * 100)
-    const isFavorite = station ? this.favoritesStore.isFavorite(station.id) : false
-
-    const overlay = document.createElement('div')
-    overlay.className = 'player-expanded-overlay'
-    overlay.id = 'player-expanded-overlay'
-
-    overlay.innerHTML = `
-      <canvas class="pex-ambient-canvas" id="pex-ambient-canvas"></canvas>
-
-      <div class="player-expanded-body">
-        <div class="pex-inner">
-
-          <!-- LEFT: Artwork -->
-          <div class="pex-artwork-col">
-            <div class="pex-artwork-wrap">
-              <div class="pex-artwork">
-                ${station ? this.logoInnerHtml(station.favicon, station.name) : FALLBACK_HTML}
-                ${isPlaying ? `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>` : ''}
-              </div>
-            </div>
-          </div>
-
-          <!-- RIGHT: Info + Controls -->
-          <div class="pex-info-col">
-
-            <div class="pex-identity">
-              <div class="pex-station-name">${this.esc(station?.name ?? 'No station')}</div>
-              <div class="pex-station-meta">
-                ${station ? `
-                  <span>${countryFlag(station.countryCode)} ${this.esc(station.country)}</span>
-                  ${station.codec ? `<span class="pex-meta-sep">·</span><span>${this.esc(station.codec)}</span>` : ''}
-                  ${station.bitrate ? `<span class="pex-meta-sep">·</span><span class="pex-bitrate">${station.bitrate} kbps</span>` : ''}
-                ` : ''}
-              </div>
-              ${station?.tags?.length ? `
-                <div class="pex-tags">
-                  ${station.tags.slice(0, 5).map(t => `<span class="pex-tag">${this.esc(t)}</span>`).join('')}
-                </div>` : ''}
-            </div>
-
-            <div class="pex-controls-wrap">
-              <div class="pex-controls">
-                <button class="pex-btn pex-btn-stop" id="pex-stop"
-                  title="Stop" aria-label="Stop playback">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <rect x="4" y="4" width="16" height="16" rx="3"/>
-                  </svg>
-                </button>
-                <button class="pex-btn-play ${isPlaying ? 'playing' : ''}" id="pex-play"
-                  data-action="${isPlaying ? 'pause' : 'play'}"
-                  title="${isPlaying ? 'Pause' : 'Play'}"
-                  aria-label="${isPlaying ? 'Pause' : 'Play'}"
-                  aria-pressed="${isPlaying}">
-                  ${isPlaying ? this.pauseIconLg() : this.playIconLg()}
-                </button>
-                <button class="pex-btn pex-btn-fav ${isFavorite ? 'active' : ''}" id="pex-fav"
-                  title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
-                  aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
-                  aria-pressed="${isFavorite}">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                    fill="${isFavorite ? 'currentColor' : 'none'}"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    aria-hidden="true">
-                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                  </svg>
-                </button>
-              </div>
-
-              <div class="pex-volume">
-                <button class="pex-btn pex-btn-mute" id="pex-mute" title="${volume === 0 ? 'Unmute' : 'Mute'}">
-                  ${this.volumeIcon(volume)}
-                </button>
-                <div class="pex-volume-slider" id="pex-volume-slider" title="${volPct}%">
-                  <div class="pex-volume-fill" id="pex-volume-fill" style="width:${volPct}%">
-                    <div class="pex-volume-thumb"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom bar — collapse button -->
-      <div class="player-expanded-mini">
-        <button class="pex-collapse-btn" id="pex-collapse-btn"
-          title="Collapse player" aria-label="Collapse player">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="m6 9 6 6 6-6"/>
-          </svg>
-        </button>
-      </div>
-    `
-
-    appMain.style.position = 'relative'
-    appMain.appendChild(overlay)
-    // Hide the mini player bar wrapper while expanded
-    const appPlayerBar = document.querySelector<HTMLElement>('.app-player-bar')
-    if (appPlayerBar) appPlayerBar.style.visibility = 'hidden'
-    requestAnimationFrame(() => overlay.classList.add('is-expanded'))
-
-    this.attachPexListeners(overlay)
-
-    if (isPlaying) {
-      // Ambient background
-      const ambientCanvas = overlay.querySelector<HTMLCanvasElement>('#pex-ambient-canvas')
-      if (ambientCanvas) {
-        this._ambientVisualizer.startAmbientVisualization(ambientCanvas, this.visualizer)
-      }
-    }
-  }
-
-  private attachPexListeners(overlay: HTMLElement): void {
-    const q = <E extends Element>(sel: string) => overlay.querySelector<E>(sel)
-
-    // Collapse button
-    q<HTMLElement>('#pex-collapse-btn')?.addEventListener('click', () => {
-      this._isExpanded = false
-      const expandBtn = this.querySelector<HTMLElement>('#player-expand-btn')
-      if (expandBtn) {
-        expandBtn.classList.remove('expanded')
-        expandBtn.title = 'Expand player'
-        expandBtn.setAttribute('aria-label', 'Expand player')
-      }
-      this.animateCollapseAndDestroy()
-    })
-
-    q<HTMLElement>('#pex-play')?.addEventListener('click', () => {
-      if (this.playerStore.isPlaying) {
-        this.playerStore.pause()
-      } else if (this.playerStore.currentStation) {
-        this.playerStore.play(this.playerStore.currentStation)
-      }
-    })
-
-    q<HTMLElement>('#pex-stop')?.addEventListener('click', () => this.playerStore.stop())
-
-    q<HTMLElement>('#pex-fav')?.addEventListener('click', async () => {
-      const station = this.playerStore.currentStation
-      if (!station) return
-      if (this.favoritesStore.isFavorite(station.id)) {
-        await this.bridge.favorites.remove(station.id)
-      } else {
-        await this.bridge.favorites.add(station)
-      }
-      const result = await this.bridge.favorites.getAll()
-      if (result.success) this.favoritesStore.setFavorites(result.data)
-    })
-
-    q<HTMLElement>('#pex-mute')?.addEventListener('click', () => {
-      if (this.playerStore.volume > 0) {
-        this.playerStore.setVolume(0)
-      } else {
-        this.playerStore.setVolume(this.playerStore.volumeBeforeMute || 0.8)
-      }
-    })
-
-    const volSlider = q<HTMLElement>('#pex-volume-slider')
-    if (volSlider) {
-      const updateVol = (e: MouseEvent) => {
-        const rect = volSlider.getBoundingClientRect()
-        this.playerStore.setVolume(Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)))
-      }
-      let dragging = false
-      volSlider.addEventListener('mousedown', (e) => {
-        dragging = true
-        const fill = q<HTMLElement>('#pex-volume-fill')
-        if (fill) fill.style.transition = 'none'
-        updateVol(e)
-      })
-      this._pexOnMouseMove = (e: Event) => { if (dragging) updateVol(e as MouseEvent) }
-      this._pexOnMouseUp   = () => {
-        if (dragging) {
-          dragging = false
-          const fill = q<HTMLElement>('#pex-volume-fill')
-          if (fill) fill.style.transition = ''
-        }
-      }
-      document.addEventListener('mousemove', this._pexOnMouseMove)
-      document.addEventListener('mouseup',   this._pexOnMouseUp)
-    }
-
-    // Keep expanded UI in sync with EventBus
-    this._pexUnsubscribers.push(
-      this.eventBus.on('player:play',  () => this.syncPexPlayState(overlay)),
-      this.eventBus.on('player:pause', () => this.syncPexPlayState(overlay)),
-      this.eventBus.on('player:stop',  () => {
-        this._isExpanded = false
-        this.destroyExpandedOverlay()
-      }),
-      this.eventBus.on('player:volume',     ({ volume }) => this.syncPexVolumeUI(overlay, volume)),
-      this.eventBus.on('favorites:changed', () => this.syncPexFavState(overlay)),
-      this.eventBus.on('player:loading',    ({ loading }) => this.syncPexLoadingUI(overlay, loading))
-    )
-  }
-
-  private syncPexPlayState(overlay: HTMLElement): void {
-    const q = <E extends Element>(sel: string) => overlay.querySelector<E>(sel)
-    const isPlaying = this.playerStore.isPlaying
-    const isLoading = this.playerStore.isLoading
-
-    const playBtn = q<HTMLElement>('#pex-play')
-    if (playBtn) {
-      playBtn.classList.toggle('playing', isPlaying)
-      playBtn.setAttribute('data-action', isPlaying ? 'pause' : 'play')
-      playBtn.title = isPlaying ? 'Pause' : 'Play'
-      playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play')
-      playBtn.setAttribute('aria-pressed', String(isPlaying))
-      if (!isLoading) {
-        playBtn.innerHTML = isPlaying ? this.pauseIconLg() : this.playIconLg()
-      }
-    }
-
-    const artworkEl = overlay.querySelector<HTMLElement>('.pex-artwork')
-    if (artworkEl) {
-      const existing = artworkEl.querySelector('.pex-live-badge')
-      if (isPlaying && !existing) {
-        artworkEl.insertAdjacentHTML('beforeend', `<div class="pex-live-badge"><span class="pex-live-dot"></span> Live</div>`)
-      } else if (!isPlaying && existing) {
-        existing.remove()
-      }
-    }
-
-    if (isPlaying) {
-      const ambientCanvas = overlay.querySelector<HTMLCanvasElement>('#pex-ambient-canvas')
-      if (ambientCanvas) {
-        this._ambientVisualizer.stopVisualization()
-        this._ambientVisualizer.startAmbientVisualization(ambientCanvas, this.visualizer)
-      }
-    } else {
-      this._ambientVisualizer.stopVisualization()
-    }
-  }
-
-  private syncPexLoadingUI(overlay: HTMLElement, loading: boolean): void {
-    const playBtn = overlay.querySelector<HTMLElement>('#pex-play')
-    if (!playBtn) return
-    const isPlaying = this.playerStore.isPlaying
-    playBtn.innerHTML = loading
-      ? `<span class="loading-spinner loading-spinner--btn"></span>`
-      : (isPlaying ? this.pauseIconLg() : this.playIconLg())
-  }
-
-  private syncPexFavState(overlay: HTMLElement): void {
-    const station = this.playerStore.currentStation
-    if (!station) return
-    const isFav = this.favoritesStore.isFavorite(station.id)
-    const btn = overlay.querySelector<HTMLElement>('#pex-fav')
-    if (!btn) return
-    btn.classList.toggle('active', isFav)
-    btn.title = isFav ? 'Remove from favorites' : 'Add to favorites'
-    btn.setAttribute('aria-label', isFav ? 'Remove from favorites' : 'Add to favorites')
-    btn.setAttribute('aria-pressed', String(isFav))
-    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-      fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-    </svg>`
-  }
-
-  private syncPexVolumeUI(overlay: HTMLElement, volume: number): void {
-    const fill    = overlay.querySelector<HTMLElement>('#pex-volume-fill')
-    const slider  = overlay.querySelector<HTMLElement>('#pex-volume-slider')
-    const muteBtn = overlay.querySelector<HTMLElement>('#pex-mute')
-    const volPct  = Math.round(volume * 100)
-    if (fill)    fill.style.width = `${volPct}%`
-    if (slider)  slider.title = `${volPct}%`
-    if (muteBtn) { muteBtn.title = volume === 0 ? 'Unmute' : 'Mute'; muteBtn.innerHTML = this.volumeIcon(volume) }
-  }
-
-  private destroyExpandedOverlay(): void {
-    this._isExpanded = false
-    this._ambientVisualizer.stopVisualization()
-    this.removePexDragListeners()
-    // Unsubscribe expanded player EventBus listeners to prevent memory leaks
-    this._pexUnsubscribers.forEach(unsub => unsub())
-    this._pexUnsubscribers = []
-    const overlay = document.getElementById('player-expanded-overlay')
-    if (overlay) overlay.remove()
-    // Restore the mini player bar
-    const appPlayerBar = document.querySelector<HTMLElement>('.app-player-bar')
-    if (appPlayerBar) appPlayerBar.style.visibility = ''
-    const btn = this.querySelector<HTMLElement>('#player-expand-btn')
-    if (btn) {
-      btn.classList.remove('expanded')
-      btn.title = 'Expand player'
-      btn.setAttribute('aria-label', 'Expand player')
-    }
-  }
-
-  private async initializeVisualizer(): Promise<void> {
-    if (this.playerStore.isPlaying) {
-      await this.visualizer.initialize(this.audioService.getAudioElement())
-      const barCanvas = this.querySelector<HTMLCanvasElement>('#player-bar-ambient')
-      if (barCanvas) {
-        this._barAmbientVisualizer.startAmbientVisualization(barCanvas, this.visualizer, true, true)
-        requestAnimationFrame(() => barCanvas.classList.add('active'))
-      }
-    }
-  }
-
-  // ── Volume UI (called from EventBus, no re-render) ────────────────────────
-
-  private updateVolumeUI(volume: number): void {
-    const fill    = this.querySelector<HTMLElement>('#player-volume-fill')
-    const slider  = this.querySelector<HTMLElement>('#player-volume-slider')
-    const muteBtn = this.querySelector<HTMLElement>('#player-mute-btn')
-    const volPct  = Math.round(volume * 100)
-
-    if (fill)    fill.style.width = `${volPct}%`
-    if (slider)  slider.title = `${volPct}%`
-    if (muteBtn) {
-      muteBtn.title     = volume === 0 ? 'Unmute' : 'Mute'
-      muteBtn.innerHTML = this.volumeIcon(volume)
-    }
-  }
-
-  // ── HTML helpers ──────────────────────────────────────────────────────────
+  // ── HTML helpers ─────────────────────────────────────────────────────────
 
   private buildMetaHtml(
     countryCode: string,
@@ -907,6 +488,17 @@ export class PlayerBar extends BaseComponent {
     `
   }
 
+  private logoInnerHtml(favicon: string | undefined | null, name: string): string {
+    if (!favicon || favicon.trim() === '') return FALLBACK_HTML
+    const trimmed = favicon.trim()
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('data:image/')) {
+      return FALLBACK_HTML
+    }
+    const encodedSrc = trimmed.replace(/"/g, '%22')
+    const encodedAlt = name.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    return `<img src="${encodedSrc}" alt="${encodedAlt}" data-logo>`
+  }
+
   // ── Icon helpers ──────────────────────────────────────────────────────────
 
   private radioIcon(): string {
@@ -925,29 +517,6 @@ export class PlayerBar extends BaseComponent {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
       viewBox="0 0 24 24" fill="currentColor">
       <polygon points="6 3 20 12 6 21 6 3"/>
-    </svg>`
-  }
-
-  private playIconLg(): string {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-      viewBox="0 0 24 24" fill="currentColor">
-      <polygon points="6 3 20 12 6 21 6 3"/>
-    </svg>`
-  }
-
-  private pauseIconLg(): string {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-      viewBox="0 0 24 24" fill="currentColor">
-      <rect x="6" y="4" width="4" height="16" rx="1.5"/>
-      <rect x="14" y="4" width="4" height="16" rx="1.5"/>
-    </svg>`
-  }
-
-  private chevronIcon(): string {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="m18 15-6-6-6 6"/>
     </svg>`
   }
 
@@ -985,31 +554,24 @@ export class PlayerBar extends BaseComponent {
     </svg>`
   }
 
-  private logoInnerHtml(favicon: string | undefined | null, name: string): string {
-    if (!favicon || favicon.trim() === '') return FALLBACK_HTML
-    const trimmed = favicon.trim()
-    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('data:image/')) {
-      return FALLBACK_HTML
-    }
-    const encodedSrc = trimmed.replace(/"/g, '%22')
-    const encodedAlt = name.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    return `<img src="${encodedSrc}" alt="${encodedAlt}" data-logo>`
+  private recognizeIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="1.75"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/>
+      <path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/>
+    </svg>`
   }
 
-  private idleBars(): string {
-    return `<div class="visualizer-idle">
-      <div class="visualizer-idle-bar"></div>
-      <div class="visualizer-idle-bar"></div>
-      <div class="visualizer-idle-bar"></div>
-      <div class="visualizer-idle-bar"></div>
-      <div class="visualizer-idle-bar"></div>
-      <div class="visualizer-idle-bar"></div>
-      <div class="visualizer-idle-bar"></div>
-      <div class="visualizer-idle-bar"></div>
-    </div>`
+  private esc(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
   }
 
-  // ── Song Recognition ─────────────────────────────────────────────────────
+  // ── Song Recognition ──────────────────────────────────────────────────────
 
   private async handleRecognize(): Promise<void> {
     const station = this.playerStore.currentStation
@@ -1018,13 +580,11 @@ export class PlayerBar extends BaseComponent {
     const btn = this.querySelector<HTMLElement>('#player-recognize-btn')
     if (!btn || this.recognition.busy) return
 
-    // Open modal in listening state immediately
     this.openRecognitionModal()
 
     const streamUrl = station.urlResolved || station.url
     const result = await this.recognition.recognize(streamUrl)
 
-    // Transition modal to result
     this.resolveRecognitionModal(result)
   }
 
@@ -1036,14 +596,12 @@ export class PlayerBar extends BaseComponent {
     modal.className = 'rcm-overlay'
     modal.setAttribute('role', 'dialog')
     modal.setAttribute('aria-modal', 'true')
-    // aria-labelledby points to the visible heading inside the dialog
     modal.setAttribute('aria-labelledby', 'rcm-heading')
 
     modal.innerHTML = `
       <div class="rcm-backdrop"></div>
       <div class="rcm-dialog" id="rcm-dialog">
 
-        <!-- Close button — hidden until result is ready -->
         <button class="rcm-close" id="rcm-close" aria-label="Close recognition" style="display:none">
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5"
@@ -1052,11 +610,9 @@ export class PlayerBar extends BaseComponent {
           </svg>
         </button>
 
-        <!-- Listening state -->
         <div class="rcm-listening" id="rcm-listening" role="status" aria-live="polite">
           <div class="rcm-listen-inner">
 
-            <!-- Icon ring with scanning pulse -->
             <div class="rcm-scan-ring-wrap" aria-hidden="true">
               <div class="rcm-scan-ring rcm-ring-1"></div>
               <div class="rcm-scan-ring rcm-ring-2"></div>
@@ -1072,7 +628,6 @@ export class PlayerBar extends BaseComponent {
               </div>
             </div>
 
-            <!-- Waveform bars (decorative) -->
             <div class="rcm-waveform" aria-hidden="true">
               <span class="rcm-bar rcm-bar-1"></span>
               <span class="rcm-bar rcm-bar-2"></span>
@@ -1085,19 +640,16 @@ export class PlayerBar extends BaseComponent {
               <span class="rcm-bar rcm-bar-9"></span>
             </div>
 
-            <!-- Text — h2 for dialog label target -->
             <div class="rcm-listening-text">
               <h2 class="rcm-listening-label" id="rcm-heading">Identifying song…</h2>
               <p class="rcm-listening-sub">Analyzing audio fingerprint</p>
             </div>
 
-            <!-- Cancel — lets user dismiss during listening -->
             <button class="rcm-cancel-btn" id="rcm-cancel">Cancel</button>
 
           </div>
         </div>
 
-        <!-- Result state (hidden initially) -->
         <div class="rcm-result" id="rcm-result" style="display:none"></div>
 
       </div>
@@ -1105,7 +657,6 @@ export class PlayerBar extends BaseComponent {
 
     document.body.appendChild(modal)
 
-    // Focus the dialog for keyboard users
     const dialog = modal.querySelector<HTMLElement>('#rcm-dialog')
     dialog?.setAttribute('tabindex', '-1')
     requestAnimationFrame(() => dialog?.focus())
@@ -1113,7 +664,7 @@ export class PlayerBar extends BaseComponent {
     modal.querySelector('#rcm-close')?.addEventListener('click', () => this.closeRecognitionModal())
     modal.querySelector('#rcm-cancel')?.addEventListener('click', () => this.closeRecognitionModal())
 
-    const onKey = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') { document.removeEventListener('keydown', onKey); this.closeRecognitionModal() }
     }
     document.addEventListener('keydown', onKey)
@@ -1130,7 +681,6 @@ export class PlayerBar extends BaseComponent {
       listening.style.display = 'none'
       resultEl.style.display  = 'flex'
 
-      // Show close button now that a result is available
       const closeBtn = document.getElementById('rcm-close')
       if (closeBtn) closeBtn.style.display = 'flex'
 
@@ -1159,8 +709,6 @@ export class PlayerBar extends BaseComponent {
         })
 
       } else {
-        // Build result HTML — modern full-bleed layout
-        // Fully encode the cover URL: escape both " and ' to prevent CSS/HTML injection
         const cover = result.coverArt
           ? result.coverArt.replace(/"/g, '%22').replace(/'/g, '%27')
           : ''
@@ -1186,7 +734,6 @@ export class PlayerBar extends BaseComponent {
           ${coverSection}
 
           <div class="rcm-body">
-            <!-- Song identity -->
             <div class="rcm-identity">
               <div class="rcm-identity-badge" aria-hidden="true">
                 <span class="rcm-badge-dot"></span>Identified
@@ -1200,7 +747,6 @@ export class PlayerBar extends BaseComponent {
                 </p>` : ''}
             </div>
 
-            <!-- Streaming services -->
             <div class="rcm-streams">
               <div class="rcm-streams-label" aria-hidden="true">Open in</div>
               <div class="rcm-streams-grid" role="group" aria-label="Open in streaming service">
@@ -1219,34 +765,22 @@ export class PlayerBar extends BaseComponent {
         `
 
         if (result.spotifyUrl) {
-          resultEl.querySelector('#rcm-spotify')?.addEventListener('click', () => {
-            this.bridge.openExternal(result.spotifyUrl!)
-          })
+          resultEl.querySelector('#rcm-spotify')?.addEventListener('click', () => this.bridge.openExternal(result.spotifyUrl!))
         }
         if (result.appleMusicUrl) {
-          resultEl.querySelector('#rcm-apple')?.addEventListener('click', () => {
-            this.bridge.openExternal(result.appleMusicUrl!)
-          })
+          resultEl.querySelector('#rcm-apple')?.addEventListener('click', () => this.bridge.openExternal(result.appleMusicUrl!))
         }
         if (result.youtubeMusicUrl) {
-          resultEl.querySelector('#rcm-ytmusic')?.addEventListener('click', () => {
-            this.bridge.openExternal(result.youtubeMusicUrl!)
-          })
+          resultEl.querySelector('#rcm-ytmusic')?.addEventListener('click', () => this.bridge.openExternal(result.youtubeMusicUrl!))
         }
         if (result.youtubeUrl) {
-          resultEl.querySelector('#rcm-youtube')?.addEventListener('click', () => {
-            this.bridge.openExternal(result.youtubeUrl!)
-          })
+          resultEl.querySelector('#rcm-youtube')?.addEventListener('click', () => this.bridge.openExternal(result.youtubeUrl!))
         }
         if (result.deezerUrl) {
-          resultEl.querySelector('#rcm-deezer')?.addEventListener('click', () => {
-            this.bridge.openExternal(result.deezerUrl!)
-          })
+          resultEl.querySelector('#rcm-deezer')?.addEventListener('click', () => this.bridge.openExternal(result.deezerUrl!))
         }
         if (result.shazamUrl) {
-          resultEl.querySelector('#rcm-shazam')?.addEventListener('click', () => {
-            this.bridge.openExternal(result.shazamUrl!)
-          })
+          resultEl.querySelector('#rcm-shazam')?.addEventListener('click', () => this.bridge.openExternal(result.shazamUrl!))
         }
       }
 
@@ -1261,16 +795,7 @@ export class PlayerBar extends BaseComponent {
     setTimeout(() => modal.remove(), 320)
   }
 
-  // ── Icon helpers (recognition) ────────────────────────────────────────────
-
-  private recognizeIcon(): string {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" stroke-width="1.75"
-      stroke-linecap="round" stroke-linejoin="round">
-      <path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/>
-      <path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/>
-    </svg>`
-  }
+  // ── Recognition service icons ────────────────────────────────────────────
 
   private spotifyIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1314,13 +839,5 @@ export class PlayerBar extends BaseComponent {
       stroke-linecap="round" stroke-linejoin="round">
       <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
     </svg>`
-  }
-
-  private esc(text: string): string {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
   }
 }
