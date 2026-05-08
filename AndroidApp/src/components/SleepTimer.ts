@@ -18,17 +18,44 @@ export class SleepTimer {
   mount(container: HTMLElement): void {
     this._container = container
     this.render()
-    this._unsub = this.eventBus.on('player:sleep-timer', () => this.render())
-    this._tickInterval = setInterval(() => {
-      if (this.playerStore.hasSleepTimer) this.render()
-    }, 30_000)
+    // Refresh UI whenever a sleep timer starts/stops — we start/stop the
+    // tick interval lazily here to avoid running a 30s poll forever.
+    this._unsub = this.eventBus.on('player:sleep-timer', () => {
+      this.render()
+      this.syncTick()
+    })
+    this.syncTick()
   }
 
   unmount(): void {
     this._unsub?.()
-    if (this._tickInterval) clearInterval(this._tickInterval)
+    this._unsub = null
+    this.stopTick()
     this._sheet?.remove()
+    this._sheet = null
     if (this._container) this._container.innerHTML = ''
+    this._container = null
+  }
+
+  /**
+   * Start the once-per-30-seconds UI refresh only while a sleep timer is
+   * active; stop it otherwise. Saves the idle polling cost.
+   */
+  private syncTick(): void {
+    if (this.playerStore.hasSleepTimer) {
+      if (this._tickInterval === null) {
+        this._tickInterval = setInterval(() => this.render(), 30_000)
+      }
+    } else {
+      this.stopTick()
+    }
+  }
+
+  private stopTick(): void {
+    if (this._tickInterval !== null) {
+      clearInterval(this._tickInterval)
+      this._tickInterval = null
+    }
   }
 
   private render(): void {

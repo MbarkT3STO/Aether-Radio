@@ -24,6 +24,7 @@ export class MiniPlayer extends BaseComponent {
   private _renderedStationId: string | null = null
   private _expanded = false
   private _sheetCleanup: (() => void) | null = null
+  private _sheetDocListeners: Array<{ type: string; listener: EventListener; opts?: AddEventListenerOptions }> = []
 
   constructor(props: Record<string, never>) {
     super(props)
@@ -113,6 +114,34 @@ export class MiniPlayer extends BaseComponent {
     if (canvas) canvas.classList.remove('active')
   }
 
+  /**
+   * Called from the Capacitor appStateChange hook when the app is backgrounded
+   * or resumed. Stops ALL canvas RAF loops (bar + sheet) so the device sleeps
+   * properly. Audio continues via the native foreground service.
+   */
+  public onAppBackgrounded(): void {
+    this._barVisualizer.stopVisualization()
+    this._sheetVisualizer.stopVisualization()
+    const barCanvas = this.querySelector<HTMLCanvasElement>('#mp-ambient-canvas')
+    if (barCanvas) barCanvas.classList.remove('active')
+    const sheetCanvas = document.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
+    if (sheetCanvas) sheetCanvas.classList.remove('active')
+  }
+
+  public onAppForegrounded(): void {
+    if (!this.playerStore.isPlaying) return
+    // Bar ambient
+    this.startBarAmbient()
+    // Sheet ambient — only if the sheet is actually open in the DOM
+    const sheetCanvas = document.querySelector<HTMLCanvasElement>('#mp-sheet-ambient')
+    if (sheetCanvas && this._expanded) {
+      this._sheetVisualizer.startAmbientVisualization(
+        sheetCanvas, this.audioService.getVisualizer(), 0.42, true
+      )
+      requestAnimationFrame(() => sheetCanvas.classList.add('active'))
+    }
+  }
+
   private attachListeners(): void {
     const expandArea  = this.querySelector('#mp-expand-area')
     const playBtn     = this.querySelector('#mp-play')
@@ -155,6 +184,11 @@ export class MiniPlayer extends BaseComponent {
     this._sleepTimer.unmount()
     // Clean up all sheet event subscriptions to prevent memory leaks
     if (this._sheetCleanup) { this._sheetCleanup(); this._sheetCleanup = null }
+    // Remove document-level drag listeners registered during sheet open
+    this._sheetDocListeners.forEach(({ type, listener, opts }) => {
+      document.removeEventListener(type, listener, opts)
+    })
+    this._sheetDocListeners = []
     const sheet = document.getElementById('mp-expanded-sheet')
     if (!sheet) return
     sheet.classList.remove('mp-sheet--open')
@@ -326,10 +360,19 @@ export class MiniPlayer extends BaseComponent {
       const onMouseMove = (e: MouseEvent) => { if (dragging) setVol(e.clientX) }
       const onEnd = () => { dragging = false }
 
-      document.addEventListener('touchmove', onTouchMove, { passive: false })
-      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('touchmove', onTouchMove as EventListener, { passive: false })
+      document.addEventListener('mousemove', onMouseMove as EventListener)
       document.addEventListener('touchend', onEnd)
       document.addEventListener('mouseup', onEnd)
+
+      // Track listeners so closeExpanded() can remove them — prevents a leak
+      // where each open/close cycle permanently adds 4 document listeners.
+      this._sheetDocListeners.push(
+        { type: 'touchmove', listener: onTouchMove as EventListener, opts: { passive: false } },
+        { type: 'mousemove', listener: onMouseMove as EventListener },
+        { type: 'touchend',  listener: onEnd },
+        { type: 'mouseup',   listener: onEnd },
+      )
     }
 
     // Swipe down on the handle to close (not the whole sheet)

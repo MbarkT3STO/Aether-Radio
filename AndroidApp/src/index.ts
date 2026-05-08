@@ -34,6 +34,7 @@ class App {
   private bottomNav      = new BottomNav({})
   private miniPlayer     = new MiniPlayer({})
   private currentView: { unmount: () => void } | null = null
+  private _volumePersistTimer: ReturnType<typeof setTimeout> | null = null
 
   constructor() { void this.init() }
 
@@ -113,7 +114,14 @@ class App {
     this.eventBus.on('player:stop',  () => this.audioService.stop())
     this.eventBus.on('player:volume', ({ volume }) => {
       this.audioService.setVolume(volume)
-      void this.bridge.settings.update({ volume })
+      // Debounce the persistent write — the Preferences plugin writes to disk
+      // and slider drags can fire this event ~60x/sec. We only need the final
+      // value, so wait for the drag to settle.
+      if (this._volumePersistTimer) clearTimeout(this._volumePersistTimer)
+      this._volumePersistTimer = setTimeout(() => {
+        void this.bridge.settings.update({ volume })
+        this._volumePersistTimer = null
+      }, 400)
     })
     this.eventBus.on('settings:buffer-changed', ({ bufferSize }) => {
       this.audioService.setBufferSize(bufferSize)
@@ -143,28 +151,23 @@ class App {
       }
     })
 
-    // Stop canvas rendering when app goes to background (battery fix)
-    // NOTE: We do NOT suspend the AudioContext — that would kill the audio stream.
+    // Stop ALL canvas rendering when app goes to background. The mini-player
+    // owns two separate VisualizerService instances (bar + sheet) whose RAF
+    // loops would otherwise keep running and drain battery. Audio keeps
+    // flowing through the native foreground service.
+    //
+    // NOTE: We do NOT suspend the AudioContext — that would kill the audio
+    // stream. The AnalyserNode's getByteFrequencyData() is only called from
+    // the RAF loop, so stopping the loop removes the Web Audio CPU cost too.
     CapApp.addListener('appStateChange', ({ isActive }) => {
-      const visualizer = this.audioService.getVisualizer()
       if (!isActive) {
-        // App went to background — stop canvas rendering only
-        visualizer.stopVisualization()
-        const ambCanvas = document.querySelector<HTMLElement>('#mp-ambient-canvas')
-        if (ambCanvas) ambCanvas.classList.remove('active')
+        // App went to background — stop every canvas RAF loop
+        this.audioService.getVisualizer().stopVisualization()
+        this.miniPlayer.onAppBackgrounded()
       } else {
-        // App came to foreground — restart visualizer if playing
-        if (this.playerStore.isPlaying) {
-          setTimeout(() => {
-            const canvas = document.querySelector<HTMLCanvasElement>('#mp-ambient-canvas')
-            if (canvas) {
-              visualizer.startAmbientVisualization(
-                canvas, this.audioService.getVisualizer(), 0.9, true
-              )
-              canvas.classList.add('active')
-            }
-          }, 200)
-        }
+        // App came to foreground — restart ambient visualizers if playing
+        // (tiny delay so layout settles before RAF kicks in)
+        setTimeout(() => this.miniPlayer.onAppForegrounded(), 200)
       }
     })
   }
