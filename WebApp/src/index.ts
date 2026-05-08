@@ -7,7 +7,9 @@ import { FavoritesStore } from './store/FavoritesStore'
 import './components/Toast'
 import { Sidebar } from './components/Sidebar'
 import { PlayerBar } from './components/PlayerBar'
+import { TopBar } from './components/TopBar'
 import { initLogoErrorHandling } from './utils/stationLogo'
+import { initRevealOnScroll } from './utils/revealOnScroll'
 import { Container } from './infrastructure/di/Container'
 
 // flag-icons is heavy (540KB of CSS + 271 SVGs). Load it async after the
@@ -38,6 +40,7 @@ class App {
 
   private sidebar = new Sidebar({})
   private playerBar = new PlayerBar({})
+  private topBar = new TopBar({})
 
   private currentView: { unmount: () => void } | null = null
 
@@ -50,10 +53,15 @@ class App {
     await this.loadFavorites()
 
     await this.sidebar.mount('#sidebar')
+    await this.topBar.mount('#topbar')
     await this.playerBar.mount('#player-bar')
 
     this.registerRoutes()
     this.setupPlayerListeners()
+
+    // Reveal-on-scroll: opt-in fade/slide for elements with class `.reveal`.
+    // Plays at most once per element.
+    initRevealOnScroll()
 
     // Fire-and-forget: race the API mirrors in the background and switch
     // to the fastest one for all subsequent requests. Users on the same

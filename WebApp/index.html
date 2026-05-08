@@ -56,11 +56,16 @@
 
   <!-- Web-only perf overrides — layered last so they win -->
   <link rel="stylesheet" href="/src/styles/web-perf.css">
+  <link rel="stylesheet" href="/src/styles/landing-shell.css">
 </head>
 <body>
+  <!-- Ambient background mesh (static radial gradients) -->
+  <div class="bg-mesh" aria-hidden="true"></div>
+
   <div id="app">
     <aside class="app-sidebar" id="sidebar"></aside>
     <main class="app-main">
+      <div class="app-topbar-slot" id="topbar"></div>
       <div class="app-content" id="content"></div>
       <div class="app-player-bar" id="player-bar"></div>
     </main>

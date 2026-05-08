@@ -1,0 +1,528 @@
+/* ═══════════════════════════════════════════════════════════════
+   LANDING-INSPIRED APP SHELL
+
+   Brings the visual language of the public Landing page into the
+   running Web App: ambient background mesh, sticky top nav with
+   theme + accent pickers + download CTA, hero-style greetings,
+   reveal-on-scroll polish. Layered on top of the portable design
+   system so nothing else has to change.
+   ═══════════════════════════════════════════════════════════════ */
+
+
+/* ═══ 1 · Ambient background mesh ═══════════════════════════════
+
+   Three static radial gradients behind the whole app. Purely
+   decorative. No filters, no animation — the blur is baked into
+   the gradient falloff, so this costs essentially zero per frame.
+   Follows the current accent color via the --accent-soft* tokens,
+   so changing accent re-tints the whole backdrop automatically.
+*/
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 600px at 10% -10%, var(--accent-soft-md) 0%, transparent 60%),
+    radial-gradient(800px 500px at 100% 40%, rgba(88, 86, 214, 0.14) 0%, transparent 60%),
+    radial-gradient(900px 500px at 30% 110%, rgba(191, 90, 242, 0.10) 0%, transparent 60%);
+  transition: background 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+html[data-theme="dark"] .bg-mesh {
+  background:
+    radial-gradient(900px 600px at 10% -10%, var(--accent-soft) 0%, transparent 60%),
+    radial-gradient(800px 500px at 100% 40%, rgba(94, 92, 230, 0.14) 0%, transparent 60%),
+    radial-gradient(900px 500px at 30% 110%, rgba(191, 90, 242, 0.08) 0%, transparent 60%);
+}
+
+/* Keep the app shell above the mesh */
+#app {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+.app-main {
+  background: transparent;
+}
+
+
+/* ═══ 2 · Top bar ═══════════════════════════════════════════════
+
+   Thin sticky nav at the top of the main area, mirroring the
+   Landing navbar: translucent material, subtle scroll shadow,
+   theme toggle + accent picker + download CTA on the right.
+
+   Sits above the content but below any modal.
+*/
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-5);
+  gap: var(--space-4);
+  background: var(--material-bar);
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow   220ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Keep the top bar inside the rounded main area on macOS layout */
+  border-top-left-radius: var(--radius-2xl);
+  border-top-right-radius: var(--radius-2xl);
+  flex-shrink: 0;
+}
+
+@supports (backdrop-filter: blur(14px)) {
+  .app-topbar {
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+  }
+}
+
+.app-topbar.is-scrolled {
+  border-bottom-color: var(--border-subtle);
+  box-shadow: var(--shadow-xs);
+}
+
+.app-topbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: var(--weight-heavy);
+  color: var(--text-primary);
+  letter-spacing: -0.016em;
+  font-size: var(--text-lg);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.app-topbar-brand:hover {
+  background: var(--fill-quaternary);
+}
+
+.app-topbar-brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: block;
+  box-shadow: 0 4px 12px var(--accent-glow), var(--shadow-xs);
+  object-fit: cover;
+}
+
+.app-topbar-brand-text {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .app-topbar-brand-text { display: inline-flex; flex-direction: column; line-height: 1; }
+}
+
+.app-topbar-brand-name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-heavy);
+  letter-spacing: -0.018em;
+}
+
+.app-topbar-brand-tag {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.app-topbar-spacer {
+  flex: 1;
+}
+
+.app-topbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* ── 2a · Theme toggle ────────────────────────────────────────── */
+
+.app-topbar-icon-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--fill-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  border: 0;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-spring);
+}
+
+.app-topbar-icon-btn:hover {
+  background: var(--fill-secondary);
+}
+
+.app-topbar-icon-btn:active {
+  transform: scale(0.94);
+}
+
+.app-topbar-theme .icon-sun { display: none; }
+.app-topbar-theme .icon-moon { display: block; }
+html[data-theme="dark"] .app-topbar-theme .icon-sun { display: block; }
+html[data-theme="dark"] .app-topbar-theme .icon-moon { display: none; }
+
+
+/* ── 2b · Accent picker ──────────────────────────────────────── */
+
+.app-accent {
+  position: relative;
+}
+
+.app-accent-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--fill-tertiary);
+  cursor: pointer;
+  border: 0;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-spring);
+}
+
+.app-accent-btn:hover {
+  background: var(--fill-secondary);
+}
+
+.app-accent-btn:active {
+  transform: scale(0.94);
+}
+
+.app-accent-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow:
+    0 0 0 2px var(--bg-secondary),
+    0 0 12px var(--accent-glow);
+  display: inline-block;
+}
+
+.app-accent-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 8px;
+  min-width: 220px;
+  box-shadow: var(--shadow-xl);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  z-index: 100;
+  transform-origin: top right;
+  animation: popIn 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.app-accent-menu[hidden] {
+  display: none;
+}
+
+.app-accent-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.app-accent-menu button .app-accent-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sw, var(--accent-primary));
+  box-shadow:
+    0 0 0 1px var(--border-subtle),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.app-accent-menu button:hover {
+  background: var(--fill-tertiary);
+}
+
+.app-accent-menu button.is-current {
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+
+/* ── 2c · Download CTA ───────────────────────────────────────── */
+
+.app-topbar-cta {
+  display: none;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.004em;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  box-shadow:
+    0 6px 18px var(--accent-glow),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-spring),
+    box-shadow var(--transition-fast);
+}
+
+.app-topbar-cta:hover {
+  background: var(--accent-hover);
+  box-shadow:
+    0 8px 22px var(--accent-glow-lg),
+    0 2px 6px rgba(0, 0, 0, 0.10);
+  transform: translateY(-1px);
+}
+
+.app-topbar-cta:active {
+  transform: scale(0.97);
+}
+
+@media (min-width: 720px) {
+  .app-topbar-cta { display: inline-flex; }
+}
+
+
+/* ═══ 3 · Sidebar — integrate with the new top bar ═════════════
+
+   Originally the sidebar had a 38px top margin to clear the macOS
+   traffic-light drag bar. Now the top bar handles that space, so
+   drop the margin and keep a nice floating feel.
+*/
+.platform-web .app-sidebar {
+  margin: 10px 0 10px 10px;
+}
+
+
+/* ═══ 4 · Main area — round with the top bar ════════════════════ */
+
+.platform-web .app-main {
+  margin: 10px 10px 0 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+@supports (backdrop-filter: blur(14px)) {
+  .platform-web .app-main {
+    background: var(--material-thick);
+  }
+}
+
+/* The content no longer needs its own background — the main area
+   wraps it in a card. */
+.platform-web .app-content {
+  padding: var(--space-6) var(--space-8);
+}
+
+
+/* ═══ 5 · Player bar — sits flush with the card ═════════════════
+
+   With the main area wrapped as a card, the player bar should
+   sit inside the card without its own margin.
+*/
+.platform-web .app-player-bar {
+  padding: 0;
+}
+
+.platform-web .player-bar {
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: none;
+}
+
+
+/* ═══ 6 · Home greeting — hero-style gradient title ═════════════
+
+   The HomeView already renders an h1 "Good morning/afternoon/evening"
+   inside .home-greeting. Give it the Landing hero's gradient flourish
+   (dark-mode only — in light mode the solid color reads better).
+*/
+.home-greeting h1 {
+  font-size: clamp(2rem, 4vw, 2.875rem);
+  font-weight: var(--weight-heavy);
+  letter-spacing: -0.026em;
+  line-height: 1.05;
+  background: linear-gradient(
+    135deg,
+    var(--text-primary) 0%,
+    var(--accent-primary) 65%,
+    var(--accent-tertiary) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No change — the gradient is static, but keep the selector for clarity */
+}
+
+
+/* ═══ 7 · Section containers — Landing-style section-head ═══════
+
+   View headers now get a subtle "eyebrow" badge above their title,
+   matching the Landing page's section labels.
+*/
+.view-header .view-header-row h1 {
+  font-size: clamp(1.875rem, 3.4vw, 2.5rem);
+  font-weight: var(--weight-heavy);
+  letter-spacing: -0.024em;
+}
+
+
+/* ═══ 8 · Reveal on scroll ══════════════════════════════════════
+
+   Opt-in per element via a .reveal class. IntersectionObserver
+   toggles .is-visible.  Keeps the UI feeling alive without ever
+   animating more than once per element.
+*/
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 640ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 640ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+
+/* ═══ 9 · Small screens — keep the shell usable ═════════════════ */
+
+@media (max-width: 640px) {
+  .platform-web .app-sidebar {
+    margin: 8px 0 8px 8px;
+  }
+  .platform-web .app-main {
+    margin: 8px 8px 0 0;
+    border-radius: var(--radius-xl);
+  }
+  .app-topbar {
+    height: 52px;
+    padding: 0 var(--space-3);
+    border-top-left-radius: var(--radius-xl);
+    border-top-right-radius: var(--radius-xl);
+  }
+  .app-topbar-brand-tag {
+    display: none;
+  }
+}
+
+
+/* ═══ 10 · Hide redundant sidebar header on web ═════════════════
+
+   The new top bar shows the Aether brand and acts as the About
+   button. Keeping the sidebar-header visible would duplicate the
+   logo. Collapse it on web only — desktop keeps its original look.
+*/
+.platform-web .sidebar-header,
+.platform-web .sidebar-divider:first-of-type {
+  display: none;
+}
+
+/* With no header, the nav should sit at the top of the sidebar.
+   The nav already has top padding internally, so just trim the
+   big gap that the header used to fill. */
+.platform-web .sidebar-nav {
+  padding-top: var(--space-4);
+}
+
+
+/* ═══ 11 · Expanded player — full-viewport on web ═══════════════
+
+   On desktop (Electron) the overlay is absolutely positioned inside
+   .app-main, which itself fills the BrowserWindow. On the web we've
+   turned .app-main into a rounded floating card with margins, which
+   clips the overlay to a sub-rectangle of the viewport (see Issue
+   "expanded player not covering all the space vertically").
+
+   Fix: on web only, promote the overlay to fixed-position covering
+   the whole viewport. Also ignore the card's border-radius and
+   overflow:hidden so the overlay can escape.
+*/
+.platform-web .player-expanded-overlay {
+  position: fixed;
+  /* Anchor to the bottom so the collapse animation shrinks into the
+     player bar position — not into the top of the viewport. */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  height: var(--player-bar-height);
+  /* Sit above the sidebar (z:200), top bar (z:50), player bar (z:100) */
+  z-index: 400;
+  border-radius: 0;
+  /* Respect safe areas on mobile browsers with notches / home bars */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.platform-web .player-expanded-overlay.is-expanded {
+  height: 100vh;
+  /* 100dvh is better on mobile browsers with dynamic URL/tab bars */
+  height: 100dvh;
+}
