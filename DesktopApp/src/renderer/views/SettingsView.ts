@@ -3,7 +3,7 @@ import { BridgeService } from '../services/BridgeService'
 import { EventBus } from '../store/EventBus'
 import { FavoritesStore } from '../store/FavoritesStore'
 import { ConfirmModal } from '../components/ConfirmModal'
-import type { AppSettings, Theme } from '../../domain/entities/AppSettings'
+import type { AppSettings, Theme, AccentColor } from '../../domain/entities/AppSettings'
 import type { AppInfo } from '../../main/ipc/handlers/WindowIpcHandler'
 
 const REPO_OWNER  = 'MbarkT3STO'
@@ -109,6 +109,16 @@ export class SettingsView extends BaseComponent {
               <button class="stg-toggle-btn ${s.theme === 'light' ? 'active' : ''}" data-theme="light">
                 ${this.iconSunSmall()} Light
               </button>
+            </div>
+          </div>
+
+          <div class="stg-row stg-row--stacked">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Accent Color</div>
+              <div class="stg-row-desc">Tint buttons, highlights, and controls</div>
+            </div>
+            <div class="stg-accent-swatches" role="radiogroup" aria-label="Accent color">
+              ${this.renderAccentSwatches(s.accentColor ?? 'blue')}
             </div>
           </div>
         </div>
@@ -334,6 +344,41 @@ export class SettingsView extends BaseComponent {
     return div.innerHTML
   }
 
+  // ── Accent color palette ───────────────────────────────────
+  private static readonly ACCENTS: Array<{ id: AccentColor; label: string; light: string; dark: string }> = [
+    { id: 'blue',         label: 'Blue',         light: '#007AFF', dark: '#0A84FF' },
+    { id: 'indigo',       label: 'Indigo',       light: '#5856D6', dark: '#5E5CE6' },
+    { id: 'royal-purple', label: 'Royal Purple', light: '#7C3AED', dark: '#A78BFA' },
+    { id: 'purple',       label: 'Purple',       light: '#AF52DE', dark: '#BF5AF2' },
+    { id: 'pink',         label: 'Pink',         light: '#FF2D55', dark: '#FF375F' },
+    { id: 'orange',       label: 'Orange',       light: '#FF9500', dark: '#FF9F0A' },
+    { id: 'green',        label: 'Green',        light: '#34C759', dark: '#30D158' },
+    { id: 'teal',         label: 'Teal',         light: '#30B0C7', dark: '#40C8E0' },
+  ]
+
+  private renderAccentSwatches(current: AccentColor): string {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    return SettingsView.ACCENTS.map(a => {
+      const color = isDark ? a.dark : a.light
+      const active = a.id === current ? 'active' : ''
+      return `
+        <button type="button"
+                class="stg-accent-swatch ${active}"
+                data-accent="${a.id}"
+                role="radio"
+                aria-checked="${a.id === current}"
+                aria-label="${this.esc(a.label)}"
+                title="${this.esc(a.label)}"
+                style="--sw: ${color}">
+          <span class="stg-accent-swatch-dot"></span>
+          <span class="stg-accent-swatch-check">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+          </span>
+        </button>
+      `
+    }).join('')
+  }
+
   private renderShortcutsCard(): string {
     const shortcuts: Array<{ keys: string[]; action: string }> = [
       { keys: ['Space'],            action: 'Play / Pause' },
@@ -367,8 +412,8 @@ export class SettingsView extends BaseComponent {
       this.on(btn, 'click', async () => {
         const theme = btn.getAttribute('data-theme') as Theme
         if (this.settings?.theme === theme) return
-        await this.applyUpdate({ theme })
         document.documentElement.setAttribute('data-theme', theme)
+        await this.applyUpdate({ theme })
         this.eventBus.emit('theme:changed', { theme })
       })
     })
@@ -380,6 +425,16 @@ export class SettingsView extends BaseComponent {
         if (this.settings?.bufferSize === bufferSize) return
         await this.applyUpdate({ bufferSize })
         this.eventBus.emit('settings:buffer-changed', { bufferSize })
+      })
+    })
+
+    // Accent color swatches
+    this.querySelectorAll<HTMLElement>('.stg-accent-swatch').forEach(btn => {
+      this.on(btn, 'click', async () => {
+        const accent = btn.getAttribute('data-accent') as AccentColor | null
+        if (!accent || this.settings?.accentColor === accent) return
+        document.documentElement.setAttribute('data-accent', accent)
+        await this.applyUpdate({ accentColor: accent })
       })
     })
 

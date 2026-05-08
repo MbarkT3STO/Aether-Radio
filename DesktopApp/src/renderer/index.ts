@@ -76,8 +76,9 @@ class App {
   private async loadSettings(): Promise<void> {
     const result = await this.bridge.settings.get()
     if (result.success) {
-      const { theme, volume, bufferSize } = result.data
+      const { theme, volume, bufferSize, accentColor } = result.data
       document.documentElement.setAttribute('data-theme', theme)
+      document.documentElement.setAttribute('data-accent', accentColor ?? 'blue')
       this.playerStore.setVolume(volume)
       this.audioService.setBufferSize(bufferSize)
     }
