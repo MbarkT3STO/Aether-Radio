@@ -267,6 +267,35 @@
   display: block;
 }
 
+/* Developer avatar — local silhouette fallback for offline use */
+.stg-about-logo-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+  z-index: 0;
+}
+
+.stg-about-logo-fallback svg {
+  width: 50%;
+  height: 50%;
+  opacity: 0.75;
+}
+
+/* When the remote avatar loads it sits above the fallback; if it fails
+   (offline), the --offline class hides the img so the silhouette stays. */
+.stg-about-logo--dev .stg-about-logo-img {
+  position: relative;
+  z-index: 1;
+}
+
+.stg-about-logo--dev.stg-about-logo--offline .stg-about-logo-img {
+  display: none;
+}
+
 .stg-about-name {
   font-family: var(--font-display);
   font-size: var(--text-base);
@@ -274,6 +303,10 @@
   color: var(--text-primary);
   letter-spacing: -0.012em;
   margin-bottom: 2px;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .stg-about-version {
