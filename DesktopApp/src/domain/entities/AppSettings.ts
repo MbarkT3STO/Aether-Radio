@@ -8,9 +8,13 @@ export type AccentColor =
   | 'royal-purple'  // Rich violet (the app's original purple)
   | 'purple'        // Apple systemPurple
   | 'pink'          // Apple systemPink
+  | 'red'           // Apple systemRed
   | 'orange'        // Apple systemOrange
   | 'green'         // Apple systemGreen
+  | 'mint'          // Apple systemMint
   | 'teal'          // Apple systemTeal
+  | 'cyan'          // Apple systemCyan
+  | 'graphite'      // Refined neutral (classic macOS Graphite)
 
 export interface AppSettings {
   theme: Theme

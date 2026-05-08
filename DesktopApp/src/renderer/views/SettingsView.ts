@@ -351,9 +351,13 @@ export class SettingsView extends BaseComponent {
     { id: 'royal-purple', label: 'Royal Purple', light: '#7C3AED', dark: '#A78BFA' },
     { id: 'purple',       label: 'Purple',       light: '#AF52DE', dark: '#BF5AF2' },
     { id: 'pink',         label: 'Pink',         light: '#FF2D55', dark: '#FF375F' },
+    { id: 'red',          label: 'Red',          light: '#FF3B30', dark: '#FF453A' },
     { id: 'orange',       label: 'Orange',       light: '#FF9500', dark: '#FF9F0A' },
     { id: 'green',        label: 'Green',        light: '#34C759', dark: '#30D158' },
+    { id: 'mint',         label: 'Mint',         light: '#00C7BE', dark: '#63E6E2' },
     { id: 'teal',         label: 'Teal',         light: '#30B0C7', dark: '#40C8E0' },
+    { id: 'cyan',         label: 'Cyan',         light: '#32ADE6', dark: '#64D2FF' },
+    { id: 'graphite',     label: 'Graphite',     light: '#6E6E73', dark: '#AEAEB2' },
   ]
 
   private renderAccentSwatches(current: AccentColor): string {
