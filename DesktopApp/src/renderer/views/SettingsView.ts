@@ -4,15 +4,27 @@ import { EventBus } from '../store/EventBus'
 import { FavoritesStore } from '../store/FavoritesStore'
 import { ConfirmModal } from '../components/ConfirmModal'
 import type { AppSettings, Theme } from '../../domain/entities/AppSettings'
+import type { AppInfo } from '../../main/ipc/handlers/WindowIpcHandler'
+
+const REPO_OWNER  = 'MbarkT3STO'
+const REPO_NAME   = 'Aether-Radio'
+const REPO_URL    = `https://github.com/${REPO_OWNER}/${REPO_NAME}`
+const ISSUES_URL  = `${REPO_URL}/issues`
+const RELEASES_URL = `${REPO_URL}/releases`
+const DEV_URL     = `https://github.com/${REPO_OWNER}`
+const DEV_NAME    = 'MBVRK'
+const FUND_URL    = 'https://liberapay.com/MBVRK/'
+const WEBSITE_URL = 'https://www.radio-browser.info'
 
 export class SettingsView extends BaseComponent {
   private bridge         = BridgeService.getInstance()
   private eventBus       = EventBus.getInstance()
   private favoritesStore = FavoritesStore.getInstance()
   private settings: AppSettings | null = null
+  private appInfo: AppInfo | null = null
 
   protected async afterMount(): Promise<void> {
-    await this.loadSettings()
+    await Promise.all([this.loadSettings(), this.loadAppInfo()])
   }
 
   private async loadSettings(): Promise<void> {
@@ -20,6 +32,15 @@ export class SettingsView extends BaseComponent {
     if (result.success) {
       this.settings = result.data
       await this.renderContent()
+    }
+  }
+
+  private async loadAppInfo(): Promise<void> {
+    try {
+      this.appInfo = await window.electronAPI.getAppInfo()
+      await this.renderContent()
+    } catch {
+      this.appInfo = null
     }
   }
 
@@ -146,37 +167,171 @@ export class SettingsView extends BaseComponent {
         </div>
 
         <!-- ── About ── -->
-        <div class="stg-card">
-          <div class="stg-card-header">
-            <div class="stg-card-icon">${this.iconInfo()}</div>
-            <div>
-              <div class="stg-card-title">About</div>
-              <div class="stg-card-sub">App information</div>
-            </div>
-          </div>
-          <div class="stg-about">
-            <div class="stg-about-logo">
-              <img src="./assets/logo.png" alt="Aether Radio" class="stg-about-logo-img">
-            </div>
-            <div>
-              <div class="stg-about-name">Aether Radio</div>
-              <div class="stg-about-version">Version 1.1.0 · Radio Browser API</div>
-            </div>
-          </div>
-          <div class="stg-divider"></div>
-          <div class="stg-row">
-            <div class="stg-row-info">
-              <div class="stg-row-label">Data Source</div>
-              <div class="stg-row-desc">Community-driven radio station database</div>
-            </div>
-            <span class="stg-data-source-link" id="stg-data-source-link" role="link" tabindex="0">radio-browser.info</span>
-          </div>
-        </div>
+        ${this.renderAboutCard()}
+
+        <!-- ── Repository ── -->
+        ${this.renderRepositoryCard()}
+
+        <!-- ── Developer ── -->
+        ${this.renderDeveloperCard()}
 
       </div>
     `
 
     this.attachListeners()
+  }
+
+  private renderAboutCard(): string {
+    const info = this.appInfo
+    return `
+      <div class="stg-card">
+        <div class="stg-card-header">
+          <div class="stg-card-icon">${this.iconInfo()}</div>
+          <div>
+            <div class="stg-card-title">About</div>
+            <div class="stg-card-sub">About this project</div>
+          </div>
+        </div>
+
+        <!-- Hero -->
+        <div class="stg-about">
+          <div class="stg-about-logo">
+            <img src="./assets/logo.png" alt="Aether Radio" class="stg-about-logo-img">
+          </div>
+          <div>
+            <div class="stg-about-name">
+              Aether Radio
+              <span class="am-version-badge" style="margin-left:8px;">v${info?.version ?? '1.1.0'}</span>
+            </div>
+            <div class="stg-about-version">World radio, reimagined</div>
+          </div>
+        </div>
+
+        <div class="stg-divider"></div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">Description</div>
+            <div class="stg-row-desc">
+              A modern desktop radio player that streams over 30,000 stations
+              from around the world.
+            </div>
+          </div>
+        </div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">Version</div>
+            <div class="stg-row-desc">Released 2026</div>
+          </div>
+          <span class="stg-data-source-link" style="cursor:default;">${this.esc(info?.version ?? '1.1.0')}</span>
+        </div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">License</div>
+            <div class="stg-row-desc">Free and open source</div>
+          </div>
+          <span class="stg-data-source-link" style="cursor:default;">MIT</span>
+        </div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">Data Source</div>
+            <div class="stg-row-desc">Community-driven radio station database</div>
+          </div>
+          <span class="stg-data-source-link" id="stg-data-source-link" role="link" tabindex="0">radio-browser.info</span>
+        </div>
+      </div>
+    `
+  }
+
+  private renderRepositoryCard(): string {
+    return `
+      <div class="stg-card">
+        <div class="stg-card-header">
+          <div class="stg-card-icon">${this.iconGitHub()}</div>
+          <div>
+            <div class="stg-card-title">Repository</div>
+            <div class="stg-card-sub">Source code and contributions</div>
+          </div>
+        </div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">GitHub</div>
+            <div class="stg-row-desc">${this.esc(REPO_OWNER)} / ${this.esc(REPO_NAME)}</div>
+          </div>
+          <button class="stg-action-btn" id="stg-open-repo">Open</button>
+        </div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">Report an Issue</div>
+            <div class="stg-row-desc">Bugs, feedback, and feature requests</div>
+          </div>
+          <button class="stg-action-btn" id="stg-report-issue">Report</button>
+        </div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">Releases</div>
+            <div class="stg-row-desc">Download previous builds and view the changelog</div>
+          </div>
+          <button class="stg-action-btn" id="stg-open-releases">View</button>
+        </div>
+      </div>
+    `
+  }
+
+  private renderDeveloperCard(): string {
+    const avatar = `https://github.com/${REPO_OWNER}.png?size=120`
+    return `
+      <div class="stg-card">
+        <div class="stg-card-header">
+          <div class="stg-card-icon">${this.iconUser()}</div>
+          <div>
+            <div class="stg-card-title">Developer</div>
+            <div class="stg-card-sub">The maker behind Aether Radio</div>
+          </div>
+        </div>
+
+        <div class="stg-about">
+          <div class="stg-about-logo">
+            <img src="${avatar}" alt="${this.esc(DEV_NAME)}" class="stg-about-logo-img"
+                 onerror="this.style.display='none'">
+          </div>
+          <div>
+            <div class="stg-about-name">${this.esc(DEV_NAME)}</div>
+            <div class="stg-about-version">Independent developer · Open source enthusiast</div>
+          </div>
+        </div>
+
+        <div class="stg-divider"></div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">GitHub Profile</div>
+            <div class="stg-row-desc">View all public repositories</div>
+          </div>
+          <button class="stg-action-btn" id="stg-open-dev">Visit</button>
+        </div>
+
+        <div class="stg-row">
+          <div class="stg-row-info">
+            <div class="stg-row-label">Support Development</div>
+            <div class="stg-row-desc">Fund ongoing work via Liberapay</div>
+          </div>
+          <button class="stg-action-btn" id="stg-sponsor">Donate</button>
+        </div>
+      </div>
+    `
+  }
+
+  private esc(s: string): string {
+    const div = document.createElement('div')
+    div.textContent = s
+    return div.innerHTML
   }
 
   private renderShortcutsCard(): string {
@@ -296,11 +451,51 @@ export class SettingsView extends BaseComponent {
       })
     }
 
-    // Data source link
+    // Data source link (radio-browser)
     const dsLink = this.querySelector<HTMLElement>('#stg-data-source-link')
     if (dsLink) {
       this.on(dsLink, 'click', () => {
-        window.electronAPI.openExternal('https://www.radio-browser.info')
+        window.electronAPI.openExternal(WEBSITE_URL)
+      })
+    }
+
+    // Repository — open
+    const repoBtn = this.querySelector<HTMLElement>('#stg-open-repo')
+    if (repoBtn) {
+      this.on(repoBtn, 'click', () => {
+        window.electronAPI.openExternal(REPO_URL)
+      })
+    }
+
+    // Report issue
+    const reportBtn = this.querySelector<HTMLElement>('#stg-report-issue')
+    if (reportBtn) {
+      this.on(reportBtn, 'click', () => {
+        window.electronAPI.openExternal(ISSUES_URL)
+      })
+    }
+
+    // Releases
+    const releasesBtn = this.querySelector<HTMLElement>('#stg-open-releases')
+    if (releasesBtn) {
+      this.on(releasesBtn, 'click', () => {
+        window.electronAPI.openExternal(RELEASES_URL)
+      })
+    }
+
+    // Developer — profile
+    const devBtn = this.querySelector<HTMLElement>('#stg-open-dev')
+    if (devBtn) {
+      this.on(devBtn, 'click', () => {
+        window.electronAPI.openExternal(DEV_URL)
+      })
+    }
+
+    // Sponsor — Liberapay
+    const sponsorBtn = this.querySelector<HTMLElement>('#stg-sponsor')
+    if (sponsorBtn) {
+      this.on(sponsorBtn, 'click', () => {
+        window.electronAPI.openExternal(FUND_URL)
       })
     }
   }
@@ -346,5 +541,13 @@ export class SettingsView extends BaseComponent {
 
   private iconDatabase(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`
+  }
+
+  private iconGitHub(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.25 2.87.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.29 0 .32.22.7.82.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5Z"/></svg>`
+  }
+
+  private iconUser(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
   }
 }

@@ -10,6 +10,7 @@ import type { Result } from '../application/Result'
 import type { Country } from '../domain/value-objects/Country'
 import type { Genre } from '../domain/value-objects/Genre'
 import type { RecognitionResult } from '../main/ipc/handlers/RecognitionIpcHandler'
+import type { AppInfo } from '../main/ipc/handlers/WindowIpcHandler'
 
 export interface ElectronAPI {
   // Radio
@@ -56,6 +57,10 @@ export interface ElectronAPI {
 
   // Shell
   openExternal: (url: string) => void
+  showLogFolder: () => void
+
+  // App info
+  getAppInfo: () => Promise<AppInfo>
 
   // Song recognition
   recognizeSong: (streamUrl: string) => Promise<{ success: boolean; data?: RecognitionResult; error?: string }>
@@ -119,6 +124,10 @@ const electronAPI: ElectronAPI = {
 
   // Shell
   openExternal: (url) => ipcRenderer.send('shell:openExternal', url),
+  showLogFolder: () => ipcRenderer.send('shell:showLogFolder'),
+
+  // App info
+  getAppInfo: () => ipcRenderer.invoke('app:getInfo'),
 
   // Song recognition
   recognizeSong: (streamUrl) => ipcRenderer.invoke('recognition:recognize', streamUrl),
