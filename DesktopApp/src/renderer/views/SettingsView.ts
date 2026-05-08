@@ -1,11 +1,14 @@
 import { BaseComponent } from '../components/base/BaseComponent'
 import { BridgeService } from '../services/BridgeService'
 import { EventBus } from '../store/EventBus'
+import { FavoritesStore } from '../store/FavoritesStore'
+import { ConfirmModal } from '../components/ConfirmModal'
 import type { AppSettings, Theme } from '../../domain/entities/AppSettings'
 
 export class SettingsView extends BaseComponent {
-  private bridge   = BridgeService.getInstance()
-  private eventBus = EventBus.getInstance()
+  private bridge         = BridgeService.getInstance()
+  private eventBus       = EventBus.getInstance()
+  private favoritesStore = FavoritesStore.getInstance()
   private settings: AppSettings | null = null
 
   protected async afterMount(): Promise<void> {
@@ -166,7 +169,7 @@ export class SettingsView extends BaseComponent {
               <div class="stg-row-label">Data Source</div>
               <div class="stg-row-desc">Community-driven radio station database</div>
             </div>
-            <span class="stg-data-source-link">radio-browser.info</span>
+            <span class="stg-data-source-link" id="stg-data-source-link" role="link" tabindex="0">radio-browser.info</span>
           </div>
         </div>
 
@@ -208,6 +211,7 @@ export class SettingsView extends BaseComponent {
     this.querySelectorAll('.stg-toggle-btn[data-theme]').forEach(btn => {
       this.on(btn, 'click', async () => {
         const theme = btn.getAttribute('data-theme') as Theme
+        if (this.settings?.theme === theme) return
         await this.applyUpdate({ theme })
         document.documentElement.setAttribute('data-theme', theme)
         this.eventBus.emit('theme:changed', { theme })
@@ -218,6 +222,7 @@ export class SettingsView extends BaseComponent {
     this.querySelectorAll('.stg-toggle-btn[data-buffer]').forEach(btn => {
       this.on(btn, 'click', async () => {
         const bufferSize = btn.getAttribute('data-buffer') as 'low' | 'balanced' | 'high'
+        if (this.settings?.bufferSize === bufferSize) return
         await this.applyUpdate({ bufferSize })
         this.eventBus.emit('settings:buffer-changed', { bufferSize })
       })
@@ -229,7 +234,14 @@ export class SettingsView extends BaseComponent {
       this.on(exportBtn, 'click', async () => {
         const result = await this.bridge.favorites.export()
         if (result.success) {
-          this.showToast(`Exported ${result.data} favorite${result.data !== 1 ? 's' : ''}`, 'success')
+          const n = result.data
+          if (n === 0) {
+            this.showToast('No favorites to export', 'info')
+          } else {
+            this.showToast(`Exported ${n} favorite${n !== 1 ? 's' : ''}`, 'success')
+          }
+        } else if (result.error.code !== 'CANCELLED') {
+          this.showToast('Export failed', 'error')
         }
       })
     }
@@ -240,19 +252,55 @@ export class SettingsView extends BaseComponent {
       this.on(importBtn, 'click', async () => {
         const result = await this.bridge.favorites.import()
         if (result.success) {
-          this.showToast(`Imported ${result.data} favorite${result.data !== 1 ? 's' : ''}`, 'success')
+          const n = result.data
+          // Refresh the shared store so every view reflects the import
+          const fresh = await this.bridge.favorites.getAll()
+          if (fresh.success) this.favoritesStore.setFavorites(fresh.data)
+          this.showToast(
+            n > 0
+              ? `Imported ${n} favorite${n !== 1 ? 's' : ''}`
+              : 'No new favorites imported',
+            n > 0 ? 'success' : 'info'
+          )
+        } else if (result.error.code !== 'CANCELLED') {
+          this.showToast('Import failed — invalid file', 'error')
         }
       })
     }
 
-    // Clear history
+    // Clear history (with confirmation)
     const clearHistoryBtn = this.querySelector<HTMLElement>('#stg-clear-history')
     if (clearHistoryBtn) {
       this.on(clearHistoryBtn, 'click', async () => {
+        const confirmed = await ConfirmModal.show({
+          title: 'Clear Play History',
+          message: 'All recently played stations will be permanently removed. This cannot be undone.',
+          confirmLabel: 'Clear History',
+          cancelLabel: 'Keep it',
+          danger: true,
+          icon: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="1.75"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/><path d="M8 6V4h8v2"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+          </svg>`
+        })
+        if (!confirmed) return
         const result = await this.bridge.history.clear()
         if (result.success) {
           this.showToast('Play history cleared', 'success')
+        } else {
+          this.showToast('Failed to clear history', 'error')
         }
+      })
+    }
+
+    // Data source link
+    const dsLink = this.querySelector<HTMLElement>('#stg-data-source-link')
+    if (dsLink) {
+      this.on(dsLink, 'click', () => {
+        window.electronAPI.openExternal('https://www.radio-browser.info')
       })
     }
   }
