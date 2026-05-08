@@ -17,6 +17,18 @@ export class MultiSourceStationRepository implements IStationRepository {
     this.apiClients = apiBaseUrls.map(url => new RadioBrowserApiClient(url))
   }
 
+  /**
+   * Replace the mirror list with a new ordering (e.g. after a latency race).
+   * The current active index resets to 0 so subsequent calls hit the
+   * newly-preferred mirror first. Called by the Container at startup after
+   * the latency probe completes.
+   */
+  setMirrors(apiBaseUrls: string[]): void {
+    if (apiBaseUrls.length === 0) return
+    this.apiClients = apiBaseUrls.map(url => new RadioBrowserApiClient(url))
+    this.activeClientIndex = 0
+  }
+
   // ── Primary-with-failover helper ──────────────────────────────────────────
 
   /**

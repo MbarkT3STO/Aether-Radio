@@ -3,6 +3,7 @@ import { WebHistoryRepository } from '../repositories/WebHistoryRepository'
 import { WebSettingsRepository } from '../repositories/WebSettingsRepository'
 import { WebCustomStationsRepository } from '../repositories/WebCustomStationsRepository'
 import { MultiSourceStationRepository } from '../repositories/MultiSourceStationRepository'
+import { rankMirrorsByLatency } from '../api/mirrorRace'
 import { SearchStationsUseCase } from '../../application/use-cases/radio/SearchStationsUseCase'
 import { GetTopStationsUseCase } from '../../application/use-cases/radio/GetTopStationsUseCase'
 import { GetStationsByCountryUseCase } from '../../application/use-cases/radio/GetStationsByCountryUseCase'
@@ -95,6 +96,39 @@ export class Container {
   static getInstance(): Container {
     if (!Container.instance) Container.instance = new Container()
     return Container.instance
+  }
+
+  /**
+   * Kick off a latency race across all known Radio Browser mirrors and
+   * re-order the active list once the results arrive. Safe to call
+   * multiple times — the race runs at most once every 10 minutes and
+   * the result is cached in sessionStorage so route changes don't repeat it.
+   */
+  static async optimizeMirrors(): Promise<void> {
+    const CACHE_KEY = 'aether:mirror-order'
+    const CACHE_TTL_MS = 10 * 60 * 1000
+
+    // Read any cached ordering from this tab's session
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as { at: number; order: string[] }
+        if (parsed && Date.now() - parsed.at < CACHE_TTL_MS && Array.isArray(parsed.order)) {
+          Container.getInstance()._stationRepo.setMirrors(parsed.order)
+          return
+        }
+      }
+    } catch {
+      // ignore cache errors
+    }
+
+    const ranked = await rankMirrorsByLatency()
+    Container.getInstance()._stationRepo.setMirrors(ranked)
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), order: ranked }))
+    } catch {
+      // ignore quota errors
+    }
   }
 
   get searchStationsUseCase() { return this._searchStationsUseCase }

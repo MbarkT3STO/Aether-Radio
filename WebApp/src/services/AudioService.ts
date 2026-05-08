@@ -1,7 +1,7 @@
 import { EventBus } from '../store/EventBus'
 import { PlayerStore } from '../store/PlayerStore'
 import type { RadioStation } from '../domain/entities/RadioStation'
-import { proxiedStreamUrl } from '../utils/streamProxy'
+import { directStreamUrl, needsProxy, proxiedStreamUrl } from '../utils/streamProxy'
 
 const MAX_RETRIES = 3
 const RETRY_DELAY_MS = 2000
@@ -9,25 +9,33 @@ const RETRY_DELAY_MS = 2000
 /**
  * AudioService — manages the single <audio> element used for playback.
  *
- * Web notes (differs from Electron):
- *  • Streams are routed through /api/stream so the audio element can set
- *    crossOrigin='anonymous' without tripping CORS on upstream Icecast
- *    servers. This is required for the visualizer and recognition to tap
- *    PCM from the AudioContext.
- *  • MediaSession is the only OS-level "now playing" hook available in the
- *    browser. It surfaces controls on mobile lockscreens and macOS Now
- *    Playing widgets.
- *  • A Wake Lock is acquired when the tab is visible + playing so the OS
- *    does not throttle audio when the screen dims on mobile devices.
+ * Playback strategy on the web:
+ *  1. First attempt: load the station's upstream URL directly. Most
+ *     stations that work in browsers already serve proper CORS headers,
+ *     and hitting the origin CDN is far faster than proxying every byte
+ *     through our Netlify Edge Function.
+ *  2. If the <audio> element errors on load (CORS, connection, mixed
+ *     content), retry once via `/api/stream` so the edge function can
+ *     relay with permissive headers.
+ *  3. After that, do the original exponential-backoff retry dance.
+ *
+ * For the visualizer/recognition to tap the audio graph, the element must
+ * be `crossOrigin='anonymous'` AND the response must have CORS headers.
+ * Direct streams usually satisfy both; the proxy always does.
  */
 export class AudioService {
   private static instance: AudioService
   private audio: HTMLAudioElement
+  // Kept for future use; currently no inbound events on this service.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private eventBus = EventBus.getInstance()
   private playerStore = PlayerStore.getInstance()
   private retryCount = 0
   private currentStationId: string | null = null
   private _onPlayStarted: ((audio: HTMLAudioElement) => Promise<void>) | null = null
+
+  /** True when the current <audio> src is the /api/stream proxy URL. */
+  private usingProxy = false
 
   // Screen Wake Lock — best effort; not all browsers support it.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,11 +67,16 @@ export class AudioService {
   async play(station: RadioStation): Promise<void> {
     this.currentStationId = station.id
     this.retryCount = 0
+    this.usingProxy = false
     this.playerStore.setLoading(true)
 
+    const upstream = station.urlResolved || station.url
+    // Always proxy HTTP streams when running on HTTPS (mixed content).
+    const startUrl = needsProxy(upstream) ? proxiedStreamUrl(upstream) : directStreamUrl(upstream)
+    this.usingProxy = needsProxy(upstream)
+
     try {
-      const upstream = station.urlResolved || station.url
-      this.audio.src = proxiedStreamUrl(upstream)
+      this.audio.src = startUrl
       this.audio.volume = this.playerStore.volume
       await this.audio.play()
       if (this._onPlayStarted) {
@@ -73,8 +86,8 @@ export class AudioService {
       this.updateMediaSession(station)
       this.requestWakeLock()
     } catch (error) {
-      console.error('Playback error:', error)
-      await this.handlePlaybackError(station)
+      console.warn('Playback error (first attempt):', error)
+      await this.handlePlaybackError(station, upstream)
     }
   }
 
@@ -90,6 +103,7 @@ export class AudioService {
     this.audio.pause()
     this.audio.src = ''
     this.currentStationId = null
+    this.usingProxy = false
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = null
       navigator.mediaSession.playbackState = 'none'
@@ -121,7 +135,8 @@ export class AudioService {
     this.audio.addEventListener('error', () => {
       const station = this.playerStore.currentStation
       if (station && this.currentStationId === station.id) {
-        this.handlePlaybackError(station)
+        const upstream = station.urlResolved || station.url
+        this.handlePlaybackError(station, upstream)
       }
     })
 
@@ -140,8 +155,8 @@ export class AudioService {
   }
 
   /**
-   * Reacquire wake lock when the tab becomes visible again — the OS releases
-   * it automatically on visibility change.
+   * Reacquire wake lock when the tab becomes visible again — the OS
+   * releases it automatically on visibility change.
    */
   private setupVisibilityHandler(): void {
     document.addEventListener('visibilitychange', () => {
@@ -197,13 +212,41 @@ export class AudioService {
     this.wakeLock = null
   }
 
-  private async handlePlaybackError(station: RadioStation): Promise<void> {
+  /**
+   * Retry strategy:
+   *  • If we tried direct and failed → switch to proxy (CORS fix).
+   *  • If we tried proxy and failed → exponential backoff up to MAX_RETRIES.
+   */
+  private async handlePlaybackError(station: RadioStation, upstream: string): Promise<void> {
+    // First-time failover: direct → proxy
+    if (!this.usingProxy && this.retryCount === 0) {
+      this.usingProxy = true
+      try {
+        this.audio.src = proxiedStreamUrl(upstream)
+        await this.audio.play()
+        this.playerStore.setLoading(false)
+        this.updateMediaSession(station)
+        this.requestWakeLock()
+        return
+      } catch (err) {
+        console.warn('Playback error (proxy fallback):', err)
+        // fall through to backoff retry
+      }
+    }
+
     if (this.retryCount < MAX_RETRIES) {
       this.retryCount++
       const delay = RETRY_DELAY_MS * Math.pow(2, this.retryCount - 1)
       await new Promise(resolve => setTimeout(resolve, delay))
       if (this.currentStationId === station.id) {
-        await this.play(station)
+        // Retries always use the proxy since direct has already failed
+        try {
+          this.audio.src = proxiedStreamUrl(upstream)
+          await this.audio.play()
+          this.playerStore.setLoading(false)
+        } catch {
+          await this.handlePlaybackError(station, upstream)
+        }
       }
     } else {
       this.playerStore.error('Failed to play station after multiple attempts')

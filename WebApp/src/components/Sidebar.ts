@@ -4,6 +4,23 @@ import { EventBus } from '../store/EventBus'
 import { AboutModal } from './AboutModal'
 import { LOGO_URL } from '../utils/assets'
 
+/**
+ * Fire a prefetch for the view chunk that corresponds to `route`.
+ * Called on nav hover so clicking feels instant.
+ */
+function prefetchViewChunk(route: string): void {
+  switch (route) {
+    case '/':          void import('../views/HomeView'); break
+    case '/featured':  void import('../views/FeaturedView'); break
+    case '/explore':   void import('../views/ExploreView'); break
+    case '/search':    void import('../views/SearchView'); break
+    case '/favorites': void import('../views/FavoritesView'); break
+    case '/history':   void import('../views/HistoryView'); break
+    case '/custom':    void import('../views/CustomStationsView'); break
+    case '/settings':  void import('../views/SettingsView'); break
+  }
+}
+
 interface NavItem { route: string; label: string; icon: string }
 
 const NAV_ITEMS: NavItem[] = [
@@ -134,6 +151,11 @@ export class Sidebar extends BaseComponent {
         const rect = (item as HTMLElement).getBoundingClientRect()
         const midY = rect.top + rect.height / 2;
         (item as HTMLElement).style.setProperty('--tooltip-y', `${midY}px`)
+
+        // Warm up the target view's JS chunk so the click-to-render path
+        // is instant. Safe to call repeatedly — the module loader caches.
+        const route = item.getAttribute('data-route')
+        if (route) prefetchViewChunk(route)
       })
     })
 

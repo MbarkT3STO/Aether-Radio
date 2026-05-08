@@ -8,6 +8,7 @@ import './components/Toast'
 import { Sidebar } from './components/Sidebar'
 import { PlayerBar } from './components/PlayerBar'
 import { initLogoErrorHandling } from './utils/stationLogo'
+import { Container } from './infrastructure/di/Container'
 
 // flag-icons is heavy (540KB of CSS + 271 SVGs). Load it async after the
 // shell is painted so it doesn't block first paint / layout of the UI.
@@ -53,6 +54,11 @@ class App {
 
     this.registerRoutes()
     this.setupPlayerListeners()
+
+    // Fire-and-forget: race the API mirrors in the background and switch
+    // to the fastest one for all subsequent requests. Users on the same
+    // continent as the fastest mirror save 150-300 ms on every API call.
+    Container.optimizeMirrors().catch(() => { /* ignore — failover handles it */ })
 
     // Once the app is idle, drop the will-change hints the perf CSS sets.
     // Keeping will-change on forever costs memory on Safari/iOS — once cards

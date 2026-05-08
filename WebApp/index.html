@@ -6,8 +6,19 @@
   <meta name="theme-color" content="#0A0A0F" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)">
   <meta name="description" content="Aether Radio — stream thousands of radio stations from around the world in your browser.">
+  <meta name="color-scheme" content="dark light">
+
   <link rel="icon" type="image/png" href="/favicon.png">
   <title>Aether Radio</title>
+
+  <!-- ── Preconnect hints ──────────────────────────────────────────────
+       Open a TCP + TLS handshake to the Radio Browser mirrors in parallel
+       with the initial render so the first API call doesn't pay connection
+       setup cost. We include all three; whichever the mirror-race picks
+       will have a warm connection ready. -->
+  <link rel="preconnect" href="https://de1.api.radio-browser.info" crossorigin>
+  <link rel="preconnect" href="https://nl1.api.radio-browser.info" crossorigin>
+  <link rel="preconnect" href="https://at1.api.radio-browser.info" crossorigin>
 
   <!-- Fonts (local, bundled) -->
   <link rel="stylesheet" href="/src/styles/fonts.css">
