@@ -1,0 +1,182 @@
+/* ═══════════════════════════════════════════════════════════════
+   CONFIRM MODAL — Apple HIG alert
+   Centered · vibrant backdrop · filled confirm / destructive buttons
+   ═══════════════════════════════════════════════════════════════ */
+
+.cm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  animation: cmBackdropIn 0.22s ease forwards;
+}
+
+html[data-theme="dark"] .cm-backdrop {
+  background: rgba(0,0,0,0);
+}
+
+/* ── Dialog ── */
+.cm-dialog {
+  position: relative;
+  z-index: 1;
+  background: var(--material-modal);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-3xl);
+  padding: var(--space-8);
+  width: 100%;
+  max-width: 380px;
+  margin: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+  box-shadow: var(--shadow-2xl);
+  animation: cmDialogIn 0.38s var(--ease-spring) forwards;
+}
+
+/* ── Icon ── */
+.cm-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-2xl);
+  background: var(--fill-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.cm-icon--danger {
+  color: var(--status-error);
+  background: rgba(255,59,48,0.12);
+}
+
+/* ── Body ── */
+.cm-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cm-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  letter-spacing: -0.016em;
+  margin: 0;
+}
+
+.cm-message {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  letter-spacing: -0.006em;
+}
+
+/* ── Actions ── */
+.cm-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.cm-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  border: none;
+  background: var(--fill-tertiary);
+  color: var(--text-primary);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-spring),
+    box-shadow var(--transition-fast);
+  outline: none;
+  letter-spacing: -0.008em;
+}
+
+.cm-btn:focus-visible {
+  box-shadow: var(--shadow-focus);
+}
+
+.cm-btn:hover {
+  background: var(--fill-secondary);
+  transform: translateY(-1px);
+}
+
+.cm-btn:active {
+  transform: scale(0.97);
+  transition-duration: 60ms;
+}
+
+/* Confirm — filled accent */
+.cm-btn--confirm {
+  color: var(--text-on-accent);
+  background: var(--accent-primary);
+  box-shadow: 0 3px 10px var(--accent-glow);
+}
+
+.cm-btn--confirm:hover {
+  background: var(--accent-hover);
+  color: var(--text-on-accent);
+  box-shadow: 0 5px 16px var(--accent-glow-lg);
+}
+
+/* Danger — filled red */
+.cm-btn--danger {
+  color: var(--text-on-accent);
+  background: var(--status-error);
+  box-shadow: 0 3px 10px rgba(255,59,48,0.30);
+}
+
+.cm-btn--danger:hover {
+  background: #D12D22;
+  box-shadow: 0 5px 16px rgba(255,59,48,0.42);
+}
+
+/* ── Animations ── */
+@keyframes cmBackdropIn {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.36); }
+}
+html[data-theme="dark"] .cm-backdrop { animation-name: cmBackdropInDark; }
+@keyframes cmBackdropInDark {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.58); }
+}
+
+@keyframes cmOverlayIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cmOverlayOut { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes cmDialogIn {
+  from { opacity: 0; transform: scale(0.86) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes cmDialogOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.92) translateY(8px); }
+}

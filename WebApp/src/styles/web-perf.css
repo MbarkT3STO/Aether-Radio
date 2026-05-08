@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════════════════════════════
+   Web-only performance optimizations
+   These are layered on top of the shared design-system CSS so we
+   don't touch the portable styles shared with Desktop/Android.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Off-screen painting skip ─────────────────────────────────────
+   Station cards in long grids (Featured has 100, Favorites can have
+   hundreds) are the heaviest repeated element. content-visibility:
+   auto tells the browser to skip style/layout/paint for cards that
+   aren't in the viewport, giving us virtual-scrolling-like behavior
+   without the complexity.
+
+   The contain-intrinsic-size reserves space so the scrollbar doesn't
+   jump while the browser streams content in.
+*/
+.station-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 180px;
+}
+
+/* Country and genre cards in Explore follow the same pattern */
+.country-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 110px;
+}
+
+.genre-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 52px;
+}
+
+/* ── GPU-accelerated transforms ─────────────────────────────────
+   Promote things we animate on hover so we don't trigger layout
+   on the surrounding grid.
+*/
+.station-card,
+.country-card,
+.genre-card {
+  will-change: transform;
+}
+
+/* Strip the will-change after the initial paint — keeping it on
+   forever is worse than leaving it off. We apply it via a class
+   that JavaScript can remove after idle.
+*/
+.perf-ready .station-card,
+.perf-ready .country-card,
+.perf-ready .genre-card {
+  will-change: auto;
+}
+
+/* ── Contain layout/paint on isolated containers ─────────────────
+   Scoping containment to these containers means the browser won't
+   re-calc layout for the entire tree when something inside them
+   changes (e.g. a heart icon toggling).
+*/
+.grid,
+.genre-grid,
+.sleep-timer-popover,
+.toast-container,
+.cm-dialog,
+.am-dialog,
+.rcm-dialog {
+  contain: layout paint;
+}
+
+/* ── Fast image rendering for tiny station logos ────────────────
+   These are 40-64px wide — disable high-quality downscaling so the
+   browser doesn't burn CPU resampling huge favicons.
+*/
+.station-card-logo-wrap img[data-logo],
+.cs-card img[data-logo] {
+  image-rendering: auto;
+}

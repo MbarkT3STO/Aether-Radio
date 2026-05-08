@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0F" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)">
+  <meta name="description" content="Aether Radio — stream thousands of radio stations from around the world in your browser.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <title>Aether Radio</title>
+
+  <!-- Fonts (local, bundled) -->
+  <link rel="stylesheet" href="/src/styles/fonts.css">
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="/src/styles/tokens.css">
+  <link rel="stylesheet" href="/src/styles/accents.css">
+  <link rel="stylesheet" href="/src/styles/reset.css">
+  <link rel="stylesheet" href="/src/styles/typography.css">
+  <link rel="stylesheet" href="/src/styles/animations.css">
+  <link rel="stylesheet" href="/src/styles/layout.css">
+  <link rel="stylesheet" href="/src/styles/accessibility.css">
+
+  <!-- Components -->
+  <link rel="stylesheet" href="/src/styles/components/sidebar.css">
+  <link rel="stylesheet" href="/src/styles/components/player-bar.css">
+  <link rel="stylesheet" href="/src/styles/components/station-card.css">
+  <link rel="stylesheet" href="/src/styles/components/search-bar.css">
+  <link rel="stylesheet" href="/src/styles/components/volume-slider.css">
+  <link rel="stylesheet" href="/src/styles/components/visualizer.css">
+  <link rel="stylesheet" href="/src/styles/components/toast.css">
+  <link rel="stylesheet" href="/src/styles/components/loading-spinner.css">
+  <link rel="stylesheet" href="/src/styles/components/empty-state.css">
+  <link rel="stylesheet" href="/src/styles/components/custom-stations.css">
+  <link rel="stylesheet" href="/src/styles/components/settings.css">
+  <link rel="stylesheet" href="/src/styles/components/explore.css">
+  <link rel="stylesheet" href="/src/styles/components/station-logo.css">
+  <link rel="stylesheet" href="/src/styles/components/home.css">
+  <link rel="stylesheet" href="/src/styles/components/search.css">
+  <link rel="stylesheet" href="/src/styles/components/confirm-modal.css">
+  <link rel="stylesheet" href="/src/styles/components/about-modal.css">
+  <link rel="stylesheet" href="/src/styles/components/recognition-modal.css">
+  <link rel="stylesheet" href="/src/styles/components/sleep-timer.css">
+  <link rel="stylesheet" href="/src/styles/components/player-expanded.css">
+
+  <!-- Web-only perf overrides — layered last so they win -->
+  <link rel="stylesheet" href="/src/styles/web-perf.css">
+</head>
+<body>
+  <div id="app">
+    <aside class="app-sidebar" id="sidebar"></aside>
+    <main class="app-main">
+      <div class="app-content" id="content"></div>
+      <div class="app-player-bar" id="player-bar"></div>
+    </main>
+  </div>
+  <script type="module" src="/src/index.ts"></script>
+</body>
+</html>

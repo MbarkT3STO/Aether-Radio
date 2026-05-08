@@ -1,0 +1,35 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Hash-based router — but also serve index.html for any unknown path
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Audio stream proxy — Edge Function (no timeout, streams bytes through)
+[[edge_functions]]
+  path = "/api/stream"
+  function = "stream-proxy"
+
+# Shazam API proxy — regular serverless Function (single small POST)
+[[edge_functions]]
+  path = "/api/shazam"
+  function = "shazam-proxy"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+    Cache-Control = "public, max-age=31536000, immutable"

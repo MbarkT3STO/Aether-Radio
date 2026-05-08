@@ -1,0 +1,347 @@
+/* ═══════════════════════════════════════════════════════════════════
+   AETHER RADIO — APP SHELL LAYOUT
+   Apple macOS layout: floating sidebar + main area + translucent bar
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── App Shell ── */
+#app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+  position: relative;
+}
+
+/* ── Titlebar — macOS-style centered window title ── */
+.app-titlebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.006em;
+  color: var(--text-secondary);
+  pointer-events: none;
+  user-select: none;
+  -webkit-app-region: drag;
+  z-index: 500;
+}
+
+/* Dim when window is inactive (Apple HIG) */
+#app:-webkit-any(:window-inactive) .app-titlebar {
+  color: var(--text-tertiary);
+}
+
+/* ── Sidebar — Apple vibrant sidebar material ── */
+.app-sidebar {
+  width: var(--sidebar-width);
+  background: var(--material-sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 200;
+  transition: width var(--transition-slow);
+  margin: 38px 0 10px 10px;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Apple sidebar material — vibrancy layer */
+@supports (backdrop-filter: blur(50px)) {
+  .app-sidebar {
+    backdrop-filter: blur(50px) saturate(1.8);
+    -webkit-backdrop-filter: blur(50px) saturate(1.8);
+  }
+}
+
+.app-sidebar.sidebar-collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+
+/* ── Main area ── */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
+  min-width: 0;
+  position: relative;
+  transition: margin var(--transition-slow);
+}
+
+/* ── macOS traffic-light drag bar ── */
+.app-drag-bar {
+  height: 28px;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+  background: transparent;
+  user-select: none;
+  position: relative;
+  z-index: 10;
+}
+
+/* ── Content area ── */
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-6) var(--space-8) var(--space-8);
+  position: relative;
+}
+
+/* ── Player bar slot ── */
+.app-player-bar {
+  height: calc(var(--player-bar-height) + 20px);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+  padding: 0 0 10px;
+}
+
+/* ── Scrollbar — Apple minimal overlay style ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track { background: transparent; }
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+
+:hover > ::-webkit-scrollbar-thumb,
+*:hover::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+  background-clip: padding-box;
+}
+
+/* Hide scrollbar entirely in content until user hovers */
+.app-content::-webkit-scrollbar-thumb { background: transparent; }
+.app-content:hover::-webkit-scrollbar-thumb { background: var(--border-medium); }
+.app-content:hover::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+/* ── Accessibility overrides ── */
+@media (prefers-reduced-transparency: reduce) {
+  .app-sidebar {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--bg-secondary);
+    border-color: var(--border-medium);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATION GRIDS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.grid-cols-auto {
+  grid-template-columns: repeat(auto-fill, minmax(244px, 1fr));
+}
+
+.grid-cols-country {
+  grid-template-columns: repeat(auto-fill, minmax(144px, 1fr));
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VIEW HEADER — Apple-style Large Title
+   ═══════════════════════════════════════════════════════════════════ */
+
+.view-header {
+  margin-bottom: var(--space-6);
+}
+
+.view-header--split {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.view-header-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.view-header-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.view-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);       /* 28 — Title 1 */
+  font-weight: var(--weight-heavy);
+  letter-spacing: -0.022em;
+  line-height: 1.10;
+  color: var(--text-primary);
+}
+
+.view-subtitle {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  letter-spacing: -0.006em;
+  line-height: 1.45;
+  margin-top: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SECTIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.section {
+  margin-bottom: var(--space-8);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.006em;
+  text-transform: none;
+}
+
+.section-title svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+  color: var(--accent-primary);
+}
+
+.section-title-count {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  background: var(--fill-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MISC SHARED UTILITIES
+   ═══════════════════════════════════════════════════════════════════ */
+
+.results-count {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.004em;
+  margin-bottom: var(--space-4);
+}
+
+.fav-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  background: var(--accent-soft);
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  color: var(--accent-primary);
+}
+
+.meta-dot { opacity: 0.35; font-size: 0.5rem; }
+
+.meta-votes {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.home-greeting-text h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-heavy);
+  letter-spacing: -0.022em;
+  line-height: 1.08;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.btn-secondary--top {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+}
+
+.home-cta-btn { margin-top: var(--space-2); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .app-content {
+    padding: var(--space-5) var(--space-5) var(--space-5);
+  }
+
+  .grid-cols-auto {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .grid-cols-country {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .app-sidebar {
+    width: var(--sidebar-width-collapsed);
+  }
+
+  .app-content {
+    padding: var(--space-4) var(--space-4) var(--space-4);
+  }
+
+  .grid-cols-auto {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .grid-cols-country {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  .view-header h1 {
+    font-size: var(--text-2xl);
+  }
+}

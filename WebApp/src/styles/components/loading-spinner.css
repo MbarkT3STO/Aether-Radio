@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════════════════════
+   LOADING SPINNER — Apple-style activity indicator
+   ═══════════════════════════════════════════════════════════════ */
+
+.loading-spinner {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border-medium);
+  border-top-color: var(--accent-primary);
+  border-right-color: var(--accent-muted);
+  animation: spin 0.72s linear infinite;
+}
+
+.loading-spinner.small { width: 18px; height: 18px; border-width: 2px; }
+.loading-spinner.large { width: 52px; height: 52px; border-width: 3px; }
+
+.loading-spinner--sm {
+  width: 10px;
+  height: 10px;
+  border-width: 1.5px;
+  border-color: var(--border-medium);
+  border-top-color: var(--accent-primary);
+  border-right-color: var(--accent-muted);
+}
+
+.loading-spinner--md {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+  border-color: var(--border-medium);
+  border-top-color: var(--accent-primary);
+  border-right-color: var(--accent-muted);
+}
+
+.loading-spinner--btn {
+  width: 20px;
+  height: 20px;
+  border-width: 2.5px;
+  border-color: rgba(255,255,255,0.28);
+  border-top-color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.pex-btn-play .loading-spinner--btn {
+  width: 26px;
+  height: 26px;
+  border-width: 3px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-8);
+  gap: var(--space-4);
+  min-height: 200px;
+}
+
+.loading-text {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.004em;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* ── Skeleton shimmer ── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--fill-tertiary) 0%,
+    var(--fill-secondary) 50%,
+    var(--fill-tertiary) 100%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}

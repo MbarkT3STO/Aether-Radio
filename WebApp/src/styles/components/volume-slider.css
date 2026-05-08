@@ -1,0 +1,96 @@
+/* ═══════════════════════════════════════════════════════════════
+   VOLUME SLIDER — Apple HIG slider
+   Pill wrapper · thin track · rising thumb on hover
+   ═══════════════════════════════════════════════════════════════ */
+
+.player-volume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--fill-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 5px 14px 5px 6px;
+  width: 168px;
+  flex-shrink: 0;
+}
+
+/* Mute button */
+.player-btn-mute {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-spring);
+  padding: 0;
+}
+
+.player-btn-mute:hover {
+  color: var(--text-primary);
+  transform: scale(1.12);
+}
+
+.player-btn-mute:active { transform: scale(0.92); }
+
+.player-btn-mute:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Track */
+.volume-slider {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  background: var(--border-medium);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  padding: 10px 0;
+  box-sizing: content-box;
+  margin: -10px 0;
+}
+
+/* Fill */
+.volume-slider-fill {
+  height: 4px;
+  background: var(--accent-primary);
+  border-radius: var(--radius-full);
+  position: relative;
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+/* Thumb */
+.volume-slider-thumb {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%) scale(0);
+  width: 14px;
+  height: 14px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22), 0 0 0 0.5px rgba(0,0,0,0.08);
+  opacity: 0;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-spring);
+  pointer-events: none;
+}
+
+.volume-slider:hover .volume-slider-thumb,
+.volume-slider:focus-within .volume-slider-thumb {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}

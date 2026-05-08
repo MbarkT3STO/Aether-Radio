@@ -1,0 +1,92 @@
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH BAR — Apple HIG search field
+   Rounded, filled style with leading icon & clear button
+   ═══════════════════════════════════════════════════════════════ */
+
+.search-bar {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+}
+
+.search-bar-input {
+  width: 100%;
+  padding: 10px var(--space-6) 10px 42px;
+  background: var(--fill-tertiary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  font-family: var(--font-body);
+  letter-spacing: -0.006em;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.search-bar-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-focus);
+}
+
+.search-bar-input::placeholder {
+  color: var(--text-placeholder);
+  font-weight: var(--weight-regular);
+}
+
+.search-bar-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  transition: color var(--transition-fast);
+}
+
+.search-bar:focus-within .search-bar-icon {
+  color: var(--accent-primary);
+}
+
+.search-bar-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: var(--fill-secondary);
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-spring);
+}
+
+.search-bar-clear.visible { opacity: 1; pointer-events: all; }
+
+.search-bar-clear:hover {
+  color: var(--text-primary);
+  background: var(--fill-primary);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.search-bar-clear:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
