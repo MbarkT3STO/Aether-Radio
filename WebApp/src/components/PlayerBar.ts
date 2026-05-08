@@ -5,7 +5,6 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
 import { VisualizerService } from '../services/VisualizerService'
 import { AudioService } from '../services/AudioService'
-import { SleepTimer } from './SleepTimer'
 import { SongRecognitionService } from '../services/SongRecognitionService'
 import { FALLBACK_HTML } from '../utils/stationLogo'
 import { countryFlag } from '../utils/countryFlag'
@@ -14,8 +13,8 @@ import { countryFlag } from '../utils/countryFlag'
  * PlayerBar — the mini player at the bottom of the app.
  *
  * Web edition: no expanded-player overlay. A single lightweight ambient
- * canvas behind the bar pulses gently with the live audio. All other
- * controls (play/stop/favorite/volume/recognize/sleep) stay on the bar.
+ * canvas behind the bar pulses gently with the live audio. Controls:
+ * play/stop, favorite, volume, and song recognition.
  */
 export class PlayerBar extends BaseComponent {
   private eventBus       = EventBus.getInstance()
@@ -24,7 +23,6 @@ export class PlayerBar extends BaseComponent {
   private bridge         = BridgeService.getInstance()
   private visualizer     = new VisualizerService()
   private audioService   = AudioService.getInstance()
-  private sleepTimer     = new SleepTimer()
   private recognition    = SongRecognitionService.getInstance()
 
   /** Ambient blob visualizer behind the bar — borrows the shared analyser */
@@ -85,7 +83,6 @@ export class PlayerBar extends BaseComponent {
                 </div>
               </div>
             </div>
-            <div id="player-sleep-timer"></div>
           </div>
 
         </div>
@@ -156,7 +153,7 @@ export class PlayerBar extends BaseComponent {
           </div>
         </div>
 
-        <!-- RIGHT: Volume + Recognize + Sleep timer -->
+        <!-- RIGHT: Volume + Recognize -->
         <div class="player-extras">
 
           <div class="player-volume">
@@ -170,8 +167,6 @@ export class PlayerBar extends BaseComponent {
               </div>
             </div>
           </div>
-
-          <div id="player-sleep-timer"></div>
 
           <button class="player-btn player-recognize-btn ${isPlaying ? '' : 'player-btn-disabled'}" id="player-recognize-btn"
             title="Identify song" aria-label="Identify song"
@@ -195,17 +190,12 @@ export class PlayerBar extends BaseComponent {
       await this.visualizer.initialize(audioEl)
       this.startBarAmbient()
     })
-    const sleepTimerContainer = this.querySelector<HTMLElement>('#player-sleep-timer')
-    if (sleepTimerContainer) {
-      void this.sleepTimer.mount(sleepTimerContainer)
-    }
   }
 
   protected beforeUnmount(): void {
     this.visualizer.stopVisualization()
     this.barAmbient.stopVisualization()
     this.removeDragListeners()
-    this.sleepTimer.unmount()
   }
 
   // ── Surgical DOM updates ──────────────────────────────────────────────────
@@ -334,7 +324,6 @@ export class PlayerBar extends BaseComponent {
     this.visualizer.stopVisualization()
     this.barAmbient.stopVisualization()
     this.removeDragListeners()
-    this.sleepTimer.unmount()
     const parent = this.element.parentNode as HTMLElement
     parent.innerHTML = this.render()
     this.element = parent.firstElementChild as HTMLElement
