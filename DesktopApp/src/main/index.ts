@@ -136,3 +136,13 @@ app.on('before-quit', () => {
     mainWindow.removeAllListeners('close')
   }
 })
+
+// Last-resort guard: some third-party HTTP libs (or undici via net.fetch)
+// can throw synchronously on streams with non-Latin-1 headers. Log and keep
+// the app running instead of surfacing the native error dialog.
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err)
+})
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason)
+})
