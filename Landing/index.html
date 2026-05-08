@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="blue">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="light dark" />
+
+  <title>Aether Radio — Tune into the world. Beautifully.</title>
+  <meta name="description" content="Aether Radio is a beautifully crafted world radio streaming app for Android, macOS, Windows and Linux. 50,000+ stations, song recognition, favorites and a stunning Apple-inspired design." />
+  <meta name="author" content="MBVRK" />
+  <meta name="keywords" content="radio, world radio, internet radio, streaming, android radio app, desktop radio, aether radio, radio browser, song recognition, shazam" />
+
+  <!-- Open Graph / social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Aether Radio — Tune into the world. Beautifully." />
+  <meta property="og:description" content="50,000+ stations from every country, song recognition, favorites, sleep timer and an Apple-inspired design. Free and open source." />
+  <meta property="og:image" content="./assets/og-image.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Aether Radio" />
+  <meta name="twitter:description" content="Tune into the world. Beautifully." />
+  <meta name="twitter:image" content="./assets/og-image.svg" />
+
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png" />
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+  <link rel="canonical" href="https://mbarkt3sto.github.io/Aether-Radio/" />
+
+  <!-- Preload critical logo to avoid layout shift -->
+  <link rel="preload" as="image" href="./assets/logo.png" fetchpriority="high" />
+
+  <!-- Design system (no external fonts — uses system SF Pro / Segoe / Roboto stack) -->
+  <link rel="stylesheet" href="./styles/tokens.css" />
+  <link rel="stylesheet" href="./styles/base.css" />
+  <link rel="stylesheet" href="./styles/landing.css" />
+</head>
+<body>
+  <!-- Ambient background mesh -->
+  <div class="bg-mesh" aria-hidden="true">
+    <div class="bg-mesh-blob bg-mesh-blob--1"></div>
+    <div class="bg-mesh-blob bg-mesh-blob--2"></div>
+    <div class="bg-mesh-blob bg-mesh-blob--3"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <!-- ══════════════  NAVBAR  ══════════════ -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="#top" aria-label="Aether Radio home">
+        <img class="nav-brand-mark" src="./assets/logo.png" alt="" width="32" height="32" decoding="async" fetchpriority="high" />
+        <span class="nav-brand-text">Aether Radio</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#design">Design</a>
+        <a href="#platforms">Platforms</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="nav-accent" role="group" aria-label="Accent color">
+          <button type="button" class="nav-accent-btn" data-accent-picker aria-haspopup="true" aria-expanded="false" aria-label="Change accent color">
+            <span class="nav-accent-swatch" aria-hidden="true"></span>
+          </button>
+          <div class="nav-accent-menu" role="menu" hidden>
+            <button type="button" role="menuitem" data-accent="blue"         style="--sw:#0A84FF"><span></span>Blue</button>
+            <button type="button" role="menuitem" data-accent="indigo"       style="--sw:#5E5CE6"><span></span>Indigo</button>
+            <button type="button" role="menuitem" data-accent="royal-purple" style="--sw:#A78BFA"><span></span>Royal Purple</button>
+            <button type="button" role="menuitem" data-accent="purple"       style="--sw:#BF5AF2"><span></span>Purple</button>
+            <button type="button" role="menuitem" data-accent="pink"         style="--sw:#FF375F"><span></span>Pink</button>
+            <button type="button" role="menuitem" data-accent="red"          style="--sw:#FF453A"><span></span>Red</button>
+            <button type="button" role="menuitem" data-accent="orange"       style="--sw:#FF9F0A"><span></span>Orange</button>
+            <button type="button" role="menuitem" data-accent="green"        style="--sw:#30D158"><span></span>Green</button>
+            <button type="button" role="menuitem" data-accent="mint"         style="--sw:#63E6E2"><span></span>Mint</button>
+            <button type="button" role="menuitem" data-accent="teal"         style="--sw:#40C8E0"><span></span>Teal</button>
+            <button type="button" role="menuitem" data-accent="cyan"         style="--sw:#64D2FF"><span></span>Cyan</button>
+            <button type="button" role="menuitem" data-accent="graphite"     style="--sw:#AEAEB2"><span></span>Graphite</button>
+          </div>
+        </div>
+
+        <button type="button" class="nav-theme" id="theme-toggle" aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <a class="btn btn-primary nav-cta" href="#download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </a>
+
+        <button type="button" class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-mobile" id="nav-mobile" hidden>
+      <a href="#features">Features</a>
+      <a href="#design">Design</a>
+      <a href="#platforms">Platforms</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="#download">Download</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ══════════════  HERO  ══════════════ -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <a class="hero-eyebrow" href="#download">
+            <span class="hero-eyebrow-pill">New</span>
+            <span>v1.1.0 — Song recognition, sleep timer, and more</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <h1 class="hero-title">
+            Tune into the world.
+            <span class="hero-title-gradient">Beautifully.</span>
+          </h1>
+
+          <p class="hero-sub">
+            Aether Radio is a meticulously crafted world radio player for Android, macOS, Windows and Linux. Over 50,000 live stations from every country, song recognition, favorites, and an Apple-inspired design that feels right at home on any device.
+          </p>
+
+          <div class="hero-cta">
+            <a class="btn btn-primary btn-lg" href="#download">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download free
+            </a>
+            <a class="btn btn-ghost btn-lg" href="https://github.com/MbarkT3STO/Aether-Radio" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.78 2.71 1.27 3.37.97.1-.75.4-1.27.73-1.56-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.2-3.09-.12-.3-.52-1.48.11-3.08 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.08.75.8 1.2 1.83 1.2 3.09 0 4.43-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+
+          <ul class="hero-badges" aria-label="Highlights">
+            <li><span class="dot dot-live"></span>50,000+ stations</li>
+            <li><span class="dot dot-blue"></span>240+ countries</li>
+            <li><span class="dot dot-purple"></span>Free & open source</li>
+          </ul>
+        </div>
+
+        <!-- Phone mockup -->
+        <div class="hero-device" role="img" aria-label="Aether Radio app preview">
+          <div class="device-phone">
+            <div class="device-phone-notch" aria-hidden="true"></div>
+            <div class="device-phone-screen">
+              <div class="app-mock">
+                <!-- status bar -->
+                <div class="mock-status">
+                  <span>9:41</span>
+                  <span class="mock-status-r">
+                    <svg viewBox="0 0 18 12" width="16" height="10" aria-hidden="true"><path fill="currentColor" d="M0 10h2v2H0zM4 8h2v4H4zM8 5h2v7H8zM12 2h2v10h-2zM16 0h2v12h-2z"/></svg>
+                    <svg viewBox="0 0 20 12" width="18" height="10" aria-hidden="true"><rect x="1" y="2" width="16" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="3" y="4" width="12" height="4" rx="1" fill="currentColor"/><rect x="18" y="5" width="1.2" height="2" fill="currentColor"/></svg>
+                  </span>
+                </div>
+
+                <!-- header greeting -->
+                <div class="mock-greeting">
+                  <div class="mock-greeting-title">Good evening</div>
+                  <div class="mock-greeting-sub">What would you like to listen to today?</div>
+                </div>
+
+                <!-- now playing card -->
+                <div class="mock-now">
+                  <div class="mock-now-art">
+                    <img src="./assets/logo.png" alt="" width="40" height="40" class="mock-now-art-img" decoding="async" loading="lazy" />
+                  </div>
+                  <div class="mock-now-info">
+                    <div class="mock-now-label">NOW PLAYING</div>
+                    <div class="mock-now-title">KEXP 90.3 FM</div>
+                    <div class="mock-now-meta">
+                      <span class="mock-flag">🇺🇸</span>
+                      <span>Seattle · Alt / Indie</span>
+                    </div>
+                  </div>
+                  <button class="mock-play" aria-label="Pause">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                  </button>
+                </div>
+
+                <!-- stat pills -->
+                <div class="mock-pills">
+                  <div class="mock-pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    <strong>24</strong><span>Favorites</span>
+                  </div>
+                  <div class="mock-pill">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <strong>126</strong><span>History</span>
+                  </div>
+                </div>
+
+                <!-- section -->
+                <div class="mock-section-title">Recently Played</div>
+                <div class="mock-cards">
+                  <div class="mock-card">
+                    <div class="mock-card-logo" style="background:linear-gradient(135deg,#FF9F0A,#FF375F)">B</div>
+                    <div class="mock-card-body">
+                      <div class="mock-card-name">BBC Radio 1</div>
+                      <div class="mock-card-meta">🇬🇧 London · Pop</div>
+                    </div>
+                  </div>
+                  <div class="mock-card">
+                    <div class="mock-card-logo" style="background:linear-gradient(135deg,#5E5CE6,#BF5AF2)">F</div>
+                    <div class="mock-card-body">
+                      <div class="mock-card-name">FIP</div>
+                      <div class="mock-card-meta">🇫🇷 Paris · Eclectic</div>
+                    </div>
+                  </div>
+                  <div class="mock-card">
+                    <div class="mock-card-logo" style="background:linear-gradient(135deg,#30D158,#63E6E2)">J</div>
+                    <div class="mock-card-body">
+                      <div class="mock-card-name">Jazz24</div>
+                      <div class="mock-card-meta">🇺🇸 Tacoma · Jazz</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- bottom nav -->
+                <div class="mock-nav">
+                  <button class="is-active"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></button>
+                  <button><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+                  <button><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+                  <button><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- floating glass cards -->
+          <div class="float-card float-card-1" aria-hidden="true">
+            <div class="float-card-bars">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div>
+              <div class="float-card-title">Now Playing</div>
+              <div class="float-card-sub">Radio Paradise</div>
+            </div>
+          </div>
+          <div class="float-card float-card-2" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7v4a4 4 0 0 0 4 4h1v-7H6V9a6 6 0 1 1 12 0v1h-4v7h1a4 4 0 0 0 4-4V9a7 7 0 0 0-7-7z"/></svg>
+            <span>High-fidelity stream</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════  STATS STRIP  ══════════════ -->
+    <section class="stats" aria-label="At a glance">
+      <div class="container stats-inner">
+        <div class="stat"><div class="stat-value" data-count="50000" data-suffix="+">0</div><div class="stat-label">Live stations</div></div>
+        <div class="stat"><div class="stat-value" data-count="240" data-suffix="+">0</div><div class="stat-label">Countries</div></div>
+        <div class="stat"><div class="stat-value" data-count="12">0</div><div class="stat-label">Accent themes</div></div>
+        <div class="stat"><div class="stat-value">4</div><div class="stat-label">Platforms</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════  FEATURES GRID  ══════════════ -->
+    <section class="section-pad" id="features">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-eyebrow">Features</span>
+          <h2 class="section-title">Everything you love about radio. Refined.</h2>
+          <p class="section-lede">Built around the global radio-browser community database, with a focus on craft, performance and a truly native feel across every platform.</p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card feature-card--wide">
+            <div class="feature-icon" style="--tint:var(--sys-blue)">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+            </div>
+            <h3>World Radio, curated</h3>
+            <p>Explore stations by country, genre, popularity and trends. Smart filters, featured picks and a clean Explore view help you surface the perfect soundtrack, anywhere.</p>
+            <ul class="feature-chips">
+              <li>Browse by country</li>
+              <li>Genres & tags</li>
+              <li>Featured picks</li>
+              <li>Trending</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" style="--tint:var(--sys-purple)">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+            <h3>Song recognition</h3>
+            <p>Identify what's playing on air with a tap. Powered by Shazam-style audio fingerprinting on-device.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" style="--tint:var(--sys-pink)">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </div>
+            <h3>Favorites & history</h3>
+            <p>One-tap to save, instant recall. Every station you've played is remembered, searchable and revisitable.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" style="--tint:var(--sys-green)">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h3>Sleep timer</h3>
+            <p>Gently fade out and pause after a set duration. Perfect for winding down without losing your stream.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" style="--tint:var(--sys-orange)">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <h3>Custom stations</h3>
+            <p>Paste any stream URL and listen in seconds. Build your own private library alongside the community catalog.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" style="--tint:var(--sys-cyan)">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="12" rx="2"/><path d="M6 20h12M9 16v4M15 16v4"/></svg>
+            </div>
+            <h3>Media controls</h3>
+            <p>Lock-screen controls, notification playback and system media keys. It just works on every OS.</p>
+          </article>
+
+          <article class="feature-card feature-card--wide">
+            <div class="feature-icon" style="--tint:var(--sys-indigo)">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <h3>Light & dark, your way</h3>
+            <p>Pixel-perfect dark and light themes plus 12 Apple-native accent colors — from Blue and Indigo to Royal Purple, Mint and Graphite. Choose once, tinted everywhere.</p>
+            <div class="feature-swatches">
+              <span style="--c:#0A84FF"></span><span style="--c:#5E5CE6"></span>
+              <span style="--c:#A78BFA"></span><span style="--c:#BF5AF2"></span>
+              <span style="--c:#FF375F"></span><span style="--c:#FF453A"></span>
+              <span style="--c:#FF9F0A"></span><span style="--c:#30D158"></span>
+              <span style="--c:#63E6E2"></span><span style="--c:#40C8E0"></span>
+              <span style="--c:#64D2FF"></span><span style="--c:#AEAEB2"></span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════  DESIGN SHOWCASE  ══════════════ -->
+    <section class="section-pad design-section" id="design">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <span class="section-eyebrow">Design</span>
+            <h2 class="section-title">Crafted around Apple's Human Interface Guidelines.</h2>
+          </div>
+          <p class="section-lede section-lede--compact">
+            Semantic colors, vibrant materials, continuous corner curves, spring physics and typography tuned for readability. The same thoughtful design system powers Android, macOS, Windows and Linux.
+          </p>
+        </div>
+
+        <div class="design-grid">
+          <div class="design-card design-card--tokens">
+            <div class="design-card-label">Design tokens</div>
+            <div class="token-swatch-grid">
+              <div class="token-swatch"><span style="background:var(--sys-red)"></span><em>Red</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-orange)"></span><em>Orange</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-yellow)"></span><em>Yellow</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-green)"></span><em>Green</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-mint)"></span><em>Mint</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-teal)"></span><em>Teal</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-cyan)"></span><em>Cyan</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-blue)"></span><em>Blue</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-indigo)"></span><em>Indigo</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-purple)"></span><em>Purple</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-pink)"></span><em>Pink</em></div>
+              <div class="token-swatch"><span style="background:var(--sys-brown)"></span><em>Brown</em></div>
+            </div>
+          </div>
+
+          <div class="design-card design-card--player">
+            <div class="design-card-label">Mini player</div>
+            <div class="demo-player">
+              <div class="demo-player-logo">
+                <img src="./assets/logo.png" alt="" width="48" height="48" decoding="async" loading="lazy" />
+              </div>
+              <div class="demo-player-body">
+                <div class="demo-player-title">Radio Nova</div>
+                <div class="demo-player-meta">🇫🇷 Paris · Electronic</div>
+                <div class="demo-player-progress"><i></i></div>
+              </div>
+              <div class="demo-player-actions">
+                <button aria-label="Previous"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 6h2v12H6zM20 6v12l-9-6z"/></svg></button>
+                <button class="demo-player-play" aria-label="Play"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+                <button aria-label="Next"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 6h2v12h-2zM4 6l9 6-9 6z"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="design-card design-card--glass">
+            <div class="design-card-label">Materials</div>
+            <div class="demo-materials">
+              <div class="demo-mat demo-mat--thin"><span>Thin</span></div>
+              <div class="demo-mat demo-mat--regular"><span>Regular</span></div>
+              <div class="demo-mat demo-mat--thick"><span>Thick</span></div>
+            </div>
+          </div>
+
+          <div class="design-card design-card--typo">
+            <div class="design-card-label">Typography</div>
+            <div class="demo-typo-row"><span class="demo-typo-label">Large Title</span><span class="demo-typo-lt">Aether</span></div>
+            <div class="demo-typo-row"><span class="demo-typo-label">Title 1</span><span class="demo-typo-t1">Now Playing</span></div>
+            <div class="demo-typo-row"><span class="demo-typo-label">Headline</span><span class="demo-typo-hl">BBC Radio 1</span></div>
+            <div class="demo-typo-row"><span class="demo-typo-label">Body</span><span class="demo-typo-bd">London, UK · Pop</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════  PLATFORMS / DOWNLOAD  ══════════════ -->
+    <section class="section-pad platforms" id="platforms">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-eyebrow">Platforms</span>
+          <h2 class="section-title">One radio. Every screen.</h2>
+          <p class="section-lede">Hand-tuned builds for mobile and desktop, with a shared codebase and a unified design language.</p>
+        </div>
+
+        <div class="platforms-grid" id="download">
+          <article class="platform-card platform-card--android">
+            <div class="platform-head">
+              <div class="platform-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M7.3 6.7 6 4.9a.5.5 0 0 1 .2-.7.5.5 0 0 1 .7.2l1.3 1.9a8.5 8.5 0 0 1 7.6 0l1.3-1.9a.5.5 0 0 1 .7-.2.5.5 0 0 1 .2.7l-1.3 1.8A7.5 7.5 0 0 1 19.5 13H4.5a7.5 7.5 0 0 1 2.8-6.3zM8.5 10.5a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8zm7 0a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8zM3 14h2v7a1.5 1.5 0 0 1-3 0v-7zm16 0h2v7a1.5 1.5 0 0 1-3 0v-7zM6 14h12v7.5a1.5 1.5 0 0 1-1.5 1.5H15v-2h-2v2h-2v-2H9v2H7.5A1.5 1.5 0 0 1 6 21.5V14z"/></svg>
+              </div>
+              <div>
+                <div class="platform-name">Android</div>
+                <div class="platform-meta">APK · 6.0+</div>
+              </div>
+            </div>
+            <p class="platform-desc">Signed APK with media notifications, lock-screen controls and Android 13 notification support.</p>
+            <a class="btn btn-primary btn-block" href="https://github.com/MbarkT3STO/Aether-Radio/releases/latest" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download APK
+            </a>
+          </article>
+
+          <article class="platform-card platform-card--mac">
+            <div class="platform-head">
+              <div class="platform-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M16.37 13.12c.02 2.53 2.21 3.37 2.24 3.39-.02.07-.35 1.2-1.16 2.37-.7 1.02-1.42 2.02-2.56 2.04-1.12.03-1.48-.66-2.76-.66s-1.68.64-2.74.69c-1.1.04-1.94-1.1-2.64-2.11-1.45-2.08-2.55-5.88-1.07-8.45.74-1.27 2.06-2.08 3.5-2.1 1.08-.02 2.1.73 2.76.73.66 0 1.9-.9 3.2-.77.55.02 2.08.22 3.06 1.66-.08.05-1.83 1.07-1.83 3.21zM14.2 5.1c.6-.72 1-1.73.89-2.73-.86.04-1.9.57-2.52 1.29-.56.64-1.04 1.66-.91 2.65.96.07 1.94-.49 2.54-1.21z"/></svg>
+              </div>
+              <div>
+                <div class="platform-name">macOS</div>
+                <div class="platform-meta">DMG · Intel & Apple Silicon</div>
+              </div>
+            </div>
+            <p class="platform-desc">Universal binary with native media keys, Touch Bar support and full vibrancy.</p>
+            <div class="dl-dropdown" data-dropdown>
+              <button type="button" class="btn btn-secondary btn-block dl-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download for Mac
+                <svg class="dl-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="dl-dropdown-menu" role="menu" hidden>
+                <a class="dl-option" role="menuitem" href="https://github.com/MbarkT3STO/Aether-Radio/releases/latest" target="_blank" rel="noopener">
+                  <span class="dl-option-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                  </span>
+                  <span class="dl-option-body">
+                    <span class="dl-option-title">Apple Silicon</span>
+                    <span class="dl-option-sub">M1 / M2 / M3 / M4 · arm64</span>
+                  </span>
+                  <svg class="dl-option-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>
+                <a class="dl-option" role="menuitem" href="https://github.com/MbarkT3STO/Aether-Radio/releases/latest" target="_blank" rel="noopener">
+                  <span class="dl-option-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                  </span>
+                  <span class="dl-option-body">
+                    <span class="dl-option-title">Intel</span>
+                    <span class="dl-option-sub">Core i5 / i7 / i9 · x64</span>
+                  </span>
+                  <svg class="dl-option-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="platform-card platform-card--win">
+            <div class="platform-head">
+              <div class="platform-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.5V11H3V5.5zM11.5 4.3 21 3v9h-9.5V4.3zM3 12h7.5v6.5L3 17.5V12zm8.5 0H21v9l-9.5-1.3V12z"/></svg>
+              </div>
+              <div>
+                <div class="platform-name">Windows</div>
+                <div class="platform-meta">NSIS Installer / Portable</div>
+              </div>
+            </div>
+            <p class="platform-desc">One-click installer with Start Menu and Desktop shortcuts, or a portable exe.</p>
+            <div class="dl-dropdown" data-dropdown>
+              <button type="button" class="btn btn-secondary btn-block dl-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download for Windows
+                <svg class="dl-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="dl-dropdown-menu" role="menu" hidden>
+                <a class="dl-option" role="menuitem" href="https://github.com/MbarkT3STO/Aether-Radio/releases/latest" target="_blank" rel="noopener">
+                  <span class="dl-option-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  </span>
+                  <span class="dl-option-body">
+                    <span class="dl-option-title">NSIS Installer</span>
+                    <span class="dl-option-sub">Recommended · Start Menu &amp; Desktop shortcuts</span>
+                  </span>
+                  <svg class="dl-option-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>
+                <a class="dl-option" role="menuitem" href="https://github.com/MbarkT3STO/Aether-Radio/releases/latest" target="_blank" rel="noopener">
+                  <span class="dl-option-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+                  </span>
+                  <span class="dl-option-body">
+                    <span class="dl-option-title">Portable</span>
+                    <span class="dl-option-sub">No install needed · run from anywhere</span>
+                  </span>
+                  <svg class="dl-option-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="platform-card platform-card--linux">
+            <div class="platform-head">
+              <div class="platform-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M12 2c-2 0-3.4 1.8-3.4 3.9 0 1-.3 1.7-.9 2.4-.7.8-1.5 1.7-1.8 3-.3 1.4.1 2.6.6 3.5.5.9.7 1.7.3 2.7-.3.8-1.1 1.5-1.1 2.4 0 1.4 1.3 2.1 3.1 2.1.7 0 1.3-.1 1.8-.4.4-.2.6-.4 1.4-.4s1 .2 1.4.4c.5.3 1.1.4 1.8.4 1.8 0 3.1-.7 3.1-2.1 0-.9-.8-1.6-1.1-2.4-.4-1-.2-1.8.3-2.7.5-.9.9-2.1.6-3.5-.3-1.3-1.1-2.2-1.8-3-.6-.7-.9-1.4-.9-2.4C15.4 3.8 14 2 12 2zm-1.7 4.3c.3 0 .6.4.6.9s-.3.9-.6.9-.6-.4-.6-.9.3-.9.6-.9zm3.4 0c.3 0 .6.4.6.9s-.3.9-.6.9-.6-.4-.6-.9.3-.9.6-.9z"/></svg>
+              </div>
+              <div>
+                <div class="platform-name">Linux</div>
+                <div class="platform-meta">AppImage / .deb</div>
+              </div>
+            </div>
+            <p class="platform-desc">Distro-agnostic AppImage or a native Debian/Ubuntu package.</p>
+            <div class="dl-dropdown" data-dropdown>
+              <button type="button" class="btn btn-secondary btn-block dl-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download for Linux
+                <svg class="dl-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="dl-dropdown-menu" role="menu" hidden>
+                <a class="dl-option" role="menuitem" href="https://github.com/MbarkT3STO/Aether-Radio/releases/latest" target="_blank" rel="noopener">
+                  <span class="dl-option-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  </span>
+                  <span class="dl-option-body">
+                    <span class="dl-option-title">AppImage</span>
+                    <span class="dl-option-sub">Any distro · x64 · no install needed</span>
+                  </span>
+                  <svg class="dl-option-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>
+                <a class="dl-option" role="menuitem" href="https://github.com/MbarkT3STO/Aether-Radio/releases/latest" target="_blank" rel="noopener">
+                  <span class="dl-option-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+                  </span>
+                  <span class="dl-option-body">
+                    <span class="dl-option-title">.deb Package</span>
+                    <span class="dl-option-sub">Debian / Ubuntu · x64</span>
+                  </span>
+                  <svg class="dl-option-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <p class="platforms-note">
+          Source code & all releases on
+          <a href="https://github.com/MbarkT3STO/Aether-Radio" target="_blank" rel="noopener">GitHub</a>.
+          Licensed MIT.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════  WHY / VALUES  ══════════════ -->
+    <section class="section-pad values">
+      <div class="container values-grid">
+        <div class="value">
+          <div class="value-icon" style="--tint:var(--sys-green)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h4>Free forever</h4>
+          <p>No subscription, no ads, no trackers. Ever.</p>
+        </div>
+        <div class="value">
+          <div class="value-icon" style="--tint:var(--sys-blue)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h4>Privacy-first</h4>
+          <p>Your favorites and history stay on your device. No account required.</p>
+        </div>
+        <div class="value">
+          <div class="value-icon" style="--tint:var(--sys-purple)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h4>Open source</h4>
+          <p>MIT licensed. Inspect, fork, contribute — it's all on GitHub.</p>
+        </div>
+        <div class="value">
+          <div class="value-icon" style="--tint:var(--sys-orange)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h4>Fast & light</h4>
+          <p>Tiny footprint, native feel, instant stream start-up.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════  FAQ  ══════════════ -->
+    <section class="section-pad faq" id="faq">
+      <div class="container faq-inner">
+        <div class="section-head">
+          <span class="section-eyebrow">Questions</span>
+          <h2 class="section-title">Frequently asked.</h2>
+        </div>
+
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Is Aether Radio really free?</summary>
+            <p>Yes. Aether Radio is completely free and open source under the MIT license. There are no ads, no subscriptions, no accounts, and no trackers. If you'd like to support development, you can <a href="https://liberapay.com/MBVRK/" target="_blank" rel="noopener">donate via Liberapay</a>.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Where do the radio stations come from?</summary>
+            <p>We use the wonderful community-driven <a href="https://www.radio-browser.info" target="_blank" rel="noopener">radio-browser.info</a> database. Over 50,000 stations curated by volunteers worldwide. You can also add your own custom streams from any URL.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Which platforms are supported?</summary>
+            <p>Android 6.0 and newer, macOS (Intel and Apple Silicon), Windows 10/11 (x64), and Linux via AppImage or <code>.deb</code>. iOS is on the roadmap.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Does song recognition work offline?</summary>
+            <p>Audio fingerprinting happens on-device, but matching against the song database requires an internet connection.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Can I contribute?</summary>
+            <p>Absolutely. Open an issue, send a pull request, or suggest a feature on our <a href="https://github.com/MbarkT3STO/Aether-Radio" target="_blank" rel="noopener">GitHub repo</a>. Every bit helps.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>What data does Aether Radio collect?</summary>
+            <p>None. Favorites, history and settings live only on your device. The app fetches station metadata from radio-browser mirrors and streams audio directly from each station's server.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════  CTA BANNER  ══════════════ -->
+    <section class="cta-banner-wrap">
+      <div class="container">
+        <div class="cta-banner">
+          <div class="cta-banner-bg" aria-hidden="true"></div>
+          <div class="cta-banner-copy">
+            <h2>Ready to tune in?</h2>
+            <p>Download Aether Radio and discover a world of sound — beautifully.</p>
+          </div>
+          <div class="cta-banner-actions">
+            <a class="btn btn-primary btn-lg" href="#download">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Get Aether Radio
+            </a>
+            <a class="btn btn-ghost btn-lg" href="https://github.com/MbarkT3STO/Aether-Radio" target="_blank" rel="noopener">Star on GitHub</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ══════════════  FOOTER  ══════════════ -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="nav-brand" href="#top">
+          <img class="nav-brand-mark" src="./assets/logo.png" alt="" width="32" height="32" decoding="async" loading="lazy" />
+          <span class="nav-brand-text">Aether Radio</span>
+        </a>
+        <p class="footer-tag">Tune into the world. Beautifully.</p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Product</h5>
+        <a href="#features">Features</a>
+        <a href="#design">Design</a>
+        <a href="#platforms">Platforms</a>
+        <a href="#download">Download</a>
+      </div>
+
+      <div class="footer-col">
+        <h5>Project</h5>
+        <a href="https://github.com/MbarkT3STO/Aether-Radio" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/MbarkT3STO/Aether-Radio/releases" target="_blank" rel="noopener">Releases</a>
+        <a href="https://github.com/MbarkT3STO/Aether-Radio/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://liberapay.com/MBVRK/" target="_blank" rel="noopener">Donate</a>
+      </div>
+
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="https://www.radio-browser.info" target="_blank" rel="noopener">radio-browser.info</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/MbarkT3STO" target="_blank" rel="noopener">About MBVRK</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom container">
+      <span>© 2026 MBVRK · Aether Radio. MIT License.</span>
+      <span>Made with care · Not affiliated with Apple or any broadcaster.</span>
+    </div>
+  </footer>
+
+  <script src="./scripts/landing.js" defer></script>
+</body>
+</html>
