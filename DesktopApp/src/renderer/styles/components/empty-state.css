@@ -26,6 +26,7 @@
   flex-shrink: 0;
   border: 1px solid var(--accent-border);
   box-shadow: var(--shadow-xs);
+  animation: floatUp 4s ease-in-out infinite;
 }
 
 

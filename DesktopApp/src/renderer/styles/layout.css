@@ -50,6 +50,7 @@
   background: var(--bg-primary);
   min-width: 0;
   position: relative;
+  transition: margin var(--transition-slow);
 }
 
 /* ── macOS traffic light drag bar ── */

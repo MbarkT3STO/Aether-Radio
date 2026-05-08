@@ -93,7 +93,7 @@ export class ExploreView extends BaseComponent {
         </div>
         <div class="grid grid-cols-country" id="country-grid">
           ${visibleCountries.map(c => `
-            <div class="country-card" data-country="${c.code}">
+            <div class="country-card" data-country="${c.code}" role="button" tabindex="0" aria-label="${this.esc(c.name)}, ${c.stationCount} stations">
               <div class="country-card-flag">${countryFlag(c.code)}</div>
               <div class="country-card-name">${this.esc(c.name)}</div>
               <div class="country-card-count">${c.stationCount.toLocaleString()} stations</div>
@@ -149,17 +149,31 @@ export class ExploreView extends BaseComponent {
   private attachListeners(): void {
     // Country cards
     this.querySelectorAll('[data-country]').forEach(card => {
-      this.on(card, 'click', () => {
+      const activate = () => {
         const code = card.getAttribute('data-country')
         if (code) this.router.navigate(`/search?country=${code}`)
+      }
+      this.on(card, 'click', activate)
+      this.on(card, 'keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+          e.preventDefault()
+          activate()
+        }
       })
     })
 
     // Genre cards
     this.querySelectorAll('[data-genre]').forEach(btn => {
-      this.on(btn, 'click', () => {
+      const activate = () => {
         const genre = btn.getAttribute('data-genre')
         if (genre) this.router.navigate(`/search?genre=${encodeURIComponent(genre)}`)
+      }
+      this.on(btn, 'click', activate)
+      this.on(btn, 'keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+          e.preventDefault()
+          activate()
+        }
       })
     })
 

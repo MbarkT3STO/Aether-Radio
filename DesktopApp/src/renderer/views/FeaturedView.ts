@@ -106,7 +106,7 @@ export class FeaturedView extends BaseComponent {
 
   private attachListeners(): void {
     this.querySelectorAll('.station-card').forEach(card => {
-      this.on(card, 'click', (e) => {
+      const handleActivate = (e: Event) => {
         const target = e.target as HTMLElement
         if (target.closest('[data-action="favorite"]')) {
           e.stopPropagation()
@@ -116,6 +116,13 @@ export class FeaturedView extends BaseComponent {
         const id = card.getAttribute('data-station-id')
         const station = this.stations.find(s => s.id === id)
         if (station) this.playerStore.play(station)
+      }
+      this.on(card, 'click', handleActivate)
+      this.on(card, 'keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+          e.preventDefault()
+          handleActivate(e)
+        }
       })
     })
   }

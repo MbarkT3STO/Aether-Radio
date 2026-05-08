@@ -105,7 +105,7 @@ export class FavoritesView extends BaseComponent {
 
   private attachListeners(): void {
     this.querySelectorAll('.station-card').forEach(card => {
-      this.on(card, 'click', (e) => {
+      const handleActivate = (e: Event) => {
         const target = e.target as HTMLElement
         if (target.closest('[data-action="remove"]')) {
           e.stopPropagation()
@@ -115,6 +115,13 @@ export class FavoritesView extends BaseComponent {
         const id  = card.getAttribute('data-station-id')
         const fav = this.favorites.find(f => f.station.id === id)
         if (fav) this.playerStore.play(fav.station)
+      }
+      this.on(card, 'click', handleActivate)
+      this.on(card, 'keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+          e.preventDefault()
+          handleActivate(e)
+        }
       })
     })
   }

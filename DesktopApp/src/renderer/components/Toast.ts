@@ -29,6 +29,9 @@ export class Toast {
   private static createContainer(): void {
     this.container = document.createElement('div')
     this.container.className = 'toast-container'
+    this.container.setAttribute('role', 'status')
+    this.container.setAttribute('aria-live', 'polite')
+    this.container.setAttribute('aria-atomic', 'false')
     document.body.appendChild(this.container)
   }
 

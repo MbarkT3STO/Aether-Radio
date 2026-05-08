@@ -131,10 +131,17 @@ export class HistoryView extends BaseComponent {
 
   private attachListeners(): void {
     this.querySelectorAll('.station-card').forEach(card => {
-      this.on(card, 'click', () => {
+      const handleActivate = () => {
         const id   = card.getAttribute('data-station-id')
         const item = this.history.find(h => h.station.id === id)
         if (item) this.playerStore.play(item.station)
+      }
+      this.on(card, 'click', handleActivate)
+      this.on(card, 'keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+          e.preventDefault()
+          handleActivate()
+        }
       })
     })
   }
