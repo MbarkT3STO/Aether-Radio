@@ -365,21 +365,21 @@ html[data-theme="dark"] .app-topbar-theme .icon-moon { display: none; }
 }
 
 
-/* ═══ 5 · Player bar — sits flush with the card ═════════════════
+/* ═══ 5 · Player bar — floating rounded pill ═══════════════════
 
-   With the main area wrapped as a card, the player bar should
-   sit inside the card without its own margin.
+   The mini player sits as a floating rounded pill inside the
+   card, with its own material + shadow. Margins nudge it away
+   from the card's edges so the radius breathes.
 */
 .platform-web .app-player-bar {
-  padding: 0;
+  padding: 10px 12px 12px;
 }
 
 .platform-web .player-bar {
   margin: 0;
-  border-radius: 0;
-  border: 0;
-  border-top: 1px solid var(--border-subtle);
-  box-shadow: none;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
 }
 
 
