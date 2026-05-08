@@ -334,10 +334,11 @@ html[data-theme="dark"] .app-topbar-theme .icon-moon { display: none; }
 
    Originally the sidebar had a 38px top margin to clear the macOS
    traffic-light drag bar. Now the top bar handles that space, so
-   drop the margin and keep a nice floating feel.
+   drop the margin and keep a nice floating feel. Adds breathing
+   room between the sidebar and the main-area card.
 */
 .platform-web .app-sidebar {
-  margin: 10px 0 10px 10px;
+  margin: 10px 10px 10px 10px;
 }
 
 
@@ -456,7 +457,7 @@ html[data-theme="dark"] .app-topbar-theme .icon-moon { display: none; }
 
 @media (max-width: 640px) {
   .platform-web .app-sidebar {
-    margin: 8px 0 8px 8px;
+    margin: 8px 8px 8px 8px;
   }
   .platform-web .app-main {
     margin: 8px 8px 0 0;
