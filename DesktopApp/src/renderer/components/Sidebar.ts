@@ -2,6 +2,7 @@ import { BaseComponent } from './base/BaseComponent'
 import { Router } from '../router/Router'
 import { EventBus } from '../store/EventBus'
 import { AboutModal } from './AboutModal'
+import { LOGO_URL } from '../utils/assets'
 
 interface NavItem { route: string; label: string; icon: string }
 
@@ -74,7 +75,7 @@ export class Sidebar extends BaseComponent {
         <div class="sidebar-header">
           <div class="sidebar-logo">
             <div class="sidebar-logo-icon sidebar-logo-icon--clickable" id="sidebar-logo-btn" title="About Aether Radio">
-              <img src="./assets/logo.png" alt="Aether Radio" class="sidebar-logo-img">
+              <img src="${LOGO_URL}" alt="Aether Radio" class="sidebar-logo-img">
             </div>
             <div class="sidebar-logo-text">
               <span class="sidebar-logo-name">Aether Radio</span>

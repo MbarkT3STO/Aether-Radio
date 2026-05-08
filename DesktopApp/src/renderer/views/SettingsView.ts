@@ -5,6 +5,7 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { ConfirmModal } from '../components/ConfirmModal'
 import type { AppSettings, Theme, AccentColor } from '../../domain/entities/AppSettings'
 import type { AppInfo } from '../../main/ipc/handlers/WindowIpcHandler'
+import { LOGO_URL } from '../utils/assets'
 
 const REPO_OWNER  = 'MbarkT3STO'
 const REPO_NAME   = 'Aether-Radio'
@@ -206,7 +207,7 @@ export class SettingsView extends BaseComponent {
         <!-- Hero -->
         <div class="stg-about">
           <div class="stg-about-logo">
-            <img src="./assets/logo.png" alt="Aether Radio" class="stg-about-logo-img">
+            <img src="${LOGO_URL}" alt="Aether Radio" class="stg-about-logo-img">
           </div>
           <div>
             <div class="stg-about-name">
@@ -296,6 +297,8 @@ export class SettingsView extends BaseComponent {
 
   private renderDeveloperCard(): string {
     const avatar = `https://github.com/${REPO_OWNER}.png?size=120`
+    // Local fallback silhouette shown when the avatar can't be fetched (offline etc.)
+    const fallback = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
     return `
       <div class="stg-card">
         <div class="stg-card-header">
@@ -307,9 +310,10 @@ export class SettingsView extends BaseComponent {
         </div>
 
         <div class="stg-about">
-          <div class="stg-about-logo">
+          <div class="stg-about-logo stg-about-logo--dev" data-dev-fallback>
+            <div class="stg-about-logo-fallback">${fallback}</div>
             <img src="${avatar}" alt="${this.esc(DEV_NAME)}" class="stg-about-logo-img"
-                 onerror="this.style.display='none'">
+                 data-dev-avatar>
           </div>
           <div>
             <div class="stg-about-name">${this.esc(DEV_NAME)}</div>
@@ -556,6 +560,18 @@ export class SettingsView extends BaseComponent {
       this.on(sponsorBtn, 'click', () => {
         window.electronAPI.openExternal(FUND_URL)
       })
+    }
+
+    // Developer avatar — show local fallback if the remote avatar fails (offline)
+    const devAvatar = this.querySelector<HTMLImageElement>('[data-dev-avatar]')
+    if (devAvatar) {
+      const handleError = (): void => {
+        const parent = devAvatar.closest('[data-dev-fallback]') as HTMLElement | null
+        if (parent) parent.classList.add('stg-about-logo--offline')
+      }
+      devAvatar.addEventListener('error', handleError)
+      // Complete but zero-sized implies the fetch already failed
+      if (devAvatar.complete && devAvatar.naturalWidth === 0) handleError()
     }
   }
 

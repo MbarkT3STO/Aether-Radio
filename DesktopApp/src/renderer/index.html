@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    Content-Security-Policy
+    · default-src 'self'                    all same-origin resources
+    · style-src   'self' 'unsafe-inline'    local stylesheets + inline style attrs
+    · font-src    'self'                    LOCAL FONTS ONLY — no web fonts
+    · script-src  'self'                    LOCAL SCRIPTS ONLY — no remote code
+    · img-src     'self' data: https: http:  station logos are remote (user content)
+    · media-src   'self' https: http:        radio streams
+    · connect-src 'self' https: http:        Radio Browser API + stream probes
+  -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: http:; media-src 'self' https: http:; connect-src 'self' https: http:; script-src 'self';">
   <title>Aether Radio</title>
   <!-- Fonts (local) -->

@@ -3,6 +3,7 @@
  * Self-contained: injects itself into document.body, cleans up on close.
  */
 import type { ElectronAPI } from '../../preload/preload'
+import { LOGO_URL } from '../utils/assets'
 
 declare global {
   interface Window { electronAPI: ElectronAPI }
@@ -39,7 +40,7 @@ export class AboutModal {
 
         <!-- Logo -->
         <div class="am-logo-wrap">
-          <img src="./assets/logo.png" alt="Aether Radio" class="am-logo">
+          <img src="${LOGO_URL}" alt="Aether Radio" class="am-logo">
           <div class="am-logo-glow"></div>
         </div>
 
