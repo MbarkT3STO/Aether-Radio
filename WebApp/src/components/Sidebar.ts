@@ -21,7 +21,16 @@ function prefetchViewChunk(route: string): void {
   }
 }
 
-interface NavItem { route: string; label: string; icon: string }
+interface NavItem {
+  /** Hash route for internal items, unused for external links */
+  route: string
+  label: string
+  icon: string
+  /** External URL — opens in a new tab instead of routing */
+  external?: string
+}
+
+const DOWNLOAD_URL = 'https://aether-radio.netlify.app/#download'
 
 const NAV_ITEMS: NavItem[] = [
   {
@@ -63,6 +72,16 @@ const NAV_ITEMS: NavItem[] = [
     route: '/settings',
     label: 'Settings',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2" fill="currentColor" stroke="none"/></svg>`
+  }
+]
+
+// External links — rendered below the main nav with a separator
+const EXTERNAL_ITEMS: NavItem[] = [
+  {
+    route: 'download',
+    label: 'Download App',
+    external: DOWNLOAD_URL,
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`
   }
 ]
 
@@ -112,6 +131,21 @@ export class Sidebar extends BaseComponent {
               <span class="sidebar-nav-label">${item.label}</span>
             </div>
           `).join('')}
+
+          <div class="sidebar-nav-section-label sidebar-nav-section-label--secondary">Get the app</div>
+          ${EXTERNAL_ITEMS.map(item => `
+            <a class="sidebar-nav-item sidebar-nav-item--external"
+               href="${item.external}"
+               target="_blank"
+               rel="noopener noreferrer"
+               data-tooltip="${item.label}">
+              <span class="sidebar-nav-icon">${item.icon}</span>
+              <span class="sidebar-nav-label">${item.label}</span>
+              <span class="sidebar-nav-external-badge" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+              </span>
+            </a>
+          `).join('')}
         </nav>
 
         <!-- Collapse toggle -->
@@ -142,8 +176,13 @@ export class Sidebar extends BaseComponent {
     // Nav item clicks
     this.querySelectorAll('.sidebar-nav-item').forEach(item => {
       this.on(item, 'click', () => {
+        // External links (rendered as <a target="_blank">) carry no
+        // data-route. The browser handles navigation natively — we must
+        // not call the hash router, or we'd bounce the current tab to
+        // an unknown hash and back to Home.
         const route = item.getAttribute('data-route')
-        if (route) this.router.navigate(route)
+        if (!route) return
+        this.router.navigate(route)
       })
 
       // Set --tooltip-y so the fixed-position tooltip aligns with the item
