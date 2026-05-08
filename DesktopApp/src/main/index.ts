@@ -1,5 +1,6 @@
 import { app, BrowserWindow, session, globalShortcut } from 'electron'
 import { join } from 'path'
+import { is } from '@electron-toolkit/utils'
 import { IpcHandlerRegistry } from './ipc/IpcHandlerRegistry'
 import { TrayManager } from './tray/TrayManager'
 import { WindowStateManager } from './window/WindowStateManager'
@@ -8,6 +9,20 @@ const trayManager = new TrayManager()
 const windowStateManager = new WindowStateManager()
 
 let mainWindow: BrowserWindow | null = null
+
+/**
+ * Returns the correct window icon path for the current platform.
+ * macOS draws its icon from the .app bundle so we skip it there
+ * (Electron respects the bundled Info.plist CFBundleIconFile).
+ * Linux/Windows benefit from an explicit PNG in the window options.
+ */
+function getWindowIconPath(): string | undefined {
+  if (process.platform === 'darwin') return undefined
+  // build/icon.png ships beside the .app / .exe in production
+  return is.dev
+    ? join(app.getAppPath(), 'build/icon.png')
+    : join(process.resourcesPath, 'build', 'icon.png')
+}
 
 function createWindow(): void {
   const state = windowStateManager.getState()
@@ -21,6 +36,7 @@ function createWindow(): void {
     minHeight: 768,
     backgroundColor: '#0A0A0F',
     titleBarStyle: 'hiddenInset',
+    icon: getWindowIconPath(),
     webPreferences: {
       preload: join(__dirname, '../preload/preload.js'),
       contextIsolation: true,
