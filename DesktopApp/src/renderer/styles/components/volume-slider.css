@@ -1,34 +1,31 @@
 /* ═══════════════════════════════════════════════════════════════
-   VOLUME SLIDER — Redesigned to match pill controls
+   VOLUME SLIDER — Apple HIG slider
+   Pill wrapper · thin track · rising thumb on hover
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Volume row wrapper ── */
 .player-volume {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: var(--bg-secondary);
+  gap: 10px;
+  background: var(--fill-tertiary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
-  padding: 5px 12px 5px 6px;
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-  width: 160px;
+  padding: 5px 14px 5px 6px;
+  width: 168px;
   flex-shrink: 0;
 }
 
-
-
-/* Mute button inside the pill */
+/* Mute button */
 .player-btn-mute {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
   flex-shrink: 0;
   border-radius: 50%;
@@ -40,10 +37,10 @@
 
 .player-btn-mute:hover {
   color: var(--text-primary);
-  transform: scale(1.15);
+  transform: scale(1.12);
 }
 
-.player-btn-mute:active { transform: scale(0.88); }
+.player-btn-mute:active { transform: scale(0.92); }
 
 .player-btn-mute:focus-visible {
   outline: 2px solid var(--accent-primary);
@@ -55,21 +52,19 @@
 .volume-slider {
   position: relative;
   flex: 1;
-  height: 3px;
+  height: 4px;
   background: var(--border-medium);
   border-radius: var(--radius-full);
   cursor: pointer;
-  padding: 9px 0;
+  padding: 10px 0;
   box-sizing: content-box;
-  margin: -9px 0;
+  margin: -10px 0;
 }
-
-
 
 /* Fill */
 .volume-slider-fill {
-  height: 3px;
-  background: var(--gradient-accent);
+  height: 4px;
+  background: var(--accent-primary);
   border-radius: var(--radius-full);
   position: relative;
   pointer-events: none;
@@ -79,14 +74,14 @@
 /* Thumb */
 .volume-slider-thumb {
   position: absolute;
-  right: -5px;
+  right: -6px;
   top: 50%;
   transform: translateY(-50%) scale(0);
-  width: 12px;
-  height: 12px;
-  background: #fff;
+  width: 14px;
+  height: 14px;
+  background: #FFFFFF;
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.22), 0 0 0 1.5px var(--accent-primary);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22), 0 0 0 0.5px rgba(0,0,0,0.08);
   opacity: 0;
   transition:
     opacity var(--transition-fast),
@@ -94,9 +89,8 @@
   pointer-events: none;
 }
 
-.volume-slider:hover .volume-slider-thumb {
+.volume-slider:hover .volume-slider-thumb,
+.volume-slider:focus-within .volume-slider-thumb {
   opacity: 1;
   transform: translateY(-50%) scale(1);
 }
-
-

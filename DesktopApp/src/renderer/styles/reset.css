@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════
    AETHER RADIO — CSS RESET
-   Apple-style base reset with Liquid Glass foundations
+   Apple HIG base reset with semantic defaults
    ═══════════════════════════════════════════════════════════════════ */
 
 *,
@@ -17,18 +17,21 @@ html {
   scroll-behavior: smooth;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  /* Prevent double-tap zoom on controls on touch displays */
+  touch-action: manipulation;
 }
 
 body {
   font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
+  font-size: var(--text-base);
+  line-height: 1.47;           /* Apple's body line height */
+  letter-spacing: -0.008em;    /* Apple optical tightening */
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
   transition: background-color 0.28s ease, color 0.28s ease;
-  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'ss01' 1;
+  font-variant-ligatures: common-ligatures contextual;
 }
 
 img, picture, video, canvas, svg {
@@ -39,31 +42,36 @@ img, picture, video, canvas, svg {
 input, button, textarea, select {
   font: inherit;
   color: inherit;
+  letter-spacing: inherit;
 }
 
 button {
   cursor: pointer;
   border: none;
   background: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {
-  color: inherit;
+  color: var(--accent-primary);
   text-decoration: none;
 }
 
-ul, ol {
-  list-style: none;
-}
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+ul, ol { list-style: none; }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.12;
+  font-weight: var(--weight-bold);
+  line-height: 1.15;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
-/* ── Focus ring — Apple-style ── */
+/* ── Focus ring — Apple-style, 2px accent with halo ── */
+:focus { outline: none; }
+
 :focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
@@ -72,14 +80,14 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Text selection ── */
 ::selection {
-  background: var(--accent-soft);
+  background: var(--accent-soft-md);
   color: var(--text-primary);
 }
 
-/* ── Accessibility: High Contrast ── */
-@media (prefers-contrast: more) {
-  :focus-visible {
-    outline-width: 3px;
-    outline-offset: 3px;
-  }
+/* ── Disabled state defaults ── */
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.35;
+  pointer-events: none;
 }

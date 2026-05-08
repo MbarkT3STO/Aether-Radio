@@ -1,24 +1,25 @@
 /* ═══════════════════════════════════════════════════════════════
-   SEARCH BAR — Apple Liquid Glass Design
+   SEARCH BAR — Apple HIG search field
+   Rounded, filled style with leading icon & clear button
    ═══════════════════════════════════════════════════════════════ */
 
 .search-bar {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 620px;
 }
 
 .search-bar-input {
   width: 100%;
   padding: 10px var(--space-6) 10px 42px;
-  background: var(--bg-tertiary);
+  background: var(--fill-tertiary);
   border: 1px solid transparent;
   border-radius: var(--radius-full);
   color: var(--text-primary);
-  font-size: var(--text-sm);
-  font-weight: 400;
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
   font-family: var(--font-body);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.006em;
   transition:
     border-color var(--transition-fast),
     background var(--transition-fast),
@@ -29,31 +30,33 @@
   outline: none;
   border-color: var(--accent-primary);
   background: var(--bg-secondary);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: var(--shadow-focus);
 }
 
 .search-bar-input::placeholder {
   color: var(--text-placeholder);
-  font-weight: 400;
+  font-weight: var(--weight-regular);
 }
 
 .search-bar-icon {
   position: absolute;
-  left: 14px;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  width: 15px;
-  height: 15px;
-  color: var(--text-muted);
+  width: 16px;
+  height: 16px;
+  color: var(--text-tertiary);
   pointer-events: none;
   transition: color var(--transition-fast);
 }
 
-.search-bar:focus-within .search-bar-icon { color: var(--accent-primary); }
+.search-bar:focus-within .search-bar-icon {
+  color: var(--accent-primary);
+}
 
 .search-bar-clear {
   position: absolute;
-  right: 9px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   width: 22px;
@@ -62,8 +65,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
-  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  background: var(--fill-secondary);
   border: none;
   cursor: pointer;
   opacity: 0;
@@ -71,6 +74,7 @@
   transition:
     opacity var(--transition-fast),
     color var(--transition-fast),
+    background var(--transition-fast),
     transform var(--transition-spring);
 }
 
@@ -78,8 +82,11 @@
 
 .search-bar-clear:hover {
   color: var(--text-primary);
-  background: var(--border-medium);
-  transform: translateY(-50%) scale(1.1);
+  background: var(--fill-primary);
+  transform: translateY(-50%) scale(1.08);
 }
 
-
+.search-bar-clear:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}

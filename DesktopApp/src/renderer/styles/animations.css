@@ -124,19 +124,11 @@
 
 /* ═══════════════════════════════════════════════════════════════
    ACCESSIBILITY — Reduced Motion
-   Apple HIG: Respect prefers-reduced-motion.
+   Global prefers-reduced-motion handled in accessibility.css.
+   Utility-class fallbacks below for explicit animate-* classes.
    ═══════════════════════════════════════════════════════════════ */
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration:        0.01ms !important;
-    animation-iteration-count: 1      !important;
-    transition-duration:       0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
   .animate-fade-in,
   .animate-slide-up,
   .animate-scale-in,
@@ -145,15 +137,4 @@
   .animate-pulse,
   .animate-spin,
   .animate-float { animation: none; opacity: 1; }
-
-  .player-bar-ambient,
-  .pex-ambient-canvas { transition: none !important; }
-
-  .home-now-playing-dot,
-  .station-card.playing::before,
-  .cs-playing-dot,
-  .player-live-dot { animation: none !important; }
-
-  .home-now-playing-bars span,
-  .visualizer-idle-bar { animation: none !important; transform: scaleY(0.6) !important; }
 }

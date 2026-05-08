@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   SIDEBAR — Apple Liquid Glass Design
+   SIDEBAR — Apple macOS Sidebar (HIG)
+   Vibrant sidebar material · pill selection · source list rows
    ═══════════════════════════════════════════════════════════════ */
 
 .sidebar {
@@ -7,7 +8,6 @@
   flex-direction: column;
   height: 100%;
   background: transparent;
-  /* NO overflow:hidden — tooltips must escape */
 }
 
 /* ── Header ── */
@@ -18,20 +18,20 @@
 }
 
 .platform-darwin .sidebar-header {
-  padding-top: 16px;
+  padding-top: 18px;
 }
 
 /* ── Logo icon ── */
 .sidebar-logo-icon {
   -webkit-app-region: no-drag;
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   flex-shrink: 0;
   border: none;
-  box-shadow: var(--shadow-md), var(--shadow-inset);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
   position: relative;
 }
 
@@ -41,13 +41,13 @@
 }
 
 .sidebar-logo-icon--clickable:hover  {
-  opacity: 0.85;
-  transform: scale(1.06);
+  opacity: 0.9;
+  transform: scale(1.05);
 }
 
 .sidebar-logo-icon--clickable:active {
-  opacity: 0.65;
-  transform: scale(0.94);
+  opacity: 0.7;
+  transform: scale(0.95);
   transition-duration: 80ms;
 }
 
@@ -69,7 +69,7 @@
 .sidebar-logo-text {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   white-space: nowrap;
   max-width: 200px;
   opacity: 1;
@@ -79,25 +79,21 @@
 
 .sidebar-logo-name {
   font-family: var(--font-display);
-  font-size: 0.9375rem;
-  font-weight: 800;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
   color: var(--text-primary);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.018em;
   white-space: nowrap;
   line-height: 1.2;
 }
 
 .sidebar-logo-tagline {
-  font-size: 0.5625rem;
-  font-weight: 700;
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   white-space: nowrap;
-  opacity: 0.85;
 }
 
 /* ── Divider ── */
@@ -111,27 +107,26 @@
 /* ── Nav ── */
 .sidebar-nav {
   flex: 1;
-  padding: 4px 8px;
+  padding: 4px 10px;
   overflow-y: auto;
   overflow-x: clip;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   -webkit-app-region: no-drag;
-  gap: 1px;
+  gap: 2px;
 }
 
-/* In collapsed mode, allow tooltips to escape */
 .sidebar.collapsed .sidebar-nav {
   overflow: visible;
 }
 
 .sidebar-nav-section-label {
-  font-size: 0.5rem;
-  font-weight: 700;
-  color: var(--text-muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.08em;
   padding: 12px 10px 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -140,18 +135,18 @@
   transition: max-height var(--transition-slow), opacity 200ms ease, padding var(--transition-slow);
 }
 
-/* ── Nav item ── */
+/* ── Nav item (Apple source-list row) ── */
 .sidebar-nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
-  border-radius: var(--radius-xl);
-  color: var(--text-secondary);
+  padding: 7px 10px;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
   cursor: pointer;
-  font-weight: 500;
-  font-size: var(--text-sm);
-  letter-spacing: -0.015em;
+  font-weight: var(--weight-medium);
+  font-size: var(--text-base);
+  letter-spacing: -0.008em;
   user-select: none;
   background: transparent;
   white-space: nowrap;
@@ -162,8 +157,7 @@
 }
 
 .sidebar-nav-item:hover {
-  color: var(--text-primary);
-  background: var(--bg-tertiary);
+  background: var(--fill-tertiary);
 }
 
 .sidebar-nav-item:focus-visible {
@@ -172,44 +166,44 @@
 }
 
 .sidebar-nav-item:active {
-  background: var(--border-subtle);
+  background: var(--fill-secondary);
   transition-duration: 60ms;
 }
 
-/* Active state — clean accent fill, no border decoration */
+/* Active — Apple "filled" selection on sidebars */
 .sidebar-nav-item.active {
-  color: var(--accent-primary);
-  background: var(--accent-soft);
-  font-weight: 600;
+  color: var(--text-on-accent);
+  background: var(--accent-primary);
+  font-weight: var(--weight-semibold);
+}
+
+/* When window is out-of-focus, Apple shows a subdued inactive selection */
+.app-sidebar:not(:focus-within) .sidebar-nav-item.active {
+  background: var(--fill-primary);
+  color: var(--text-primary);
 }
 
 /* ── Nav icon ── */
 .sidebar-nav-icon {
-  width: 18px;
-  height: 18px;
-  min-width: 18px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.60;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  color: var(--text-secondary);
+  transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
-.sidebar-nav-item.active .sidebar-nav-icon,
-.sidebar-nav-item:hover .sidebar-nav-icon {
-  opacity: 1;
+.sidebar-nav-item:hover .sidebar-nav-icon { color: var(--text-primary); }
+.sidebar-nav-item.active .sidebar-nav-icon { color: var(--text-on-accent); }
+
+.app-sidebar:not(:focus-within) .sidebar-nav-item.active .sidebar-nav-icon {
+  color: var(--accent-primary);
 }
 
-.sidebar-nav-item.active .sidebar-nav-icon {
-  transform: scale(1.05);
-}
-
-.sidebar-nav-icon svg {
-  width: 17px;
-  height: 17px;
-  flex-shrink: 0;
-}
+.sidebar-nav-icon svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 /* ── Nav label ── */
 .sidebar-nav-label {
@@ -220,10 +214,8 @@
   transition: max-width var(--transition-slow), opacity 200ms ease;
 }
 
-/* ── Tooltip (fixed position, aligned to button) ── */
-.sidebar.collapsed .sidebar-nav-item {
-  position: relative;
-}
+/* ── Tooltip (collapsed state) ── */
+.sidebar.collapsed .sidebar-nav-item { position: relative; }
 
 .sidebar-nav-item::after {
   content: attr(data-tooltip);
@@ -231,12 +223,12 @@
   left: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
-  background: var(--bg-elevated);
+  background: var(--material-tooltip);
   border: 1px solid var(--border-medium);
   color: var(--text-primary);
   font-size: var(--text-xs);
-  font-weight: 600;
-  padding: 4px 10px;
+  font-weight: var(--weight-semibold);
+  padding: 5px 10px;
   border-radius: var(--radius-md);
   white-space: nowrap;
   pointer-events: none;
@@ -244,33 +236,35 @@
   z-index: 99999;
   box-shadow: var(--shadow-md);
   transition: opacity 100ms ease 60ms;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
 }
 
-/* ── Collapse button — sits between nav and footer, aligned to nav padding ── */
+/* ── Collapse button ── */
 .sidebar-collapse-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 32px;
-  padding: 0 8px;
+  padding: 0 10px;
   margin: 2px 0 4px;
   flex-shrink: 0;
   align-self: stretch;
 
   background: transparent;
   border: none;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   -webkit-app-region: no-drag;
 
   gap: 8px;
   font-family: var(--font-body);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.004em;
 
   transition:
     color var(--transition-fast),
@@ -278,12 +272,13 @@
 }
 
 .sidebar-collapse-btn:hover {
-  color: var(--text-secondary);
-  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  background: var(--fill-tertiary);
 }
 
 .sidebar-collapse-btn:active {
   color: var(--text-primary);
+  background: var(--fill-secondary);
   transition-duration: 60ms;
 }
 
@@ -293,12 +288,10 @@
   width: 14px;
   height: 14px;
   transition: transform var(--transition-slow);
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
-.sidebar-collapse-btn:hover svg {
-  opacity: 0.8;
-}
+.sidebar-collapse-btn:hover svg { opacity: 1; }
 
 .sidebar-collapse-label {
   white-space: nowrap;
@@ -318,7 +311,7 @@
 .sidebar-footer-divider {
   height: 1px;
   background: var(--border-subtle);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .sidebar-version {
@@ -326,7 +319,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: var(--text-xs);
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .sidebar-version-text {
@@ -335,22 +328,22 @@
   max-width: 120px;
   opacity: 1;
   transition: max-width var(--transition-slow), opacity 200ms ease;
-  letter-spacing: -0.01em;
-  font-size: 0.6875rem;
+  letter-spacing: -0.004em;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
 }
 
 .sidebar-version-badge {
   padding: 2px 8px;
-  background: var(--accent-soft);
+  background: var(--fill-tertiary);
   border-radius: var(--radius-full);
-  font-size: 0.5rem;
-  font-weight: 700;
-  color: var(--accent-primary);
-  letter-spacing: 0.05em;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
   flex-shrink: 0;
   opacity: 1;
   transition: opacity var(--transition-slow);
-  border: 1px solid var(--accent-border);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -370,7 +363,7 @@
 }
 
 .platform-darwin .sidebar.collapsed .sidebar-header {
-  padding-top: 16px;
+  padding-top: 18px;
 }
 
 .sidebar.collapsed .sidebar-logo {
@@ -387,14 +380,14 @@
 
 .sidebar.collapsed .sidebar-nav {
   align-items: center;
-  padding: 4px 0;
+  padding: 4px 8px;
 }
 
 .sidebar.collapsed .sidebar-nav-item {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   justify-content: center;
   gap: 0;
   margin-left: 0;
@@ -403,14 +396,13 @@
 
 .sidebar.collapsed .sidebar-collapse-btn svg {
   transform: rotate(180deg);
-  opacity: 0.65;
+  opacity: 0.7;
   margin: 0 auto;
 }
 
-/* In collapsed mode the button is icon-only, centered */
 .sidebar.collapsed .sidebar-collapse-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   justify-content: center;
   align-self: center;
@@ -453,5 +445,3 @@
   opacity: 0;
   pointer-events: none;
 }
-
-

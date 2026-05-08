@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
-   EXPANDED PLAYER — Full-screen immersive overlay
+   EXPANDED PLAYER — Apple HIG full-screen now-playing
+   Dominant artwork · ambient blur bloom · large controls
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Overlay shell ── */
 .player-expanded-overlay {
   position: absolute;
   left: 0; right: 0; bottom: 0;
@@ -45,7 +45,7 @@
   z-index: 1;
   pointer-events: none;
   background: var(--bg-primary);
-  opacity: 0.42;
+  opacity: 0.50;
   transition: opacity 0.42s ease;
 }
 
@@ -76,7 +76,7 @@
   align-items: center;
   gap: 56px;
   width: 100%;
-  max-width: 900px;
+  max-width: 960px;
   height: 100%;
 }
 
@@ -102,13 +102,13 @@
 }
 
 .pex-artwork {
-  width: clamp(180px, calc(100vh - 260px), 380px);
-  height: clamp(180px, calc(100vh - 260px), 380px);
-  border-radius: var(--radius-2xl);
+  width: clamp(180px, calc(100vh - 260px), 400px);
+  height: clamp(180px, calc(100vh - 260px), 400px);
+  border-radius: var(--radius-3xl);
   overflow: visible;
   position: relative;
   flex-shrink: 0;
-  background: var(--bg-tertiary);
+  background: var(--fill-tertiary);
   box-shadow: var(--shadow-2xl), 0 0 0 1px var(--border-subtle);
   transition: transform var(--transition-spring), box-shadow var(--transition-slow);
 }
@@ -123,7 +123,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-3xl);
   overflow: hidden;
 }
 
@@ -131,9 +131,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-tertiary);
+  background: var(--fill-tertiary);
   color: var(--accent-primary);
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 /* Artwork reflection */
@@ -153,19 +153,19 @@
 /* Live badge */
 .pex-live-badge {
   position: absolute;
-  bottom: 12px;
-  left: 12px;
+  bottom: 14px;
+  left: 14px;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(52,199,89,0.35);
-  font-size: 0.6rem;
-  font-weight: 700;
+  border: 1px solid rgba(52,199,89,0.40);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   color: var(--status-live);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -199,15 +199,15 @@
 .pex-identity {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .pex-station-name {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
-  font-weight: 800;
+  font-size: clamp(1.625rem, 3vw, 2.625rem);
+  font-weight: var(--weight-heavy);
   color: var(--text-primary);
-  letter-spacing: -0.045em;
+  letter-spacing: -0.025em;
   line-height: 1.06;
   white-space: nowrap;
   overflow: hidden;
@@ -219,38 +219,36 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
 }
 
 .pex-meta-sep { opacity: 0.35; }
 
 .pex-bitrate {
-  padding: 2px 8px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  padding: 3px 10px;
+  background: var(--fill-tertiary);
   border-radius: var(--radius-full);
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 0.03em;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
 }
 
 .pex-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 4px;
+  gap: 6px;
+  margin-top: var(--space-1);
 }
 
 .pex-tag {
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: var(--radius-full);
   background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
   color: var(--accent-primary);
-  font-size: 0.6875rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -267,15 +265,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--bg-secondary);
+  background: var(--fill-tertiary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   padding: 7px 8px;
-  box-shadow: var(--shadow-md), var(--shadow-inset);
   align-self: flex-start;
 }
 
-/* Secondary buttons (stop, favorite) */
+/* Secondary buttons */
 .pex-btn {
   display: flex;
   align-items: center;
@@ -284,9 +281,10 @@
   border: none;
   cursor: pointer;
   background: transparent;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   transition:
     color var(--transition-fast),
+    background var(--transition-fast),
     transform var(--transition-spring);
   flex-shrink: 0;
   width: 40px;
@@ -301,36 +299,38 @@
 
 .pex-btn:hover {
   color: var(--text-primary);
-  transform: scale(1.10);
+  background: var(--fill-secondary);
+  transform: scale(1.08);
 }
 
 .pex-btn:active {
-  transform: scale(0.88);
+  transform: scale(0.90);
   transition-duration: 60ms;
 }
 
 /* Stop */
 .pex-btn-stop {
-  width: 36px;
-  height: 36px;
-  color: var(--text-muted);
+  width: 38px;
+  height: 38px;
+  color: var(--text-tertiary);
 }
 
 .pex-btn-stop:hover {
   color: var(--status-error);
+  background: rgba(255,59,48,0.10);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   PLAY BUTTON — fully isolated
+   PLAY BUTTON
    ═══════════════════════════════════════════════════════════════ */
 .pex-btn-play {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 68px;
-  height: 68px;
+  width: 72px;
+  height: 72px;
   background: var(--accent-primary);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -342,12 +342,13 @@
     0 3px 10px rgba(0,0,0,0.12);
   transition:
     transform var(--transition-spring),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .pex-btn-play:hover {
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--accent-hover);
+  color: var(--text-on-accent);
   transform: scale(1.06);
   box-shadow:
     0 8px 32px var(--accent-glow-lg),
@@ -356,7 +357,7 @@
 
 .pex-btn-play:active {
   background: var(--accent-pressed);
-  color: #fff;
+  color: var(--text-on-accent);
   transform: scale(0.94);
   box-shadow: 0 2px 10px var(--accent-glow);
   transition-duration: 60ms;
@@ -377,23 +378,10 @@
   pointer-events: none;
 }
 
-@keyframes playRingPulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50%       { opacity: 0; transform: scale(1.18); }
-}
-
 /* Favorite */
-.pex-btn-fav {
-  color: var(--text-muted);
-}
-
-.pex-btn-fav:hover {
-  color: var(--palette-pink);
-}
-
-.pex-btn-fav.active {
-  color: var(--palette-pink);
-}
+.pex-btn-fav { color: var(--text-tertiary); }
+.pex-btn-fav:hover { color: var(--sys-pink); background: rgba(255,45,85,0.10); }
+.pex-btn-fav.active { color: var(--sys-pink); }
 
 /* ═══════════════════════════════════════════════════════════════
    VOLUME
@@ -402,24 +390,23 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-secondary);
+  background: var(--fill-tertiary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   padding: 7px 16px 7px 8px;
-  box-shadow: var(--shadow-md), var(--shadow-inset);
-  max-width: 320px;
+  max-width: 340px;
 }
 
 .pex-btn-mute {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   flex-shrink: 0;
   cursor: pointer;
   border-radius: 50%;
@@ -431,10 +418,10 @@
 
 .pex-btn-mute:hover {
   color: var(--text-primary);
-  transform: scale(1.15);
+  transform: scale(1.12);
 }
 
-.pex-btn-mute:active { transform: scale(0.88); }
+.pex-btn-mute:active { transform: scale(0.92); }
 
 .pex-btn-mute:focus-visible {
   outline: 2px solid var(--accent-primary);
@@ -443,7 +430,7 @@
 
 .pex-volume-slider {
   flex: 1;
-  height: 3px;
+  height: 4px;
   border-radius: var(--radius-full);
   background: var(--border-medium);
   border: none;
@@ -455,9 +442,9 @@
 }
 
 .pex-volume-fill {
-  height: 3px;
+  height: 4px;
   border-radius: var(--radius-full);
-  background: var(--gradient-accent);
+  background: var(--accent-primary);
   position: relative;
   transition: width 0.05s linear;
   pointer-events: none;
@@ -465,14 +452,14 @@
 
 .pex-volume-thumb {
   position: absolute;
-  right: -5px;
+  right: -6px;
   top: 50%;
   transform: translateY(-50%) scale(0);
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.22), 0 0 0 1.5px var(--accent-primary);
+  background: #FFFFFF;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22), 0 0 0 0.5px rgba(0,0,0,0.08);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--transition-fast), transform var(--transition-spring);
@@ -504,32 +491,32 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   padding: 8px;
   box-sizing: content-box;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-right: 4px;
   transition:
     color var(--transition-fast),
+    background var(--transition-fast),
     transform var(--transition-spring);
 }
 
-.pex-collapse-btn svg {
-  transition: transform var(--transition-slow);
-}
+.pex-collapse-btn svg { transition: transform var(--transition-slow); }
 
 .pex-collapse-btn:hover {
   color: var(--text-primary);
-  transform: scale(1.08);
+  background: var(--fill-tertiary);
+  transform: scale(1.05);
 }
 
 .pex-collapse-btn:active {
-  transform: scale(0.90);
+  transform: scale(0.92);
   transition-duration: 60ms;
 }
 

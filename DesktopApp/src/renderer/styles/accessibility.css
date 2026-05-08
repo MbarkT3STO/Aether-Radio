@@ -1,0 +1,167 @@
+/* ═══════════════════════════════════════════════════════════════════
+   AETHER RADIO — ACCESSIBILITY
+   Honors Apple HIG accessibility settings:
+   · prefers-reduced-transparency  (iOS "Reduce Transparency")
+   · prefers-contrast: more        (iOS "Increase Contrast")
+   · prefers-reduced-motion        (macOS/iOS "Reduce Motion")
+   · forced-colors                 (Windows High Contrast parity)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Reduce Transparency ──
+   Replace semi-transparent materials with opaque surfaces so content
+   stays legible when users disable vibrancy. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --material-thin:    var(--bg-secondary);
+    --material-regular: var(--bg-secondary);
+    --material-thick:   var(--bg-secondary);
+    --material-chrome:  var(--bg-secondary);
+    --material-sidebar: var(--bg-secondary);
+    --material-bar:     var(--bg-secondary);
+    --material-overlay: var(--bg-secondary);
+    --material-tooltip: var(--bg-secondary);
+  }
+
+  [data-theme="dark"] {
+    --material-thin:    var(--bg-secondary);
+    --material-regular: var(--bg-secondary);
+    --material-thick:   var(--bg-secondary);
+    --material-chrome:  var(--bg-secondary);
+    --material-sidebar: var(--bg-secondary);
+    --material-bar:     var(--bg-secondary);
+    --material-overlay: var(--bg-secondary);
+    --material-tooltip: var(--bg-secondary);
+  }
+
+  .app-sidebar,
+  .player-bar,
+  .toast,
+  .sleep-timer-popover,
+  .cm-backdrop,
+  .am-backdrop,
+  .rcm-backdrop {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* ── Increase Contrast ──
+   Darker labels, stronger borders, more prominent focus. */
+@media (prefers-contrast: more) {
+  :root {
+    --text-secondary:   rgba(0,0,0,0.82);
+    --text-tertiary:    rgba(0,0,0,0.62);
+    --text-muted:       rgba(0,0,0,0.46);
+    --text-placeholder: rgba(0,0,0,0.55);
+
+    --border-subtle:  rgba(0,0,0,0.28);
+    --border-medium:  rgba(0,0,0,0.46);
+    --border-strong:  rgba(0,0,0,0.66);
+
+    --fill-primary:    rgba(0,0,0,0.14);
+    --fill-secondary:  rgba(0,0,0,0.10);
+    --fill-tertiary:   rgba(0,0,0,0.08);
+    --fill-quaternary: rgba(0,0,0,0.05);
+
+    --accent-soft:    rgba(0,122,255,0.20);
+    --accent-soft-md: rgba(0,122,255,0.28);
+    --accent-border:  rgba(0,122,255,0.55);
+  }
+
+  [data-theme="dark"] {
+    --text-secondary:   rgba(255,255,255,0.88);
+    --text-tertiary:    rgba(255,255,255,0.70);
+    --text-muted:       rgba(255,255,255,0.52);
+    --text-placeholder: rgba(255,255,255,0.60);
+
+    --border-subtle:  rgba(255,255,255,0.28);
+    --border-medium:  rgba(255,255,255,0.46);
+    --border-strong:  rgba(255,255,255,0.66);
+
+    --fill-primary:    rgba(255,255,255,0.16);
+    --fill-secondary:  rgba(255,255,255,0.12);
+    --fill-tertiary:   rgba(255,255,255,0.10);
+    --fill-quaternary: rgba(255,255,255,0.06);
+  }
+
+  :focus-visible {
+    outline-width: 3px !important;
+    outline-offset: 3px !important;
+  }
+
+  .station-card,
+  .home-now-playing-card,
+  .home-stat-pill,
+  .genre-card,
+  .country-card,
+  .cs-card,
+  .stg-card {
+    border-width: 1.5px !important;
+  }
+}
+
+/* ── Forced Colors (Windows High Contrast, Edge) ── */
+@media (forced-colors: active) {
+  .station-card,
+  .sidebar-nav-item,
+  .btn,
+  .home-stat-pill,
+  .genre-card,
+  .country-card,
+  .cs-card,
+  .stg-card {
+    border: 1px solid CanvasText !important;
+  }
+  .sidebar-nav-item.active,
+  .station-card.playing,
+  .cs-card--playing {
+    forced-color-adjust: none;
+    background: Highlight !important;
+    color: HighlightText !important;
+    border-color: Highlight !important;
+  }
+  .player-btn-play,
+  .pex-btn-play,
+  .btn-primary,
+  .cs-btn-submit,
+  .cs-add-btn,
+  .cs-empty-cta {
+    forced-color-adjust: none;
+    background: Highlight !important;
+    color: HighlightText !important;
+  }
+}
+
+/* ── Reduce Motion ──
+   Apple HIG: disable non-essential motion; keep opacity changes. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .player-bar-ambient,
+  .pex-ambient-canvas { transition: none !important; }
+
+  .home-np-live-dot,
+  .home-np-bars span,
+  .station-card.playing::before,
+  .cs-playing-dot,
+  .player-live-ring,
+  .pex-live-dot,
+  .am-logo-glow,
+  .rcm-scan-ring,
+  .rcm-bar,
+  .rcm-icon-circle,
+  .empty-state-icon {
+    animation: none !important;
+  }
+
+  .home-np-bars span,
+  .visualizer-idle-bar,
+  .rcm-bar { transform: scaleY(0.6) !important; }
+}

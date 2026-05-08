@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   VISUALIZER — Apple Liquid Glass Design
+   VISUALIZER — Minimal bar display
    ═══════════════════════════════════════════════════════════════ */
 
 .visualizer {
@@ -29,7 +29,7 @@
   flex: 1;
   background: var(--accent-primary);
   border-radius: 2px 2px 0 0;
-  opacity: 0.22;
+  opacity: 0.30;
   animation: barDance 1.5s ease-in-out infinite;
 }
 

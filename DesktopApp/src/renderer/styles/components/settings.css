@@ -1,9 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
-   SETTINGS VIEW — Apple Liquid Glass Design
+   SETTINGS VIEW — Apple HIG grouped inset list
+   Sectioned cards · rows with descriptions · segmented controls
    ═══════════════════════════════════════════════════════════════ */
 
 .stg-content-wrap {
-  max-width: 600px;
+  max-width: 640px;
   width: 100%;
 }
 
@@ -13,7 +14,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-2xl);
   overflow: hidden;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
   width: 100%;
   box-shadow: var(--shadow-xs);
   transition:
@@ -23,7 +24,6 @@
 
 .stg-card:hover {
   box-shadow: var(--shadow-sm);
-  border-color: var(--border-medium);
 }
 
 /* ── Card Header ── */
@@ -33,12 +33,12 @@
   gap: 12px;
   padding: 14px 18px;
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-tertiary);
+  background: var(--fill-quaternary);
 }
 
 .stg-card-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-lg);
   background: var(--accent-soft);
   display: flex;
@@ -46,24 +46,23 @@
   justify-content: center;
   color: var(--accent-primary);
   flex-shrink: 0;
-  box-shadow: var(--shadow-xs);
 }
 
 .stg-card-title {
   font-family: var(--font-display);
-  font-size: var(--text-sm);
-  font-weight: 700;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
   color: var(--text-primary);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.012em;
   line-height: 1.2;
 }
 
 .stg-card-sub {
   font-size: var(--text-xs);
-  color: var(--text-tertiary);
-  font-weight: 400;
-  margin-top: 1px;
-  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  font-weight: var(--weight-regular);
+  margin-top: 2px;
+  letter-spacing: -0.004em;
 }
 
 /* ── Row ── */
@@ -82,29 +81,28 @@
 .stg-row-info { flex: 1; min-width: 0; }
 
 .stg-row-label {
-  font-weight: 600;
-  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
   color: var(--text-primary);
   margin-bottom: 2px;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.008em;
 }
 
 .stg-row-desc {
-  font-size: var(--text-xs);
-  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   line-height: 1.45;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.004em;
 }
 
-/* ── Toggle Group (Apple segmented control) ── */
+/* ── Segmented control (Apple HIG) ── */
 .stg-toggle-group {
   display: flex;
   gap: 2px;
-  background: var(--bg-tertiary);
+  background: var(--fill-tertiary);
   padding: 3px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   flex-shrink: 0;
-  border: 1px solid var(--border-subtle);
 }
 
 .stg-toggle-btn {
@@ -112,10 +110,10 @@
   align-items: center;
   gap: 5px;
   padding: 5px 14px;
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--text-tertiary);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
   cursor: pointer;
   transition:
     color var(--transition-fast),
@@ -126,19 +124,18 @@
   border: none;
   font-family: var(--font-body);
   white-space: nowrap;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
 }
 
 .stg-toggle-btn:hover {
   color: var(--text-primary);
-  transform: scale(1.02);
 }
 
 .stg-toggle-btn.active {
-  background: var(--bg-elevated);
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-xs);
   color: var(--text-primary);
-  font-weight: 700;
+  font-weight: var(--weight-semibold);
 }
 
 /* ── About section ── */
@@ -150,12 +147,12 @@
 }
 
 .stg-about-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-xl);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: var(--shadow-md), var(--shadow-inset);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
 }
 
 .stg-about-logo-img {
@@ -167,17 +164,17 @@
 
 .stg-about-name {
   font-family: var(--font-display);
-  font-size: var(--text-base);
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
   color: var(--text-primary);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.014em;
   margin-bottom: 2px;
 }
 
 .stg-about-version {
   font-size: var(--text-xs);
-  color: var(--text-muted);
-  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  letter-spacing: -0.004em;
 }
 
 /* ── Divider ── */
@@ -189,13 +186,14 @@
 
 /* ── Data source link ── */
 .stg-data-source-link {
-  font-size: var(--text-xs);
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   color: var(--accent-primary);
   white-space: nowrap;
   flex-shrink: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
   transition: opacity var(--transition-fast);
+  cursor: pointer;
 }
 
 .stg-data-source-link:hover { opacity: 0.75; }
@@ -215,20 +213,20 @@
   align-items: center;
   justify-content: center;
   padding: 3px 8px;
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
   white-space: nowrap;
   box-shadow: 0 1px 0 var(--border-medium);
 }
 
 .stg-kbd-plus {
-  font-size: 0.6rem;
-  color: var(--text-muted);
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
   padding: 0 1px;
 }
 
@@ -242,40 +240,34 @@
 .stg-action-btn {
   padding: 6px 14px;
   border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   font-family: var(--font-body);
   color: var(--accent-primary);
   background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
+  border: none;
   cursor: pointer;
   transition:
     background var(--transition-fast),
-    transform var(--transition-spring),
-    box-shadow var(--transition-fast);
+    transform var(--transition-spring);
   white-space: nowrap;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
 }
 
 .stg-action-btn:hover {
   background: var(--accent-soft-md);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
 }
 
 .stg-action-btn:active {
-  transform: translateY(0) scale(0.97);
-  box-shadow: none;
+  transform: scale(0.97);
 }
 
 .stg-action-btn--danger {
   color: var(--status-error);
-  background: rgba(255,59,48,0.08);
-  border-color: rgba(255,59,48,0.18);
+  background: rgba(255,59,48,0.10);
 }
 
 .stg-action-btn--danger:hover {
-  background: rgba(255,59,48,0.14);
+  background: rgba(255,59,48,0.18);
 }
-
-

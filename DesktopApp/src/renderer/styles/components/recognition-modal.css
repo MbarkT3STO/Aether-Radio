@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   SONG RECOGNITION MODAL
+   SONG RECOGNITION MODAL — Apple HIG modal with hero + identity
    ═══════════════════════════════════════════════════════════════ */
 
 .rcm-overlay {
@@ -19,38 +19,40 @@
 .rcm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.36);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
+
+[data-theme="dark"] .rcm-backdrop { background: rgba(0,0,0,0.60); }
 
 /* ── Dialog ── */
 .rcm-dialog {
   position: relative;
   z-index: 1;
-  background: var(--bg-secondary);
+  background: var(--material-modal);
   border-radius: var(--radius-3xl);
-  width: 420px;
+  width: 440px;
   max-width: 90vw;
   overflow: hidden;
   box-shadow: var(--shadow-2xl);
   animation: rcmDialogIn 0.40s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  border: 1px solid var(--border-medium);
+  border: 1px solid var(--border-subtle);
 }
 
-/* ── Close button ── */
+/* ── Close ── */
 .rcm-close {
   position: absolute;
   top: 12px;
   right: 12px;
   z-index: 100;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
+  background: var(--fill-tertiary);
+  border: none;
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,8 +64,8 @@
 
 .rcm-close:hover {
   color: var(--text-primary);
-  background: var(--bg-elevated);
-  transform: scale(1.10);
+  background: var(--fill-secondary);
+  transform: scale(1.08);
 }
 
 .rcm-close:active {
@@ -81,28 +83,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 20px;
-  height: 36px;
+  padding: 0 22px;
+  height: 38px;
   border-radius: var(--radius-full);
-  border: 1px solid var(--border-medium);
-  background: transparent;
-  color: var(--text-tertiary);
+  border: none;
+  background: var(--fill-tertiary);
+  color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
   transition:
     color var(--transition-fast),
     background var(--transition-fast),
-    border-color var(--transition-fast),
     transform var(--transition-spring);
 }
 
 .rcm-cancel-btn:hover {
   color: var(--status-error);
-  border-color: rgba(255,59,48,0.35);
-  background: rgba(255,59,48,0.07);
+  background: rgba(255,59,48,0.10);
   transform: translateY(-1px);
 }
 
@@ -123,11 +123,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 320px;
   position: relative;
   overflow: hidden;
   transition: opacity 0.3s ease, transform 0.3s ease;
-  background: var(--bg-secondary);
+  background: var(--material-modal);
 }
 
 .rcm-listening.rcm-fade-out {
@@ -140,7 +140,7 @@
   flex-direction: column;
   align-items: center;
   gap: 28px;
-  padding: 48px 32px 40px;
+  padding: 52px 32px 42px;
   position: relative;
   z-index: 1;
 }
@@ -148,8 +148,8 @@
 /* ── Scanning ring + icon ── */
 .rcm-scan-ring-wrap {
   position: relative;
-  width: 108px;
-  height: 108px;
+  width: 112px;
+  height: 112px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,16 +166,16 @@
 .rcm-ring-2 { animation-delay: 0.8s; }
 .rcm-ring-3 { animation-delay: 1.6s; }
 
-/* Icon circle — gradient pill matching play button */
+/* Icon circle */
 .rcm-icon-circle {
-  width: 80px;
-  height: 80px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
   background: var(--gradient-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-on-accent);
   position: relative;
   z-index: 2;
   box-shadow:
@@ -217,18 +217,18 @@
 
 .rcm-listening-label {
   font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
   color: var(--text-primary);
-  letter-spacing: -0.03em;
-  margin-bottom: 6px;
+  letter-spacing: -0.016em;
+  margin-bottom: var(--space-1);
 }
 
 .rcm-listening-sub {
-  font-size: var(--text-xs);
-  color: var(--text-tertiary);
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.005em;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -272,7 +272,7 @@
 .rcm-hero {
   position: relative;
   width: 100%;
-  height: 210px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,15 +285,15 @@
   inset: -20px;
   background-size: cover;
   background-position: center;
-  filter: blur(32px) saturate(1.7) brightness(0.65);
+  filter: blur(32px) saturate(1.8) brightness(0.65);
   transform: scale(1.1);
 }
 
 .rcm-hero-cover {
   position: relative;
   z-index: 2;
-  width: 148px;
-  height: 148px;
+  width: 156px;
+  height: 156px;
   border-radius: var(--radius-2xl);
   object-fit: cover;
   box-shadow: 0 14px 44px rgba(0,0,0,0.42);
@@ -306,40 +306,37 @@
   left: 0;
   right: 0;
   height: 64px;
-  background: linear-gradient(to bottom, transparent, var(--bg-secondary));
+  background: linear-gradient(to bottom, transparent, var(--material-modal));
   z-index: 1;
 }
 
 .rcm-hero-nocov {
-  background: linear-gradient(135deg,
-    hsla(var(--h), 60%, 60%, 0.14) 0%,
-    hsla(var(--h), 60%, 50%, 0.08) 100%
-  );
+  background: linear-gradient(135deg, var(--accent-soft-md) 0%, var(--accent-soft) 100%);
 }
 
 .rcm-hero-nocov-orb {
-  width: 84px;
-  height: 84px;
+  width: 92px;
+  height: 92px;
   border-radius: 50%;
   background: var(--gradient-accent);
   box-shadow: 0 8px 36px var(--accent-glow);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-on-accent);
   animation: rcmIconPop 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* ── Body Section ── */
 .rcm-body {
   padding: 24px 24px 28px;
-  background: var(--bg-secondary);
+  background: var(--material-modal);
 }
 
 /* ── Song Identity ── */
 .rcm-identity {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 }
 
 .rcm-identity-badge {
@@ -349,13 +346,12 @@
   padding: 4px 12px;
   border-radius: var(--radius-full);
   background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  font-size: 0.625rem;
-  font-weight: 700;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent-primary);
-  margin-bottom: 14px;
+  margin-bottom: var(--space-3);
 }
 
 .rcm-badge-dot {
@@ -369,31 +365,31 @@
 
 .rcm-title {
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   color: var(--text-primary);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.018em;
   line-height: 1.18;
-  margin-bottom: 6px;
+  margin-bottom: var(--space-1);
 }
 
 .rcm-artist {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   color: var(--text-secondary);
-  margin-bottom: 6px;
-  letter-spacing: -0.015em;
+  margin-bottom: var(--space-1);
+  letter-spacing: -0.01em;
 }
 
 .rcm-meta {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   color: var(--text-tertiary);
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.004em;
 }
 
 .rcm-meta-sep { opacity: 0.45; }
@@ -406,11 +402,11 @@
 }
 
 .rcm-streams-label {
-  font-size: 0.625rem;
-  font-weight: 700;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.10em;
-  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
   margin-bottom: 2px;
 }
 
@@ -424,8 +420,8 @@
   content: 'No streaming links available';
   grid-column: 1 / -1;
   text-align: center;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
   padding: 12px 0;
 }
 
@@ -434,15 +430,15 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 0 10px;
+  min-height: 46px;
+  padding: 0 12px;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  background: var(--bg-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  background: var(--fill-tertiary);
   color: var(--text-primary);
   transition:
     background var(--transition-fast),
@@ -451,11 +447,11 @@
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
   white-space: nowrap;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.008em;
 }
 
 .rcm-stream-btn:hover {
-  transform: translateY(-2px) scale(1.01);
+  transform: translateY(-2px);
   border-color: transparent;
   box-shadow: var(--shadow-md);
 }
@@ -472,10 +468,10 @@
 }
 
 /* Brand hover colors */
-.rcm-s-spotify:hover  { background: #1DB954; color: #fff; border-color: transparent; }
-.rcm-s-apple:hover    { background: #FC3C44; color: #fff; border-color: transparent; }
-.rcm-s-ytmusic:hover  { background: #FF0000; color: #fff; border-color: transparent; }
-.rcm-s-deezer:hover   { background: #A238FF; color: #fff; border-color: transparent; }
+.rcm-s-spotify:hover { background: #1DB954; color: #FFFFFF; border-color: transparent; }
+.rcm-s-apple:hover   { background: #FC3C44; color: #FFFFFF; border-color: transparent; }
+.rcm-s-ytmusic:hover { background: #FF0000; color: #FFFFFF; border-color: transparent; }
+.rcm-s-deezer:hover  { background: #A238FF; color: #FFFFFF; border-color: transparent; }
 
 /* ── More links ── */
 .rcm-streams-more {
@@ -490,24 +486,24 @@
   justify-content: center;
   gap: 6px;
   min-height: 40px;
-  padding: 0 10px;
+  padding: 0 12px;
   border-radius: var(--radius-lg);
   border: none;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   background: transparent;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   transition:
     background var(--transition-fast),
     color var(--transition-fast),
     transform var(--transition-spring);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
 }
 
 .rcm-more-btn:hover {
-  background: var(--bg-tertiary);
+  background: var(--fill-tertiary);
   color: var(--text-primary);
   transform: translateY(-1px);
 }
@@ -534,42 +530,40 @@
 }
 
 .rcm-miss-icon {
-  width: 76px;
-  height: 76px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  background: var(--fill-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-tertiary);
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
   animation: rcmMissShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
-  box-shadow: var(--shadow-sm);
 }
 
 .rcm-miss-title {
   font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
   color: var(--text-primary);
-  margin-bottom: 8px;
-  letter-spacing: -0.025em;
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.016em;
 }
 
 .rcm-miss-sub {
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
-  font-weight: 400;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  font-weight: var(--weight-regular);
   text-align: center;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
+  line-height: 1.55;
+  letter-spacing: -0.006em;
 }
 
 .rcm-miss-actions {
   display: flex;
   gap: 10px;
-  margin-top: 28px;
+  margin-top: var(--space-8);
   width: 100%;
   justify-content: center;
 }
@@ -578,28 +572,25 @@
   min-height: 44px;
   padding: 0 36px;
   border-radius: var(--radius-full);
-  border: 1px solid var(--border-medium);
+  border: none;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--text-primary);
-  background: var(--bg-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-on-accent);
+  background: var(--accent-primary);
+  box-shadow: 0 4px 14px var(--accent-glow);
   transition:
     background var(--transition-fast),
-    color var(--transition-fast),
-    border-color var(--transition-fast),
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.008em;
 }
 
 .rcm-retry-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
-  background: var(--accent-soft);
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--accent-glow-lg);
 }
 
 .rcm-retry-btn:active {

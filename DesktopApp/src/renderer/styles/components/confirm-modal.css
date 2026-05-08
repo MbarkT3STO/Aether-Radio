@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   CONFIRM MODAL — Apple Liquid Glass Design
+   CONFIRM MODAL — Apple HIG alert
+   Centered · vibrant backdrop · filled confirm / destructive buttons
    ═══════════════════════════════════════════════════════════════ */
 
 .cm-overlay {
@@ -15,21 +16,25 @@
 .cm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.36);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
+}
+
+[data-theme="dark"] .cm-backdrop {
+  background: rgba(0,0,0,0.58);
 }
 
 /* ── Dialog ── */
 .cm-dialog {
   position: relative;
   z-index: 1;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-medium);
+  background: var(--material-modal);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-3xl);
   padding: var(--space-8);
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   margin: var(--space-6);
   display: flex;
   flex-direction: column;
@@ -42,46 +47,44 @@
 
 /* ── Icon ── */
 .cm-icon {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: var(--radius-2xl);
-  background: var(--bg-tertiary);
+  background: var(--fill-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
   flex-shrink: 0;
-  border: 1px solid var(--border-subtle);
 }
 
 .cm-icon--danger {
   color: var(--status-error);
-  background: rgba(239,68,68,0.10);
-  border-color: rgba(239,68,68,0.20);
+  background: rgba(255,59,48,0.12);
 }
 
 /* ── Body ── */
 .cm-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .cm-title {
   font-family: var(--font-display);
-  font-size: var(--text-lg);
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
   color: var(--text-primary);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.016em;
   margin: 0;
 }
 
 .cm-message {
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.006em;
 }
 
 /* ── Actions ── */
@@ -97,62 +100,61 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  height: 42px;
+  height: 44px;
   border-radius: var(--radius-full);
   font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
   border: none;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
+  background: var(--fill-tertiary);
+  color: var(--text-primary);
   transition:
     background var(--transition-fast),
     color var(--transition-fast),
     transform var(--transition-spring),
     box-shadow var(--transition-fast);
   outline: none;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.008em;
 }
 
 .cm-btn:focus-visible {
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: var(--shadow-focus);
 }
 
 .cm-btn:hover {
-  background: var(--bg-elevated);
-  color: var(--text-primary);
+  background: var(--fill-secondary);
   transform: translateY(-1px);
 }
 
 .cm-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
   transition-duration: 60ms;
 }
 
-/* Confirm */
+/* Confirm — filled accent */
 .cm-btn--confirm {
-  color: var(--accent-primary);
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
+  color: var(--text-on-accent);
+  background: var(--accent-primary);
+  box-shadow: 0 3px 10px var(--accent-glow);
 }
 
 .cm-btn--confirm:hover {
-  background: var(--accent-soft-md);
-  color: var(--accent-hover);
-  box-shadow: var(--shadow-sm);
+  background: var(--accent-hover);
+  color: var(--text-on-accent);
+  box-shadow: 0 5px 16px var(--accent-glow-lg);
 }
 
-/* Danger */
+/* Danger — filled red */
 .cm-btn--danger {
-  color: var(--status-error);
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.20);
+  color: var(--text-on-accent);
+  background: var(--status-error);
+  box-shadow: 0 3px 10px rgba(255,59,48,0.30);
 }
 
 .cm-btn--danger:hover {
-  background: rgba(239,68,68,0.14);
-  box-shadow: var(--shadow-sm);
+  background: #D12D22;
+  box-shadow: 0 5px 16px rgba(255,59,48,0.42);
 }
 
 /* ── Animations ── */
@@ -168,5 +170,3 @@
   from { opacity: 1; transform: scale(1) translateY(0); }
   to   { opacity: 0; transform: scale(0.92) translateY(8px); }
 }
-
-

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   LOADING SPINNER — Apple Liquid Glass Design
+   LOADING SPINNER — Apple-style activity indicator
    ═══════════════════════════════════════════════════════════════ */
 
 .loading-spinner {
@@ -39,7 +39,7 @@
   height: 20px;
   border-width: 2.5px;
   border-color: rgba(255,255,255,0.28);
-  border-top-color: #ffffff;
+  border-top-color: #FFFFFF;
   flex-shrink: 0;
 }
 
@@ -60,10 +60,10 @@
 }
 
 .loading-text {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.004em;
   animation: pulse 1.6s ease-in-out infinite;
 }
 
@@ -71,9 +71,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--bg-secondary) 0%,
-    var(--bg-tertiary) 50%,
-    var(--bg-secondary) 100%
+    var(--fill-tertiary) 0%,
+    var(--fill-secondary) 50%,
+    var(--fill-tertiary) 100%
   );
   background-size: 400% 100%;
   animation: shimmer 1.8s ease-in-out infinite;

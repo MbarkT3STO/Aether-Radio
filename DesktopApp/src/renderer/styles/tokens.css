@@ -1,144 +1,289 @@
 /* ═══════════════════════════════════════════════════════════════════
-   AETHER RADIO — DESIGN SYSTEM v3
-   Modern warm palette with violet-blue accent.
-   Sophisticated, lovable, and clean.
+   AETHER RADIO — APPLE HIG DESIGN SYSTEM
+   ---------------------------------------------------------------
+   Faithful to Apple's Human Interface Guidelines:
+   · Semantic color hierarchy (label, fill, background, separator)
+   · Apple system color palette (iOS/macOS)
+   · Apple materials (thin / regular / thick / chrome)
+   · SF Pro typography scale
+   · 10pt standard radii / 8-point spacing grid
+   · Full light + dark mode parity
+   · Accessibility-first (contrast, transparency, motion)
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Accent Hue ── */
-  --h: 270;
-  --s: 72%;
+  color-scheme: light dark;
 
-  /* ── Color Palette ── */
-  --palette-indigo:    #7C3AED;   /* Royal purple             */
-  --palette-indigo-dk: #A78BFA;   /* Royal purple — dark      */
-  --palette-blue:      #3B82F6;   /* Bright blue             */
-  --palette-blue-dk:   #60A5FA;   /* Bright blue — dark      */
-  --palette-purple:    #9333EA;   /* Deep purple             */
-  --palette-purple-dk: #C084FC;   /* Deep purple — dark      */
-  --palette-pink:      #EC4899;   /* Warm pink               */
-  --palette-pink-dk:   #F472B6;   /* Warm pink — dark        */
-  --palette-red:       #EF4444;   /* Clean red               */
-  --palette-red-dk:    #F87171;   /* Clean red — dark        */
-  --palette-orange:    #F59E0B;   /* Amber orange            */
-  --palette-orange-dk: #FBBF24;   /* Amber orange — dark     */
-  --palette-yellow:    #EAB308;   /* Golden yellow           */
-  --palette-yellow-dk: #FACC15;   /* Golden yellow — dark    */
-  --palette-green:     #22C55E;   /* Fresh green             */
-  --palette-green-dk:  #4ADE80;   /* Fresh green — dark      */
-  --palette-teal:      #06B6D4;   /* Ocean teal              */
-  --palette-teal-dk:   #22D3EE;   /* Ocean teal — dark       */
-  --palette-mint:      #14B8A6;   /* Soft mint               */
-  --palette-mint-dk:   #2DD4BF;   /* Soft mint — dark        */
-  --palette-cyan:      #0EA5E9;   /* Sky cyan                */
-  --palette-cyan-dk:   #38BDF8;   /* Sky cyan — dark         */
+  /* ═══════════════════════════════════════════════════════════
+     APPLE SYSTEM COLORS — LIGHT (iOS / macOS)
+     Source: developer.apple.com/design/human-interface-guidelines/color
+     ═══════════════════════════════════════════════════════════ */
+  --sys-red:       #FF3B30;
+  --sys-orange:    #FF9500;
+  --sys-yellow:    #FFCC00;
+  --sys-green:     #34C759;
+  --sys-mint:      #00C7BE;
+  --sys-teal:      #30B0C7;
+  --sys-cyan:      #32ADE6;
+  --sys-blue:      #007AFF;
+  --sys-indigo:    #5856D6;
+  --sys-purple:    #AF52DE;
+  --sys-pink:      #FF2D55;
+  --sys-brown:     #A2845E;
 
-  /* ══════════════════════════════════════════════════════════════
-     LIGHT MODE — Warm & Clean
-     Cream-tinted whites, soft lavender undertones
-     ══════════════════════════════════════════════════════════════ */
+  --sys-gray:      #8E8E93;
+  --sys-gray2:     #AEAEB2;
+  --sys-gray3:     #C7C7CC;
+  --sys-gray4:     #D1D1D6;
+  --sys-gray5:     #E5E5EA;
+  --sys-gray6:     #F2F2F7;
+}
 
-  /* Backgrounds — warm off-whites */
-  --bg-primary:   #F8F7FC;   /* Lavender-tinted canvas           */
-  --bg-secondary: #FFFFFF;   /* Pure white cards                  */
-  --bg-tertiary:  #F3F2F8;   /* Subtle lavender fill             */
-  --bg-elevated:  #FFFFFF;   /* Elevated surfaces                */
-  --bg-base:      #F8F7FC;   /* Base canvas                      */
+[data-theme="dark"] {
+  /* ═══════════════════════════════════════════════════════════
+     APPLE SYSTEM COLORS — DARK (higher-luminance variants)
+     ═══════════════════════════════════════════════════════════ */
+  --sys-red:       #FF453A;
+  --sys-orange:    #FF9F0A;
+  --sys-yellow:    #FFD60A;
+  --sys-green:     #30D158;
+  --sys-mint:      #63E6E2;
+  --sys-teal:      #40C8E0;
+  --sys-cyan:      #64D2FF;
+  --sys-blue:      #0A84FF;
+  --sys-indigo:    #5E5CE6;
+  --sys-purple:    #BF5AF2;
+  --sys-pink:      #FF375F;
+  --sys-brown:     #AC8E68;
 
-  /* Text — warm grays with depth */
-  --text-primary:   #1A1625;               /* Deep warm black      */
-  --text-secondary: rgba(26,22,37,0.72);   /* Secondary            */
-  --text-tertiary:  rgba(26,22,37,0.48);   /* Tertiary             */
-  --text-muted:     rgba(26,22,37,0.32);   /* Muted                */
-  --text-placeholder: rgba(26,22,37,0.28); /* Placeholder          */
+  --sys-gray:      #8E8E93;
+  --sys-gray2:     #636366;
+  --sys-gray3:     #48484A;
+  --sys-gray4:     #3A3A3C;
+  --sys-gray5:     #2C2C2E;
+  --sys-gray6:     #1C1C1E;
+}
 
-  /* Borders — soft lavender-gray */
-  --border-subtle:  rgba(26,22,37,0.08);   /* Subtle separator     */
-  --border-medium:  rgba(26,22,37,0.14);   /* Medium separator     */
-  --border-strong:  rgba(26,22,37,0.24);   /* Strong separator     */
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE — Semantic Surfaces, Labels, Fills, Separators
+   Mirrors Apple's label hierarchy (primary/secondary/tertiary/quaternary)
+   ═══════════════════════════════════════════════════════════════════ */
 
-  /* Materials — frosted glass with warmth */
+:root {
+  /* ── Backgrounds (Apple system background hierarchy) ── */
+  --bg-primary:   #F2F2F7;   /* systemGroupedBackground        */
+  --bg-secondary: #FFFFFF;   /* secondarySystemGroupedBg       */
+  --bg-tertiary:  #F2F2F7;   /* tertiarySystemGroupedBg        */
+  --bg-elevated:  #FFFFFF;   /* elevated surfaces              */
+  --bg-base:      #F2F2F7;   /* page canvas                    */
+
+  /* ── Labels (Apple label hierarchy) ── */
+  --text-primary:     rgba(0,0,0,1.00);      /* label              */
+  --text-secondary:   rgba(60,60,67,0.60);   /* secondaryLabel     */
+  --text-tertiary:    rgba(60,60,67,0.30);   /* tertiaryLabel      */
+  --text-muted:       rgba(60,60,67,0.18);   /* quaternaryLabel    */
+  --text-placeholder: rgba(60,60,67,0.30);   /* placeholderText    */
+  --text-on-accent:   #FFFFFF;               /* text on filled accent */
+
+  /* ── Fills (Apple fill hierarchy — for shapes, toggles, pills) ── */
+  --fill-primary:    rgba(120,120,128,0.20); /* systemFill         */
+  --fill-secondary:  rgba(120,120,128,0.16); /* secondarySystemFill*/
+  --fill-tertiary:   rgba(118,118,128,0.12); /* tertiarySystemFill */
+  --fill-quaternary: rgba(116,116,128,0.08); /* quaternarySystemFill */
+
+  /* ── Separators ── */
+  --border-subtle:  rgba(60,60,67,0.12);     /* opaqueSeparator    */
+  --border-medium:  rgba(60,60,67,0.22);     /* separator          */
+  --border-strong:  rgba(60,60,67,0.36);     /* prominent separator*/
+
+  /* ── Materials (Apple vibrancy: thin/regular/thick/chrome) ── */
   --material-thin:       rgba(255,255,255,0.55);
   --material-regular:    rgba(255,255,255,0.72);
   --material-thick:      rgba(255,255,255,0.88);
-  --material-chrome:     rgba(248,247,252,0.85);
-  --material-sidebar:    rgba(248,247,252,0.82);
-  --material-bar:        rgba(255,255,255,0.82);
-  --material-overlay:    #FFFFFF;
+  --material-chrome:     rgba(242,242,247,0.80);  /* chromeMaterial */
+  --material-sidebar:    rgba(242,242,247,0.78);  /* sidebar material */
+  --material-bar:        rgba(255,255,255,0.80);  /* bar material   */
+  --material-overlay:    rgba(255,255,255,0.94);
   --material-modal:      #FFFFFF;
+  --material-tooltip:    rgba(255,255,255,0.96);
 
-  /* Accent — Royal Purple */
-  --accent-primary:   #7C3AED;
-  --accent-secondary: #6D28D9;
-  --accent-tertiary:  #8B5CF6;
-  --accent-hover:     #8B5CF6;
-  --accent-pressed:   #6D28D9;
-  --accent-soft:      rgba(124,58,237,0.09);
-  --accent-soft-md:   rgba(124,58,237,0.15);
-  --accent-glow:      rgba(124,58,237,0.20);
-  --accent-glow-lg:   rgba(124,58,237,0.32);
-  --accent-muted:     rgba(124,58,237,0.36);
-  --accent-border:    rgba(124,58,237,0.22);
+  /* ── Accent (Apple systemBlue — control tint) ── */
+  --accent-primary:   var(--sys-blue);
+  --accent-secondary: #0062CC;
+  --accent-tertiary:  #409CFF;
+  --accent-hover:     #1A85FF;
+  --accent-pressed:   #0062CC;
+  --accent-soft:      rgba(0,122,255,0.10);
+  --accent-soft-md:   rgba(0,122,255,0.16);
+  --accent-glow:      rgba(0,122,255,0.22);
+  --accent-glow-lg:   rgba(0,122,255,0.32);
+  --accent-muted:     rgba(0,122,255,0.40);
+  --accent-border:    rgba(0,122,255,0.24);
 
-  /* Gradients — royal purple to deeper purple */
-  --gradient-accent:    linear-gradient(135deg, #7C3AED 0%, #9333EA 100%);
-  --gradient-vivid:     linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #9333EA 100%);
-  --gradient-warm:      linear-gradient(135deg, #EC4899 0%, #F59E0B 100%);
-  --gradient-cool:      linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #06B6D4 100%);
-  --gradient-spectrum:  linear-gradient(135deg, #7C3AED 0%, #9333EA 50%, #6D28D9 100%);
-  --gradient-royal:     linear-gradient(135deg, #7C3AED 0%, #9333EA 100%);
-  --gradient-logo:      linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%);
-  --gradient-hero:      linear-gradient(160deg, rgba(124,58,237,0.07) 0%, rgba(147,51,234,0.04) 100%);
-  --gradient-card:      linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
-  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.15) 100%);
+  /* ── Status (semantic) ── */
+  --status-live:    var(--sys-green);
+  --status-warning: var(--sys-orange);
+  --status-error:   var(--sys-red);
+  --status-info:    var(--sys-blue);
 
-  /* Status — vibrant semantic colors */
-  --status-live:    #22C55E;
-  --status-warning: #F59E0B;
-  --status-error:   #EF4444;
-  --status-info:    #7C3AED;
+  /* ── Gradients ── */
+  --gradient-accent:   linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 100%);
+  --gradient-vivid:    linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-purple) 50%, var(--sys-pink) 100%);
+  --gradient-warm:     linear-gradient(135deg, var(--sys-pink) 0%, var(--sys-orange) 100%);
+  --gradient-cool:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-teal) 50%, var(--sys-mint) 100%);
+  --gradient-spectrum: linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 50%, var(--sys-purple) 100%);
+  --gradient-royal:    linear-gradient(135deg, var(--sys-indigo) 0%, var(--sys-purple) 100%);
+  --gradient-logo:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-cyan) 100%);
+  --gradient-hero:     linear-gradient(160deg, rgba(0,122,255,0.06) 0%, rgba(88,86,214,0.04) 100%);
+  --gradient-card:     linear-gradient(145deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.60) 100%);
+  --gradient-glass:    linear-gradient(135deg, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.15) 100%);
 
-  /* Shadows — soft and warm */
-  --shadow-xs:  0 1px 2px rgba(26,22,37,0.04), 0 1px 1px rgba(26,22,37,0.02);
-  --shadow-sm:  0 2px 8px rgba(26,22,37,0.05), 0 1px 3px rgba(26,22,37,0.03);
-  --shadow-md:  0 4px 16px rgba(26,22,37,0.07), 0 2px 6px rgba(26,22,37,0.04);
-  --shadow-lg:  0 8px 32px rgba(26,22,37,0.09), 0 4px 12px rgba(26,22,37,0.05);
-  --shadow-xl:  0 16px 56px rgba(26,22,37,0.11), 0 8px 20px rgba(26,22,37,0.06);
-  --shadow-2xl: 0 24px 80px rgba(26,22,37,0.13), 0 12px 28px rgba(26,22,37,0.07);
-  --shadow-glow:    0 0 20px var(--accent-glow), 0 0 40px rgba(124,58,237,0.10);
-  --shadow-glow-lg: 0 0 32px var(--accent-glow-lg), 0 0 64px rgba(124,58,237,0.14);
-  --shadow-ambient: 0 0 80px rgba(26,22,37,0.05);
-  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(26,22,37,0.03);
+  /* ── Shadows (soft, natural) ── */
+  --shadow-xs:  0 1px 2px  rgba(0,0,0,0.04), 0 1px 1px  rgba(0,0,0,0.02);
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.06), 0 1px 3px  rgba(0,0,0,0.03);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.08), 0 2px 6px  rgba(0,0,0,0.04);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-xl:  0 16px 56px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.06);
+  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.14), 0 12px 28px rgba(0,0,0,0.08);
+  --shadow-glow:    0 0 20px var(--accent-glow), 0 0 40px rgba(0,122,255,0.10);
+  --shadow-glow-lg: 0 0 32px var(--accent-glow-lg), 0 0 64px rgba(0,122,255,0.14);
+  --shadow-ambient: 0 0 80px rgba(0,0,0,0.05);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(0,0,0,0.03);
+  --shadow-focus:   0 0 0 4px rgba(0,122,255,0.25);
+}
 
-  /* Typography */
-  --font-display: 'DM Sans', -apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
-  --font-body:    'DM Sans', -apple-system, 'SF Pro Text',    BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
-  --font-mono:    'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', monospace;
+/* ═══════════════════════════════════════════════════════════════════
+   DARK MODE — Apple's "Elevated" Surface Model
+   Deeper canvas, secondary cards lift above. Mirrors iOS/macOS dark.
+   ═══════════════════════════════════════════════════════════════════ */
 
-  --text-2xs:  0.625rem;
-  --text-xs:   0.75rem;
-  --text-sm:   0.875rem;
-  --text-base: 1rem;
-  --text-lg:   1.125rem;
-  --text-xl:   1.25rem;
-  --text-2xl:  1.5rem;
-  --text-3xl:  1.875rem;
-  --text-4xl:  2.25rem;
-  --text-5xl:  3rem;
+[data-theme="dark"] {
+  /* Backgrounds — layered elevation */
+  --bg-primary:   #000000;   /* systemBackground (dark)        */
+  --bg-secondary: #1C1C1E;   /* secondarySystemBackground      */
+  --bg-tertiary:  #2C2C2E;   /* tertiarySystemBackground       */
+  --bg-elevated:  #2C2C2E;   /* elevated surface               */
+  --bg-base:      #000000;   /* canvas                         */
 
-  /* Spacing */
-  --space-1:  0.25rem;
-  --space-2:  0.5rem;
-  --space-3:  0.75rem;
-  --space-4:  1rem;
-  --space-5:  1.25rem;
-  --space-6:  1.5rem;
-  --space-8:  2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
+  /* Labels — Apple dark label hierarchy */
+  --text-primary:     rgba(255,255,255,1.00);
+  --text-secondary:   rgba(235,235,245,0.60);
+  --text-tertiary:    rgba(235,235,245,0.30);
+  --text-muted:       rgba(235,235,245,0.18);
+  --text-placeholder: rgba(235,235,245,0.30);
+  --text-on-accent:   #FFFFFF;
+
+  /* Fills (dark) */
+  --fill-primary:    rgba(120,120,128,0.36);
+  --fill-secondary:  rgba(120,120,128,0.32);
+  --fill-tertiary:   rgba(118,118,128,0.24);
+  --fill-quaternary: rgba(116,116,128,0.18);
+
+  /* Separators (dark) */
+  --border-subtle:  rgba(84,84,88,0.30);
+  --border-medium:  rgba(84,84,88,0.55);
+  --border-strong:  rgba(84,84,88,0.80);
+
+  /* Materials (dark vibrancy) */
+  --material-thin:    rgba(28,28,30,0.55);
+  --material-regular: rgba(28,28,30,0.72);
+  --material-thick:   rgba(28,28,30,0.88);
+  --material-chrome:  rgba(28,28,30,0.80);
+  --material-sidebar: rgba(18,18,20,0.82);
+  --material-bar:     rgba(22,22,24,0.82);
+  --material-overlay: rgba(28,28,30,0.94);
+  --material-modal:   #1C1C1E;
+  --material-tooltip: rgba(44,44,46,0.96);
+
+  /* Accent — systemBlue (dark variant) */
+  --accent-primary:   var(--sys-blue);
+  --accent-secondary: #0975E2;
+  --accent-tertiary:  #4DA4FF;
+  --accent-hover:     #2F9BFF;
+  --accent-pressed:   #0062CC;
+  --accent-soft:      rgba(10,132,255,0.18);
+  --accent-soft-md:   rgba(10,132,255,0.26);
+  --accent-glow:      rgba(10,132,255,0.36);
+  --accent-glow-lg:   rgba(10,132,255,0.50);
+  --accent-muted:     rgba(10,132,255,0.55);
+  --accent-border:    rgba(10,132,255,0.42);
+
+  /* Status (dark) */
+  --status-live:    var(--sys-green);
+  --status-warning: var(--sys-orange);
+  --status-error:   var(--sys-red);
+  --status-info:    var(--sys-blue);
+
+  /* Gradients (dark) */
+  --gradient-accent:   linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 100%);
+  --gradient-vivid:    linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-purple) 50%, var(--sys-pink) 100%);
+  --gradient-warm:     linear-gradient(135deg, var(--sys-pink) 0%, var(--sys-orange) 100%);
+  --gradient-cool:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-teal) 50%, var(--sys-mint) 100%);
+  --gradient-spectrum: linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 50%, var(--sys-purple) 100%);
+  --gradient-royal:    linear-gradient(135deg, var(--sys-indigo) 0%, var(--sys-purple) 100%);
+  --gradient-logo:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-cyan) 100%);
+  --gradient-hero:     linear-gradient(160deg, rgba(10,132,255,0.14) 0%, rgba(94,92,230,0.06) 100%);
+  --gradient-card:     linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  --gradient-glass:    linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+
+  /* Shadows (deeper blacks) */
+  --shadow-xs:  0 1px 3px  rgba(0,0,0,0.40);
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.50);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.60);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.70);
+  --shadow-xl:  0 16px 56px rgba(0,0,0,0.80);
+  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.90);
+  --shadow-glow:    0 0 24px var(--accent-glow), 0 0 48px rgba(10,132,255,0.14);
+  --shadow-glow-lg: 0 0 40px var(--accent-glow-lg), 0 0 80px rgba(10,132,255,0.20);
+  --shadow-ambient: 0 0 120px rgba(0,0,0,0.85);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.25);
+  --shadow-focus:   0 0 0 4px rgba(10,132,255,0.40);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TYPOGRAPHY · SPACING · RADII · MOTION
+   Apple's type scale, 8-pt grid, 10pt-style radii
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Typography — SF Pro first; DM Sans fallback preserved */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'DM Sans', system-ui, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'DM Sans', system-ui, sans-serif;
+  --font-mono:    ui-monospace, 'SF Mono', 'Menlo', 'Monaco', 'JetBrains Mono', 'Cascadia Code', monospace;
+
+  /* Apple-style type scale (px → rem @ 16px base) */
+  --text-2xs:   0.6875rem;  /* 11 · footnote/caption-2  */
+  --text-xs:    0.75rem;    /* 12 · caption-1           */
+  --text-sm:    0.8125rem;  /* 13 · subheadline         */
+  --text-base:  0.9375rem;  /* 15 · body/callout        */
+  --text-md:    1rem;       /* 16 · body-large          */
+  --text-lg:    1.0625rem;  /* 17 · body-emphasized     */
+  --text-xl:    1.25rem;    /* 20 · title-3             */
+  --text-2xl:   1.375rem;   /* 22 · title-2             */
+  --text-3xl:   1.75rem;    /* 28 · title-1             */
+  --text-4xl:   2.125rem;   /* 34 · large-title         */
+  --text-5xl:   2.625rem;   /* 42 · display             */
+
+  /* Font weights (Apple: regular/medium/semibold/bold/heavy) */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-heavy:    800;
+
+  /* Spacing — Apple 8-point grid */
+  --space-1:  0.25rem;   /*  4 */
+  --space-2:  0.5rem;    /*  8 */
+  --space-3:  0.75rem;   /* 12 */
+  --space-4:  1rem;      /* 16 */
+  --space-5:  1.25rem;   /* 20 */
+  --space-6:  1.5rem;    /* 24 */
+  --space-8:  2rem;      /* 32 */
+  --space-10: 2.5rem;    /* 40 */
+  --space-12: 3rem;      /* 48 */
+  --space-16: 4rem;      /* 64 */
+  --space-20: 5rem;      /* 80 */
+  --space-24: 6rem;      /* 96 */
 
   --space-xs:  var(--space-2);
   --space-sm:  var(--space-4);
@@ -147,19 +292,19 @@
   --space-xl:  var(--space-12);
   --space-2xl: var(--space-16);
 
-  /* Border Radius */
+  /* Border Radius — Apple's continuous curves */
   --radius-xs:   0.25rem;
   --radius-sm:   0.5rem;
   --radius-md:   0.75rem;
-  --radius-lg:   1rem;
-  --radius-xl:   1.25rem;
-  --radius-2xl:  1.5rem;
-  --radius-3xl:  2rem;
+  --radius-lg:   0.875rem;
+  --radius-xl:   1.125rem;
+  --radius-2xl:  1.375rem;
+  --radius-3xl:  1.75rem;
   --radius-full: 9999px;
 
-  /* Transitions */
-  --transition-fast:   120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-base:   200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Transitions — Apple timing curves */
+  --transition-fast:   160ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-base:   220ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-slow:   320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-medium: 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --transition-spring: 480ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -173,10 +318,10 @@
   --ease-expo:   cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Layout */
-  --sidebar-width:           240px;
-  --sidebar-width-collapsed: 64px;
+  --sidebar-width:           248px;
+  --sidebar-width-collapsed: 68px;
   --player-bar-height:       88px;
-  --header-height:           64px;
+  --header-height:           52px;
 
   /* Z-Index */
   --z-base:     0;
@@ -188,86 +333,41 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   DARK MODE — Rich & Immersive
-   Deep charcoal (not pure black), warm undertones
+   LEGACY PALETTE ALIASES — keep existing component code working
+   Maps the old ad-hoc palette onto Apple's system colors.
    ═══════════════════════════════════════════════════════════════════ */
 
-[data-theme="dark"] {
-  /* Backgrounds — rich charcoal with warmth */
-  --bg-primary:   #0F0E14;   /* Deep warm charcoal               */
-  --bg-secondary: #1A1820;   /* Card surfaces                    */
-  --bg-tertiary:  #242230;   /* Tertiary fills                   */
-  --bg-elevated:  #242230;   /* Elevated surfaces                */
-  --bg-base:      #0F0E14;   /* Base canvas                      */
+:root, [data-theme="dark"] {
+  --palette-indigo:    var(--sys-indigo);
+  --palette-indigo-dk: var(--sys-indigo);
+  --palette-blue:      var(--sys-blue);
+  --palette-blue-dk:   var(--sys-blue);
+  --palette-purple:    var(--sys-purple);
+  --palette-purple-dk: var(--sys-purple);
+  --palette-pink:      var(--sys-pink);
+  --palette-pink-dk:   var(--sys-pink);
+  --palette-red:       var(--sys-red);
+  --palette-red-dk:    var(--sys-red);
+  --palette-orange:    var(--sys-orange);
+  --palette-orange-dk: var(--sys-orange);
+  --palette-yellow:    var(--sys-yellow);
+  --palette-yellow-dk: var(--sys-yellow);
+  --palette-green:     var(--sys-green);
+  --palette-green-dk:  var(--sys-green);
+  --palette-teal:      var(--sys-teal);
+  --palette-teal-dk:   var(--sys-teal);
+  --palette-mint:      var(--sys-mint);
+  --palette-mint-dk:   var(--sys-mint);
+  --palette-cyan:      var(--sys-cyan);
+  --palette-cyan-dk:   var(--sys-cyan);
 
-  /* Text — clean whites with warmth */
-  --text-primary:   #F5F3FF;
-  --text-secondary: rgba(245,243,255,0.72);
-  --text-tertiary:  rgba(245,243,255,0.46);
-  --text-muted:     rgba(245,243,255,0.30);
-  --text-placeholder: rgba(245,243,255,0.24);
-
-  /* Borders — subtle violet-gray */
-  --border-subtle:  rgba(245,243,255,0.07);
-  --border-medium:  rgba(245,243,255,0.12);
-  --border-strong:  rgba(245,243,255,0.20);
-
-  /* Materials — dark glass with depth */
-  --material-thin:       rgba(26,24,32,0.55);
-  --material-regular:    rgba(26,24,32,0.72);
-  --material-thick:      rgba(26,24,32,0.90);
-  --material-chrome:     rgba(26,24,32,0.85);
-  --material-sidebar:    rgba(20,18,26,0.90);
-  --material-bar:        rgba(22,20,28,0.92);
-  --material-overlay:    #1A1820;
-  --material-modal:      #242230;
-
-  /* Accent — Royal Purple, same hue, enhanced visibility on dark */
-  --accent-primary:   #7C3AED;
-  --accent-secondary: #6D28D9;
-  --accent-tertiary:  #8B5CF6;
-  --accent-hover:     #9353FF;
-  --accent-pressed:   #6D28D9;
-  --accent-soft:      rgba(124,58,237,0.18);
-  --accent-soft-md:   rgba(124,58,237,0.26);
-  --accent-glow:      rgba(124,58,237,0.35);
-  --accent-glow-lg:   rgba(124,58,237,0.50);
-  --accent-muted:     rgba(124,58,237,0.55);
-  --accent-border:    rgba(124,58,237,0.40);
-
-  /* Gradients — royal purple family */
-  --gradient-accent:    linear-gradient(135deg, #7C3AED 0%, #9333EA 100%);
-  --gradient-vivid:     linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #9333EA 100%);
-  --gradient-warm:      linear-gradient(135deg, #F472B6 0%, #FBBF24 100%);
-  --gradient-cool:      linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #2DD4BF 100%);
-  --gradient-spectrum:  linear-gradient(135deg, #7C3AED 0%, #9333EA 50%, #6D28D9 100%);
-  --gradient-royal:     linear-gradient(135deg, #7C3AED 0%, #9333EA 100%);
-  --gradient-logo:      linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%);
-  --gradient-hero:      linear-gradient(160deg, rgba(124,58,237,0.12) 0%, rgba(147,51,234,0.06) 100%);
-  --gradient-card:      linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-  --gradient-glass:     linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
-
-  /* Status */
-  --status-live:    #4ADE80;
-  --status-warning: #FBBF24;
-  --status-error:   #F87171;
-  --status-info:    #7C3AED;
-
-  /* Shadows — deep and rich */
-  --shadow-xs:  0 1px 3px  rgba(0,0,0,0.35);
-  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.45);
-  --shadow-md:  0 4px 16px rgba(0,0,0,0.55);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.65);
-  --shadow-xl:  0 16px 56px rgba(0,0,0,0.75);
-  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.85);
-  --shadow-glow:    0 0 24px var(--accent-glow), 0 0 48px rgba(124,58,237,0.14);
-  --shadow-glow-lg: 0 0 40px var(--accent-glow-lg), 0 0 80px rgba(124,58,237,0.18);
-  --shadow-ambient: 0 0 120px rgba(0,0,0,0.85);
-  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.25);
+  /* Accent hue fallback used by older radial-gradient patterns */
+  --h: 211;   /* systemBlue hue */
+  --s: 100%;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   THEME TRANSITION — smooth color morphing
+   THEME TRANSITION — smooth color morphing between light/dark
    ═══════════════════════════════════════════════════════════════════ */
 
 body,
@@ -280,8 +380,7 @@ body,
 .stg-card,
 .cs-card,
 .cs-form-card,
-.home-stat-card,
-.home-quick-link,
+.home-stat-pill,
 .home-now-playing-card,
 .search-bar-input,
 .sidebar-nav-item,
@@ -291,8 +390,7 @@ body,
 .genre-card,
 .country-card,
 .view-header-icon,
-.home-stat-icon,
-.home-quick-link-icon,
+.home-empty-icon,
 .empty-state-icon,
 .search-idle-icon-wrap,
 .search-no-results-icon,
