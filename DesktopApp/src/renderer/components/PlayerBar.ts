@@ -58,7 +58,6 @@ export class PlayerBar extends BaseComponent {
     const isPlaying = this.playerStore.isPlaying
     const isLoading = this.playerStore.isLoading
     const volume    = this.playerStore.volume
-    const isMacOS   = navigator.userAgent.includes('Macintosh')
 
     // ── Empty state ──────────────────────────────────────────
     if (!station) {
@@ -178,11 +177,11 @@ export class PlayerBar extends BaseComponent {
 
           <div id="player-sleep-timer"></div>
 
-          ${isMacOS ? `<button class="player-btn player-recognize-btn ${isPlaying ? '' : 'player-btn-disabled'}" id="player-recognize-btn"
+          <button class="player-btn player-recognize-btn ${isPlaying ? '' : 'player-btn-disabled'}" id="player-recognize-btn"
             title="Identify song" aria-label="Identify song"
             ${isPlaying ? '' : 'disabled'}>
             ${this.recognizeIcon()}
-          </button>` : ''}
+          </button>
 
           <button class="player-btn player-expand-btn ${this._isExpanded ? 'expanded' : ''}"
             id="player-expand-btn"
