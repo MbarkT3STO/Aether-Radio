@@ -92,7 +92,14 @@ html[data-theme="dark"] .am-backdrop { background: rgba(0,0,0,0.58); }
   display: block;
   position: relative;
   z-index: 1;
-  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  border: 1px solid var(--accent-border);
+  box-shadow:
+    0 0 0 3px var(--accent-soft),
+    var(--shadow-lg),
+    var(--shadow-inset);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .am-logo-glow {

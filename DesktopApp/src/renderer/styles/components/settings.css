@@ -240,12 +240,20 @@
 }
 
 .stg-about-logo {
+  position: relative;
   width: 48px;
   height: 48px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
+  border: 1px solid var(--accent-border);
+  box-shadow:
+    0 0 0 2px var(--accent-soft),
+    var(--shadow-sm),
+    var(--shadow-inset);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .stg-about-logo-img {
