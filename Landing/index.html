@@ -55,6 +55,10 @@
       <nav class="nav-links" aria-label="Primary">
         <a href="#features">Features</a>
         <a href="#design">Design</a>
+        <a href="#live" class="nav-link-live">
+          <span class="live-dot" aria-hidden="true"></span>
+          Live
+        </a>
         <a href="#platforms">Platforms</a>
         <a href="#faq">FAQ</a>
       </nav>
@@ -95,6 +99,12 @@
           Download
         </a>
 
+        <a class="nav-launch" href="https://aether-live.netlify.app/" target="_blank" rel="noopener" aria-label="Launch Aether Radio in your browser">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="nav-launch-label">Launch web app</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+
         <button type="button" class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
@@ -104,9 +114,17 @@
     <div class="nav-mobile" id="nav-mobile" hidden>
       <a href="#features">Features</a>
       <a href="#design">Design</a>
+      <a href="#live" class="nav-link-live">
+        <span class="live-dot" aria-hidden="true"></span>
+        Live
+      </a>
       <a href="#platforms">Platforms</a>
       <a href="#faq">FAQ</a>
       <a class="btn btn-primary" href="#download">Download</a>
+      <a class="btn btn-ghost" href="https://aether-live.netlify.app/" target="_blank" rel="noopener">
+        <span class="live-dot" aria-hidden="true"></span>
+        Launch web app
+      </a>
     </div>
   </header>
 
@@ -134,6 +152,11 @@
             <a class="btn btn-primary btn-lg" href="#download">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download free
+            </a>
+            <a class="btn btn-secondary btn-lg hero-cta-live" href="https://aether-live.netlify.app/" target="_blank" rel="noopener">
+              <span class="live-dot" aria-hidden="true"></span>
+              Try it live
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
             </a>
             <a class="btn btn-ghost btn-lg" href="https://github.com/MbarkT3STO/Aether-Radio" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.78 2.71 1.27 3.37.97.1-.75.4-1.27.73-1.56-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.2-3.09-.12-.3-.52-1.48.11-3.08 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.18-1.18 3.18-1.18.63 1.6.23 2.78.11 3.08.75.8 1.2 1.83 1.2 3.09 0 4.43-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
@@ -418,6 +441,191 @@
       </div>
     </section>
 
+    <!-- ══════════════  LIVE WEB APP  ══════════════ -->
+    <section class="section-pad live-section" id="live">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <span class="section-eyebrow section-eyebrow--live">
+              <span class="live-dot" aria-hidden="true"></span>
+              Available now
+            </span>
+            <h2 class="section-title">No install? No problem.</h2>
+          </div>
+          <p class="section-lede section-lede--compact">
+            Aether Radio runs straight in your browser — same catalogue, same design, same song recognition. Open a URL and the world is already playing.
+          </p>
+        </div>
+
+        <div class="live-grid">
+          <!-- Browser window mockup -->
+          <a class="live-browser" href="https://aether-live.netlify.app/" target="_blank" rel="noopener" aria-label="Open Aether Radio Live in a new tab">
+            <div class="live-browser-chrome">
+              <div class="live-browser-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="live-browser-address" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>aether-live.netlify.app</span>
+              </div>
+              <div class="live-browser-actions" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              </div>
+            </div>
+
+            <div class="live-browser-viewport">
+              <!-- Miniature sidebar -->
+              <aside class="live-app-side" aria-hidden="true">
+                <div class="live-app-brand">
+                  <img src="./assets/logo.png" alt="" width="18" height="18" decoding="async" loading="lazy" />
+                  <span>Aether Radio</span>
+                </div>
+                <div class="live-app-nav">
+                  <span class="is-active"><i class="lv-i lv-i-home"></i>Home</span>
+                  <span><i class="lv-i lv-i-star"></i>Featured</span>
+                  <span><i class="lv-i lv-i-globe"></i>Explore</span>
+                  <span><i class="lv-i lv-i-search"></i>Search</span>
+                  <span><i class="lv-i lv-i-heart"></i>Favorites</span>
+                  <span><i class="lv-i lv-i-clock"></i>History</span>
+                </div>
+              </aside>
+
+              <!-- Main -->
+              <main class="live-app-main">
+                <div class="live-app-top">
+                  <div class="live-app-hello">
+                    <div class="live-app-hello-eyebrow">Good evening</div>
+                    <div class="live-app-hello-title">What sounds good today?</div>
+                  </div>
+                  <div class="live-app-search" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <span>Search stations…</span>
+                  </div>
+                </div>
+
+                <div class="live-app-grid">
+                  <div class="live-app-card" style="--tint:var(--sys-blue)">
+                    <div class="live-app-card-logo">K</div>
+                    <div class="live-app-card-name">KEXP</div>
+                    <div class="live-app-card-meta">🇺🇸 Seattle</div>
+                  </div>
+                  <div class="live-app-card" style="--tint:var(--sys-pink)">
+                    <div class="live-app-card-logo">B</div>
+                    <div class="live-app-card-name">BBC 6 Music</div>
+                    <div class="live-app-card-meta">🇬🇧 London</div>
+                  </div>
+                  <div class="live-app-card" style="--tint:var(--sys-purple)">
+                    <div class="live-app-card-logo">F</div>
+                    <div class="live-app-card-name">FIP</div>
+                    <div class="live-app-card-meta">🇫🇷 Paris</div>
+                  </div>
+                  <div class="live-app-card" style="--tint:var(--sys-green)">
+                    <div class="live-app-card-logo">J</div>
+                    <div class="live-app-card-name">Jazz24</div>
+                    <div class="live-app-card-meta">🇺🇸 Tacoma</div>
+                  </div>
+                  <div class="live-app-card" style="--tint:var(--sys-orange)">
+                    <div class="live-app-card-logo">R</div>
+                    <div class="live-app-card-name">Radio Nova</div>
+                    <div class="live-app-card-meta">🇫🇷 Paris</div>
+                  </div>
+                  <div class="live-app-card" style="--tint:var(--sys-cyan)">
+                    <div class="live-app-card-logo">S</div>
+                    <div class="live-app-card-name">SomaFM</div>
+                    <div class="live-app-card-meta">🇺🇸 San Francisco</div>
+                  </div>
+                </div>
+
+                <!-- Bottom player bar -->
+                <div class="live-app-player" aria-hidden="true">
+                  <div class="live-app-player-art"></div>
+                  <div class="live-app-player-body">
+                    <div class="live-app-player-title">KEXP 90.3 FM</div>
+                    <div class="live-app-player-meta">🇺🇸 Seattle · Alt / Indie</div>
+                  </div>
+                  <div class="live-app-player-bars">
+                    <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <button class="live-app-player-play" aria-label="Pause">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                  </button>
+                </div>
+              </main>
+            </div>
+
+            <!-- Floating launch pill hovering over the mockup -->
+            <span class="live-launch-pill" aria-hidden="true">
+              <span class="live-dot"></span>
+              Launch
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+            </span>
+          </a>
+
+          <!-- Benefits + CTA -->
+          <div class="live-copy">
+            <ul class="live-points" role="list">
+              <li>
+                <span class="live-point-ic" style="--tint:var(--sys-green)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </span>
+                <div>
+                  <strong>Nothing to install</strong>
+                  <p>Runs in any modern browser. One click, one tab, you're tuned in.</p>
+                </div>
+              </li>
+              <li>
+                <span class="live-point-ic" style="--tint:var(--sys-blue)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                </span>
+                <div>
+                  <strong>50,000+ stations, edge-proxied</strong>
+                  <p>Netlify Edge Functions bypass stream CORS so every Icecast/Shoutcast source plays smoothly.</p>
+                </div>
+              </li>
+              <li>
+                <span class="live-point-ic" style="--tint:var(--sys-purple)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </span>
+                <div>
+                  <strong>Song recognition &amp; visualizer</strong>
+                  <p>Full feature parity with the desktop and Android builds — powered by WASM, entirely in your browser.</p>
+                </div>
+              </li>
+              <li>
+                <span class="live-point-ic" style="--tint:var(--sys-pink)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <div>
+                  <strong>Private by default</strong>
+                  <p>No accounts, no cookies, no analytics. Favorites &amp; history live in <code>localStorage</code> only.</p>
+                </div>
+              </li>
+            </ul>
+
+            <div class="live-cta">
+              <a class="btn btn-primary btn-lg" href="https://aether-live.netlify.app/" target="_blank" rel="noopener">
+                <span class="live-dot" aria-hidden="true"></span>
+                Open web app
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+              <a class="btn btn-ghost btn-lg" href="https://github.com/MbarkT3STO/Aether-Radio/tree/master/WebApp" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                See the source
+              </a>
+            </div>
+
+            <div class="live-browser-row" aria-label="Supported browsers">
+              <span class="live-browser-pill">Chrome</span>
+              <span class="live-browser-pill">Safari</span>
+              <span class="live-browser-pill">Firefox</span>
+              <span class="live-browser-pill">Edge</span>
+              <span class="live-browser-pill">Arc</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ══════════════  PLATFORMS / DOWNLOAD  ══════════════ -->
     <section class="section-pad platforms" id="platforms">
       <div class="container">
@@ -428,6 +636,29 @@
         </div>
 
         <div class="platforms-grid" id="download">
+          <article class="platform-card platform-card--web">
+            <div class="platform-head">
+              <div class="platform-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>
+                </svg>
+              </div>
+              <div>
+                <div class="platform-name">Web</div>
+                <div class="platform-meta">
+                  <span class="live-dot" aria-hidden="true"></span>
+                  Live now · any browser
+                </div>
+              </div>
+            </div>
+            <p class="platform-desc">Zero install. Full feature parity, edge-proxied streams and WASM song recognition — right in your tab.</p>
+            <a class="btn btn-primary btn-block" href="https://aether-live.netlify.app/" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              Launch web app
+            </a>
+          </article>
+
           <article class="platform-card platform-card--android">
             <div class="platform-head">
               <div class="platform-icon">
@@ -635,7 +866,12 @@
 
           <details class="faq-item">
             <summary>Which platforms are supported?</summary>
-            <p>Android 6.0 and newer, macOS (Intel and Apple Silicon), Windows 10/11 (x64), and Linux via AppImage or <code>.deb</code>. iOS is on the roadmap.</p>
+            <p>Android 6.0 and newer, macOS (Intel and Apple Silicon), Windows 10/11 (x64), Linux via AppImage or <code>.deb</code>, and the <a href="https://aether-live.netlify.app/" target="_blank" rel="noopener">web app</a> in any modern browser. iOS is on the roadmap.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Is there a browser version I can use without installing?</summary>
+            <p>Yes — <a href="https://aether-live.netlify.app/" target="_blank" rel="noopener">Aether Radio Live</a> runs entirely in your browser with the same 50,000+ stations, song recognition, favorites, sleep timer and 12 accent themes. Two Netlify Edge Functions handle stream CORS and the Shazam signature proxy, so audio plays on any Icecast/Shoutcast source. Your favorites and history stay in <code>localStorage</code> — no account, no cookies, no tracking.</p>
           </details>
 
           <details class="faq-item">
@@ -692,6 +928,7 @@
         <h5>Product</h5>
         <a href="#features">Features</a>
         <a href="#design">Design</a>
+        <a href="#live">Web app</a>
         <a href="#platforms">Platforms</a>
         <a href="#download">Download</a>
       </div>
