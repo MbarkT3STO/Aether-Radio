@@ -2,8 +2,19 @@
   "name": "aether-radio",
   "version": "1.1.0",
   "description": "Aether Radio — World Radio Desktop Application",
+  "homepage": "https://github.com/MbarkT3STO/Aether-Radio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MbarkT3STO/Aether-Radio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MbarkT3STO/Aether-Radio/issues"
+  },
   "main": "./out/main/index.js",
-  "author": "Aether Radio",
+  "author": {
+    "name": "MBVRK",
+    "email": "contact@aetherradio.app"
+  },
   "license": "MIT",
   "scripts": {
     "dev": "clear && electron-vite dev",
