@@ -177,8 +177,8 @@
   font-weight: var(--weight-semibold);
 }
 
-/* When window is out-of-focus, Apple shows a subdued inactive selection */
-.app-sidebar:not(:focus-within) .sidebar-nav-item.active {
+/* When the whole window loses focus, Apple dims the sidebar selection */
+.app-sidebar:-webkit-any(:window-inactive) .sidebar-nav-item.active {
   background: var(--fill-primary);
   color: var(--text-primary);
 }
@@ -199,7 +199,7 @@
 .sidebar-nav-item:hover .sidebar-nav-icon { color: var(--text-primary); }
 .sidebar-nav-item.active .sidebar-nav-icon { color: var(--text-on-accent); }
 
-.app-sidebar:not(:focus-within) .sidebar-nav-item.active .sidebar-nav-icon {
+.app-sidebar:-webkit-any(:window-inactive) .sidebar-nav-item.active .sidebar-nav-icon {
   color: var(--accent-primary);
 }
 
