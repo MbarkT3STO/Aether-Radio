@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   TOASTS — Apple HIG notification banners
-   Vibrant overlay material · colored leading stripe · rounded card
+   TOASTS — Apple HIG notification capsule
+   Vibrant material · tinted iconographic leading circle · no stripe
    ═══════════════════════════════════════════════════════════════ */
 
 .toast-container {
@@ -12,22 +12,27 @@
   flex-direction: column-reverse;
   gap: 8px;
   pointer-events: none;
+  max-width: calc(100vw - 40px);
 }
 
 /* ── Toast card ── */
 .toast {
   display: flex;
-  align-items: stretch;
-  min-width: 300px;
-  max-width: 420px;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
+  align-items: center;
+  gap: 12px;
+  min-width: 280px;
+  max-width: 380px;
+  padding: 12px 16px 12px 12px;
+  border-radius: var(--radius-xl);
   pointer-events: all;
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-lg), 0 0 0 0.5px var(--border-subtle);
   background: var(--material-overlay);
-  animation: toastIn 0.38s var(--ease-spring) both;
   position: relative;
+  transform-origin: right center;
+
+  /* Animate only the transform/opacity of the capsule itself —
+     no backdrop-filter lives on an opacity-animated parent. */
+  animation: toastIn 0.38s var(--ease-spring) both;
 }
 
 @supports (backdrop-filter: blur(40px)) {
@@ -38,35 +43,14 @@
 }
 
 .toast.removing {
-  animation: toastOut 0.24s var(--ease-in) forwards;
+  animation: toastOut 0.22s var(--ease-in) forwards;
 }
 
-/* ── Colored left stripe ── */
-.toast::before {
-  content: '';
-  width: 3px;
-  flex-shrink: 0;
-  display: block;
-}
-
-.toast.success::before { background: var(--status-live); }
-.toast.error::before   { background: var(--status-error); }
-.toast.info::before    { background: var(--accent-primary); }
-
-/* ── Content ── */
-.toast-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  flex: 1;
-  min-width: 0;
-}
-
-/* ── Icon ── */
+/* ── Iconographic leading circle ── */
 .toast-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -74,28 +58,44 @@
   flex-shrink: 0;
 }
 
-.toast.success .toast-icon { color: var(--status-live);  background: rgba(52,199,89,0.14); }
-.toast.error   .toast-icon { color: var(--status-error); background: rgba(255,59,48,0.14); }
-.toast.info    .toast-icon { color: var(--accent-primary); background: var(--accent-soft); }
+.toast-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.75;
+}
+
+.toast.success .toast-icon { color: var(--status-live);    background: rgba(52,199,89,0.16);  }
+.toast.error   .toast-icon { color: var(--status-error);   background: rgba(255,59,48,0.16);  }
+.toast.info    .toast-icon { color: var(--accent-primary); background: var(--accent-soft);    }
 
 /* ── Message ── */
 .toast-message {
   flex: 1;
   font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-medium);
   line-height: 1.4;
   color: var(--text-primary);
   min-width: 0;
   letter-spacing: -0.008em;
+  word-wrap: break-word;
+}
+
+/* ── Reduced transparency fallback (accessibility.css already covers this,
+       but keep a specific opaque background here for safety) ── */
+@media (prefers-reduced-transparency: reduce) {
+  .toast {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+  }
 }
 
 /* ── Animations ── */
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(24px) scale(0.92); }
+  from { opacity: 0; transform: translateX(18px) scale(0.94); }
   to   { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 @keyframes toastOut {
   from { opacity: 1; transform: translateX(0) scale(1); }
-  to   { opacity: 0; transform: translateX(16px) scale(0.95); }
+  to   { opacity: 0; transform: translateX(12px) scale(0.96); }
 }

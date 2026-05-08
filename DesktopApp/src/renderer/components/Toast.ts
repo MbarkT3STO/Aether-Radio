@@ -38,11 +38,10 @@ export class Toast {
   private static createToast(opts: ToastOptions): HTMLElement {
     const toast = document.createElement('div')
     toast.className = `toast ${opts.type}`
+    toast.setAttribute('role', 'status')
     toast.innerHTML = `
-      <div class="toast-content">
-        <div class="toast-icon">${this.getIcon(opts.type)}</div>
-        <div class="toast-message">${this.escapeHtml(opts.message)}</div>
-      </div>
+      <div class="toast-icon">${this.getIcon(opts.type)}</div>
+      <div class="toast-message">${this.escapeHtml(opts.message)}</div>
     `
     return toast
   }
@@ -57,15 +56,15 @@ export class Toast {
 
   private static getIcon(type: ToastType): string {
     const icons: Record<ToastType, string> = {
-      success: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <path d="m9 12 2 2 4-4"/>
       </svg>`,
-      error: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <path d="m15 9-6 6"/><path d="m9 9 6 6"/>
       </svg>`,
-      info: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <path d="M12 16v-4"/><path d="M12 8h.01"/>
       </svg>`
