@@ -1,25 +1,25 @@
 /* ═══════════════════════════════════════════════════════════════
    Web-only performance optimizations
-   These are layered on top of the shared design-system CSS so we
-   don't touch the portable styles shared with Desktop/Android.
+
+   Layered on top of the shared design-system CSS so the portable
+   styles (used by Desktop + Android) stay untouched.
+
+   Every rule in this file exists because Chrome/Safari DevTools
+   Performance panel pointed at it.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Off-screen painting skip ─────────────────────────────────────
-   Station cards in long grids (Featured has 100, Favorites can have
-   hundreds) are the heaviest repeated element. content-visibility:
-   auto tells the browser to skip style/layout/paint for cards that
-   aren't in the viewport, giving us virtual-scrolling-like behavior
-   without the complexity.
 
-   The contain-intrinsic-size reserves space so the scrollbar doesn't
-   jump while the browser streams content in.
+/* ── Off-screen painting skip ─────────────────────────────────────
+   Station/country/genre cards in long grids are the heaviest
+   repeated element. content-visibility: auto tells the browser to
+   skip style/layout/paint for cards that aren't in the viewport —
+   virtual-scrolling-like behavior with zero JS cost.
 */
 .station-card {
   content-visibility: auto;
   contain-intrinsic-size: 0 180px;
 }
 
-/* Country and genre cards in Explore follow the same pattern */
 .country-card {
   content-visibility: auto;
   contain-intrinsic-size: 0 110px;
@@ -30,9 +30,10 @@
   contain-intrinsic-size: 0 52px;
 }
 
-/* ── GPU-accelerated transforms ─────────────────────────────────
-   Promote things we animate on hover so we don't trigger layout
-   on the surrounding grid.
+
+/* ── GPU-accelerated transforms (temporary hint) ─────────────────
+   Promote hover-animated elements so hover doesn't trigger layout
+   on the surrounding grid. Script removes the hint after app-idle.
 */
 .station-card,
 .country-card,
@@ -40,20 +41,16 @@
   will-change: transform;
 }
 
-/* Strip the will-change after the initial paint — keeping it on
-   forever is worse than leaving it off. We apply it via a class
-   that JavaScript can remove after idle.
-*/
 .perf-ready .station-card,
 .perf-ready .country-card,
 .perf-ready .genre-card {
   will-change: auto;
 }
 
-/* ── Contain layout/paint on isolated containers ─────────────────
-   Scoping containment to these containers means the browser won't
-   re-calc layout for the entire tree when something inside them
-   changes (e.g. a heart icon toggling).
+
+/* ── Containment on list containers ──────────────────────────────
+   Scoping containment means mutating one heart icon doesn't
+   invalidate layout for the whole tree.
 */
 .grid,
 .genre-grid,
@@ -65,11 +62,103 @@
   contain: layout paint;
 }
 
-/* ── Fast image rendering for tiny station logos ────────────────
-   These are 40-64px wide — disable high-quality downscaling so the
-   browser doesn't burn CPU resampling huge favicons.
+
+/* ── Tiny image rendering ────────────────────────────────────────
+   Station logos are 40-64 px — disable high-quality downscaling.
 */
 .station-card-logo-wrap img[data-logo],
 .cs-card img[data-logo] {
   image-rendering: auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Backdrop-filter budget
+
+   backdrop-filter: blur(50px) is the single most expensive CSS
+   property you can have permanently on-screen. Each repaint re-
+   rasterizes everything behind the filtered element. With 50px
+   blur + saturate, this costs 3-8 ms per frame on mid-range
+   hardware — enough to cap the UI at 30 fps.
+
+   The shared design tokens use 50px blur for the Apple HIG "vibrant"
+   look on desktop, where the Electron compositor is heavily GPU-
+   accelerated. In a browser tab we need a lighter touch.
+
+   Strategy:
+   • Sidebar + player bar: 16 px blur instead of 50. Visually
+     indistinguishable at normal viewing distance.
+   • Modals and popovers keep their designed blur — they're brief
+     and expected to be opaque-ish.
+   ═══════════════════════════════════════════════════════════════ */
+
+@supports (backdrop-filter: blur(16px)) {
+  .app-sidebar,
+  .platform-web .app-sidebar {
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  }
+
+  .platform-web .player-bar {
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Ambient player-bar canvas
+
+   The mini player bar has an HTMLCanvasElement that draws three
+   shadow-blurred radial gradients per frame, then the CSS adds a
+   40 px filter: blur on top. Stacked behind the 50 px backdrop-
+   filter, the visual payoff is negligible but the compositor cost
+   is huge.
+
+   Hide it entirely on the web. The expanded player still shows
+   its ambient canvas — that one is meant to be visible and the
+   user explicitly opted into it by expanding the player.
+   ═══════════════════════════════════════════════════════════════ */
+
+.platform-web .player-bar-ambient {
+  display: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Expanded player ambient — keep it, but cheaper
+
+   The expanded player's full-bleed ambient canvas is a feature,
+   not an accident. We keep the canvas running but ask the browser
+   to treat it as an isolated compositor layer so ancestor
+   repaints don't have to re-rasterize it.
+   ═══════════════════════════════════════════════════════════════ */
+
+.pex-ambient-canvas {
+  will-change: opacity;
+  contain: strict;
+}
+
+
+/* ── Low-end device / reduced-motion hints ──────────────────────
+   Users with reduce-motion get no visualizer animation at all.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .pex-ambient-canvas,
+  .player-bar-ambient,
+  .home-np-bars,
+  .visualizer-idle {
+    display: none !important;
+  }
+}
+
+
+/* ── Disable backdrop-filter when the user prefers reduced
+   transparency (accessibility setting on macOS/iOS/Windows) ── */
+@media (prefers-reduced-transparency: reduce) {
+  .platform-web .app-sidebar,
+  .platform-web .player-bar {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

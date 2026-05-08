@@ -29,6 +29,11 @@ export class Router {
   }
 
   navigate(path: string): void {
+    // Don't trigger a hashchange if we're already on this route — it
+    // would cause a needless view unmount + remount, including dropping
+    // scroll position and re-fetching data.
+    const currentHash = window.location.hash.slice(1) || '/'
+    if (currentHash === path) return
     window.location.hash = path
   }
 

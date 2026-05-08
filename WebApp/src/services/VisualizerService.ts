@@ -9,6 +9,9 @@ export class VisualizerService {
   private activeCanvas: HTMLCanvasElement | null = null
   private themeUnsubscribe: (() => void) | null = null
 
+  /** Optional per-loop cleanup (e.g. tearing down a ResizeObserver) */
+  private _onStopExtraCleanup: (() => void) | null = null
+
   // Expose for shared-canvas use by a secondary VisualizerService instance
   get sharedAnalyser(): AnalyserNode | null { return this.analyser }
   get sharedDataArray(): Uint8Array<ArrayBuffer> | null  { return this.dataArray }
@@ -85,12 +88,20 @@ export class VisualizerService {
     this.analyser  = source.sharedAnalyser
     this.dataArray = source.sharedDataArray
     this.stopVisualization()
+
+    // If the canvas is hidden via CSS (e.g. the web build disables the
+    // mini player-bar ambient via display:none), skip starting the loop.
+    // Running rAF + getByteFrequencyData for an off-screen 0-pixel canvas
+    // is pure waste.
+    const cs = getComputedStyle(canvas)
+    if (cs.display === 'none' || cs.visibility === 'hidden') return
+
     this.activeCanvas = canvas
     this.ambientLoop(canvas, large, centered)
   }
 
   private ambientLoop(canvas: HTMLCanvasElement, large = false, centered = false): void {
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
     // Three blobs: indigo center, blue-shifted right, violet-shifted bottom
@@ -101,18 +112,72 @@ export class VisualizerService {
     ]
 
     let t = 0
-    // Cache computed style reads — only refresh every 30 frames (~0.5s at 60fps)
+
+    // ── Size is measured once and re-measured only on resize ──
+    // getBoundingClientRect + canvas resize per frame forces a layout
+    // flush and a full canvas buffer reallocation. Caching them and
+    // listening to a ResizeObserver keeps the hot path doing nothing but
+    // drawing.
+    //
+    // We also cap DPR at 1.5 — the canvas is blurred before it reaches
+    // the screen, so rendering at 2× is wasted work.
+    const dprCap = Math.min(window.devicePixelRatio || 1, 1.5)
+    let w = 0
+    let hh = 0
+
+    const resize = (): void => {
+      const rect = canvas.getBoundingClientRect()
+      const pw = Math.max(1, Math.round(rect.width  * dprCap))
+      const ph = Math.max(1, Math.round(rect.height * dprCap))
+      if (canvas.width !== pw || canvas.height !== ph) {
+        canvas.width  = pw
+        canvas.height = ph
+      }
+      w  = canvas.width
+      hh = canvas.height
+    }
+    resize()
+
+    const ro = new ResizeObserver(resize)
+    ro.observe(canvas)
+
+    // Cache computed style reads — only refresh every 60 frames (~2 s)
     let cachedH = 249
     let cachedS = '90%'
     let cachedIsDark = false
     let styleFrameCount = 0
 
-    const draw = (): void => {
+    // ── 30 fps throttling ──
+    // The ambient is a slow bloom; humans can't tell the difference
+    // between 30 and 60 fps for it, but the browser can (and so can
+    // the compositor sharing a thread with the UI).
+    const frameIntervalMs = 1000 / 30
+    let lastFrameTs = 0
+
+    // Suspend the loop entirely when the tab is hidden — Chrome throttles
+    // rAF to 1 fps in background tabs anyway, but fully skipping the work
+    // saves battery on mobile.
+    let paused = document.visibilityState === 'hidden'
+    const onVisibility = (): void => {
+      paused = document.visibilityState === 'hidden'
+      // Force a style re-read on resume so theme changes made while hidden
+      // are picked up immediately.
+      if (!paused) styleFrameCount = 60
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    const draw = (ts: number): void => {
       this.animationId = requestAnimationFrame(draw)
+
+      if (paused) return
+
+      // Honor the frame budget
+      if (ts - lastFrameTs < frameIntervalMs) return
+      lastFrameTs = ts
       t++
 
       // Throttle expensive getComputedStyle reads
-      if (styleFrameCount === 0 || styleFrameCount >= 30) {
+      if (styleFrameCount === 0 || styleFrameCount >= 60) {
         const style  = getComputedStyle(document.documentElement)
         cachedH      = parseFloat(style.getPropertyValue('--h').trim()) || 249
         cachedS      = style.getPropertyValue('--s').trim() || '90%'
@@ -125,21 +190,11 @@ export class VisualizerService {
       const s      = cachedS
       const isDark = cachedIsDark
 
-      const dpr  = window.devicePixelRatio || 1
-      const rect = canvas.getBoundingClientRect()
-      const pw   = Math.round(rect.width  * dpr)
-      const ph   = Math.round(rect.height * dpr)
-      if (canvas.width !== pw || canvas.height !== ph) {
-        canvas.width  = pw
-        canvas.height = ph
-      }
-
-      const w  = canvas.width
-      const hh = canvas.height
+      if (w === 0 || hh === 0) return
 
       ctx.clearRect(0, 0, w, hh)
 
-      // Pull fresh frequency data every frame
+      // Pull fresh frequency data
       if (this.analyser && this.dataArray) {
         this.analyser.getByteFrequencyData(this.dataArray)
       }
@@ -161,10 +216,9 @@ export class VisualizerService {
           ? (large ? 0.45 + energy * 0.40 : 0.28 + energy * 0.32)
           : (large ? 0.30 + energy * 0.30 : 0.18 + energy * 0.22)
 
-        ctx.save()
-        ctx.shadowColor = `hsla(${blobHue}, ${s}, ${isDark ? '65%' : '55%'}, ${alpha})`
-        ctx.shadowBlur  = Math.min(w, hh) * 0.35
-
+        // Dropped the expensive shadowBlur — the .pex-ambient-canvas
+        // has a CSS filter: blur(Xpx) that does the same job on the
+        // GPU instead of the 2D canvas software path.
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius)
         grad.addColorStop(0,   `hsla(${blobHue}, ${s}, ${isDark ? '65%' : '55%'}, ${alpha})`)
         grad.addColorStop(0.5, `hsla(${blobHue}, ${s}, ${isDark ? '55%' : '50%'}, ${alpha * 0.5})`)
@@ -174,11 +228,16 @@ export class VisualizerService {
         ctx.beginPath()
         ctx.ellipse(cx, cy, radius, radius * 0.85, phase * 0.3, 0, Math.PI * 2)
         ctx.fill()
-        ctx.restore()
       }
     }
 
-    draw()
+    // Patch stopVisualization so the ResizeObserver gets torn down too
+    this._onStopExtraCleanup = (): void => {
+      try { ro.disconnect() } catch { /* noop */ }
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+
+    this.animationId = requestAnimationFrame(draw)
   }
 
   private drawLoop(canvas: HTMLCanvasElement): void {
@@ -258,6 +317,10 @@ export class VisualizerService {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId)
       this.animationId = null
+    }
+    if (this._onStopExtraCleanup) {
+      try { this._onStopExtraCleanup() } catch { /* ignore */ }
+      this._onStopExtraCleanup = null
     }
     // Clear the canvas so no frozen frame is left visible
     if (this.activeCanvas) {
