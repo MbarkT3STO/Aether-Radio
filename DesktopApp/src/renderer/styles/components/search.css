@@ -223,6 +223,11 @@
   transform: translateY(-2px);
 }
 
+.search-chip:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
 .search-chip:active {
   transform: translateY(0) scale(0.97);
   transition-duration: 60ms;

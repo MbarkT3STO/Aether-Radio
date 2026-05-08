@@ -57,6 +57,11 @@
   transition-duration: 60ms;
 }
 
+.home-now-playing-card:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
 /* Artwork */
 .home-np-artwork {
   width: 64px;
@@ -201,6 +206,11 @@
 .home-stat-pill:active {
   transform: translateY(0) scale(0.97);
   transition-duration: 60ms;
+}
+
+.home-stat-pill:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .home-stat-pill svg {

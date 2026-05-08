@@ -202,10 +202,10 @@
 
   /* Text — clean whites with warmth */
   --text-primary:   #F5F3FF;
-  --text-secondary: rgba(245,243,255,0.68);
-  --text-tertiary:  rgba(245,243,255,0.42);
-  --text-muted:     rgba(245,243,255,0.28);
-  --text-placeholder: rgba(245,243,255,0.22);
+  --text-secondary: rgba(245,243,255,0.72);
+  --text-tertiary:  rgba(245,243,255,0.46);
+  --text-muted:     rgba(245,243,255,0.30);
+  --text-placeholder: rgba(245,243,255,0.24);
 
   /* Borders — subtle violet-gray */
   --border-subtle:  rgba(245,243,255,0.07);

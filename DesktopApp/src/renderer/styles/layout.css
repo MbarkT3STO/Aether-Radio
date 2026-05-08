@@ -85,8 +85,8 @@
 
 /* ── Scrollbar — Apple minimal style ── */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -96,9 +96,23 @@
 ::-webkit-scrollbar-thumb {
   background: var(--border-medium);
   border-radius: var(--radius-full);
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* Show scrollbar only on hover for cleaner look */
+.app-content::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.app-content:hover::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+}
+
+.app-content:hover::-webkit-scrollbar-thumb:hover {
   background: var(--border-strong);
 }
 

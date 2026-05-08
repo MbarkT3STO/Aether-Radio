@@ -30,6 +30,11 @@
   transition-duration: 60ms;
 }
 
+.station-card:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
 /* Playing state */
 .station-card.playing {
   border-color: var(--accent-primary);
@@ -182,6 +187,11 @@
   color: var(--palette-pink);
   transform: scale(1.22);
   background: rgba(255,45,85,0.08);
+}
+
+.station-card-favorite:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .station-card-favorite.active {

@@ -166,6 +166,11 @@
   background: var(--bg-tertiary);
 }
 
+.sidebar-nav-item:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
 .sidebar-nav-item:active {
   background: var(--border-subtle);
   transition-duration: 60ms;
