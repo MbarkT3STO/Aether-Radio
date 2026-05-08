@@ -10,18 +10,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: amOverlayIn 0.22s ease forwards;
 }
 
 .am-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.36);
+  background: rgba(0,0,0,0);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  animation: amBackdropIn 0.22s ease forwards;
 }
 
-html[data-theme="dark"] .am-backdrop { background: rgba(0,0,0,0.58); }
+html[data-theme="dark"] .am-backdrop { animation-name: amBackdropInDark; }
 
 /* ── Dialog ── */
 .am-dialog {
@@ -216,6 +216,15 @@ html[data-theme="dark"] .am-backdrop { background: rgba(0,0,0,0.58); }
 .am-link:active { opacity: 0.60; }
 
 /* ── Animations ── */
+@keyframes amBackdropIn {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.36); }
+}
+@keyframes amBackdropInDark {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.58); }
+}
+
 @keyframes amOverlayIn  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes amOverlayOut { from { opacity: 1; } to { opacity: 0; } }
 

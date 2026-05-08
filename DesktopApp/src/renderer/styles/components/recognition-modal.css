@@ -9,22 +9,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: rcmOverlayIn 0.22s ease forwards;
 }
 
-.rcm-overlay.rcm-fade-out-modal {
-  animation: rcmOverlayOut 0.26s ease forwards;
+.rcm-overlay.rcm-fade-out-modal .rcm-backdrop {
+  animation: rcmBackdropOut 0.24s ease forwards;
 }
 
 .rcm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.36);
+  background: rgba(0,0,0,0);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  animation: rcmBackdropIn 0.22s ease forwards;
 }
 
-html[data-theme="dark"] .rcm-backdrop { background: rgba(0,0,0,0.60); }
+html[data-theme="dark"] .rcm-backdrop { animation-name: rcmBackdropInDark; }
 
 /* ── Dialog ── */
 .rcm-dialog {
@@ -607,6 +607,19 @@ html[data-theme="dark"] .rcm-backdrop { background: rgba(0,0,0,0.60); }
 /* ═══════════════════════════════════════════════════════════════
    ANIMATIONS
    ═══════════════════════════════════════════════════════════════ */
+@keyframes rcmBackdropIn {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.36); }
+}
+@keyframes rcmBackdropInDark {
+  from { background-color: rgba(0,0,0,0); }
+  to   { background-color: rgba(0,0,0,0.60); }
+}
+@keyframes rcmBackdropOut {
+  from { background-color: rgba(0,0,0,0.36); }
+  to   { background-color: rgba(0,0,0,0); }
+}
+
 @keyframes rcmOverlayIn  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rcmOverlayOut { from { opacity: 1; } to { opacity: 0; } }
 
