@@ -3,42 +3,82 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════ NAVBAR ═══════════════════ */
+/* The outer .nav is a transparent sticky wrapper; the visible pill is .nav-inner.
+   This lets us float a rounded capsule with a gap above it, matching the
+   Apple-style "detached" toolbar pattern used across macOS apps. */
 .nav {
   position: sticky;
   top: 0;
   z-index: 50;
-  height: var(--nav-height);
   display: flex;
   align-items: center;
-  background: var(--material-bar);
-  border-bottom: 1px solid transparent;
-  transition:
-    background 280ms var(--ease-in-out),
-    border-color 280ms var(--ease-in-out),
-    box-shadow 280ms var(--ease-in-out);
+  justify-content: center;
+  padding: 10px 12px 0;
+  background: transparent;
+  border-bottom: none;
+  pointer-events: none;               /* only the pill is interactive */
+  transition: padding 280ms var(--ease-in-out);
 }
-/* Backdrop blur only if browser supports it (cheap check, otherwise plain translucent bg) */
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .nav {
-    background: var(--material-bar);
-    backdrop-filter: saturate(160%) blur(14px);
-    -webkit-backdrop-filter: saturate(160%) blur(14px);
-  }
-}
-.nav.is-scrolled {
-  border-bottom-color: var(--border-subtle);
-  box-shadow: var(--shadow-xs);
-}
+@media (min-width: 768px) { .nav { padding: 14px 20px 0; } }
 
 .nav-inner {
-  width: min(1200px, 100% - 2rem);
+  pointer-events: auto;
+  width: min(1160px, 100% - 24px);
+  height: 58px;
   margin-inline: auto;
+  padding: 0 10px 0 16px;
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  background: var(--material-bar);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 12px 32px rgba(0, 0, 0, 0.08),
+    0 2px 10px rgba(0, 0, 0, 0.04);
+  transition:
+    background 280ms var(--ease-in-out),
+    border-color 280ms var(--ease-in-out),
+    box-shadow 280ms var(--ease-in-out),
+    transform 280ms var(--ease-in-out),
+    width 280ms var(--ease-in-out),
+    padding 280ms var(--ease-in-out);
 }
 @media (min-width: 768px) {
-  .nav-inner { width: min(1200px, 100% - 4rem); }
+  .nav-inner { width: min(1160px, 100% - 40px); padding: 0 12px 0 22px; }
+}
+
+/* Dark-mode: slightly heavier lift to counter the dark backdrop */
+html[data-theme="dark"] .nav-inner {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 14px 38px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* Backdrop blur only if browser supports it */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-inner {
+    backdrop-filter: saturate(180%) blur(18px);
+    -webkit-backdrop-filter: saturate(180%) blur(18px);
+  }
+}
+
+/* Scrolled state — pill lifts a touch and shadow deepens */
+.nav.is-scrolled .nav-inner {
+  border-color: var(--border-medium);
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 18px 44px rgba(0, 0, 0, 0.12),
+    0 4px 14px rgba(0, 0, 0, 0.06);
+}
+html[data-theme="dark"] .nav.is-scrolled .nav-inner {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 22px 56px rgba(0, 0, 0, 0.70),
+    0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
 .nav-brand {
@@ -203,18 +243,24 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
 .nav[data-mobile-open="true"] .nav-burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .nav-mobile {
+  pointer-events: auto;
   position: absolute;
-  top: var(--nav-height);
-  left: 0; right: 0;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-lg);
-  padding: var(--space-4);
+  top: calc(100% + 8px);
+  left: 12px;
+  right: 12px;
+  background: var(--material-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-3);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   animation: slideDown 220ms var(--ease-spring);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
 }
+@media (min-width: 768px) { .nav-mobile { left: 20px; right: 20px; } }
 .nav-mobile[hidden] { display: none; }
 .nav-mobile a {
   display: block;
@@ -1382,7 +1428,7 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
 
 /* Reduce blur on low-powered devices (explicit override for small screens) */
 @media (max-width: 480px) {
-  .nav { backdrop-filter: saturate(140%) blur(10px); -webkit-backdrop-filter: saturate(140%) blur(10px); }
+  .nav-inner { backdrop-filter: saturate(150%) blur(12px); -webkit-backdrop-filter: saturate(150%) blur(12px); }
   .demo-mat { backdrop-filter: blur(8px) saturate(130%); -webkit-backdrop-filter: blur(8px) saturate(130%); }
 }
 
