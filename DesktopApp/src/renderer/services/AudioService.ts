@@ -123,8 +123,10 @@ export class AudioService {
   private async handlePlaybackError(station: RadioStation): Promise<void> {
     if (this.retryCount < MAX_RETRIES) {
       this.retryCount++
+      // Exponential backoff: 2s, 4s, 8s
+      const delay = RETRY_DELAY_MS * Math.pow(2, this.retryCount - 1)
 
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS))
+      await new Promise(resolve => setTimeout(resolve, delay))
 
       if (this.currentStationId === station.id) {
         await this.play(station)

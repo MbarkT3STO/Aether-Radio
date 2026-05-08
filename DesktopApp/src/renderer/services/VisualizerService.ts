@@ -97,16 +97,29 @@ export class VisualizerService {
     ]
 
     let t = 0
+    // Cache computed style reads — only refresh every 30 frames (~0.5s at 60fps)
+    let cachedH = 249
+    let cachedS = '90%'
+    let cachedIsDark = false
+    let styleFrameCount = 0
 
     const draw = (): void => {
       this.animationId = requestAnimationFrame(draw)
       t++
 
-      // Read theme per-frame so theme changes are reflected immediately
-      const style  = getComputedStyle(document.documentElement)
-      const h      = parseFloat(style.getPropertyValue('--h').trim()) || 249
-      const s      = style.getPropertyValue('--s').trim() || '90%'
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+      // Throttle expensive getComputedStyle reads
+      if (styleFrameCount === 0 || styleFrameCount >= 30) {
+        const style  = getComputedStyle(document.documentElement)
+        cachedH      = parseFloat(style.getPropertyValue('--h').trim()) || 249
+        cachedS      = style.getPropertyValue('--s').trim() || '90%'
+        cachedIsDark = document.documentElement.getAttribute('data-theme') === 'dark'
+        styleFrameCount = 0
+      }
+      styleFrameCount++
+
+      const h      = cachedH
+      const s      = cachedS
+      const isDark = cachedIsDark
 
       const dpr  = window.devicePixelRatio || 1
       const rect = canvas.getBoundingClientRect()

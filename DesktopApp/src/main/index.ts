@@ -26,6 +26,7 @@ function createWindow(): void {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      backgroundThrottling: false, // Prevent audio stuttering when window is hidden/minimized
     },
   })
 

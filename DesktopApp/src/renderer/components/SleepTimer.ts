@@ -85,7 +85,10 @@ export class SleepTimer extends BaseComponent {
 
   protected afterMount(): void {
     this.attachListeners()
-    this.startTick()
+    // Only start tick if timer is active (saves CPU when idle)
+    if (this.playerStore.hasSleepTimer) {
+      this.startTick()
+    }
     if (!this.unsubscribeSleepTimer) {
       this.unsubscribeSleepTimer = this.eventBus.on('player:sleep-timer', () => {
         this.rerender()
@@ -206,9 +209,14 @@ export class SleepTimer extends BaseComponent {
 
   private startTick(): void {
     this.stopTick()
+    // Only start the interval if a sleep timer is actually active
+    if (!this.playerStore.hasSleepTimer) return
     this.tickInterval = setInterval(() => {
       if (this.playerStore.hasSleepTimer) {
         this.rerender()
+      } else {
+        // Timer expired — stop ticking to save CPU
+        this.stopTick()
       }
     }, 30_000)
   }
@@ -228,7 +236,10 @@ export class SleepTimer extends BaseComponent {
     parent.innerHTML = this.render()
     this.element = parent.firstElementChild as HTMLElement
     this.attachListeners()
-    this.startTick()
+    // Only restart tick if timer is active (saves CPU when idle)
+    if (this.playerStore.hasSleepTimer) {
+      this.startTick()
+    }
   }
 
   private timerIcon(): string {

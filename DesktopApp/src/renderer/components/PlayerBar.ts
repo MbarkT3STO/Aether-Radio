@@ -35,6 +35,8 @@ export class PlayerBar extends BaseComponent {
   // Expanded volume drag listeners
   private _pexOnMouseMove: ((e: Event) => void) | null = null
   private _pexOnMouseUp: (() => void) | null = null
+  // Expanded player EventBus unsubscribers — cleaned up on overlay destroy
+  private _pexUnsubscribers: Array<() => void> = []
 
   constructor(props: Record<string, never>) {
     super(props)
@@ -517,6 +519,9 @@ export class PlayerBar extends BaseComponent {
     // Stop ambient immediately so it doesn't keep running during animation
     this._ambientVisualizer.stopVisualization()
     this.removePexDragListeners()
+    // Unsubscribe expanded player EventBus listeners
+    this._pexUnsubscribers.forEach(unsub => unsub())
+    this._pexUnsubscribers = []
     // Wait for height transition to finish, then remove
     let done = false
     const finish = (): void => {
@@ -544,6 +549,9 @@ export class PlayerBar extends BaseComponent {
     // Remove any stale overlay without touching _isExpanded
     this._ambientVisualizer.stopVisualization()
     this.removePexDragListeners()
+    // Clean up any stale EventBus listeners from a previous overlay
+    this._pexUnsubscribers.forEach(unsub => unsub())
+    this._pexUnsubscribers = []
     const stale = document.getElementById('player-expanded-overlay')
     if (stale) stale.remove()
 
@@ -737,15 +745,17 @@ export class PlayerBar extends BaseComponent {
     }
 
     // Keep expanded UI in sync with EventBus
-    this.eventBus.on('player:play',  () => this.syncPexPlayState(overlay))
-    this.eventBus.on('player:pause', () => this.syncPexPlayState(overlay))
-    this.eventBus.on('player:stop',  () => {
-      this._isExpanded = false
-      this.destroyExpandedOverlay()
-    })
-    this.eventBus.on('player:volume',     ({ volume }) => this.syncPexVolumeUI(overlay, volume))
-    this.eventBus.on('favorites:changed', () => this.syncPexFavState(overlay))
-    this.eventBus.on('player:loading',    ({ loading }) => this.syncPexLoadingUI(overlay, loading))
+    this._pexUnsubscribers.push(
+      this.eventBus.on('player:play',  () => this.syncPexPlayState(overlay)),
+      this.eventBus.on('player:pause', () => this.syncPexPlayState(overlay)),
+      this.eventBus.on('player:stop',  () => {
+        this._isExpanded = false
+        this.destroyExpandedOverlay()
+      }),
+      this.eventBus.on('player:volume',     ({ volume }) => this.syncPexVolumeUI(overlay, volume)),
+      this.eventBus.on('favorites:changed', () => this.syncPexFavState(overlay)),
+      this.eventBus.on('player:loading',    ({ loading }) => this.syncPexLoadingUI(overlay, loading))
+    )
   }
 
   private syncPexPlayState(overlay: HTMLElement): void {
@@ -826,6 +836,9 @@ export class PlayerBar extends BaseComponent {
     this._isExpanded = false
     this._ambientVisualizer.stopVisualization()
     this.removePexDragListeners()
+    // Unsubscribe expanded player EventBus listeners to prevent memory leaks
+    this._pexUnsubscribers.forEach(unsub => unsub())
+    this._pexUnsubscribers = []
     const overlay = document.getElementById('player-expanded-overlay')
     if (overlay) overlay.remove()
     // Restore the mini player bar
