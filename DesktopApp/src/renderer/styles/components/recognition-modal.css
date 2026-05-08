@@ -24,7 +24,7 @@
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
 
-[data-theme="dark"] .rcm-backdrop { background: rgba(0,0,0,0.60); }
+html[data-theme="dark"] .rcm-backdrop { background: rgba(0,0,0,0.60); }
 
 /* ── Dialog ── */
 .rcm-dialog {

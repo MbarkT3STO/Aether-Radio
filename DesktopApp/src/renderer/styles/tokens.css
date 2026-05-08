@@ -39,7 +39,7 @@
   --sys-gray6:     #F2F2F7;
 }
 
-[data-theme="dark"] {
+html[data-theme="dark"] {
   /* ═══════════════════════════════════════════════════════════
      APPLE SYSTEM COLORS — DARK (higher-luminance variants)
      ═══════════════════════════════════════════════════════════ */
@@ -157,7 +157,7 @@
    Deeper canvas, secondary cards lift above. Mirrors iOS/macOS dark.
    ═══════════════════════════════════════════════════════════════════ */
 
-[data-theme="dark"] {
+html[data-theme="dark"] {
   /* Backgrounds — layered elevation */
   --bg-primary:   #000000;   /* systemBackground (dark)        */
   --bg-secondary: #1C1C1E;   /* secondarySystemBackground      */
@@ -337,7 +337,7 @@
    Maps the old ad-hoc palette onto Apple's system colors.
    ═══════════════════════════════════════════════════════════════════ */
 
-:root, [data-theme="dark"] {
+:root, html[data-theme="dark"] {
   --palette-indigo:    var(--sys-indigo);
   --palette-indigo-dk: var(--sys-indigo);
   --palette-blue:      var(--sys-blue);

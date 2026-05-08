@@ -21,7 +21,7 @@
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
 
-[data-theme="dark"] .cm-backdrop {
+html[data-theme="dark"] .cm-backdrop {
   background: rgba(0,0,0,0.58);
 }
 
