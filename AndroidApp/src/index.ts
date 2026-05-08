@@ -54,13 +54,26 @@ class App {
   }
 
   private async loadSettings(): Promise<void> {
+    // Restore accent color from localStorage first so the app tints correctly
+    // on first paint (independent of server settings roundtrip).
+    try {
+      const storedAccent = localStorage.getItem('accent-color')
+      if (storedAccent) {
+        document.documentElement.setAttribute('data-accent', storedAccent)
+      } else {
+        document.documentElement.setAttribute('data-accent', 'blue')
+      }
+    } catch {
+      document.documentElement.setAttribute('data-accent', 'blue')
+    }
+
     const result = await this.bridge.settings.get()
     if (result.success) {
       const { theme, volume, bufferSize } = result.data
       document.documentElement.setAttribute('data-theme', theme)
       this.playerStore.setVolume(volume)
       this.audioService.setBufferSize(bufferSize)
-      // Apply dark status bar for dark theme
+      // Apply status bar styling matching the current theme
       try {
         await StatusBar.setStyle({ style: theme === 'dark' ? Style.Dark : Style.Light })
         await StatusBar.setBackgroundColor({ color: theme === 'dark' ? '#000000' : '#f2f2f7' })

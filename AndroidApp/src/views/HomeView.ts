@@ -4,7 +4,6 @@ import { PlayerStore } from '../store/PlayerStore'
 import { FavoritesStore } from '../store/FavoritesStore'
 import { Router } from '../router/Router'
 import { EventBus } from '../store/EventBus'
-import type { RadioStation } from '../domain/entities/RadioStation'
 import type { PlayHistory } from '../domain/entities/PlayHistory'
 import { renderStationCard } from '../utils/renderCard'
 import { countryFlag } from '../utils/countryFlag'
@@ -21,13 +20,8 @@ export class HomeView extends BaseComponent {
   private unsubscribers: Array<() => void> = []
 
   async afterMount(): Promise<void> {
-    // Render the page structure immediately — don't wait for data
     this.updateContent()
-
-    // Then load data and refresh
     await this.loadData()
-
-    // Re-render now-playing card when station changes — store unsubscribers
     this.unsubscribers.push(
       this.eventBus.on('player:play',  () => { this.updateNowPlaying(); this.syncPlayingState() }),
       this.eventBus.on('player:pause', () => { this.updateNowPlaying(); this.syncPlayingState() }),
@@ -46,13 +40,9 @@ export class HomeView extends BaseComponent {
         this.bridge.history.getAll(),
         this.bridge.favorites.getAll()
       ])
-
       if (historyResult.success) this.recentHistory = historyResult.data.slice(0, 6)
       if (favResult.success)     this.favoritesCount = favResult.data.length
-    } catch (_) {
-      // Data unavailable — render with defaults (empty history, 0 favorites)
-    }
-
+    } catch (_) { /* offline */ }
     this.updateContent()
   }
 
@@ -68,78 +58,55 @@ export class HomeView extends BaseComponent {
     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
     content.innerHTML = `
-
-      <!-- ── Greeting ── -->
+      <!-- Greeting -->
       <div class="home-greeting">
-        <div class="home-greeting-text">
-          <h1>${greeting}</h1>
-          <p class="view-subtitle">What would you like to listen to today?</p>
-        </div>
+        <h1>${greeting}</h1>
+        <p class="home-greeting-sub">What would you like to listen to today?</p>
       </div>
 
-      <!-- ── Now Playing ── -->
+      <!-- Now Playing -->
       <div id="home-now-playing"></div>
 
-      <!-- ── Quick Stats ── -->
-      <div class="home-stats">
-        <div class="home-stat-card" data-nav="/favorites">
-          <div class="home-stat-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-            </svg>
-          </div>
-          <div class="home-stat-info">
-            <div class="home-stat-value">${this.favoritesCount}</div>
-            <div class="home-stat-label">Favorites</div>
-          </div>
-        </div>
-
-        <div class="home-stat-card" data-nav="/history">
-          <div class="home-stat-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-              <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
-            </svg>
-          </div>
-          <div class="home-stat-info">
-            <div class="home-stat-value">${this.recentHistory.length}</div>
-            <div class="home-stat-label">Recently Played</div>
-          </div>
-        </div>
-
-        <div class="home-stat-card" data-nav="/featured">
-          <div class="home-stat-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-          </div>
-          <div class="home-stat-info">
-            <div class="home-stat-value">Top</div>
-            <div class="home-stat-label">Featured</div>
-          </div>
-        </div>
-
-        <div class="home-stat-card" data-nav="/explore">
-          <div class="home-stat-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
-            </svg>
-          </div>
-          <div class="home-stat-info">
-            <div class="home-stat-value">Explore</div>
-            <div class="home-stat-label">Countries & Genres</div>
-          </div>
-        </div>
+      <!-- Quick Stats (inline pills) -->
+      <div class="home-stats-row">
+        <button class="home-stat-pill" data-nav="/favorites" aria-label="Open favorites">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+          <span class="home-stat-pill-value">${this.favoritesCount}</span>
+          <span class="home-stat-pill-label">Favorites</span>
+        </button>
+        <button class="home-stat-pill" data-nav="/history" aria-label="Open history">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/>
+          </svg>
+          <span class="home-stat-pill-value">${this.recentHistory.length}</span>
+          <span class="home-stat-pill-label">History</span>
+        </button>
+        <button class="home-stat-pill" data-nav="/featured" aria-label="Featured stations">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+          </svg>
+          <span class="home-stat-pill-label">Featured</span>
+        </button>
+        <button class="home-stat-pill" data-nav="/custom" aria-label="My stations">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/>
+          </svg>
+          <span class="home-stat-pill-label">My Stations</span>
+        </button>
       </div>
 
-      <!-- ── Recently Played ── -->
+      <!-- Recently Played -->
       ${this.recentHistory.length > 0 ? `
         <section class="section">
           <div class="section-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-              <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+              <path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/>
             </svg>
             Recently Played
           </div>
@@ -153,68 +120,20 @@ export class HomeView extends BaseComponent {
         </section>
       ` : `
         <section class="section">
-          <div class="section-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-              <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
-            </svg>
-            Recently Played
-          </div>
           <div class="home-empty-section">
-            <p>No history yet — start listening to see stations here.</p>
-            <button class="btn btn-primary home-cta-btn" data-nav="/featured">Browse Featured Stations</button>
+            <div class="home-empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+                <circle cx="12" cy="12" r="2"/>
+                <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/>
+              </svg>
+            </div>
+            <p class="home-empty-title">Start listening</p>
+            <p class="home-empty-sub">Browse stations and your history will appear here</p>
+            <button class="btn btn-primary home-cta-btn" data-nav="/featured">Browse Featured</button>
           </div>
         </section>
       `}
-
-      <!-- ── Quick Links ── -->
-      <section class="section">
-        <div class="section-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-          </svg>
-          Quick Access
-        </div>
-        <div class="home-quick-links">
-          <button class="home-quick-link" data-nav="/featured">
-            <span class="home-quick-link-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
-            </span>
-            <span class="home-quick-link-label">Featured Stations</span>
-          </button>
-          <button class="home-quick-link" data-nav="/explore">
-            <span class="home-quick-link-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
-              </svg>
-            </span>
-            <span class="home-quick-link-label">Explore</span>
-          </button>
-          <button class="home-quick-link" data-nav="/search">
-            <span class="home-quick-link-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-              </svg>
-            </span>
-            <span class="home-quick-link-label">Search</span>
-          </button>
-          <button class="home-quick-link" data-nav="/custom">
-            <span class="home-quick-link-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="2"/>
-                <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
-                <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-                <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
-              </svg>
-            </span>
-            <span class="home-quick-link-label">My Stations</span>
-          </button>
-        </div>
-      </section>
     `
 
     this.updateNowPlaying()
@@ -237,40 +156,39 @@ export class HomeView extends BaseComponent {
     const station   = this.playerStore.currentStation
     const isPlaying = this.playerStore.isPlaying
 
-    if (!station) {
-      container.innerHTML = ''
-      return
-    }
+    if (!station) { container.innerHTML = ''; return }
 
     const flag = countryFlag(station.countryCode)
 
     container.innerHTML = `
       <div class="home-now-playing">
-        <div class="home-now-playing-label">
-          <span class="home-now-playing-dot"></span>
-          Now Playing
-        </div>
-        <div class="home-now-playing-card">
-          <div class="home-now-playing-logo">
+        <div class="home-now-playing-card" role="button" tabindex="0">
+          <div class="home-np-artwork">
             ${station.favicon
               ? `<img src="${station.favicon.replace(/"/g, '%22')}" alt="${this.esc(station.name)}" data-logo>`
               : `<div class="station-logo-fallback">${this.radioSvg()}</div>`
             }
           </div>
-          <div class="home-now-playing-info">
-            <div class="home-now-playing-name">${this.esc(station.name)}</div>
-            <div class="home-now-playing-meta">
+          <div class="home-np-info">
+            <div class="home-np-status">
+              ${isPlaying
+                ? `<span class="home-np-live-dot"></span><span>Now Playing</span>`
+                : `<span>Paused</span>`
+              }
+            </div>
+            <div class="home-np-name">${this.esc(station.name)}</div>
+            <div class="home-np-meta">
               ${flag} ${this.esc(station.country)}
               ${station.tags.length > 0 ? ` · ${this.esc(station.tags[0] ?? '')}` : ''}
               ${station.bitrate ? ` · ${station.bitrate} kbps` : ''}
             </div>
           </div>
-          <div class="home-now-playing-status ${isPlaying ? 'playing' : 'paused'}">
+          <div class="home-np-visualizer">
             ${isPlaying
-              ? `<span class="home-now-playing-bars">
+              ? `<span class="home-np-bars">
                   <span></span><span></span><span></span><span></span>
                 </span>`
-              : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted)">
                   <rect x="6" y="4" width="4" height="16" rx="1.5"/>
                   <rect x="14" y="4" width="4" height="16" rx="1.5"/>
                 </svg>`
@@ -282,7 +200,6 @@ export class HomeView extends BaseComponent {
   }
 
   private attachListeners(): void {
-    // Stat cards and quick links — navigate on click
     this.querySelectorAll('[data-nav]').forEach(el => {
       this.on(el, 'click', () => {
         const route = el.getAttribute('data-nav')
@@ -290,7 +207,6 @@ export class HomeView extends BaseComponent {
       })
     })
 
-    // Station cards in recently played
     this.querySelectorAll('.station-card').forEach(card => {
       this.on(card, 'click', (e) => {
         const target = e.target as HTMLElement
@@ -304,6 +220,14 @@ export class HomeView extends BaseComponent {
         if (item) this.playerStore.play(item.station)
       })
     })
+
+    // Now Playing card opens the expanded sheet via MiniPlayer — simulate click
+    const npCard = this.querySelector<HTMLElement>('.home-now-playing-card')
+    if (npCard) {
+      this.on(npCard, 'click', () => {
+        document.querySelector<HTMLElement>('#mp-expand-area')?.click()
+      })
+    }
   }
 
   private async handleFavorite(btn: HTMLElement): Promise<void> {
@@ -320,7 +244,7 @@ export class HomeView extends BaseComponent {
   }
 
   private radioSvg(): string {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/><path d="M7.76 16.24a6 6 0 0 1 0-8.49"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg>`
   }
 
   private esc(text: string): string {

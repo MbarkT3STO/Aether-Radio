@@ -1,129 +1,364 @@
 /* ═══════════════════════════════════════════════════════════════════
-   AETHER RADIO ANDROID — APPLE DESIGN SYSTEM
-   Clean, system-native, mobile-first
+   AETHER RADIO ANDROID — APPLE HIG DESIGN SYSTEM
+   Full parity with Desktop app. Apple system colors, materials,
+   semantic surfaces, fills, separators, gradients, motion tokens.
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Accent (Apple Blue) ── */
-  --h: 211;
-  --s: 100%;
+  color-scheme: light dark;
 
-  /* ── Light Mode Backgrounds (Apple iOS) ── */
-  --bg-primary:   #f2f2f7;
-  --bg-secondary: #ffffff;
-  --bg-tertiary:  #e5e5ea;
-  --bg-elevated:  #ffffff;
+  /* ═══════════════════════════════════════════════════════════
+     APPLE SYSTEM COLORS — LIGHT (iOS / macOS)
+     ═══════════════════════════════════════════════════════════ */
+  --sys-red:       #FF3B30;
+  --sys-orange:    #FF9500;
+  --sys-yellow:    #FFCC00;
+  --sys-green:     #34C759;
+  --sys-mint:      #00C7BE;
+  --sys-teal:      #30B0C7;
+  --sys-cyan:      #32ADE6;
+  --sys-blue:      #007AFF;
+  --sys-indigo:    #5856D6;
+  --sys-purple:    #AF52DE;
+  --sys-pink:      #FF2D55;
+  --sys-brown:     #A2845E;
 
-  /* ── Light Mode Text ── */
-  --text-primary:   #1c1c1e;
-  --text-secondary: #3a3a3c;
-  --text-tertiary:  #636366;
-  --text-muted:     #8e8e93;
+  --sys-gray:      #8E8E93;
+  --sys-gray2:     #AEAEB2;
+  --sys-gray3:     #C7C7CC;
+  --sys-gray4:     #D1D1D6;
+  --sys-gray5:     #E5E5EA;
+  --sys-gray6:     #F2F2F7;
+}
 
-  /* ── Accent Colors (Apple Blue — Light) ── */
-  --accent-primary:   #007aff;
-  --accent-secondary: #5856d6;
-  --accent-hover:     #0062cc;
-  --accent-soft:      rgba(0, 122, 255, 0.10);
-  --accent-glow:      rgba(0, 122, 255, 0.20);
-  --accent-muted:     rgba(0, 122, 255, 0.40);
+html[data-theme="dark"] {
+  --sys-red:       #FF453A;
+  --sys-orange:    #FF9F0A;
+  --sys-yellow:    #FFD60A;
+  --sys-green:     #30D158;
+  --sys-mint:      #63E6E2;
+  --sys-teal:      #40C8E0;
+  --sys-cyan:      #64D2FF;
+  --sys-blue:      #0A84FF;
+  --sys-indigo:    #5E5CE6;
+  --sys-purple:    #BF5AF2;
+  --sys-pink:      #FF375F;
+  --sys-brown:     #AC8E68;
 
-  /* ── Status / Semantic Colors ── */
-  --status-live:    #34c759;
-  --status-warning: #ff9500;
-  --status-error:   #ff3b30;
-  --status-info:    #007aff;
+  --sys-gray:      #8E8E93;
+  --sys-gray2:     #636366;
+  --sys-gray3:     #48484A;
+  --sys-gray4:     #3A3A3C;
+  --sys-gray5:     #2C2C2E;
+  --sys-gray6:     #1C1C1E;
+}
 
-  /* ── Accent aliases (backward compat) ── */
-  --accent-emerald: #34c759;
-  --accent-amber:   #ff9500;
-  --accent-red:     #ff3b30;
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE — Semantic Surfaces, Labels, Fills, Separators
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Backgrounds (Apple system background hierarchy) */
+  --bg-primary:   #F2F2F7;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary:  #F2F2F7;
+  --bg-elevated:  #FFFFFF;
+  --bg-base:      #F2F2F7;
 
-  /* ── Borders ── */
-  --border-subtle:  rgba(60, 60, 67, 0.08);
-  --border-medium:  rgba(60, 60, 67, 0.14);
-  --border-strong:  rgba(60, 60, 67, 0.22);
-  --border-glass:   rgba(255, 255, 255, 0.60);
+  /* Labels (Apple label hierarchy) */
+  --text-primary:     rgba(0,0,0,1.00);
+  --text-secondary:   rgba(60,60,67,0.60);
+  --text-tertiary:    rgba(60,60,67,0.30);
+  --text-muted:       rgba(60,60,67,0.18);
+  --text-placeholder: rgba(60,60,67,0.30);
+  --text-on-accent:   #FFFFFF;
 
-  /* ── Surfaces ── */
-  --surface-overlay: rgba(255, 255, 255, 0.82);
-  --surface-glass:   rgba(255, 255, 255, 0.72);
+  /* Fills */
+  --fill-primary:    rgba(120,120,128,0.20);
+  --fill-secondary:  rgba(120,120,128,0.16);
+  --fill-tertiary:   rgba(118,118,128,0.12);
+  --fill-quaternary: rgba(116,116,128,0.08);
 
-  /* ── Shadows (very soft, Apple-style) ── */
-  --shadow-xs:     0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
-  --shadow-sm:     0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-md:     0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
-  --shadow-lg:     0 8px 30px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-xl:     0 16px 56px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.07);
-  --shadow-glow:   0 0 24px var(--accent-glow);
+  /* Separators */
+  --border-subtle:  rgba(60,60,67,0.12);
+  --border-medium:  rgba(60,60,67,0.22);
+  --border-strong:  rgba(60,60,67,0.36);
+  --border-glass:   rgba(255,255,255,0.60);
 
-  /* ── Legacy shadow aliases (no more neumorphic) ── */
+  /* Materials (Apple vibrancy) */
+  --material-thin:    rgba(255,255,255,0.55);
+  --material-regular: rgba(255,255,255,0.72);
+  --material-thick:   rgba(255,255,255,0.88);
+  --material-chrome:  rgba(242,242,247,0.80);
+  --material-sidebar: rgba(242,242,247,0.78);
+  --material-bar:     rgba(255,255,255,0.80);
+  --material-overlay: rgba(255,255,255,0.94);
+  --material-modal:   #FFFFFF;
+  --material-tooltip: rgba(255,255,255,0.96);
+
+  /* Accent — systemBlue */
+  --accent-primary:   var(--sys-blue);
+  --accent-secondary: #0062CC;
+  --accent-tertiary:  #409CFF;
+  --accent-hover:     #1A85FF;
+  --accent-pressed:   #0062CC;
+  --accent-soft:      rgba(0,122,255,0.10);
+  --accent-soft-md:   rgba(0,122,255,0.16);
+  --accent-glow:      rgba(0,122,255,0.22);
+  --accent-glow-lg:   rgba(0,122,255,0.32);
+  --accent-muted:     rgba(0,122,255,0.40);
+  --accent-border:    rgba(0,122,255,0.24);
+
+  /* Status */
+  --status-live:    var(--sys-green);
+  --status-warning: var(--sys-orange);
+  --status-error:   var(--sys-red);
+  --status-info:    var(--sys-blue);
+
+  /* Legacy accent aliases */
+  --accent-emerald: var(--sys-green);
+  --accent-amber:   var(--sys-orange);
+  --accent-red:     var(--sys-red);
+
+  /* Gradients */
+  --gradient-accent:   linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 100%);
+  --gradient-vivid:    linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-purple) 50%, var(--sys-pink) 100%);
+  --gradient-warm:     linear-gradient(135deg, var(--sys-pink) 0%, var(--sys-orange) 100%);
+  --gradient-cool:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-teal) 50%, var(--sys-mint) 100%);
+  --gradient-spectrum: linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 50%, var(--sys-purple) 100%);
+  --gradient-royal:    linear-gradient(135deg, var(--sys-indigo) 0%, var(--sys-purple) 100%);
+  --gradient-logo:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-cyan) 100%);
+  --gradient-hero:     linear-gradient(160deg, rgba(0,122,255,0.06) 0%, rgba(88,86,214,0.04) 100%);
+  --gradient-card:     linear-gradient(145deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.60) 100%);
+  --gradient-glass:    linear-gradient(135deg, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.15) 100%);
+  --grad-primary:      linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+
+  /* Shadows (soft, Apple-style) */
+  --shadow-xs:  0 1px 2px  rgba(0,0,0,0.04), 0 1px 1px  rgba(0,0,0,0.02);
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.06), 0 1px 3px  rgba(0,0,0,0.03);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.08), 0 2px 6px  rgba(0,0,0,0.04);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-xl:  0 16px 56px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.06);
+  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.14), 0 12px 28px rgba(0,0,0,0.08);
+  --shadow-glow:    0 0 20px var(--accent-glow), 0 0 40px rgba(0,122,255,0.10);
+  --shadow-glow-lg: 0 0 32px var(--accent-glow-lg), 0 0 64px rgba(0,122,255,0.14);
+  --shadow-ambient: 0 0 80px rgba(0,0,0,0.05);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(0,0,0,0.03);
+  --shadow-focus:   0 0 0 4px rgba(0,122,255,0.25);
+
+  /* Legacy shadow aliases */
   --nm-raised:  var(--shadow-sm);
   --nm-pressed: none;
   --neu-shadow-hover: var(--shadow-md);
   --neu-shadow-pressed: none;
   --neu-shadow-float: var(--shadow-lg);
+  --shadow-card: var(--shadow-sm);
 
-  /* ── Typography (SF Pro system stack) ── */
-  --font-display: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
-  --font-body:    -apple-system, 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
-  --font-mono:    'SF Mono', 'JetBrains Mono', Monaco, monospace;
+  --surface-overlay: var(--material-overlay);
+  --surface-glass:   var(--material-bar);
+}
 
-  /* ── Spacing ── */
-  --space-xs:  8px;
-  --space-sm:  16px;
-  --space-md:  24px;
-  --space-lg:  32px;
-  --space-xl:  48px;
-  --space-2xl: 64px;
+/* ═══════════════════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] {
+  --bg-primary:   #000000;
+  --bg-secondary: #1C1C1E;
+  --bg-tertiary:  #2C2C2E;
+  --bg-elevated:  #2C2C2E;
+  --bg-base:      #000000;
 
-  /* ── Legacy spacing aliases ── */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
+  --text-primary:     rgba(255,255,255,1.00);
+  --text-secondary:   rgba(235,235,245,0.60);
+  --text-tertiary:    rgba(235,235,245,0.30);
+  --text-muted:       rgba(235,235,245,0.18);
+  --text-placeholder: rgba(235,235,245,0.30);
+  --text-on-accent:   #FFFFFF;
 
-  /* ── Text sizes ── */
-  --text-2xs:  0.625rem;
-  --text-xs:   0.75rem;
-  --text-sm:   0.875rem;
-  --text-base: 1rem;
-  --text-lg:   1.125rem;
-  --text-xl:   1.375rem;
-  --text-2xl:  1.75rem;
-  --text-3xl:  2.25rem;
+  --fill-primary:    rgba(120,120,128,0.36);
+  --fill-secondary:  rgba(120,120,128,0.32);
+  --fill-tertiary:   rgba(118,118,128,0.24);
+  --fill-quaternary: rgba(116,116,128,0.18);
 
-  /* ── Border Radius (Apple generous curves) ── */
-  --radius-xs:   4px;
-  --radius-sm:   10px;
-  --radius-md:   14px;
-  --radius-lg:   20px;
-  --radius-xl:   28px;
-  --radius-full: 999px;
+  --border-subtle:  rgba(84,84,88,0.30);
+  --border-medium:  rgba(84,84,88,0.55);
+  --border-strong:  rgba(84,84,88,0.80);
+  --border-glass:   rgba(255,255,255,0.06);
 
-  /* ── Transitions (Apple spring physics) ── */
-  --transition-fast:   120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-medium: 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --material-thin:    rgba(28,28,30,0.55);
+  --material-regular: rgba(28,28,30,0.72);
+  --material-thick:   rgba(28,28,30,0.88);
+  --material-chrome:  rgba(28,28,30,0.80);
+  --material-sidebar: rgba(18,18,20,0.82);
+  --material-bar:     rgba(22,22,24,0.82);
+  --material-overlay: rgba(28,28,30,0.94);
+  --material-modal:   #1C1C1E;
+  --material-tooltip: rgba(44,44,46,0.96);
+
+  --accent-primary:   var(--sys-blue);
+  --accent-secondary: #0975E2;
+  --accent-tertiary:  #4DA4FF;
+  --accent-hover:     #2F9BFF;
+  --accent-pressed:   #0062CC;
+  --accent-soft:      rgba(10,132,255,0.18);
+  --accent-soft-md:   rgba(10,132,255,0.26);
+  --accent-glow:      rgba(10,132,255,0.36);
+  --accent-glow-lg:   rgba(10,132,255,0.50);
+  --accent-muted:     rgba(10,132,255,0.55);
+  --accent-border:    rgba(10,132,255,0.42);
+
+  --status-live:    var(--sys-green);
+  --status-warning: var(--sys-orange);
+  --status-error:   var(--sys-red);
+  --status-info:    var(--sys-blue);
+
+  --accent-emerald: var(--sys-green);
+  --accent-amber:   var(--sys-orange);
+  --accent-red:     var(--sys-red);
+
+  --gradient-accent:   linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 100%);
+  --gradient-vivid:    linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-purple) 50%, var(--sys-pink) 100%);
+  --gradient-warm:     linear-gradient(135deg, var(--sys-pink) 0%, var(--sys-orange) 100%);
+  --gradient-cool:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-teal) 50%, var(--sys-mint) 100%);
+  --gradient-spectrum: linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-indigo) 50%, var(--sys-purple) 100%);
+  --gradient-royal:    linear-gradient(135deg, var(--sys-indigo) 0%, var(--sys-purple) 100%);
+  --gradient-logo:     linear-gradient(135deg, var(--sys-blue) 0%, var(--sys-cyan) 100%);
+  --gradient-hero:     linear-gradient(160deg, rgba(10,132,255,0.14) 0%, rgba(94,92,230,0.06) 100%);
+  --gradient-card:     linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  --gradient-glass:    linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+  --grad-primary:      linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+
+  --shadow-xs:  0 1px 3px  rgba(0,0,0,0.40);
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,0.50);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.60);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.70);
+  --shadow-xl:  0 16px 56px rgba(0,0,0,0.80);
+  --shadow-2xl: 0 24px 80px rgba(0,0,0,0.90);
+  --shadow-glow:    0 0 24px var(--accent-glow), 0 0 48px rgba(10,132,255,0.14);
+  --shadow-glow-lg: 0 0 40px var(--accent-glow-lg), 0 0 80px rgba(10,132,255,0.20);
+  --shadow-ambient: 0 0 120px rgba(0,0,0,0.85);
+  --shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.25);
+  --shadow-focus:   0 0 0 4px rgba(10,132,255,0.40);
+
+  --nm-raised:  var(--shadow-sm);
+  --nm-pressed: none;
+  --neu-shadow-hover: var(--shadow-md);
+  --neu-shadow-pressed: none;
+  --neu-shadow-float: var(--shadow-lg);
+  --shadow-card: var(--shadow-sm);
+
+  --surface-overlay: var(--material-overlay);
+  --surface-glass:   var(--material-bar);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TYPOGRAPHY · SPACING · RADII · MOTION
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Typography — SF Pro first; DM Sans fallback */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'DM Sans', system-ui, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'DM Sans', system-ui, sans-serif;
+  --font-mono:    ui-monospace, 'SF Mono', 'Menlo', 'Monaco', 'JetBrains Mono', 'Cascadia Code', monospace;
+
+  /* Type scale (Apple) — mobile uses slightly bigger body for readability */
+  --text-2xs:   0.6875rem;
+  --text-xs:    0.75rem;
+  --text-sm:    0.8125rem;
+  --text-base:  0.9375rem;
+  --text-md:    1rem;
+  --text-lg:    1.0625rem;
+  --text-xl:    1.25rem;
+  --text-2xl:   1.375rem;
+  --text-3xl:   1.75rem;
+  --text-4xl:   2.125rem;
+  --text-5xl:   2.625rem;
+
+  /* Weights */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-heavy:    800;
+
+  /* Spacing — 8-pt grid */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --space-xs:  var(--space-2);
+  --space-sm:  var(--space-4);
+  --space-md:  var(--space-6);
+  --space-lg:  var(--space-8);
+  --space-xl:  var(--space-12);
+  --space-2xl: var(--space-16);
+
+  /* Radii — Apple continuous curves */
+  --radius-xs:   0.25rem;
+  --radius-sm:   0.5rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   0.875rem;
+  --radius-xl:   1.125rem;
+  --radius-2xl:  1.375rem;
+  --radius-3xl:  1.75rem;
+  --radius-full: 9999px;
+
+  /* Transitions — Apple spring */
+  --transition-fast:   160ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-base:   220ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-slow:   320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-medium: 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-spring: 480ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-bounce: 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:    cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-expo:   cubic-bezier(0.16, 1, 0.3, 1);
 
   --t-fast: 0.12s;
   --t-base: 0.28s;
   --t-slow: 0.4s;
-  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* ── Layout ── */
+  /* Layout — Mobile */
   --player-bar-height: 72px;
   --bottom-nav-height: 56px;
+  --header-height:     52px;
 
-  /* ── Legacy color aliases ── */
+  /* Z-Index */
+  --z-base:     0;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEGACY PALETTE ALIASES — keep existing component code working
+   ═══════════════════════════════════════════════════════════════════ */
+:root, html[data-theme="dark"] {
+  --palette-indigo:    var(--sys-indigo);
+  --palette-blue:      var(--sys-blue);
+  --palette-purple:    var(--sys-purple);
+  --palette-pink:      var(--sys-pink);
+  --palette-red:       var(--sys-red);
+  --palette-orange:    var(--sys-orange);
+  --palette-yellow:    var(--sys-yellow);
+  --palette-green:     var(--sys-green);
+  --palette-teal:      var(--sys-teal);
+  --palette-mint:      var(--sys-mint);
+  --palette-cyan:      var(--sys-cyan);
+
   --color-bg-base:        var(--bg-primary);
   --color-bg-elevated:    var(--bg-secondary);
   --color-bg-overlay:     var(--bg-tertiary);
@@ -138,79 +373,41 @@
   --color-text-muted:     var(--text-tertiary);
   --color-border-subtle:  var(--border-subtle);
   --color-border-strong:  var(--border-strong);
-  --shadow-card:          var(--shadow-sm);
-  --grad-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-}
 
-/* ═══════════════════════════════════════════════════════════════════
-   DARK MODE — Apple Dark
-   ═══════════════════════════════════════════════════════════════════ */
-[data-theme="dark"] {
-  --bg-primary:   #000000;
-  --bg-secondary: #1c1c1e;
-  --bg-tertiary:  #2c2c2e;
-  --bg-elevated:  #3a3a3c;
-
-  --text-primary:   rgba(255, 255, 255, 0.92);
-  --text-secondary: rgba(255, 255, 255, 0.60);
-  --text-tertiary:  rgba(255, 255, 255, 0.38);
-  --text-muted:     rgba(255, 255, 255, 0.24);
-
-  --accent-primary:   #0a84ff;
-  --accent-secondary: #5e5ce6;
-  --accent-hover:     #409cff;
-  --accent-soft:      rgba(10, 132, 255, 0.14);
-  --accent-glow:      rgba(10, 132, 255, 0.28);
-  --accent-muted:     rgba(10, 132, 255, 0.50);
-
-  --status-live:    #30d158;
-  --status-warning: #ff9f0a;
-  --status-error:   #ff453a;
-  --status-info:    #0a84ff;
-
-  --accent-emerald: #30d158;
-  --accent-amber:   #ff9f0a;
-  --accent-red:     #ff453a;
-
-  --border-subtle:  rgba(255, 255, 255, 0.08);
-  --border-medium:  rgba(255, 255, 255, 0.13);
-  --border-strong:  rgba(255, 255, 255, 0.20);
-  --border-glass:   rgba(255, 255, 255, 0.06);
-
-  --surface-overlay: rgba(28, 28, 30, 0.88);
-  --surface-glass:   rgba(28, 28, 30, 0.72);
-
-  --shadow-xs:     0 1px 4px rgba(0,0,0,0.30);
-  --shadow-sm:     0 2px 8px rgba(0,0,0,0.40);
-  --shadow-md:     0 4px 16px rgba(0,0,0,0.50);
-  --shadow-lg:     0 8px 32px rgba(0,0,0,0.60);
-  --shadow-xl:     0 16px 56px rgba(0,0,0,0.70);
-  --shadow-glow:   0 0 32px var(--accent-glow);
-
-  --nm-raised:  var(--shadow-sm);
-  --nm-pressed: none;
-  --neu-shadow-hover: var(--shadow-md);
-  --neu-shadow-float: var(--shadow-lg);
-
-  --color-bg-base:        var(--bg-primary);
-  --color-bg-elevated:    var(--bg-secondary);
-  --color-bg-overlay:     var(--bg-tertiary);
-  --color-bg-subtle:      var(--bg-secondary);
-  --color-accent-primary: var(--accent-primary);
-  --color-text-primary:   var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted:     var(--text-tertiary);
-  --color-border-subtle:  var(--border-subtle);
-  --color-border-strong:  var(--border-strong);
-  --shadow-card:          var(--shadow-sm);
+  --h: 211;
+  --s: 100%;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    THEME TRANSITIONS
    ═══════════════════════════════════════════════════════════════════ */
-body, .station-card, .mini-player, .bottom-nav, .stg-card, h1, h2, h3 {
+body,
+.app-main,
+.station-card,
+.stg-card,
+.cs-card,
+.cs-form-card,
+.home-stat-pill,
+.home-now-playing-card,
+.search-bar-input,
+.mini-player,
+.bottom-nav,
+.sleep-timer-sheet-panel,
+.cm-dialog,
+.am-dialog,
+.toast,
+.genre-card,
+.country-card,
+.view-header-icon,
+.home-empty-icon,
+.empty-state-icon,
+.search-idle-icon-wrap,
+.search-no-results-icon,
+.stg-card-icon,
+.cs-empty-icon-wrap {
   transition:
-    background-color 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    border-color     250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    color            250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background-color 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color     280ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color            280ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow       280ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }

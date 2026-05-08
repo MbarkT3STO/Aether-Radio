@@ -1,5 +1,11 @@
-/* ── Reset (Apple Mobile) ── */
-*, *::before, *::after {
+/* ═══════════════════════════════════════════════════════════════════
+   AETHER RADIO ANDROID — CSS RESET
+   Apple HIG base reset, mobile-optimized
+   ═══════════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -9,44 +15,68 @@
 
 html {
   scroll-behavior: smooth;
+  text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+  height: 100%;
 }
 
 body {
   font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
+  font-size: var(--text-base);
+  line-height: 1.47;
+  letter-spacing: -0.008em;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
-  /* Prevent rubber-band scroll on iOS/Android WebView */
+  transition: background-color 0.28s ease, color 0.28s ease;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'ss01' 1;
+  font-variant-ligatures: common-ligatures contextual;
+  -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
+  height: 100%;
+  height: 100dvh;
 }
 
-img, picture, video, canvas, svg { display: block; max-width: 100%; }
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
 
-input, button, textarea, select { font: inherit; color: inherit; }
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
 
 button {
   cursor: pointer;
   border: none;
   background: none;
-  outline: none;
-  /* Remove tap highlight on Android WebView */
   -webkit-tap-highlight-color: transparent;
 }
 
-a { color: inherit; text-decoration: none; }
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 ul, ol { list-style: none; }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   line-height: 1.15;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
+
+/* Focus — Apple-style with halo */
+:focus { outline: none; }
 
 :focus-visible {
   outline: 2px solid var(--accent-primary);
@@ -55,6 +85,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::selection {
-  background: var(--accent-soft);
+  background: var(--accent-soft-md);
   color: var(--text-primary);
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.35;
+  pointer-events: none;
 }

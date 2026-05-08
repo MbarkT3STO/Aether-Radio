@@ -1,0 +1,368 @@
+/* ═══════════════════════════════════════════════════════════════════
+   AETHER RADIO — ACCENT COLOR PALETTE
+   User-selectable accent colors. Each entry overrides every accent
+   token so the UI feels natively tinted in both light and dark mode.
+   ---------------------------------------------------------------
+   Selection is expressed as  html[data-accent="<key>"].
+   Default (no attribute) = Apple systemBlue (defined in tokens.css).
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── BLUE (default — Apple systemBlue) ────────────────────────────── */
+html[data-accent="blue"] {
+  --accent-primary:   #007AFF;
+  --accent-secondary: #0062CC;
+  --accent-tertiary:  #409CFF;
+  --accent-hover:     #1A85FF;
+  --accent-pressed:   #0062CC;
+  --accent-soft:      rgba(0,122,255,0.10);
+  --accent-soft-md:   rgba(0,122,255,0.16);
+  --accent-glow:      rgba(0,122,255,0.22);
+  --accent-glow-lg:   rgba(0,122,255,0.32);
+  --accent-muted:     rgba(0,122,255,0.40);
+  --accent-border:    rgba(0,122,255,0.24);
+  --shadow-focus:     0 0 0 4px rgba(0,122,255,0.25);
+}
+html[data-accent="blue"][data-theme="dark"] {
+  --accent-primary:   #0A84FF;
+  --accent-secondary: #0975E2;
+  --accent-tertiary:  #4DA4FF;
+  --accent-hover:     #2F9BFF;
+  --accent-pressed:   #0062CC;
+  --accent-soft:      rgba(10,132,255,0.18);
+  --accent-soft-md:   rgba(10,132,255,0.26);
+  --accent-glow:      rgba(10,132,255,0.36);
+  --accent-glow-lg:   rgba(10,132,255,0.50);
+  --accent-muted:     rgba(10,132,255,0.55);
+  --accent-border:    rgba(10,132,255,0.42);
+  --shadow-focus:     0 0 0 4px rgba(10,132,255,0.40);
+}
+
+/* ── INDIGO (Apple systemIndigo) ─────────────────────────────────── */
+html[data-accent="indigo"] {
+  --accent-primary:   #5856D6;
+  --accent-secondary: #4440BE;
+  --accent-tertiary:  #7D7BDE;
+  --accent-hover:     #6B69E0;
+  --accent-pressed:   #4440BE;
+  --accent-soft:      rgba(88,86,214,0.12);
+  --accent-soft-md:   rgba(88,86,214,0.20);
+  --accent-glow:      rgba(88,86,214,0.26);
+  --accent-glow-lg:   rgba(88,86,214,0.38);
+  --accent-muted:     rgba(88,86,214,0.45);
+  --accent-border:    rgba(88,86,214,0.28);
+  --shadow-focus:     0 0 0 4px rgba(88,86,214,0.28);
+}
+html[data-accent="indigo"][data-theme="dark"] {
+  --accent-primary:   #5E5CE6;
+  --accent-secondary: #4846D8;
+  --accent-tertiary:  #8280EE;
+  --accent-hover:     #7270EA;
+  --accent-pressed:   #4846D8;
+  --accent-soft:      rgba(94,92,230,0.20);
+  --accent-soft-md:   rgba(94,92,230,0.30);
+  --accent-glow:      rgba(94,92,230,0.40);
+  --accent-glow-lg:   rgba(94,92,230,0.55);
+  --accent-muted:     rgba(94,92,230,0.58);
+  --accent-border:    rgba(94,92,230,0.44);
+  --shadow-focus:     0 0 0 4px rgba(94,92,230,0.42);
+}
+
+/* ── ROYAL PURPLE (rich violet — app's original signature) ───────── */
+html[data-accent="royal-purple"] {
+  --accent-primary:   #7C3AED;
+  --accent-secondary: #6D28D9;
+  --accent-tertiary:  #8B5CF6;
+  --accent-hover:     #8B5CF6;
+  --accent-pressed:   #6D28D9;
+  --accent-soft:      rgba(124,58,237,0.11);
+  --accent-soft-md:   rgba(124,58,237,0.18);
+  --accent-glow:      rgba(124,58,237,0.24);
+  --accent-glow-lg:   rgba(124,58,237,0.36);
+  --accent-muted:     rgba(124,58,237,0.42);
+  --accent-border:    rgba(124,58,237,0.26);
+  --shadow-focus:     0 0 0 4px rgba(124,58,237,0.28);
+}
+html[data-accent="royal-purple"][data-theme="dark"] {
+  --accent-primary:   #A78BFA;
+  --accent-secondary: #8B5CF6;
+  --accent-tertiary:  #C4B5FD;
+  --accent-hover:     #B197FB;
+  --accent-pressed:   #8B5CF6;
+  --accent-soft:      rgba(167,139,250,0.18);
+  --accent-soft-md:   rgba(167,139,250,0.28);
+  --accent-glow:      rgba(167,139,250,0.38);
+  --accent-glow-lg:   rgba(167,139,250,0.52);
+  --accent-muted:     rgba(167,139,250,0.55);
+  --accent-border:    rgba(167,139,250,0.42);
+  --shadow-focus:     0 0 0 4px rgba(167,139,250,0.42);
+}
+
+/* ── PURPLE (Apple systemPurple) ─────────────────────────────────── */
+html[data-accent="purple"] {
+  --accent-primary:   #AF52DE;
+  --accent-secondary: #8E3FB8;
+  --accent-tertiary:  #C77DE5;
+  --accent-hover:     #BD6BE2;
+  --accent-pressed:   #8E3FB8;
+  --accent-soft:      rgba(175,82,222,0.11);
+  --accent-soft-md:   rgba(175,82,222,0.18);
+  --accent-glow:      rgba(175,82,222,0.24);
+  --accent-glow-lg:   rgba(175,82,222,0.36);
+  --accent-muted:     rgba(175,82,222,0.44);
+  --accent-border:    rgba(175,82,222,0.28);
+  --shadow-focus:     0 0 0 4px rgba(175,82,222,0.28);
+}
+html[data-accent="purple"][data-theme="dark"] {
+  --accent-primary:   #BF5AF2;
+  --accent-secondary: #A044D4;
+  --accent-tertiary:  #D07FF5;
+  --accent-hover:     #CC6FF4;
+  --accent-pressed:   #A044D4;
+  --accent-soft:      rgba(191,90,242,0.20);
+  --accent-soft-md:   rgba(191,90,242,0.30);
+  --accent-glow:      rgba(191,90,242,0.40);
+  --accent-glow-lg:   rgba(191,90,242,0.54);
+  --accent-muted:     rgba(191,90,242,0.58);
+  --accent-border:    rgba(191,90,242,0.44);
+  --shadow-focus:     0 0 0 4px rgba(191,90,242,0.42);
+}
+
+/* ── PINK (Apple systemPink) ─────────────────────────────────────── */
+html[data-accent="pink"] {
+  --accent-primary:   #FF2D55;
+  --accent-secondary: #D6143B;
+  --accent-tertiary:  #FF5E7C;
+  --accent-hover:     #FF4368;
+  --accent-pressed:   #D6143B;
+  --accent-soft:      rgba(255,45,85,0.10);
+  --accent-soft-md:   rgba(255,45,85,0.18);
+  --accent-glow:      rgba(255,45,85,0.24);
+  --accent-glow-lg:   rgba(255,45,85,0.36);
+  --accent-muted:     rgba(255,45,85,0.42);
+  --accent-border:    rgba(255,45,85,0.26);
+  --shadow-focus:     0 0 0 4px rgba(255,45,85,0.28);
+}
+html[data-accent="pink"][data-theme="dark"] {
+  --accent-primary:   #FF375F;
+  --accent-secondary: #E01E47;
+  --accent-tertiary:  #FF6985;
+  --accent-hover:     #FF5376;
+  --accent-pressed:   #E01E47;
+  --accent-soft:      rgba(255,55,95,0.20);
+  --accent-soft-md:   rgba(255,55,95,0.30);
+  --accent-glow:      rgba(255,55,95,0.40);
+  --accent-glow-lg:   rgba(255,55,95,0.54);
+  --accent-muted:     rgba(255,55,95,0.58);
+  --accent-border:    rgba(255,55,95,0.44);
+  --shadow-focus:     0 0 0 4px rgba(255,55,95,0.42);
+}
+
+/* ── ORANGE (Apple systemOrange) ─────────────────────────────────── */
+html[data-accent="orange"] {
+  --accent-primary:   #FF9500;
+  --accent-secondary: #D87A00;
+  --accent-tertiary:  #FFB340;
+  --accent-hover:     #FFA31F;
+  --accent-pressed:   #D87A00;
+  --accent-soft:      rgba(255,149,0,0.12);
+  --accent-soft-md:   rgba(255,149,0,0.20);
+  --accent-glow:      rgba(255,149,0,0.26);
+  --accent-glow-lg:   rgba(255,149,0,0.38);
+  --accent-muted:     rgba(255,149,0,0.45);
+  --accent-border:    rgba(255,149,0,0.28);
+  --shadow-focus:     0 0 0 4px rgba(255,149,0,0.30);
+}
+html[data-accent="orange"][data-theme="dark"] {
+  --accent-primary:   #FF9F0A;
+  --accent-secondary: #E0860A;
+  --accent-tertiary:  #FFBC4A;
+  --accent-hover:     #FFAE2C;
+  --accent-pressed:   #E0860A;
+  --accent-soft:      rgba(255,159,10,0.20);
+  --accent-soft-md:   rgba(255,159,10,0.30);
+  --accent-glow:      rgba(255,159,10,0.40);
+  --accent-glow-lg:   rgba(255,159,10,0.54);
+  --accent-muted:     rgba(255,159,10,0.58);
+  --accent-border:    rgba(255,159,10,0.44);
+  --shadow-focus:     0 0 0 4px rgba(255,159,10,0.42);
+}
+
+/* ── GREEN (Apple systemGreen) ───────────────────────────────────── */
+html[data-accent="green"] {
+  --accent-primary:   #34C759;
+  --accent-secondary: #248A3D;
+  --accent-tertiary:  #5FD47C;
+  --accent-hover:     #43D267;
+  --accent-pressed:   #248A3D;
+  --accent-soft:      rgba(52,199,89,0.12);
+  --accent-soft-md:   rgba(52,199,89,0.20);
+  --accent-glow:      rgba(52,199,89,0.26);
+  --accent-glow-lg:   rgba(52,199,89,0.38);
+  --accent-muted:     rgba(52,199,89,0.45);
+  --accent-border:    rgba(52,199,89,0.28);
+  --shadow-focus:     0 0 0 4px rgba(52,199,89,0.30);
+}
+html[data-accent="green"][data-theme="dark"] {
+  --accent-primary:   #30D158;
+  --accent-secondary: #1F8A37;
+  --accent-tertiary:  #5AD978;
+  --accent-hover:     #47DA6B;
+  --accent-pressed:   #1F8A37;
+  --accent-soft:      rgba(48,209,88,0.20);
+  --accent-soft-md:   rgba(48,209,88,0.30);
+  --accent-glow:      rgba(48,209,88,0.40);
+  --accent-glow-lg:   rgba(48,209,88,0.54);
+  --accent-muted:     rgba(48,209,88,0.58);
+  --accent-border:    rgba(48,209,88,0.44);
+  --shadow-focus:     0 0 0 4px rgba(48,209,88,0.42);
+}
+
+/* ── TEAL (Apple systemTeal) ─────────────────────────────────────── */
+html[data-accent="teal"] {
+  --accent-primary:   #30B0C7;
+  --accent-secondary: #218494;
+  --accent-tertiary:  #56C4D6;
+  --accent-hover:     #3FBCD0;
+  --accent-pressed:   #218494;
+  --accent-soft:      rgba(48,176,199,0.12);
+  --accent-soft-md:   rgba(48,176,199,0.20);
+  --accent-glow:      rgba(48,176,199,0.26);
+  --accent-glow-lg:   rgba(48,176,199,0.38);
+  --accent-muted:     rgba(48,176,199,0.45);
+  --accent-border:    rgba(48,176,199,0.28);
+  --shadow-focus:     0 0 0 4px rgba(48,176,199,0.30);
+}
+html[data-accent="teal"][data-theme="dark"] {
+  --accent-primary:   #40C8E0;
+  --accent-secondary: #2798B0;
+  --accent-tertiary:  #63D4E6;
+  --accent-hover:     #51CEE3;
+  --accent-pressed:   #2798B0;
+  --accent-soft:      rgba(64,200,224,0.20);
+  --accent-soft-md:   rgba(64,200,224,0.30);
+  --accent-glow:      rgba(64,200,224,0.40);
+  --accent-glow-lg:   rgba(64,200,224,0.54);
+  --accent-muted:     rgba(64,200,224,0.58);
+  --accent-border:    rgba(64,200,224,0.44);
+  --shadow-focus:     0 0 0 4px rgba(64,200,224,0.42);
+}
+
+/* ── RED (Apple systemRed — bold and confident) ──────────────────── */
+html[data-accent="red"] {
+  --accent-primary:   #FF3B30;
+  --accent-secondary: #C8271E;
+  --accent-tertiary:  #FF6961;
+  --accent-hover:     #FF4F44;
+  --accent-pressed:   #C8271E;
+  --accent-soft:      rgba(255,59,48,0.10);
+  --accent-soft-md:   rgba(255,59,48,0.18);
+  --accent-glow:      rgba(255,59,48,0.24);
+  --accent-glow-lg:   rgba(255,59,48,0.36);
+  --accent-muted:     rgba(255,59,48,0.42);
+  --accent-border:    rgba(255,59,48,0.26);
+  --shadow-focus:     0 0 0 4px rgba(255,59,48,0.28);
+}
+html[data-accent="red"][data-theme="dark"] {
+  --accent-primary:   #FF453A;
+  --accent-secondary: #D6342B;
+  --accent-tertiary:  #FF7068;
+  --accent-hover:     #FF5A51;
+  --accent-pressed:   #D6342B;
+  --accent-soft:      rgba(255,69,58,0.20);
+  --accent-soft-md:   rgba(255,69,58,0.30);
+  --accent-glow:      rgba(255,69,58,0.40);
+  --accent-glow-lg:   rgba(255,69,58,0.54);
+  --accent-muted:     rgba(255,69,58,0.58);
+  --accent-border:    rgba(255,69,58,0.44);
+  --shadow-focus:     0 0 0 4px rgba(255,69,58,0.42);
+}
+
+/* ── MINT (Apple systemMint — fresh seafoam) ─────────────────────── */
+html[data-accent="mint"] {
+  --accent-primary:   #00C7BE;
+  --accent-secondary: #0D9A92;
+  --accent-tertiary:  #33D3CC;
+  --accent-hover:     #17D1C8;
+  --accent-pressed:   #0D9A92;
+  --accent-soft:      rgba(0,199,190,0.11);
+  --accent-soft-md:   rgba(0,199,190,0.18);
+  --accent-glow:      rgba(0,199,190,0.24);
+  --accent-glow-lg:   rgba(0,199,190,0.36);
+  --accent-muted:     rgba(0,199,190,0.42);
+  --accent-border:    rgba(0,199,190,0.26);
+  --shadow-focus:     0 0 0 4px rgba(0,199,190,0.28);
+}
+html[data-accent="mint"][data-theme="dark"] {
+  --accent-primary:   #63E6E2;
+  --accent-secondary: #3DCEC9;
+  --accent-tertiary:  #8FECE9;
+  --accent-hover:     #78EAE6;
+  --accent-pressed:   #3DCEC9;
+  --accent-soft:      rgba(99,230,226,0.18);
+  --accent-soft-md:   rgba(99,230,226,0.28);
+  --accent-glow:      rgba(99,230,226,0.38);
+  --accent-glow-lg:   rgba(99,230,226,0.52);
+  --accent-muted:     rgba(99,230,226,0.56);
+  --accent-border:    rgba(99,230,226,0.42);
+  --shadow-focus:     0 0 0 4px rgba(99,230,226,0.42);
+}
+
+/* ── CYAN (Apple systemCyan — crisp sky) ─────────────────────────── */
+html[data-accent="cyan"] {
+  --accent-primary:   #32ADE6;
+  --accent-secondary: #2487B6;
+  --accent-tertiary:  #5FC0EB;
+  --accent-hover:     #46B7E9;
+  --accent-pressed:   #2487B6;
+  --accent-soft:      rgba(50,173,230,0.12);
+  --accent-soft-md:   rgba(50,173,230,0.20);
+  --accent-glow:      rgba(50,173,230,0.26);
+  --accent-glow-lg:   rgba(50,173,230,0.38);
+  --accent-muted:     rgba(50,173,230,0.45);
+  --accent-border:    rgba(50,173,230,0.28);
+  --shadow-focus:     0 0 0 4px rgba(50,173,230,0.30);
+}
+html[data-accent="cyan"][data-theme="dark"] {
+  --accent-primary:   #64D2FF;
+  --accent-secondary: #3FB4E8;
+  --accent-tertiary:  #8FDEFF;
+  --accent-hover:     #7AD8FF;
+  --accent-pressed:   #3FB4E8;
+  --accent-soft:      rgba(100,210,255,0.20);
+  --accent-soft-md:   rgba(100,210,255,0.30);
+  --accent-glow:      rgba(100,210,255,0.40);
+  --accent-glow-lg:   rgba(100,210,255,0.54);
+  --accent-muted:     rgba(100,210,255,0.58);
+  --accent-border:    rgba(100,210,255,0.44);
+  --shadow-focus:     0 0 0 4px rgba(100,210,255,0.42);
+}
+
+/* ── GRAPHITE (refined neutral — classic macOS Graphite) ─────────── */
+html[data-accent="graphite"] {
+  --accent-primary:   #6E6E73;
+  --accent-secondary: #4E4E52;
+  --accent-tertiary:  #8E8E93;
+  --accent-hover:     #7C7C82;
+  --accent-pressed:   #4E4E52;
+  --accent-soft:      rgba(110,110,115,0.10);
+  --accent-soft-md:   rgba(110,110,115,0.18);
+  --accent-glow:      rgba(110,110,115,0.22);
+  --accent-glow-lg:   rgba(110,110,115,0.32);
+  --accent-muted:     rgba(110,110,115,0.40);
+  --accent-border:    rgba(110,110,115,0.26);
+  --shadow-focus:     0 0 0 4px rgba(110,110,115,0.28);
+}
+html[data-accent="graphite"][data-theme="dark"] {
+  --accent-primary:   #AEAEB2;
+  --accent-secondary: #8E8E93;
+  --accent-tertiary:  #C7C7CC;
+  --accent-hover:     #BCBCC0;
+  --accent-pressed:   #8E8E93;
+  --accent-soft:      rgba(174,174,178,0.16);
+  --accent-soft-md:   rgba(174,174,178,0.24);
+  --accent-glow:      rgba(174,174,178,0.30);
+  --accent-glow-lg:   rgba(174,174,178,0.42);
+  --accent-muted:     rgba(174,174,178,0.50);
+  --accent-border:    rgba(174,174,178,0.36);
+  --shadow-focus:     0 0 0 4px rgba(174,174,178,0.38);
+}

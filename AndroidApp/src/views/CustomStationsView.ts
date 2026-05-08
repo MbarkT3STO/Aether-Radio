@@ -4,6 +4,7 @@ import { BridgeService } from '../services/BridgeService'
 import { PlayerStore } from '../store/PlayerStore'
 import { EventBus } from '../store/EventBus'
 import { stationLogoHtml } from '../utils/stationLogo'
+import { ConfirmModal } from '../components/ConfirmModal'
 
 function toast(message: string, type = 'info'): void {
   window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type } }))
@@ -273,7 +274,14 @@ export class CustomStationsView extends BaseComponent {
   private async handleDelete(id: string): Promise<void> {
     const s = this.stations.find(x => x.id === id)
     if (!s) return
-    if (!confirm(`Delete "${s.name}"?`)) return
+    const confirmed = await ConfirmModal.show({
+      title: `Delete "${s.name}"?`,
+      message: 'This custom station will be permanently removed.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+      danger: true,
+    })
+    if (!confirmed) return
     const result = await this.bridge.customStations.remove(id)
     if (result.success) { toast(`"${s.name}" deleted`, 'success'); await this.loadStations() }
     else toast('Failed to delete station', 'error')
