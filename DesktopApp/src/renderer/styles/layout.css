@@ -12,6 +12,32 @@
   position: relative;
 }
 
+/* ── Titlebar — macOS-style centered window title ── */
+.app-titlebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.006em;
+  color: var(--text-secondary);
+  pointer-events: none;
+  user-select: none;
+  -webkit-app-region: drag;
+  z-index: 500;
+}
+
+/* Dim when window is inactive (Apple HIG) */
+#app:-webkit-any(:window-inactive) .app-titlebar {
+  color: var(--text-tertiary);
+}
+
 /* ── Sidebar — Apple vibrant sidebar material ── */
 .app-sidebar {
   width: var(--sidebar-width);
