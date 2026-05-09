@@ -1,6 +1,5 @@
 import { ipcMain } from 'electron'
 import { IpcChannel } from '../IpcChannel'
-import type { ShazamRoot } from 'node-shazam/dist/cjs/types/shazam'
 
 export interface RecognitionResult {
   title: string
@@ -19,6 +18,18 @@ export interface RecognitionResult {
 const FETCH_BYTES   = 192 * 1024   // 192 KB ≈ 8 s at 192 kbps
 const FETCH_TIMEOUT = 15_000
 
+// Shazam API constants
+const SHAZAM_HOST   = 'https://amp.shazam.com'
+const SHAZAM_PARAMS = 'sync=true&webv3=true&sampling=true&connected=&shazamapiversion=v3&sharehub=true&hubv5minorversion=v5.1&hidelb=true&video=v3'
+
+function uuidv4(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  }).toUpperCase()
+}
+
 export class RecognitionIpcHandler {
   static register(): void {
     ipcMain.handle(IpcChannel.RECOGNIZE_SONG, async (_, streamUrl: string) => {
@@ -30,81 +41,195 @@ export class RecognitionIpcHandler {
         return { success: false, error: String(e) }
       }
     })
+
+    ipcMain.handle(IpcChannel.RECOGNIZE_SIGNATURE, async (_, signatureUri: string, samplems: number) => {
+      try {
+        const result = await queryShazamApi(signatureUri, samplems)
+        if (!result) return { success: false, error: 'Not recognized' }
+        return { success: true, data: result }
+      } catch (e) {
+        return { success: false, error: String(e) }
+      }
+    })
   }
 }
 
+/**
+ * Main recognition pipeline — fetches stream bytes, generates signatures
+ * via shazamio-core WASM, and queries Shazam API using Node.js https
+ * (not Electron's fetch, which has issues on Windows).
+ */
 async function recognizeStream(streamUrl: string): Promise<RecognitionResult | null> {
-  const os   = await import('os')
-  const path = await import('path')
-  const fs   = await import('fs/promises')
-
-  // 1. Fetch a chunk of the live stream via Node http/https
-  //    (Electron's net.fetch throws on Icecast streams with non-Latin-1 ICY headers)
+  // 1. Fetch a chunk of the live stream
   const audioBuffer = await fetchStreamChunk(streamUrl)
   if (!audioBuffer) return null
 
-  // 2. Write to a temp file — node-shazam reads from disk
-  const tmpFile = path.join(os.tmpdir(), `aether-rec-${Date.now()}.mp3`)
-  await fs.writeFile(tmpFile, audioBuffer)
+  // 2. Generate signatures from the raw audio bytes using shazamio-core WASM
+  const { recognizeBytes } = await import('shazamio-core')
+  const signatures = recognizeBytes(new Uint8Array(audioBuffer), 0, Number.MAX_SAFE_INTEGER)
 
+  if (!signatures || signatures.length === 0) return null
+
+  // 3. Try signatures from the middle outward (middle of the clip is most
+  //    likely to contain clean audio without stream-join artifacts)
+  let result: RecognitionResult | null = null
   try {
-    // 3. Recognise via node-shazam (uses shazamio-core WASM + Shazam API)
-    const { Shazam } = await import('node-shazam')
-    const shazam = new Shazam()
-    const response = await shazam.recognise(tmpFile, 'en-US') as ShazamRoot | null
-
-    if (!response?.track) return null
-    const track = response.track
-
-    const title  = track.title?.trim()
-    const artist = track.subtitle?.trim()
-    if (!title || !artist) return null
-
-    // Album + release year from SONG section metadata
-    const songSection = track.sections?.find(s => s.type === 'SONG')
-    const album       = songSection?.metadata?.find(m => m.title === 'Album')?.text
-    const releaseDate = songSection?.metadata?.find(m => m.title === 'Released')?.text
-
-    // Cover art
-    const coverArt = track.images?.coverarthq ?? track.images?.coverart
-
-    // Streaming links from hub.options
-    const spotifyOption    = track.hub?.options?.find(o => o.providername?.toUpperCase() === 'SPOTIFY')
-    const appleMusicOption = track.hub?.options?.find(o => o.providername?.toUpperCase() === 'APPLEMUSIC')
-
-    const spotifyDirect    = spotifyOption?.actions?.find(a => a.type === 'uri')?.uri
-    const appleMusicUrl    = appleMusicOption?.actions?.find(a => a.type === 'uri')?.uri
-
-    // YouTube URL from sections
-    const videoSection  = track.sections?.find(s => s.youtubeurl)
-    const youtubeUrl    = videoSection?.youtubeurl ?? undefined
-
-    // Search-based URLs — always available as fallback
-    const searchQuery     = encodeURIComponent(`${title} ${artist}`)
-    const spotifyUrl      = spotifyDirect ?? `https://open.spotify.com/search/${searchQuery}`
-    const youtubeMusicUrl = `https://music.youtube.com/search?q=${searchQuery}`
-    const deezerUrl       = `https://www.deezer.com/search/${searchQuery}`
-
-    // Shazam track page
-    const shazamUrl = track.url ?? undefined
-
-    return {
-      title,
-      artist,
-      album:          album          ?? undefined,
-      releaseDate:    releaseDate    ?? undefined,
-      coverArt:       coverArt       ?? undefined,
-      spotifyUrl:     spotifyUrl     ?? undefined,
-      appleMusicUrl:  appleMusicUrl  ?? undefined,
-      youtubeMusicUrl,
-      youtubeUrl,
-      deezerUrl,
-      shazamUrl,
+    for (let i = Math.floor(signatures.length / 2); i < signatures.length; i += 4) {
+      const sig = signatures[i]
+      if (!sig) continue
+      result = await queryShazamApi(sig.uri, sig.samplems)
+      if (result) break
     }
   } finally {
-    await fs.unlink(tmpFile).catch(() => {})
+    // Free all WASM-allocated signatures
+    for (const sig of signatures) {
+      try { sig.free() } catch { /* ignore */ }
+    }
+  }
+
+  return result
+}
+
+/**
+ * POST a Shazam signature to the Shazam API using Node.js https module.
+ * This bypasses Electron's fetch/net module which can have issues on Windows
+ * with certain SSL/proxy configurations.
+ */
+async function queryShazamApi(signatureUri: string, samplems: number): Promise<RecognitionResult | null> {
+  const https = await import('https')
+  const { URL } = await import('url')
+
+  const url = `${SHAZAM_HOST}/discovery/v5/en/US/iphone/-/tag/${uuidv4()}/${uuidv4()}?${SHAZAM_PARAMS}`
+
+  const body = JSON.stringify({
+    timezone:    Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York',
+    signature:   { uri: signatureUri, samplems },
+    timestamp:   Date.now(),
+    context:     {},
+    geolocation: {},
+  })
+
+  const parsed = new URL(url)
+
+  const responseText = await new Promise<string>((resolve, reject) => {
+    const req = https.request(
+      {
+        method: 'POST',
+        hostname: parsed.hostname,
+        port: 443,
+        path: parsed.pathname + parsed.search,
+        headers: {
+          'Content-Type':        'application/json',
+          'Content-Length':      Buffer.byteLength(body),
+          'X-Shazam-Platform':   'IPHONE',
+          'X-Shazam-AppVersion': '14.1.0',
+          'Accept':              '*/*',
+          'Accept-Language':     'en-US',
+          'User-Agent':          'Shazam/3685 CFNetwork/1485 Darwin/23.1.0',
+        },
+        timeout: FETCH_TIMEOUT,
+      },
+      (res) => {
+        const chunks: Buffer[] = []
+        res.on('data', (chunk: Buffer) => chunks.push(chunk))
+        res.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')))
+        res.on('error', reject)
+      }
+    )
+
+    req.on('timeout', () => { req.destroy(); reject(new Error('Shazam API timeout')) })
+    req.on('error', reject)
+    req.write(body)
+    req.end()
+  })
+
+  let data: { matches?: unknown[]; track?: ShazamTrackResponse }
+  try {
+    data = JSON.parse(responseText)
+  } catch {
+    return null
+  }
+
+  if (!data.matches?.length || !data.track) return null
+  return parseShazamTrack(data.track)
+}
+
+// ── Shazam response parsing ─────────────────────────────────────────────────
+
+interface ShazamTrackResponse {
+  title?: string
+  subtitle?: string
+  url?: string
+  images?: { coverart?: string; coverarthq?: string }
+  sections?: { type: string; metadata?: { title: string; text: string }[]; youtubeurl?: string }[]
+  hub?: {
+    providers?: { type?: string; actions?: { type?: string; uri?: string }[] }[]
+    options?: { providername?: string; actions?: { type?: string; uri?: string }[] }[]
   }
 }
+
+function parseShazamTrack(track: ShazamTrackResponse): RecognitionResult | null {
+  const title  = track.title?.trim()
+  const artist = track.subtitle?.trim()
+  if (!title || !artist) return null
+
+  const songSection = track.sections?.find(s => s.type === 'SONG')
+  const album       = songSection?.metadata?.find(m => m.title === 'Album')?.text
+  const releaseDate = songSection?.metadata?.find(m => m.title === 'Released')?.text
+  const coverArt    = track.images?.coverarthq ?? track.images?.coverart
+
+  // Provider deep links
+  let spotifyDirect: string | undefined
+  let appleMusicDirect: string | undefined
+
+  if (track.hub?.providers) {
+    for (const provider of track.hub.providers) {
+      const type = provider.type?.toLowerCase() ?? ''
+      const openAction = provider.actions?.find(a => a.type === 'open')
+      const uriAction  = provider.actions?.find(a => a.type === 'uri')
+      let url = openAction?.uri ?? uriAction?.uri
+      if (!url) continue
+      if (url.startsWith('spotify:') && !url.startsWith('https://')) {
+        const parts = url.split(':')
+        parts.shift()
+        url = 'https://open.spotify.com/' + parts.join('/')
+      }
+      if (type === 'spotify') spotifyDirect = url
+      if (type === 'applemusic' || type === 'itunes') appleMusicDirect = url
+    }
+  }
+
+  if (track.hub?.options) {
+    const spotOpt  = track.hub.options.find(o => o.providername?.toUpperCase() === 'SPOTIFY')
+    const appleOpt = track.hub.options.find(o => o.providername?.toUpperCase() === 'APPLEMUSIC')
+    spotifyDirect    ??= spotOpt?.actions?.find(a => a.type === 'uri')?.uri
+    appleMusicDirect ??= appleOpt?.actions?.find(a => a.type === 'uri')?.uri
+  }
+
+  const searchQuery     = encodeURIComponent(`${title} ${artist}`)
+  const spotifyUrl      = spotifyDirect ?? `https://open.spotify.com/search/${searchQuery}`
+  const appleMusicUrl   = appleMusicDirect
+  const youtubeMusicUrl = `https://music.youtube.com/search?q=${searchQuery}`
+  const deezerUrl       = `https://www.deezer.com/search/${searchQuery}`
+  const youtubeUrl      = track.sections?.find(s => s.youtubeurl)?.youtubeurl
+  const shazamUrl       = track.url ?? undefined
+
+  return {
+    title,
+    artist,
+    album:          album          ?? undefined,
+    releaseDate:    releaseDate    ?? undefined,
+    coverArt:       coverArt       ?? undefined,
+    spotifyUrl:     spotifyUrl     ?? undefined,
+    appleMusicUrl:  appleMusicUrl  ?? undefined,
+    youtubeMusicUrl,
+    youtubeUrl,
+    deezerUrl,
+    shazamUrl,
+  }
+}
+
+// ── Stream chunk fetcher ────────────────────────────────────────────────────
 
 async function fetchStreamChunk(url: string): Promise<Buffer | null> {
   const http  = await import('http')
@@ -143,12 +268,10 @@ async function fetchStreamChunk(url: string): Promise<Buffer | null> {
           'Icy-MetaData': '0',
           'Accept': '*/*',
         },
-        // Node's parser is tolerant of non-Latin-1 ICY metadata
-        // (Electron's net.fetch / undici is not)
         timeout: FETCH_TIMEOUT,
       },
       (res) => {
-        // Follow redirects (Icecast mount points often redirect)
+        // Follow redirects
         if (
           res.statusCode &&
           res.statusCode >= 300 &&

@@ -40,4 +40,5 @@ export enum IpcChannel {
 
   // Song recognition
   RECOGNIZE_SONG = 'recognition:recognize',
+  RECOGNIZE_SIGNATURE = 'recognition:recognizeSignature',
 }

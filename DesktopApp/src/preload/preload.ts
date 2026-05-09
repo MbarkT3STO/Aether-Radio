@@ -64,6 +64,7 @@ export interface ElectronAPI {
 
   // Song recognition
   recognizeSong: (streamUrl: string) => Promise<{ success: boolean; data?: RecognitionResult; error?: string }>
+  recognizeSignature: (signatureUri: string, samplems: number) => Promise<{ success: boolean; data?: RecognitionResult; error?: string }>
 }
 
 const electronAPI: ElectronAPI = {
@@ -131,6 +132,7 @@ const electronAPI: ElectronAPI = {
 
   // Song recognition
   recognizeSong: (streamUrl) => ipcRenderer.invoke('recognition:recognize', streamUrl),
+  recognizeSignature: (signatureUri, samplems) => ipcRenderer.invoke('recognition:recognizeSignature', signatureUri, samplems),
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)
