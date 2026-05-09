@@ -12,7 +12,7 @@ const copyTrayAssets = {
   writeBundle(): void {
     const outDir = resolve(__dirname, 'out/renderer/assets')
     mkdirSync(outDir, { recursive: true })
-    for (const f of ['tray-icon.png', 'tray-icon@2x.png']) {
+    for (const f of ['tray-icon.png', 'tray-icon@2x.png', 'tray-icon.ico']) {
       copyFileSync(
         resolve(__dirname, 'src/renderer/assets', f),
         resolve(outDir, f)

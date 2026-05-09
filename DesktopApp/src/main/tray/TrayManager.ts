@@ -8,11 +8,13 @@ export class TrayManager {
   private isPlaying = false
 
   create(mainWindow: BrowserWindow): void {
-    // Use the colored app icon for the tray on every platform.
-    // @2x is loaded automatically by Electron when present alongside the 1x file.
+    // Windows needs a multi-resolution .ico for proper DPI scaling in the
+    // notification area. macOS/Linux use the PNG (Electron picks @2x automatically).
+    const iconFile = process.platform === 'win32' ? 'tray-icon.ico' : 'tray-icon.png'
+
     const iconPath = is.dev
-      ? path.join(app.getAppPath(), 'src/renderer/assets/tray-icon.png')
-      : path.join(__dirname, '../renderer/assets/tray-icon.png')
+      ? path.join(app.getAppPath(), 'src/renderer/assets', iconFile)
+      : path.join(__dirname, '../renderer/assets', iconFile)
 
     const icon = nativeImage.createFromPath(iconPath)
 
