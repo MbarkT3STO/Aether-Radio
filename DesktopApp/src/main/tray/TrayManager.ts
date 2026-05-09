@@ -8,17 +8,15 @@ export class TrayManager {
   private isPlaying = false
 
   create(mainWindow: BrowserWindow): void {
+    // Use the colored app icon for the tray on every platform.
+    // @2x is loaded automatically by Electron when present alongside the 1x file.
     const iconPath = is.dev
       ? path.join(app.getAppPath(), 'src/renderer/assets/tray-icon.png')
-      : path.join(__dirname, '../../renderer/assets/tray-icon.png')
+      : path.join(__dirname, '../renderer/assets/tray-icon.png')
 
     const icon = nativeImage.createFromPath(iconPath)
-    if (process.platform === 'darwin') {
-      icon.setTemplateImage(true)
-    }
-    const resized = icon.resize({ width: 16, height: 16 })
 
-    this.tray = new Tray(resized)
+    this.tray = new Tray(icon)
     this.tray.setToolTip('Aether Radio')
     this.updateMenu(mainWindow)
     // No click handler — interaction is via context menu only
