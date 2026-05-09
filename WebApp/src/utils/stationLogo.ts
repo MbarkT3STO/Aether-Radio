@@ -3,7 +3,7 @@
  * Uses event delegation for error handling — NO inline onerror attributes.
  */
 
-export const RADIO_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="10" width="20" height="11" rx="2.5" stroke="currentColor" stroke-width="1.5" opacity="0.8"/><path d="M6.5 15.5a2 2 0 1 0 4 0 2 2 0 0 0-4 0Z" fill="currentColor" opacity="0.7"/><circle cx="8.5" cy="15.5" r="0.75" fill="currentColor" opacity="0.9"/><rect x="14" y="13.5" width="5" height="1.25" rx="0.625" fill="currentColor" opacity="0.5"/><rect x="14" y="16" width="3.5" height="1.25" rx="0.625" fill="currentColor" opacity="0.35"/><path d="M7 10 L17.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/><circle cx="17.5" cy="3.5" r="1.5" fill="currentColor" opacity="0.6"/></svg>`
+export const RADIO_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="20" height="12" rx="2"/><path d="M8 15a2 2 0 1 0 0 .01"/><line x1="14" y1="13" x2="19" y2="13"/><line x1="14" y1="16" x2="17" y2="16"/><path d="M6.5 9 16 3.5"/></svg>`
 
 export const FALLBACK_HTML = `<div class="station-logo-fallback">${RADIO_ICON_SVG}</div>`
 
