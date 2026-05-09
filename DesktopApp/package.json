@@ -38,6 +38,10 @@
       "out/**/*",
       "package.json"
     ],
+    "asarUnpack": [
+      "node_modules/shazamio-core/**",
+      "node_modules/node-shazam/**"
+    ],
     "extraResources": [
       {
         "from": "build",
