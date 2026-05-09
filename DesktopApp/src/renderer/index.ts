@@ -28,6 +28,40 @@ if (navigator.userAgent.includes('Macintosh')) {
   document.documentElement.classList.add('platform-darwin')
 }
 
+// On Windows we use a frameless window with custom window controls.
+if (navigator.userAgent.includes('Windows')) {
+  document.documentElement.classList.add('platform-win32')
+
+  // Inject custom window control buttons into the titlebar
+  const titlebar = document.querySelector('.app-titlebar')
+  if (titlebar) {
+    const controls = document.createElement('div')
+    controls.className = 'window-controls'
+    controls.innerHTML = `
+      <button class="window-control-btn" id="win-minimize" aria-label="Minimize">
+        <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+      </button>
+      <button class="window-control-btn" id="win-maximize" aria-label="Maximize">
+        <svg width="10" height="10" viewBox="0 0 10 10"><rect width="10" height="10" rx="0" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+      </button>
+      <button class="window-control-btn window-control-btn--close" id="win-close" aria-label="Close">
+        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </button>
+    `
+    titlebar.appendChild(controls)
+
+    document.getElementById('win-minimize')!.addEventListener('click', () => {
+      window.electronAPI.windowMinimize()
+    })
+    document.getElementById('win-maximize')!.addEventListener('click', () => {
+      window.electronAPI.windowMaximize()
+    })
+    document.getElementById('win-close')!.addEventListener('click', () => {
+      window.electronAPI.windowClose()
+    })
+  }
+}
+
 class App {
   private router: Router
   private eventBus: EventBus

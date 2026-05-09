@@ -55,6 +55,11 @@ export interface ElectronAPI {
   // Power save / playback state (Feature 4)
   playerStateChanged: (playing: boolean) => void
 
+  // Window controls (Windows frameless)
+  windowMinimize: () => void
+  windowMaximize: () => void
+  windowClose: () => void
+
   // Shell
   openExternal: (url: string) => void
   showLogFolder: () => void
@@ -122,6 +127,11 @@ const electronAPI: ElectronAPI = {
 
   // Power save (Feature 4)
   playerStateChanged: (playing) => ipcRenderer.send('player:state-changed', playing),
+
+  // Window controls (Windows frameless)
+  windowMinimize: () => ipcRenderer.send('window:minimize'),
+  windowMaximize: () => ipcRenderer.send('window:maximize'),
+  windowClose: () => ipcRenderer.send('window:close'),
 
   // Shell
   openExternal: (url) => ipcRenderer.send('shell:openExternal', url),

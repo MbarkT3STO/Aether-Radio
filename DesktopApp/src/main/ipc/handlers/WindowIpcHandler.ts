@@ -38,6 +38,14 @@ export class WindowIpcHandler {
       mainWindow.minimize()
     })
 
+    ipcMain.on(IpcChannel.WINDOW_MAXIMIZE, () => {
+      if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize()
+      } else {
+        mainWindow.maximize()
+      }
+    })
+
     ipcMain.on(IpcChannel.WINDOW_CLOSE, () => {
       mainWindow.hide()
     })

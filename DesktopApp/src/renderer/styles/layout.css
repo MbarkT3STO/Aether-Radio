@@ -38,6 +38,69 @@
   color: var(--text-tertiary);
 }
 
+/* ── Windows custom window controls ── */
+.window-controls {
+  display: none;
+}
+
+:root.platform-win32 .window-controls {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+}
+
+:root.platform-win32 .app-titlebar {
+  height: 32px;
+}
+
+.window-control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+  outline: none;
+}
+
+.window-control-btn:hover {
+  background: var(--fill-secondary);
+  color: var(--text-primary);
+}
+
+.window-control-btn:active {
+  background: var(--fill-tertiary);
+}
+
+.window-control-btn--close:hover {
+  background: #e81123;
+  color: #fff;
+}
+
+.window-control-btn--close:active {
+  background: #bf0f1d;
+  color: #fff;
+}
+
+/* On Windows the sidebar needs top margin to account for the taller titlebar */
+:root.platform-win32 .app-sidebar {
+  margin-top: 42px;
+}
+
+/* On Windows the drag bar matches the taller titlebar */
+:root.platform-win32 .app-drag-bar {
+  height: 32px;
+}
+
 /* ── Sidebar — Apple vibrant sidebar material ── */
 .app-sidebar {
   width: var(--sidebar-width);

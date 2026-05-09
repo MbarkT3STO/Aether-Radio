@@ -22,6 +22,7 @@ export enum IpcChannel {
   // Tray / Window
   TRAY_UPDATE = 'tray:update',
   WINDOW_MINIMIZE = 'window:minimize',
+  WINDOW_MAXIMIZE = 'window:maximize',
   WINDOW_CLOSE = 'window:close',
 
   // Playback state (power save blocker)
