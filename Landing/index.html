@@ -11,16 +11,17 @@
   <meta name="description" content="Aether Radio is a beautifully crafted world radio streaming app for Android, macOS, Windows and Linux. 50,000+ stations, song recognition, favorites and a stunning Apple-inspired design." />
   <meta name="author" content="MBVRK" />
   <meta name="keywords" content="radio, world radio, internet radio, streaming, android radio app, desktop radio, aether radio, radio browser, song recognition, shazam" />
+  <meta name="robots" content="index, follow" />
 
   <!-- Open Graph / social -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Aether Radio — Tune into the world. Beautifully." />
   <meta property="og:description" content="50,000+ stations from every country, song recognition, favorites, sleep timer and an Apple-inspired design. Free and open source." />
-  <meta property="og:image" content="./assets/og-image.svg" />
+  <meta property="og:image" content="./assets/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Aether Radio" />
   <meta name="twitter:description" content="Tune into the world. Beautifully." />
-  <meta name="twitter:image" content="./assets/og-image.svg" />
+  <meta name="twitter:image" content="./assets/og-image.png" />
 
   <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png" />
@@ -29,6 +30,32 @@
 
   <!-- Preload critical logo to avoid layout shift -->
   <link rel="preload" as="image" href="./assets/logo.png" fetchpriority="high" />
+
+  <!-- Structured data for rich search results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Aether Radio",
+    "operatingSystem": "Android, macOS, Windows, Linux, Web",
+    "applicationCategory": "MultimediaApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "A beautifully crafted world radio streaming app with 50,000+ stations, song recognition, favorites and an Apple-inspired design.",
+    "url": "https://mbarkt3sto.github.io/Aether-Radio/",
+    "downloadUrl": "https://github.com/MbarkT3STO/Aether-Radio/releases/latest",
+    "softwareVersion": "1.1.0",
+    "author": {
+      "@type": "Person",
+      "name": "MBVRK",
+      "url": "https://github.com/MbarkT3STO"
+    },
+    "license": "https://opensource.org/licenses/MIT"
+  }
+  </script>
 
   <!-- Design system (no external fonts — uses system SF Pro / Segoe / Roboto stack) -->
   <link rel="stylesheet" href="./styles/tokens.css" />
@@ -48,7 +75,7 @@
   <header class="nav" id="nav">
     <div class="nav-inner">
       <a class="nav-brand" href="#top" aria-label="Aether Radio home">
-        <img class="nav-brand-mark" src="./assets/logo.png" alt="" width="32" height="32" decoding="async" fetchpriority="high" />
+        <img class="nav-brand-mark" src="./assets/logo.png" alt="" width="32" height="32" decoding="async" />
         <span class="nav-brand-text">Aether Radio</span>
       </a>
 
@@ -135,7 +162,7 @@
         <div class="hero-copy">
           <a class="hero-eyebrow" href="#download">
             <span class="hero-eyebrow-pill">New</span>
-            <span>v1.1.0 — Song recognition, sleep timer, and more</span>
+            <span>Song recognition, sleep timer, custom stations and more</span>
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </a>
 
@@ -280,9 +307,9 @@
     <!-- ══════════════  STATS STRIP  ══════════════ -->
     <section class="stats" aria-label="At a glance">
       <div class="container stats-inner">
-        <div class="stat"><div class="stat-value" data-count="50000" data-suffix="+">0</div><div class="stat-label">Live stations</div></div>
-        <div class="stat"><div class="stat-value" data-count="240" data-suffix="+">0</div><div class="stat-label">Countries</div></div>
-        <div class="stat"><div class="stat-value" data-count="12">0</div><div class="stat-label">Accent themes</div></div>
+        <div class="stat"><div class="stat-value" data-count="50000" data-suffix="+">50,000+</div><div class="stat-label">Live stations</div></div>
+        <div class="stat"><div class="stat-value" data-count="240" data-suffix="+">240+</div><div class="stat-label">Countries</div></div>
+        <div class="stat"><div class="stat-value" data-count="12">12</div><div class="stat-label">Accent themes</div></div>
         <div class="stat"><div class="stat-value">4</div><div class="stat-label">Platforms</div></div>
       </div>
     </section>
@@ -950,7 +977,7 @@
     </div>
 
     <div class="footer-bottom container">
-      <span>© 2026 MBVRK · Aether Radio. MIT License.</span>
+      <span>© <span id="footer-year">2026</span> MBVRK · Aether Radio. MIT License.</span>
       <span>Made with care · Not affiliated with Apple or any broadcaster.</span>
     </div>
   </footer>

@@ -1,0 +1,5 @@
+# Aether Radio Landing
+User-agent: *
+Allow: /
+
+Sitemap: https://mbarkt3sto.github.io/Aether-Radio/sitemap.xml

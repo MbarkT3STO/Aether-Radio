@@ -24,8 +24,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'ss01' 1;
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
   overflow-x: clip;
   position: relative;
+  /* Safe area insets for notched devices */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 img, svg, video { display: block; max-width: 100%; }
@@ -97,6 +101,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 8px;
   padding: 0 20px;
   height: 44px;
+  min-height: 44px; /* WCAG touch target minimum */
   border-radius: var(--radius-full);
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -107,6 +112,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid transparent;
   cursor: pointer;
   white-space: nowrap;
+  -webkit-touch-callout: none;
   transition:
     background var(--transition-fast),
     color var(--transition-fast),

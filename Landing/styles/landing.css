@@ -259,6 +259,11 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
   animation: slideDown 220ms var(--ease-spring);
   backdrop-filter: saturate(180%) blur(18px);
   -webkit-backdrop-filter: saturate(180%) blur(18px);
+  max-height: calc(100vh - 80px);
+  max-height: calc(100dvh - 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 @media (min-width: 768px) { .nav-mobile { left: 20px; right: 20px; } }
 .nav-mobile[hidden] { display: none; }
@@ -407,6 +412,7 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
   transition: transform 600ms var(--ease-spring);
   animation: floatPhone 8s ease-in-out infinite;
   will-change: transform;
+  max-height: 580px;
 }
 .device-phone:hover { transform: rotate(-2deg) translateY(-8px); }
 
@@ -675,6 +681,9 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
 @media (max-width: 960px) {
   .float-card-1 { left: 0; top: 6%; }
   .float-card-2 { right: 0; bottom: 6%; }
+}
+@media (max-width: 480px) {
+  .float-card { display: none; }
 }
 
 .float-card-title {
@@ -1104,7 +1113,7 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
 }
 
 @media (min-width: 560px)  { .platforms-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .platforms-grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-5); } }
+@media (min-width: 1024px) { .platforms-grid { grid-template-columns: repeat(5, 1fr); gap: var(--space-5); } }
 
 .platform-card {
   position: relative;
@@ -1426,10 +1435,70 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
   .faq-item p { padding: 0 var(--space-5) var(--space-4); font-size: var(--text-sm); }
 }
 
+/* Small phones (320–480px) */
+@media (max-width: 480px) {
+  .hero-eyebrow { font-size: var(--text-xs); padding: 5px 10px 5px 5px; gap: 6px; }
+  .hero-eyebrow-pill { font-size: 9px; padding: 2px 7px; }
+  .hero-badges { gap: var(--space-3); font-size: var(--text-xs); }
+  .hero-cta { gap: 8px; }
+  .hero-cta .btn-lg { width: 100%; }
+  .stats-inner { gap: var(--space-3); }
+  .stat-value { font-size: clamp(1.5rem, 8vw, 2rem); }
+  .section-head { margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+  .section-lede { font-size: var(--text-base); }
+  .live-browser { min-height: 280px; aspect-ratio: auto; }
+  .live-browser-chrome { height: 32px; padding: 0 10px; }
+  .live-browser-address { font-size: 9px; max-width: 180px; }
+  .live-app-side { padding: 10px 6px; }
+  .live-app-nav span { font-size: 9px; gap: 5px; padding: 4px 5px; }
+  .live-app-brand span { display: none; }
+  .live-app-main { padding: 10px; gap: 10px; }
+  .live-app-hello-title { font-size: var(--text-base); }
+  .live-app-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .live-app-card { padding: 8px 6px; }
+  .live-app-card-logo { width: 22px; height: 22px; font-size: 11px; }
+  .live-app-card-name { font-size: 10px; }
+  .live-app-card-meta { font-size: 8.5px; }
+  .demo-player { flex-wrap: wrap; gap: 8px; }
+  .demo-player-actions { margin-left: auto; }
+  .cta-banner-copy h2 { font-size: clamp(1.5rem, 7vw, 2rem); }
+  .cta-banner-actions { flex-direction: column; }
+  .cta-banner-actions .btn { width: 100%; }
+  .footer-bottom { flex-direction: column; gap: var(--space-3); text-align: center; }
+  .nav-accent-menu { right: -40px; min-width: 180px; }
+  .dl-option { padding: 10px 12px; gap: 10px; }
+  .dl-option-icon { width: 30px; height: 30px; }
+  .dl-option-title { font-size: var(--text-sm); }
+  .dl-option-sub { font-size: 10px; }
+}
+
 /* Reduce blur on low-powered devices (explicit override for small screens) */
 @media (max-width: 480px) {
   .nav-inner { backdrop-filter: saturate(150%) blur(12px); -webkit-backdrop-filter: saturate(150%) blur(12px); }
   .demo-mat { backdrop-filter: blur(8px) saturate(130%); -webkit-backdrop-filter: blur(8px) saturate(130%); }
+}
+
+/* Very small phones (iPhone SE, Galaxy Fold) */
+@media (max-width: 360px) {
+  .container { width: min(1200px, 100% - 1rem); }
+  .nav-inner { width: min(1160px, 100% - 12px); padding: 0 8px 0 12px; height: 52px; }
+  .nav-brand-text { font-size: var(--text-base); }
+  .nav-accent-btn { width: 34px; height: 34px; }
+  .nav-theme { width: 34px; height: 34px; }
+  .nav-burger { width: 34px; height: 34px; }
+  .nav-actions { gap: 6px; }
+  .hero-title { font-size: clamp(2rem, 10vw, 2.5rem); }
+  .hero-sub { font-size: var(--text-sm); }
+  .hero-cta .btn-lg { height: 44px; padding: 0 18px; font-size: var(--text-sm); }
+  .btn-lg { height: 46px; padding: 0 20px; font-size: var(--text-base); }
+  .section-title { font-size: clamp(1.375rem, 7vw, 1.75rem); }
+  .platform-icon { width: 44px; height: 44px; }
+  .platform-name { font-size: var(--text-md); }
+  .faq-item summary { padding: var(--space-3) var(--space-4); font-size: var(--text-sm); }
+  .faq-item p { padding: 0 var(--space-4) var(--space-3); font-size: var(--text-xs); }
+  .live-browser-viewport { grid-template-columns: 70px 1fr; }
+  .live-app-nav span { font-size: 8px; padding: 3px 4px; }
+  .token-swatch-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
 }
 
 /* ═══════════════════ DOWNLOAD DROPDOWN ═══════════════════ */
@@ -2133,11 +2202,8 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
 }
 
 /* ───── Platforms grid: fit 5 cards nicely ───── */
-@media (min-width: 1024px) {
-  .platforms-grid { grid-template-columns: repeat(5, 1fr); }
-}
 @media (min-width: 768px) and (max-width: 1023px) {
-  .platforms-grid { grid-template-columns: repeat(2, 1fr); }
+  .platforms-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* Mobile nav: live entry shows dot cleanly alongside the text */
@@ -2149,4 +2215,27 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
 .nav-mobile .btn .live-dot {
   width: 7px;
   height: 7px;
+}
+
+/* ═══════════════════ LANDSCAPE MOBILE ═══════════════════ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero { padding-top: 2rem; padding-bottom: 2rem; }
+  .hero-grid { gap: 2rem; }
+  .hero-device { display: none; }
+  .stats { padding: 1.5rem 0; }
+  .section-pad { padding-block: clamp(2rem, 5vw, 4rem); }
+  .nav { padding-top: 6px; }
+  .nav-inner { height: 48px; }
+  .nav-mobile { max-height: 60vh; overflow-y: auto; }
+}
+
+/* ═══════════════════ TABLET PORTRAIT (768–1023px) ═══════════════════ */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-grid { grid-template-columns: 1fr; text-align: center; }
+  .hero-copy { max-width: 680px; margin-inline: auto; }
+  .hero-device { margin-top: var(--space-4); }
+  .hero-cta { justify-content: center; }
+  .hero-badges { justify-content: center; }
+  .live-grid { grid-template-columns: 1fr; }
+  .live-browser { max-width: 680px; margin-inline: auto; }
 }

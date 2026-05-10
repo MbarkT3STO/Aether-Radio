@@ -129,11 +129,13 @@
       mobile?.setAttribute('hidden', '')
       nav?.removeAttribute('data-mobile-open')
       burger?.setAttribute('aria-expanded', 'false')
+      body.style.overflow = ''
     }
     const openMobile = () => {
       mobile?.removeAttribute('hidden')
       nav?.setAttribute('data-mobile-open', 'true')
       burger?.setAttribute('aria-expanded', 'true')
+      body.style.overflow = 'hidden'
     }
 
     burger?.addEventListener('click', () => {
@@ -172,10 +174,11 @@
       const target = parseInt(el.dataset.count, 10)
       const suffix = el.dataset.suffix || ''
       const duration = 1400
-      const start = performance.now()
       const format = n => n.toLocaleString('en-US')
       const ease = t => 1 - Math.pow(1 - t, 3)
 
+      el.textContent = '0' + suffix
+      const start = performance.now()
       const step = now => {
         const t = Math.min(1, (now - start) / duration)
         const v = Math.floor(target * ease(t))
@@ -290,5 +293,9 @@
         device.style.transform = ''
       })
     }
+
+    // ══════════════ DYNAMIC FOOTER YEAR
+    const yearEl = document.getElementById('footer-year')
+    if (yearEl) yearEl.textContent = new Date().getFullYear()
   })
 })()
