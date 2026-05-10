@@ -662,6 +662,8 @@ export class PlayerBar extends BaseComponent {
             </div>
 
             <div class="pex-controls-wrap">
+
+              <!-- Primary: playback controls -->
               <div class="pex-controls">
                 <button class="pex-btn pex-btn-stop" id="pex-stop"
                   title="Stop" aria-label="Stop playback">
@@ -687,28 +689,33 @@ export class PlayerBar extends BaseComponent {
                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                   </svg>
                 </button>
-                <button class="pex-btn pex-btn-eq ${this.isEqActive() ? 'eq-active' : ''}" id="pex-eq"
+              </div>
+
+              <!-- Secondary: audio tools -->
+              <div class="pex-tools">
+                <button class="pex-tool-btn ${this.isEqActive() ? 'pex-tool-active' : ''}" id="pex-eq"
                   title="Equalizer" aria-label="Equalizer">
                   ${this.eqIcon()}
+                  <span class="pex-tool-label">EQ</span>
                 </button>
-                <button class="pex-btn pex-btn-record ${this.recordingService.isRecording ? 'recording' : ''}" id="pex-record"
+                <button class="pex-tool-btn" id="pex-recognize"
+                  title="Identify song" aria-label="Identify song"
+                  ${isPlaying ? '' : 'disabled'}>
+                  ${this.recognizeIcon()}
+                  <span class="pex-tool-label">Identify</span>
+                </button>
+                <button class="pex-tool-btn ${this.recordingService.isRecording ? 'pex-tool-recording' : ''}" id="pex-record"
                   title="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
                   aria-label="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
                   ${isPlaying ? '' : 'disabled'}>
                   ${this.recordingService.isRecording
-                    ? `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
-                    : this.recordIcon()
+                    ? `<span class="record-indicator"></span><span class="pex-tool-label record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
+                    : `${this.recordIcon()}<span class="pex-tool-label">Record</span>`
                   }
                 </button>
               </div>
 
-              <div class="pex-buffer-row">
-                <div class="pex-buffer-indicator" id="pex-buffer-indicator">
-                  <div class="pex-buffer-fill" id="pex-buffer-fill" style="width:${this.bufferHealth.percent}%"></div>
-                </div>
-                <span class="pex-buffer-label" id="pex-buffer-label">${this.bufferHealth.percent}%</span>
-              </div>
-
+              <!-- Volume -->
               <div class="pex-volume">
                 <button class="pex-btn pex-btn-mute" id="pex-mute" title="${volume === 0 ? 'Unmute' : 'Mute'}">
                   ${this.volumeIcon(volume)}
@@ -719,6 +726,20 @@ export class PlayerBar extends BaseComponent {
                   </div>
                 </div>
               </div>
+
+              <!-- Buffer health -->
+              <div class="pex-buffer-row">
+                <span class="pex-buffer-icon" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+                  </svg>
+                </span>
+                <div class="pex-buffer-indicator" id="pex-buffer-indicator">
+                  <div class="pex-buffer-fill" id="pex-buffer-fill" style="width:${this.bufferHealth.percent}%"></div>
+                </div>
+                <span class="pex-buffer-label" id="pex-buffer-label">Buffer ${this.bufferHealth.percent}%</span>
+              </div>
+
             </div>
 
           </div>
@@ -847,13 +868,13 @@ export class PlayerBar extends BaseComponent {
         const btn = overlay.querySelector<HTMLElement>('#pex-record')
         if (!btn) return
         if (this.recordingService.isRecording) {
-          btn.classList.add('recording')
+          btn.classList.add('pex-tool-recording')
           btn.title = 'Stop recording'
-          btn.innerHTML = `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
+          btn.innerHTML = `<span class="record-indicator"></span><span class="pex-tool-label record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
         } else {
-          btn.classList.remove('recording')
+          btn.classList.remove('pex-tool-recording')
           btn.title = 'Record'
-          btn.innerHTML = this.recordIcon()
+          btn.innerHTML = `${this.recordIcon()}<span class="pex-tool-label">Record</span>`
         }
       })
     )
@@ -861,6 +882,11 @@ export class PlayerBar extends BaseComponent {
     // EQ button in expanded player
     q<HTMLElement>('#pex-eq')?.addEventListener('click', () => {
       import('./Equalizer').then(({ Equalizer }) => Equalizer.show())
+    })
+
+    // Recognize button in expanded player
+    q<HTMLElement>('#pex-recognize')?.addEventListener('click', () => {
+      this.handleRecognize()
     })
 
     // Record button in expanded player
