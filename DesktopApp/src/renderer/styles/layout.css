@@ -38,67 +38,78 @@
   color: var(--text-tertiary);
 }
 
-/* ── Windows custom window controls ── */
+/* ── Custom traffic-light window controls ── */
 .window-controls {
-  display: none;
-}
-
-:root.platform-win32 .window-controls {
   display: flex;
   align-items: center;
+  gap: 8px;
   position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   pointer-events: auto;
   -webkit-app-region: no-drag;
 }
 
-:root.platform-win32 .app-titlebar {
-  height: 32px;
-}
-
-.window-control-btn {
+.window-control-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 100%;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  padding: 0;
+  transition: opacity 0.15s ease;
   outline: none;
 }
 
-.window-control-btn:hover {
+.window-control-dot svg {
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.window-controls:hover .window-control-dot svg {
+  opacity: 1;
+}
+
+.window-control-dot--close {
+  background: #ff5f57;
+}
+
+.window-control-dot--close:hover {
+  background: #ff3b30;
+}
+
+.window-control-dot--minimize {
+  background: #febc2e;
+}
+
+.window-control-dot--minimize:hover {
+  background: #f5a623;
+}
+
+.window-control-dot--maximize {
+  background: #28c840;
+}
+
+.window-control-dot--maximize:hover {
+  background: #1db934;
+}
+
+.window-control-dot:active {
+  opacity: 0.7;
+}
+
+/* Dim dots when window is inactive */
+#app:-webkit-any(:window-inactive) .window-control-dot {
   background: var(--fill-secondary);
-  color: var(--text-primary);
 }
 
-.window-control-btn:active {
-  background: var(--fill-tertiary);
-}
-
-.window-control-btn--close:hover {
-  background: #e81123;
-  color: #fff;
-}
-
-.window-control-btn--close:active {
-  background: #bf0f1d;
-  color: #fff;
-}
-
-/* On Windows the sidebar needs top margin to account for the taller titlebar */
-:root.platform-win32 .app-sidebar {
-  margin-top: 42px;
-}
-
-/* On Windows the drag bar matches the taller titlebar */
-:root.platform-win32 .app-drag-bar {
-  height: 32px;
+#app:-webkit-any(:window-inactive) .window-control-dot svg {
+  opacity: 0;
 }
 
 /* ── Sidebar — Apple vibrant sidebar material ── */
@@ -111,7 +122,7 @@
   position: relative;
   z-index: 200;
   transition: width var(--transition-slow);
-  margin: 38px 0 10px 10px;
+  margin: 30px 0 10px 10px;
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-sm);

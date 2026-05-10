@@ -22,42 +22,40 @@ import { initLogoErrorHandling } from './utils/stationLogo'
 initLogoErrorHandling()
 
 // Tag the root element with the current platform so CSS can target it.
-// On macOS with titleBarStyle:'hiddenInset' the traffic lights overlap the
-// top-left corner, so we need extra top padding in the sidebar header.
 if (navigator.userAgent.includes('Macintosh')) {
   document.documentElement.classList.add('platform-darwin')
 }
-
-// On Windows we use a frameless window with custom window controls.
 if (navigator.userAgent.includes('Windows')) {
   document.documentElement.classList.add('platform-win32')
+}
 
-  // Inject custom window control buttons into the titlebar
+// Frameless window — inject custom macOS-style traffic light controls on all platforms.
+{
   const titlebar = document.querySelector('.app-titlebar')
   if (titlebar) {
     const controls = document.createElement('div')
     controls.className = 'window-controls'
     controls.innerHTML = `
-      <button class="window-control-btn" id="win-minimize" aria-label="Minimize">
-        <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+      <button class="window-control-dot window-control-dot--close" id="win-close" aria-label="Close">
+        <svg width="6" height="6" viewBox="0 0 6 6"><path d="M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
       </button>
-      <button class="window-control-btn" id="win-maximize" aria-label="Maximize">
-        <svg width="10" height="10" viewBox="0 0 10 10"><rect width="10" height="10" rx="0" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+      <button class="window-control-dot window-control-dot--minimize" id="win-minimize" aria-label="Minimize">
+        <svg width="6" height="1" viewBox="0 0 6 1"><rect width="6" height="1" fill="currentColor" rx="0.5"/></svg>
       </button>
-      <button class="window-control-btn window-control-btn--close" id="win-close" aria-label="Close">
-        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <button class="window-control-dot window-control-dot--maximize" id="win-maximize" aria-label="Maximize">
+        <svg width="6" height="6" viewBox="0 0 6 6"><path d="M0.75 3.75L2.5 5.25L5.25 0.75" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       </button>
     `
-    titlebar.appendChild(controls)
+    titlebar.prepend(controls)
 
+    document.getElementById('win-close')!.addEventListener('click', () => {
+      window.electronAPI.windowClose()
+    })
     document.getElementById('win-minimize')!.addEventListener('click', () => {
       window.electronAPI.windowMinimize()
     })
     document.getElementById('win-maximize')!.addEventListener('click', () => {
       window.electronAPI.windowMaximize()
-    })
-    document.getElementById('win-close')!.addEventListener('click', () => {
-      window.electronAPI.windowClose()
     })
   }
 }

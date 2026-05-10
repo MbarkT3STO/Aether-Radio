@@ -31,10 +31,10 @@ function getWindowIconPath(): string | undefined {
 function createWindow(): void {
   const state = windowStateManager.getState()
 
-  // On Windows we remove the native frame entirely so we can provide our own
-  // custom window controls. macOS keeps hiddenInset for the native traffic lights.
-  const isWindows = process.platform === 'win32'
-
+  // Frameless window on all platforms — we provide our own custom
+  // traffic-light-style controls in the renderer.
+  // frame:false removes the native title bar and window chrome entirely.
+  // titleBarStyle:'hidden' ensures macOS doesn't show native traffic lights.
   mainWindow = new BrowserWindow({
     width: state.width,
     height: state.height,
@@ -43,9 +43,9 @@ function createWindow(): void {
     minWidth: 1024,
     minHeight: 768,
     backgroundColor: '#0A0A0F',
-    ...(isWindows
-      ? { frame: false }
-      : { titleBarStyle: 'hiddenInset' }),
+    frame: false,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: -20, y: -20 },
     icon: getWindowIconPath(),
     webPreferences: {
       preload: join(__dirname, '../preload/preload.js'),

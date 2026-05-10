@@ -17,10 +17,6 @@
   -webkit-app-region: drag;
 }
 
-.platform-darwin .sidebar-header {
-  padding-top: 18px;
-}
-
 /* ── Logo icon ── */
 .sidebar-logo-icon {
   -webkit-app-region: no-drag;
@@ -388,10 +384,6 @@
   display: flex;
   justify-content: center;
   padding: 20px 0 12px;
-}
-
-.platform-darwin .sidebar.collapsed .sidebar-header {
-  padding-top: 18px;
 }
 
 .sidebar.collapsed .sidebar-logo {
