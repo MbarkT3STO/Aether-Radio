@@ -150,7 +150,7 @@
 
     // ══════════════ SCROLL REVEAL
     const toReveal = document.querySelectorAll(
-      '.feature-card, .platform-card, .design-card, .value, .faq-item, .stat, .cta-banner, .section-head, .donate-card'
+      '.feature-card, .platform-card, .design-card, .value, .faq-item, .stat, .cta-banner, .section-head, .donate-card, .screenshots-track'
     )
     toReveal.forEach(el => el.classList.add('reveal'))
 
@@ -297,5 +297,185 @@
     // ══════════════ DYNAMIC FOOTER YEAR
     const yearEl = document.getElementById('footer-year')
     if (yearEl) yearEl.textContent = new Date().getFullYear()
+
+    // ══════════════ SCREENSHOTS CAROUSEL
+    const screenshotGroups = document.querySelectorAll('.screenshots-group')
+
+    screenshotGroups.forEach(group => {
+      const track = group.querySelector('.screenshots-track')
+      const scroll = track?.querySelector('.screenshots-scroll')
+      const arrows = group.querySelectorAll('.screenshots-arrow')
+
+      if (!track || !scroll) return
+
+      // Arrow buttons scroll the track
+      arrows.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const dir = parseInt(btn.dataset.dir, 10)
+          const items = track.querySelectorAll('.screenshot-item')
+          if (!items.length) return
+          const itemWidth = items[0].offsetWidth
+          const gap = parseInt(getComputedStyle(scroll).gap) || 16
+          track.scrollBy({ left: dir * (itemWidth + gap), behavior: 'smooth' })
+        })
+      })
+
+      // Drag to scroll (pointer devices) — only activate after movement threshold
+      let isDragging = false, didDrag = false, startX = 0, scrollStart = 0, pointerId = null
+      track.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch') return
+        isDragging = true
+        didDrag = false
+        startX = e.clientX
+        scrollStart = track.scrollLeft
+        pointerId = e.pointerId
+      })
+      track.addEventListener('pointermove', (e) => {
+        if (!isDragging) return
+        const dx = Math.abs(e.clientX - startX)
+        if (!didDrag && dx > 5) {
+          didDrag = true
+          track.setPointerCapture(pointerId)
+          track.style.cursor = 'grabbing'
+        }
+        if (didDrag) {
+          e.preventDefault()
+          track.scrollLeft = scrollStart - (e.clientX - startX)
+        }
+      })
+      const stopDrag = () => {
+        isDragging = false
+        track.style.cursor = ''
+        if (pointerId != null) {
+          try { track.releasePointerCapture(pointerId) } catch (_) {}
+        }
+        pointerId = null
+      }
+      track.addEventListener('pointerup', stopDrag)
+      track.addEventListener('pointercancel', stopDrag)
+
+      // Prevent click if we actually dragged
+      track.addEventListener('click', (e) => {
+        if (didDrag) { e.stopPropagation(); e.preventDefault(); didDrag = false }
+      }, true)
+    })
+
+    // ══════════════ LIGHTBOX (full-view screenshots + swipe)
+    const lightbox     = document.getElementById('lightbox')
+    const lightboxImg  = document.getElementById('lightbox-img')
+    const lightboxClose = document.getElementById('lightbox-close')
+    const lightboxPrev = document.getElementById('lightbox-prev')
+    const lightboxNext = document.getElementById('lightbox-next')
+    const lightboxCounter = document.getElementById('lightbox-counter')
+    const allScreenshots = [...document.querySelectorAll('.screenshot-frame--desktop img, .screenshot-frame--mobile img')]
+    let lbIndex = 0
+
+    const openLightbox = (index) => {
+      lbIndex = index
+      updateLightbox()
+      lightbox.removeAttribute('hidden')
+      requestAnimationFrame(() => lightbox.classList.add('is-open'))
+      body.style.overflow = 'hidden'
+    }
+
+    const closeLightbox = () => {
+      lightbox.classList.remove('is-open')
+      setTimeout(() => {
+        lightbox.setAttribute('hidden', '')
+        body.style.overflow = ''
+      }, 220)
+    }
+
+    const updateLightbox = () => {
+      const img = allScreenshots[lbIndex]
+      if (!img) return
+      lightboxImg.src = img.src
+      lightboxImg.alt = img.alt
+      lightboxImg.style.transform = ''
+      lightboxCounter.textContent = `${lbIndex + 1} / ${allScreenshots.length}`
+    }
+
+    const lbPrev = () => { lbIndex = (lbIndex - 1 + allScreenshots.length) % allScreenshots.length; updateLightbox() }
+    const lbNext = () => { lbIndex = (lbIndex + 1) % allScreenshots.length; updateLightbox() }
+
+    // Click to open
+    allScreenshots.forEach((img, i) => {
+      img.closest('.screenshot-frame--desktop, .screenshot-frame--mobile')?.addEventListener('click', () => openLightbox(i))
+    })
+
+    // Controls
+    lightboxClose?.addEventListener('click', closeLightbox)
+    lightboxPrev?.addEventListener('click', lbPrev)
+    lightboxNext?.addEventListener('click', lbNext)
+
+    // Click backdrop to close
+    lightbox?.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target.classList.contains('lightbox-content')) closeLightbox()
+    })
+
+    // Keyboard
+    document.addEventListener('keydown', (e) => {
+      if (lightbox?.hasAttribute('hidden')) return
+      if (e.key === 'Escape') closeLightbox()
+      if (e.key === 'ArrowLeft') lbPrev()
+      if (e.key === 'ArrowRight') lbNext()
+    })
+
+    // Swipe in lightbox (touch + mouse drag)
+    const lbContent = document.getElementById('lightbox-content')
+    if (lbContent) {
+      let swipeStartX = 0, swipeStartY = 0, swiping = false, swipeDelta = 0
+
+      const onSwipeStart = (x, y) => {
+        swipeStartX = x
+        swipeStartY = y
+        swiping = true
+        swipeDelta = 0
+        lightboxImg.classList.add('is-swiping')
+      }
+
+      const onSwipeMove = (x) => {
+        if (!swiping) return
+        swipeDelta = x - swipeStartX
+        lightboxImg.style.transform = `translateX(${swipeDelta}px) scale(${1 - Math.abs(swipeDelta) * 0.0003})`
+      }
+
+      const onSwipeEnd = () => {
+        if (!swiping) return
+        swiping = false
+        lightboxImg.classList.remove('is-swiping')
+        if (Math.abs(swipeDelta) > 60) {
+          swipeDelta < 0 ? lbNext() : lbPrev()
+        } else {
+          lightboxImg.style.transform = ''
+        }
+      }
+
+      // Touch events
+      lbContent.addEventListener('touchstart', (e) => {
+        onSwipeStart(e.touches[0].clientX, e.touches[0].clientY)
+      }, { passive: true })
+      lbContent.addEventListener('touchmove', (e) => {
+        if (!swiping) return
+        const dx = Math.abs(e.touches[0].clientX - swipeStartX)
+        const dy = Math.abs(e.touches[0].clientY - swipeStartY)
+        if (dx > dy) e.preventDefault()
+        onSwipeMove(e.touches[0].clientX)
+      }, { passive: false })
+      lbContent.addEventListener('touchend', onSwipeEnd)
+      lbContent.addEventListener('touchcancel', onSwipeEnd)
+
+      // Mouse drag
+      lbContent.addEventListener('mousedown', (e) => {
+        e.preventDefault()
+        onSwipeStart(e.clientX, e.clientY)
+      })
+      document.addEventListener('mousemove', (e) => {
+        if (!swiping) return
+        e.preventDefault()
+        onSwipeMove(e.clientX)
+      })
+      document.addEventListener('mouseup', onSwipeEnd)
+    }
   })
 })()
