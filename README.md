@@ -152,15 +152,28 @@ cd ../Landing && python3 -m http.server 8080
 
 ## 📥 Download
 
-Prebuilt binaries and installers are published on the [GitHub Releases](https://github.com/MbarkT3STO/Aether-Radio/releases) page.
+Prebuilt binaries and installers for **v1.1.0** are available on the [GitHub Releases](https://github.com/MbarkT3STO/Aether-Radio/releases/tag/v1.1.0) page.
 
-| Platform | Format | Architectures |
+| Platform | Format | Download |
 |---|---|---|
-| **Android** | `.apk` (direct install) | universal |
-| **macOS** | `.dmg` · `.zip` | Intel (x64) · Apple Silicon (arm64) |
-| **Windows** | NSIS installer · portable `.exe` | x64 |
-| **Linux** | `.AppImage` · `.deb` | x64 |
-| **Web** | PWA-capable static build | any modern browser |
+| **Android** | `.apk` (direct install) | [Aether.apk](https://github.com/MbarkT3STO/Aether-Radio/releases/download/v1.1.0/Aether.apk) |
+| **macOS** | `.dmg` (Apple Silicon) | [Aether.Radio-1.1.0-arm64.dmg](https://github.com/MbarkT3STO/Aether-Radio/releases/download/v1.1.0/Aether.Radio-1.1.0-arm64.dmg) |
+| **macOS** | `.dmg` (Intel) | [Aether.Radio-1.1.0.dmg](https://github.com/MbarkT3STO/Aether-Radio/releases/download/v1.1.0/Aether.Radio-1.1.0.dmg) |
+| **Windows** | Setup (Installer) | [Aether.Radio.Setup.1.1.0.exe](https://github.com/MbarkT3STO/Aether-Radio/releases/download/v1.1.0/Aether.Radio.Setup.1.1.0.exe) |
+| **Windows** | Portable `.exe` | [Aether.Radio.1.1.0.exe](https://github.com/MbarkT3STO/Aether-Radio/releases/download/v1.1.0/Aether.Radio.1.1.0.exe) |
+| **Linux** | `.AppImage` | [Aether.Radio-1.1.0.AppImage](https://github.com/MbarkT3STO/Aether-Radio/releases/download/v1.1.0/Aether.Radio-1.1.0.AppImage) |
+| **Web** | Browser app | [aether-live.netlify.app](https://aether-live.netlify.app/) |
+
+## 🆕 What's New in v1.1.0
+
+- 🎵 **Song Recognition** — Identify what's playing on air with one tap
+- 🌙 **Sleep Timer** — Gentle fade-out after a set duration
+- 🎙️ **Stream Recording** — Capture live radio to your device
+- 📻 **Custom Stations** — Paste any stream URL
+- 🌐 **Web App Launched** — Full feature parity in the browser
+- 🎛️ **Equalizer & Audio Enhancements** — Crossfade, buffer management
+- 🖥️ **Custom Window Controls** — Native-feeling title bar on Windows
+- ⚡ **Performance Optimizations** — Reduced CPU usage, skeleton loading, micro-interactions
 
 ## 🧰 Tech stack at a glance
 
