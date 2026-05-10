@@ -550,20 +550,19 @@ export class PlayerBar extends BaseComponent {
         const fill = this.querySelector<HTMLElement>('#player-volume-fill')
         if (fill) fill.style.transition = 'none'
         updateVolume(e as MouseEvent)
-      })
 
-      // Store document listeners so we can remove them on unmount
-      this._onMouseMove = (e: Event) => { if (dragging) updateVolume(e as MouseEvent) }
-      this._onMouseUp   = () => {
-        if (dragging) {
+        // Only attach document-level listeners during active drag (saves CPU)
+        this._onMouseMove = (ev: Event) => { updateVolume(ev as MouseEvent) }
+        this._onMouseUp   = () => {
           dragging = false
           ;(volumeSlider as HTMLElement).classList.remove('dragging')
           const fill = this.querySelector<HTMLElement>('#player-volume-fill')
           if (fill) fill.style.transition = ''
+          this.removeDragListeners()
         }
-      }
-      document.addEventListener('mousemove', this._onMouseMove)
-      document.addEventListener('mouseup',   this._onMouseUp)
+        document.addEventListener('mousemove', this._onMouseMove)
+        document.addEventListener('mouseup',   this._onMouseUp)
+      })
     }
   }
 
@@ -874,18 +873,19 @@ export class PlayerBar extends BaseComponent {
         const fill = q<HTMLElement>('#pex-volume-fill')
         if (fill) fill.style.transition = 'none'
         updateVol(e)
-      })
-      this._pexOnMouseMove = (e: Event) => { if (dragging) updateVol(e as MouseEvent) }
-      this._pexOnMouseUp   = () => {
-        if (dragging) {
+
+        // Only attach document-level listeners during active drag (saves CPU)
+        this._pexOnMouseMove = (ev: Event) => { updateVol(ev as MouseEvent) }
+        this._pexOnMouseUp   = () => {
           dragging = false
           volSlider.classList.remove('dragging')
           const fill = q<HTMLElement>('#pex-volume-fill')
           if (fill) fill.style.transition = ''
+          this.removePexDragListeners()
         }
-      }
-      document.addEventListener('mousemove', this._pexOnMouseMove)
-      document.addEventListener('mouseup',   this._pexOnMouseUp)
+        document.addEventListener('mousemove', this._pexOnMouseMove)
+        document.addEventListener('mouseup',   this._pexOnMouseUp)
+      })
     }
 
     // Keep expanded UI in sync with EventBus

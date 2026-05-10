@@ -3,6 +3,15 @@ import { EqualizerService } from './EqualizerService'
 import { CrossfadeService } from './CrossfadeService'
 import { RecordingService } from './RecordingService'
 
+/**
+ * Target frame rates for visualizations.
+ * Lower rates dramatically reduce CPU usage while remaining visually smooth.
+ * - Bar visualizer: 30fps is plenty for frequency bars
+ * - Ambient blobs: 20fps is sufficient for slow-moving gradients
+ */
+const BAR_TARGET_FPS = 30
+const AMBIENT_TARGET_FPS = 20
+
 export class VisualizerService {
   private audioContext: AudioContext | null = null
   private analyser: AnalyserNode | null = null
@@ -11,6 +20,8 @@ export class VisualizerService {
   private animationId: number | null = null
   private activeCanvas: HTMLCanvasElement | null = null
   private themeUnsubscribe: (() => void) | null = null
+  private visibilityHandler: (() => void) | null = null
+  private isPaused = false
 
   // Expose for shared-canvas use by a secondary VisualizerService instance
   get sharedAnalyser(): AnalyserNode | null { return this.analyser }
@@ -70,6 +81,8 @@ export class VisualizerService {
     if (!this.analyser || !this.dataArray) return
     this.stopVisualization()
     this.activeCanvas = canvas
+    this.isPaused = false
+    this.registerVisibilityListener()
     this.drawLoop(canvas)
   }
 
@@ -87,6 +100,8 @@ export class VisualizerService {
     if (!this.analyser || !this.dataArray) return
     this.stopVisualization()
     this.activeCanvas = canvas
+    this.isPaused = false
+    this.registerVisibilityListener()
     this.drawLoop(canvas)
   }
 
@@ -104,6 +119,8 @@ export class VisualizerService {
     this.dataArray = source.sharedDataArray
     this.stopVisualization()
     this.activeCanvas = canvas
+    this.isPaused = false
+    this.registerVisibilityListener()
     this.ambientLoop(canvas, large, centered)
   }
 
@@ -119,18 +136,29 @@ export class VisualizerService {
     ]
 
     let t = 0
-    // Cache computed style reads — only refresh every 30 frames (~0.5s at 60fps)
+    // Cache computed style reads — only refresh every 60 frames (~3s at 20fps)
     let cachedH = 249
     let cachedS = '90%'
     let cachedIsDark = false
     let styleFrameCount = 0
 
-    const draw = (): void => {
+    const frameInterval = 1000 / AMBIENT_TARGET_FPS
+    let lastFrameTime = 0
+
+    const draw = (timestamp: number): void => {
       this.animationId = requestAnimationFrame(draw)
+
+      // Skip frame if not enough time has elapsed (throttle to target FPS)
+      if (timestamp - lastFrameTime < frameInterval) return
+      lastFrameTime = timestamp
+
+      // Skip rendering when document is hidden (saves CPU when minimized)
+      if (this.isPaused) return
+
       t++
 
       // Throttle expensive getComputedStyle reads
-      if (styleFrameCount === 0 || styleFrameCount >= 30) {
+      if (styleFrameCount === 0 || styleFrameCount >= 60) {
         const style  = getComputedStyle(document.documentElement)
         cachedH      = parseFloat(style.getPropertyValue('--h').trim()) || 249
         cachedS      = style.getPropertyValue('--s').trim() || '90%'
@@ -196,7 +224,7 @@ export class VisualizerService {
       }
     }
 
-    draw()
+    draw(0)
   }
 
   private drawLoop(canvas: HTMLCanvasElement): void {
@@ -229,8 +257,19 @@ export class VisualizerService {
       return g
     }
 
-    const draw = (): void => {
+    const frameInterval = 1000 / BAR_TARGET_FPS
+    let lastFrameTime = 0
+
+    const draw = (timestamp: number): void => {
       this.animationId = requestAnimationFrame(draw)
+
+      // Skip frame if not enough time has elapsed (throttle to target FPS)
+      if (timestamp - lastFrameTime < frameInterval) return
+      lastFrameTime = timestamp
+
+      // Skip rendering when document is hidden (saves CPU when minimized)
+      if (this.isPaused) return
+
       if (!this.analyser || !this.dataArray) return
 
       // Resize canvas to match physical pixels (DPR-aware) — fixes blurry bars on Retina
@@ -269,7 +308,7 @@ export class VisualizerService {
       }
     }
 
-    draw()
+    draw(0)
   }
 
   stopVisualization(): void {
@@ -277,6 +316,8 @@ export class VisualizerService {
       cancelAnimationFrame(this.animationId)
       this.animationId = null
     }
+    this.isPaused = false
+    this.unregisterVisibilityListener()
     // Clear the canvas so no frozen frame is left visible
     if (this.activeCanvas) {
       const ctx = this.activeCanvas.getContext('2d')
@@ -298,5 +339,26 @@ export class VisualizerService {
     this.analyser = null
     this.source   = null
     this.dataArray = null
+  }
+
+  /**
+   * Pause/resume rendering based on page visibility.
+   * When the window is hidden (minimized, behind other windows), we stop
+   * all canvas drawing to save CPU. requestAnimationFrame still fires but
+   * the draw callback returns immediately.
+   */
+  private registerVisibilityListener(): void {
+    if (this.visibilityHandler) return
+    this.visibilityHandler = () => {
+      this.isPaused = document.hidden
+    }
+    document.addEventListener('visibilitychange', this.visibilityHandler)
+  }
+
+  private unregisterVisibilityListener(): void {
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler)
+      this.visibilityHandler = null
+    }
   }
 }

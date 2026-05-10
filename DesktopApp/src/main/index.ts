@@ -52,7 +52,9 @@ function createWindow(): void {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
-      backgroundThrottling: false, // Prevent audio stuttering when window is hidden/minimized
+      backgroundThrottling: false, // Required: prevents audio stuttering when window is hidden/minimized.
+      // The renderer's VisualizerService handles its own throttling via
+      // document.visibilitychange to avoid wasting CPU when not visible.
       // Hard-disable DevTools in packaged builds. With this flag off Electron
       // tears out the DevTools runtime entirely — openDevTools() becomes a
       // no-op and the inspector shortcut never reaches a listener.

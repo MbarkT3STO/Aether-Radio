@@ -68,8 +68,10 @@ export class BufferHealthService {
 
   private startPolling(): void {
     this.stopPolling()
-    // Poll every 500ms for buffer state
-    this.pollInterval = setInterval(() => this.checkBuffer(), 500)
+    // Poll every 2000ms for buffer state — sufficient for UI indicator updates.
+    // Stalling is detected instantly via the 'waiting' event listener, so
+    // aggressive polling is unnecessary and wastes CPU cycles.
+    this.pollInterval = setInterval(() => this.checkBuffer(), 2000)
   }
 
   private stopPolling(): void {

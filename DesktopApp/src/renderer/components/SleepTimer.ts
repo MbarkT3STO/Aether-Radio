@@ -213,7 +213,13 @@ export class SleepTimer extends BaseComponent {
     if (!this.playerStore.hasSleepTimer) return
     this.tickInterval = setInterval(() => {
       if (this.playerStore.hasSleepTimer) {
-        this.rerender()
+        // Surgical update: only update the badge text instead of full rerender
+        // when the popover is closed (saves DOM thrashing)
+        if (!this.isOpen) {
+          this.updateBadgeOnly()
+        } else {
+          this.rerender()
+        }
       } else {
         // Timer expired — stop ticking to save CPU
         this.stopTick()
@@ -225,6 +231,24 @@ export class SleepTimer extends BaseComponent {
     if (this.tickInterval !== null) {
       clearInterval(this.tickInterval)
       this.tickInterval = null
+    }
+  }
+
+  /**
+   * Lightweight update — only patches the badge text and button title/aria
+   * without tearing down and rebuilding the entire DOM subtree.
+   */
+  private updateBadgeOnly(): void {
+    if (!this.element) return
+    const minutesLeft = this.playerStore.sleepTimerMinutesLeft
+    const badge = this.element.querySelector('.sleep-timer-badge')
+    if (badge && minutesLeft !== null) {
+      badge.textContent = `${minutesLeft}m`
+    }
+    const btn = this.element.querySelector('#sleep-timer-toggle')
+    if (btn) {
+      btn.setAttribute('title', `Sleep timer: ${minutesLeft ?? 0}m left`)
+      btn.setAttribute('aria-label', `Sleep timer active, ${minutesLeft ?? 0} minutes left`)
     }
   }
 
