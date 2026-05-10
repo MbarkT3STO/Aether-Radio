@@ -374,6 +374,13 @@ html[data-theme="dark"] .nav-theme .icon-moon { display: none; }
 }
 .platform-menu a:last-child { border-bottom: none; }
 .platform-menu a:hover { background: var(--accent-soft); color: var(--accent-primary); }
+.platform-menu-disabled {
+  display: block; padding: 10px 16px;
+  font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: var(--text-tertiary); opacity: 0.5;
+  cursor: not-allowed; user-select: none;
+}
+.platform-menu-disabled small { display: block; font-size: 0.75rem; opacity: 0.7; margin-top: 2px; }
 @keyframes menuPop { from { opacity: 0; transform: translateX(-50%) translateY(-4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
 /* ══════════ VALUES ══════════ */
