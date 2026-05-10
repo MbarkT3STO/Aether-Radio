@@ -36,6 +36,7 @@ export interface AppSettings {
   equalizerPreset: EqualizerPreset
   equalizerBands: EqualizerBands
   crossfadeDuration: number // seconds (0 = disabled)
+  showBufferHealth: boolean
 }
 
 export const DEFAULT_EQUALIZER_BANDS: EqualizerBands = {
@@ -67,4 +68,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   equalizerPreset: 'flat',
   equalizerBands: { ...DEFAULT_EQUALIZER_BANDS },
   crossfadeDuration: 0,
+  showBufferHealth: false,
 }

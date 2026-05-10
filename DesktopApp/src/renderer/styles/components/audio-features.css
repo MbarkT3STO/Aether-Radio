@@ -56,6 +56,11 @@
   overflow: hidden;
   margin-top: 5px;
   transition: opacity 0.3s ease;
+  display: none;
+}
+
+:root.show-buffer-health .player-buffer-bar {
+  display: block;
 }
 
 .player-buffer-bar-fill {
@@ -175,11 +180,15 @@
 
 /* ── Buffer row in expanded player ── */
 .pex-buffer-row {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 8px;
   max-width: 340px;
   align-self: flex-start;
+}
+
+:root.show-buffer-health .pex-buffer-row {
+  display: flex;
 }
 
 .pex-buffer-icon {

@@ -156,6 +156,16 @@ export class SettingsView extends BaseComponent {
               <button class="stg-toggle-btn ${(s.crossfadeDuration ?? 0) === 6 ? 'active' : ''}" data-crossfade="6">6s</button>
             </div>
           </div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Buffer Health</div>
+              <div class="stg-row-desc">Show stream buffer indicator in the player</div>
+            </div>
+            <div class="stg-toggle-group">
+              <button class="stg-toggle-btn ${s.showBufferHealth ? '' : 'active'}" data-buffer-health="hide">Hidden</button>
+              <button class="stg-toggle-btn ${s.showBufferHealth ? 'active' : ''}" data-buffer-health="show">Visible</button>
+            </div>
+          </div>
         </div>
 
         <!-- ── Keyboard Shortcuts ── -->
@@ -458,6 +468,17 @@ export class SettingsView extends BaseComponent {
         import('../services/CrossfadeService').then(({ CrossfadeService }) => {
           CrossfadeService.getInstance().setDuration(duration)
         })
+      })
+    })
+
+    // Buffer health visibility toggle
+    this.querySelectorAll('.stg-toggle-btn[data-buffer-health]').forEach(btn => {
+      this.on(btn, 'click', async () => {
+        const show = btn.getAttribute('data-buffer-health') === 'show'
+        if (this.settings?.showBufferHealth === show) return
+        await this.applyUpdate({ showBufferHealth: show })
+        // Apply immediately to the DOM
+        document.documentElement.classList.toggle('show-buffer-health', show)
       })
     })
 
