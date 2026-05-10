@@ -335,7 +335,12 @@
 .sidebar-footer-divider {
   height: 1px;
   background: var(--border-subtle);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+/* Settings button in footer */
+.sidebar-settings-btn {
+  margin-bottom: 10px;
 }
 
 .sidebar-version {
@@ -450,8 +455,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 0 16px;
+  padding: 0 8px 16px;
 }
+
+.sidebar.collapsed .sidebar-settings-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 8px;
+}
+
+.sidebar.collapsed .sidebar-settings-btn .sidebar-nav-label {
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar.collapsed .sidebar-settings-btn:hover::after { opacity: 1; }
 
 .sidebar.collapsed .sidebar-version { justify-content: center; }
 

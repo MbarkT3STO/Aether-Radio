@@ -42,12 +42,9 @@ const NAV_ITEMS: NavItem[] = [
     label: 'History',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/></svg>`
   },
-  {
-    route: '/settings',
-    label: 'Settings',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2" fill="currentColor" stroke="none"/></svg>`
-  }
 ]
+
+const SETTINGS_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2" fill="currentColor" stroke="none"/></svg>`
 
 // Chevron left — points LEFT = "collapse". CSS rotates it 180° when collapsed so it points RIGHT = "expand"
 const CHEVRON = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`
@@ -107,6 +104,10 @@ export class Sidebar extends BaseComponent {
         <!-- Footer -->
         <div class="sidebar-footer">
           <div class="sidebar-footer-divider"></div>
+          <div class="sidebar-nav-item sidebar-settings-btn" data-route="/settings" data-tooltip="Settings">
+            <span class="sidebar-nav-icon">${SETTINGS_ICON}</span>
+            <span class="sidebar-nav-label">Settings</span>
+          </div>
           <div class="sidebar-version">
             <span class="sidebar-version-text">Aether Radio</span>
             <span class="sidebar-version-badge">v1</span>
