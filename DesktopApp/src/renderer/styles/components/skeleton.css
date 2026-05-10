@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════════════════════════
+   SKELETON LOADING — Shimmer placeholders for station cards
+   Matches station-card dimensions for zero layout shift
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Shimmer animation ── */
+@keyframes skeletonShimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Skeleton card (mirrors .station-card) ── */
+.skeleton-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+/* ── Skeleton primitives ── */
+.skeleton-bone {
+  background: linear-gradient(
+    90deg,
+    var(--fill-quaternary) 25%,
+    var(--fill-tertiary) 50%,
+    var(--fill-quaternary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* ── Card header (logo + text) ── */
+.skeleton-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.skeleton-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+
+.skeleton-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.skeleton-name {
+  height: 14px;
+  width: 70%;
+}
+
+.skeleton-country {
+  height: 11px;
+  width: 45%;
+}
+
+/* ── Tags row ── */
+.skeleton-tags {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.skeleton-tag {
+  height: 22px;
+  width: 56px;
+  border-radius: var(--radius-full);
+}
+
+/* ── Footer (meta + heart) ── */
+.skeleton-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.skeleton-meta {
+  height: 11px;
+  width: 100px;
+}
+
+.skeleton-heart {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Stagger animation delays for natural feel ── */
+.skeleton-card:nth-child(2) .skeleton-bone { animation-delay: 0.1s; }
+.skeleton-card:nth-child(3) .skeleton-bone { animation-delay: 0.2s; }
+.skeleton-card:nth-child(4) .skeleton-bone { animation-delay: 0.3s; }
+.skeleton-card:nth-child(5) .skeleton-bone { animation-delay: 0.15s; }
+.skeleton-card:nth-child(6) .skeleton-bone { animation-delay: 0.25s; }
+.skeleton-card:nth-child(7) .skeleton-bone { animation-delay: 0.05s; }
+.skeleton-card:nth-child(8) .skeleton-bone { animation-delay: 0.35s; }
+
+/* ── Fade out when content loads ── */
+.skeleton-grid {
+  animation: skeletonFadeIn 0.3s ease;
+}
+
+@keyframes skeletonFadeIn {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}

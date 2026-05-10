@@ -3,6 +3,7 @@ import { PlayerStore } from '../store/PlayerStore'
 import { CrossfadeService } from './CrossfadeService'
 import { BufferHealthService } from './BufferHealthService'
 import { RecordingService } from './RecordingService'
+import { StreamProbeService } from './StreamProbeService'
 import type { RadioStation } from '../../domain/entities/RadioStation'
 
 const MAX_RETRIES = 3
@@ -16,6 +17,7 @@ export class AudioService {
   private crossfadeService = CrossfadeService.getInstance()
   private bufferHealthService = BufferHealthService.getInstance()
   private recordingService = RecordingService.getInstance()
+  private streamProbe = StreamProbeService.getInstance()
   private retryCount = 0
   private currentStationId: string | null = null
   private _onPlayStarted: ((audio: HTMLAudioElement) => Promise<void>) | null = null
@@ -48,13 +50,27 @@ export class AudioService {
     this.retryCount = 0
     this.playerStore.setLoading(true)
 
+    const streamUrl = station.urlResolved || station.url
+
+    // Quick probe: validate stream is alive before committing to playback
+    if (previousStationId !== station.id) {
+      const probe = await this.streamProbe.probe(streamUrl)
+      if (!probe.alive) {
+        this.playerStore.setLoading(false)
+        this.playerStore.error(probe.error || 'Station offline')
+        this.showToast(probe.error || 'Station appears to be offline', 'error')
+        this.currentStationId = previousStationId
+        return
+      }
+    }
+
     try {
       // Crossfade: fade out if switching stations (not first play)
       if (previousStationId && previousStationId !== station.id) {
         await this.crossfadeService.fadeOut()
       }
 
-      this.audio.src = station.urlResolved || station.url
+      this.audio.src = streamUrl
       this.audio.volume = this.playerStore.volume
       await this.audio.play()
 

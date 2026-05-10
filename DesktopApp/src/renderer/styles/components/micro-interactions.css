@@ -1,0 +1,85 @@
+/* ═══════════════════════════════════════════════════════════════
+   MICRO-INTERACTIONS — Subtle animations for premium feel
+   Play button bounce · Volume tooltip · Live ring audio sync
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Play button state-change bounce ── */
+.player-btn-play.bounce {
+  animation: playBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes playBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.88); }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* Expanded player play button bounce */
+.pex-btn-play.bounce {
+  animation: pexPlayBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pexPlayBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.90); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ── Volume tooltip ── */
+.volume-slider,
+.pex-volume-slider {
+  position: relative;
+}
+
+.volume-tooltip {
+  position: absolute;
+  top: -28px;
+  left: var(--tooltip-x, 50%);
+  transform: translateX(-50%);
+  background: var(--material-tooltip);
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  padding: 3px 8px;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 999;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: opacity 0.15s ease;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.volume-slider.dragging .volume-tooltip,
+.volume-slider:hover .volume-tooltip,
+.pex-volume-slider.dragging .volume-tooltip,
+.pex-volume-slider:hover .volume-tooltip {
+  opacity: 1;
+}
+
+/* ── Live ring synced to audio energy ── */
+/* The default CSS animation is replaced by JS-driven opacity/scale
+   when audio is playing. These classes are toggled by the visualizer. */
+.player-live-ring.audio-synced {
+  animation: none;
+  transition: opacity 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* ── Favorite heart pop ── */
+.station-card-favorite.pop,
+.player-card-favorite.pop {
+  animation: heartPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}

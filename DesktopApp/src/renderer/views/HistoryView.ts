@@ -5,6 +5,7 @@ import { EventBus } from '../store/EventBus'
 import type { PlayHistory } from '../../domain/entities/PlayHistory'
 import { renderStationCard } from '../utils/renderCard'
 import { ConfirmModal } from '../components/ConfirmModal'
+import { skeletonGrid } from '../utils/skeleton'
 
 export class HistoryView extends BaseComponent {
   private bridge      = BridgeService.getInstance()
@@ -32,7 +33,7 @@ export class HistoryView extends BaseComponent {
           <div id="clear-btn-container"></div>
         </div>
         <div id="history-content">
-          <div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">Loading history…</div></div>
+          ${skeletonGrid(8)}
         </div>
       </div>
     `

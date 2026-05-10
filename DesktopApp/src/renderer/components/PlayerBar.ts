@@ -286,6 +286,9 @@ export class PlayerBar extends BaseComponent {
       if (!isLoading) {
         playBtn.innerHTML = isPlaying ? this.pauseIcon() : this.playIcon()
       }
+      // Micro-interaction: bounce on state change
+      playBtn.classList.remove('bounce')
+      requestAnimationFrame(() => playBtn.classList.add('bounce'))
     }
 
     // Live dot
@@ -512,15 +515,26 @@ export class PlayerBar extends BaseComponent {
     }
 
     if (volumeSlider) {
+      // Inject volume tooltip
+      const tooltip = document.createElement('div')
+      tooltip.className = 'volume-tooltip'
+      tooltip.textContent = `${Math.round(this.playerStore.volume * 100)}%`
+      ;(volumeSlider as HTMLElement).appendChild(tooltip)
+
       const updateVolume = (e: MouseEvent) => {
         const rect = (volumeSlider as HTMLElement).getBoundingClientRect()
         const vol  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
         this.playerStore.setVolume(vol)
+        // Update tooltip position and text
+        const pct = Math.round(vol * 100)
+        tooltip.textContent = `${pct}%`
+        tooltip.style.setProperty('--tooltip-x', `${((e.clientX - rect.left) / rect.width) * 100}%`)
       }
       let dragging = false
 
       this.on(volumeSlider, 'mousedown', (e) => {
         dragging = true
+        ;(volumeSlider as HTMLElement).classList.add('dragging')
         const fill = this.querySelector<HTMLElement>('#player-volume-fill')
         if (fill) fill.style.transition = 'none'
         updateVolume(e as MouseEvent)
@@ -531,6 +545,7 @@ export class PlayerBar extends BaseComponent {
       this._onMouseUp   = () => {
         if (dragging) {
           dragging = false
+          ;(volumeSlider as HTMLElement).classList.remove('dragging')
           const fill = this.querySelector<HTMLElement>('#player-volume-fill')
           if (fill) fill.style.transition = ''
         }
@@ -825,13 +840,25 @@ export class PlayerBar extends BaseComponent {
 
     const volSlider = q<HTMLElement>('#pex-volume-slider')
     if (volSlider) {
+      // Inject volume tooltip
+      const tooltip = document.createElement('div')
+      tooltip.className = 'volume-tooltip'
+      tooltip.textContent = `${Math.round(this.playerStore.volume * 100)}%`
+      volSlider.appendChild(tooltip)
+
       const updateVol = (e: MouseEvent) => {
         const rect = volSlider.getBoundingClientRect()
-        this.playerStore.setVolume(Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)))
+        const vol = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+        this.playerStore.setVolume(vol)
+        // Update tooltip position and text
+        const pct = Math.round(vol * 100)
+        tooltip.textContent = `${pct}%`
+        tooltip.style.setProperty('--tooltip-x', `${((e.clientX - rect.left) / rect.width) * 100}%`)
       }
       let dragging = false
       volSlider.addEventListener('mousedown', (e) => {
         dragging = true
+        volSlider.classList.add('dragging')
         const fill = q<HTMLElement>('#pex-volume-fill')
         if (fill) fill.style.transition = 'none'
         updateVol(e)
@@ -840,6 +867,7 @@ export class PlayerBar extends BaseComponent {
       this._pexOnMouseUp   = () => {
         if (dragging) {
           dragging = false
+          volSlider.classList.remove('dragging')
           const fill = q<HTMLElement>('#pex-volume-fill')
           if (fill) fill.style.transition = ''
         }

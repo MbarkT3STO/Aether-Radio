@@ -5,6 +5,7 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { EventBus } from '../store/EventBus'
 import type { RadioStation } from '../../domain/entities/RadioStation'
 import { renderStationCard } from '../utils/renderCard'
+import { skeletonGrid } from '../utils/skeleton'
 
 const SUGGESTION_CHIPS = [
   'Jazz', 'Classical', 'Rock', 'Electronic', 'Pop',
@@ -127,7 +128,7 @@ export class SearchView extends BaseComponent {
 
   private showLoading(): void {
     const results = this.querySelector('#search-results')
-    if (results) results.innerHTML = `<div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">Searching…</div></div>`
+    if (results) results.innerHTML = skeletonGrid(8)
   }
 
   private showIdleState(): void {

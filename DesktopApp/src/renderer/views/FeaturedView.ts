@@ -5,6 +5,7 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { EventBus } from '../store/EventBus'
 import type { RadioStation } from '../../domain/entities/RadioStation'
 import { renderStationCard } from '../utils/renderCard'
+import { skeletonGrid } from '../utils/skeleton'
 
 export class FeaturedView extends BaseComponent {
   private bridge         = BridgeService.getInstance()
@@ -55,10 +56,7 @@ export class FeaturedView extends BaseComponent {
           <p class="view-subtitle">Top voted radio stations from around the world</p>
         </div>
         <div id="featured-grid">
-          <div class="loading-container">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Loading stations…</div>
-          </div>
+          ${skeletonGrid(12)}
         </div>
       </div>
     `
