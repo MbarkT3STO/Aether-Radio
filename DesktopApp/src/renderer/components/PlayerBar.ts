@@ -121,6 +121,9 @@ export class PlayerBar extends BaseComponent {
             <div class="player-station-meta" id="player-station-meta">
               ${this.buildMetaHtml(station.countryCode, station.country, station.tags, station.bitrate, isLoading)}
             </div>
+            <div class="player-buffer-bar" id="player-buffer-indicator" title="Buffer: ${this.bufferHealth.percent}%">
+              <div class="player-buffer-bar-fill" id="player-buffer-fill" style="width:${this.bufferHealth.percent}%"></div>
+            </div>
           </div>
         </div>
 
@@ -165,9 +168,33 @@ export class PlayerBar extends BaseComponent {
           </div>
         </div>
 
-        <!-- RIGHT: Volume + Visualizer -->
+        <!-- RIGHT: Tools + Volume -->
         <div class="player-extras">
 
+          <!-- Audio tools group -->
+          <div class="player-tools-group">
+            <button class="player-btn player-eq-btn ${this.isEqActive() ? 'eq-active' : ''}" id="player-eq-btn"
+              title="Equalizer" aria-label="Equalizer">
+              ${this.eqIcon()}
+            </button>
+            <button class="player-btn player-recognize-btn ${isPlaying ? '' : 'player-btn-disabled'}" id="player-recognize-btn"
+              title="Identify song" aria-label="Identify song"
+              ${isPlaying ? '' : 'disabled'}>
+              ${this.recognizeIcon()}
+            </button>
+            <button class="player-btn player-record-btn ${this.recordingService.isRecording ? 'recording' : ''} ${isPlaying ? '' : 'player-btn-disabled'}"
+              id="player-record-btn"
+              title="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
+              aria-label="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
+              ${isPlaying ? '' : 'disabled'}>
+              ${this.recordingService.isRecording
+                ? `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
+                : this.recordIcon()
+              }
+            </button>
+          </div>
+
+          <!-- Volume -->
           <div class="player-volume">
             <button class="player-btn player-btn-mute" id="player-mute-btn" data-action="mute"
               title="${volume === 0 ? 'Unmute' : 'Mute'}">
@@ -181,32 +208,6 @@ export class PlayerBar extends BaseComponent {
           </div>
 
           <div id="player-sleep-timer"></div>
-
-          <button class="player-btn player-recognize-btn ${isPlaying ? '' : 'player-btn-disabled'}" id="player-recognize-btn"
-            title="Identify song" aria-label="Identify song"
-            ${isPlaying ? '' : 'disabled'}>
-            ${this.recognizeIcon()}
-          </button>
-
-          <button class="player-btn player-eq-btn ${this.isEqActive() ? 'eq-active' : ''}" id="player-eq-btn"
-            title="Equalizer" aria-label="Equalizer">
-            ${this.eqIcon()}
-          </button>
-
-          <button class="player-btn player-record-btn ${this.recordingService.isRecording ? 'recording' : ''} ${isPlaying ? '' : 'player-btn-disabled'}"
-            id="player-record-btn"
-            title="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
-            aria-label="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
-            ${isPlaying ? '' : 'disabled'}>
-            ${this.recordingService.isRecording
-              ? `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
-              : this.recordIcon()
-            }
-          </button>
-
-          <div class="player-buffer-indicator" id="player-buffer-indicator" title="Buffer health: ${this.bufferHealth.percent}%">
-            <div class="player-buffer-fill" id="player-buffer-fill" style="width:${this.bufferHealth.percent}%"></div>
-          </div>
 
           <button class="player-btn player-expand-btn ${this._isExpanded ? 'expanded' : ''}"
             id="player-expand-btn"
@@ -460,7 +461,7 @@ export class PlayerBar extends BaseComponent {
       const indicator = this.querySelector<HTMLElement>('#player-buffer-indicator')
       if (fill) fill.style.width = `${percent}%`
       if (indicator) {
-        indicator.title = `Buffer health: ${percent}%`
+        indicator.title = `Buffer: ${percent}%`
         indicator.classList.toggle('buffer-low', percent > 0 && percent < 40)
         indicator.classList.toggle('buffer-critical', percent === 0)
       }

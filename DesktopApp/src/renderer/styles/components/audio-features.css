@@ -15,6 +15,7 @@
   background: rgba(255, 59, 48, 0.12);
   border-radius: var(--radius-full);
   padding: 4px 10px;
+  width: auto;
 }
 
 .record-indicator {
@@ -38,19 +39,26 @@
   50% { opacity: 0.3; }
 }
 
-/* ── Buffer health indicator ── */
-.player-buffer-indicator {
-  width: 36px;
-  height: 4px;
-  border-radius: var(--radius-full);
-  background: var(--fill-tertiary);
-  overflow: hidden;
+/* ── Tools group (EQ, Recognize, Record) ── */
+.player-tools-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   flex-shrink: 0;
-  position: relative;
-  align-self: center;
 }
 
-.player-buffer-fill {
+/* ── Buffer bar (inline under station meta) ── */
+.player-buffer-bar {
+  width: 100%;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: var(--fill-quaternary);
+  overflow: hidden;
+  margin-top: 5px;
+  transition: opacity 0.3s ease;
+}
+
+.player-buffer-bar-fill {
   height: 100%;
   border-radius: var(--radius-full);
   background: var(--sys-green);
@@ -58,18 +66,11 @@
   min-width: 0;
 }
 
-/* Color coding based on buffer health */
-.player-buffer-fill[style*="width:0%"],
-.player-buffer-fill[style*="width: 0%"] {
-  background: var(--sys-red);
-}
-
-/* Low buffer (we'll handle this via JS class) */
-.player-buffer-indicator.buffer-low .player-buffer-fill {
+.player-buffer-bar.buffer-low .player-buffer-bar-fill {
   background: var(--sys-orange);
 }
 
-.player-buffer-indicator.buffer-critical .player-buffer-fill {
+.player-buffer-bar.buffer-critical .player-buffer-bar-fill {
   background: var(--sys-red);
   animation: buffer-pulse 0.8s ease-in-out infinite;
 }
