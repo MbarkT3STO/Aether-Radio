@@ -5,6 +5,9 @@ import { FavoritesStore } from '../store/FavoritesStore'
 import { BridgeService } from '../services/BridgeService'
 import { VisualizerService } from '../services/VisualizerService'
 import { AudioService } from '../services/AudioService'
+import { RecordingService } from '../services/RecordingService'
+import { BufferHealthService } from '../services/BufferHealthService'
+import { EqualizerService } from '../services/EqualizerService'
 import { SleepTimer } from './SleepTimer'
 import { SongRecognitionService } from '../services/SongRecognitionService'
 import { FALLBACK_HTML } from '../utils/stationLogo'
@@ -17,6 +20,8 @@ export class PlayerBar extends BaseComponent {
   private bridge         = BridgeService.getInstance()
   private visualizer     = new VisualizerService()
   private audioService   = AudioService.getInstance()
+  private recordingService = RecordingService.getInstance()
+  private bufferHealth   = BufferHealthService.getInstance()
   private sleepTimer     = new SleepTimer()
   private recognition    = SongRecognitionService.getInstance()
 
@@ -182,6 +187,26 @@ export class PlayerBar extends BaseComponent {
             ${isPlaying ? '' : 'disabled'}>
             ${this.recognizeIcon()}
           </button>
+
+          <button class="player-btn player-eq-btn ${this.isEqActive() ? 'eq-active' : ''}" id="player-eq-btn"
+            title="Equalizer" aria-label="Equalizer">
+            ${this.eqIcon()}
+          </button>
+
+          <button class="player-btn player-record-btn ${this.recordingService.isRecording ? 'recording' : ''} ${isPlaying ? '' : 'player-btn-disabled'}"
+            id="player-record-btn"
+            title="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
+            aria-label="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
+            ${isPlaying ? '' : 'disabled'}>
+            ${this.recordingService.isRecording
+              ? `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
+              : this.recordIcon()
+            }
+          </button>
+
+          <div class="player-buffer-indicator" id="player-buffer-indicator" title="Buffer health: ${this.bufferHealth.percent}%">
+            <div class="player-buffer-fill" id="player-buffer-fill" style="width:${this.bufferHealth.percent}%"></div>
+          </div>
 
           <button class="player-btn player-expand-btn ${this._isExpanded ? 'expanded' : ''}"
             id="player-expand-btn"
@@ -407,6 +432,44 @@ export class PlayerBar extends BaseComponent {
     if (recognizeBtn) {
       this.on(recognizeBtn, 'click', () => this.handleRecognize())
     }
+
+    const eqBtn = this.querySelector<HTMLElement>('#player-eq-btn')
+    if (eqBtn) {
+      this.on(eqBtn, 'click', () => {
+        import('./Equalizer').then(({ Equalizer }) => Equalizer.show())
+      })
+    }
+
+    const recordBtn = this.querySelector<HTMLElement>('#player-record-btn')
+    if (recordBtn) {
+      this.on(recordBtn, 'click', () => {
+        if (this.recordingService.isRecording) {
+          this.recordingService.stop()
+          this.updateRecordingUI()
+        } else {
+          const stationName = this.playerStore.currentStation?.name
+          this.recordingService.start(stationName)
+          this.updateRecordingUI()
+        }
+      })
+    }
+
+    // Buffer health updates
+    this.eventBus.on('player:buffer-health', ({ percent }) => {
+      const fill = this.querySelector<HTMLElement>('#player-buffer-fill')
+      const indicator = this.querySelector<HTMLElement>('#player-buffer-indicator')
+      if (fill) fill.style.width = `${percent}%`
+      if (indicator) {
+        indicator.title = `Buffer health: ${percent}%`
+        indicator.classList.toggle('buffer-low', percent > 0 && percent < 40)
+        indicator.classList.toggle('buffer-critical', percent === 0)
+      }
+    })
+
+    // Recording duration updates
+    this.eventBus.on('player:recording', () => {
+      this.updateRecordingUI()
+    })
 
     if (playBtn) {
       this.on(playBtn, 'click', () => {
@@ -907,7 +970,55 @@ export class PlayerBar extends BaseComponent {
     `
   }
 
+  // ── Recording UI (called from EventBus, no re-render) ──────────────────
+
+  private updateRecordingUI(): void {
+    const btn = this.querySelector<HTMLElement>('#player-record-btn')
+    if (!btn) return
+
+    if (this.recordingService.isRecording) {
+      btn.classList.add('recording')
+      btn.title = 'Stop recording'
+      btn.setAttribute('aria-label', 'Stop recording')
+      btn.innerHTML = `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
+    } else {
+      btn.classList.remove('recording')
+      btn.title = 'Record'
+      btn.setAttribute('aria-label', 'Record')
+      btn.innerHTML = this.recordIcon()
+    }
+  }
+
   // ── Icon helpers ──────────────────────────────────────────────────────────
+
+  private recordIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/>
+    </svg>`
+  }
+
+  private eqIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <line x1="4" y1="21" x2="4" y2="14"/>
+      <line x1="4" y1="10" x2="4" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="12"/>
+      <line x1="12" y1="8" x2="12" y2="3"/>
+      <line x1="20" y1="21" x2="20" y2="16"/>
+      <line x1="20" y1="12" x2="20" y2="3"/>
+      <circle cx="4" cy="12" r="2"/>
+      <circle cx="12" cy="10" r="2"/>
+      <circle cx="20" cy="14" r="2"/>
+    </svg>`
+  }
+
+  private isEqActive(): boolean {
+    return EqualizerService.getInstance().preset !== 'flat'
+  }
 
   private radioIcon(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"

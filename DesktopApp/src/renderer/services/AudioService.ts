@@ -1,5 +1,8 @@
 import { EventBus } from '../store/EventBus'
 import { PlayerStore } from '../store/PlayerStore'
+import { CrossfadeService } from './CrossfadeService'
+import { BufferHealthService } from './BufferHealthService'
+import { RecordingService } from './RecordingService'
 import type { RadioStation } from '../../domain/entities/RadioStation'
 
 const MAX_RETRIES = 3
@@ -10,6 +13,9 @@ export class AudioService {
   private audio: HTMLAudioElement
   private eventBus = EventBus.getInstance()
   private playerStore = PlayerStore.getInstance()
+  private crossfadeService = CrossfadeService.getInstance()
+  private bufferHealthService = BufferHealthService.getInstance()
+  private recordingService = RecordingService.getInstance()
   private retryCount = 0
   private currentStationId: string | null = null
   private _onPlayStarted: ((audio: HTMLAudioElement) => Promise<void>) | null = null
@@ -18,6 +24,7 @@ export class AudioService {
     this.audio = new Audio()
     this.audio.crossOrigin = 'anonymous'
     this.setupEventListeners()
+    this.bufferHealthService.attach(this.audio)
   }
 
   static getInstance(): AudioService {
@@ -36,14 +43,24 @@ export class AudioService {
   }
 
   async play(station: RadioStation): Promise<void> {
+    const previousStationId = this.currentStationId
     this.currentStationId = station.id
     this.retryCount = 0
     this.playerStore.setLoading(true)
 
     try {
+      // Crossfade: fade out if switching stations (not first play)
+      if (previousStationId && previousStationId !== station.id) {
+        await this.crossfadeService.fadeOut()
+      }
+
       this.audio.src = station.urlResolved || station.url
       this.audio.volume = this.playerStore.volume
       await this.audio.play()
+
+      // Crossfade: fade in the new station
+      this.crossfadeService.fadeIn()
+
       if (this._onPlayStarted) {
         await this._onPlayStarted(this.audio)
       }
@@ -85,6 +102,11 @@ export class AudioService {
   }
 
   stop(): void {
+    // Stop recording if active
+    if (this.recordingService.isRecording) {
+      this.recordingService.stop()
+    }
+    this.crossfadeService.reset()
     this.audio.pause()
     this.audio.src = ''
     this.currentStationId = null

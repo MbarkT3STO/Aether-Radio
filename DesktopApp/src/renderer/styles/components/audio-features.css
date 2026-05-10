@@ -1,0 +1,89 @@
+/* ═══════════════════════════════════════════════════════════════
+   AUDIO FEATURES — Recording button, Buffer indicator
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Recording button ── */
+.player-record-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.player-record-btn.recording {
+  color: var(--sys-red);
+  background: rgba(255, 59, 48, 0.12);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+}
+
+.record-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sys-red);
+  animation: record-pulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.record-time {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+@keyframes record-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── Buffer health indicator ── */
+.player-buffer-indicator {
+  width: 36px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--fill-tertiary);
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  align-self: center;
+}
+
+.player-buffer-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--sys-green);
+  transition: width 0.4s ease, background 0.3s ease;
+  min-width: 0;
+}
+
+/* Color coding based on buffer health */
+.player-buffer-fill[style*="width:0%"],
+.player-buffer-fill[style*="width: 0%"] {
+  background: var(--sys-red);
+}
+
+/* Low buffer (we'll handle this via JS class) */
+.player-buffer-indicator.buffer-low .player-buffer-fill {
+  background: var(--sys-orange);
+}
+
+.player-buffer-indicator.buffer-critical .player-buffer-fill {
+  background: var(--sys-red);
+  animation: buffer-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes buffer-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── Equalizer button (in player bar) ── */
+.player-eq-btn {
+  transition: color var(--transition-fast);
+}
+
+.player-eq-btn.eq-active {
+  color: var(--accent-primary);
+}

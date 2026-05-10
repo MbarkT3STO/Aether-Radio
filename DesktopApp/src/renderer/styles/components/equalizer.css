@@ -1,0 +1,205 @@
+/* ═══════════════════════════════════════════════════════════════
+   EQUALIZER MODAL — Apple HIG modal sheet
+   5-band parametric EQ with preset pills
+   ═══════════════════════════════════════════════════════════════ */
+
+.eq-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.eq-modal-overlay.eq-modal--open {
+  opacity: 1;
+}
+
+.eq-modal-overlay.eq-modal--closing {
+  opacity: 0;
+}
+
+.eq-modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: 24px;
+  width: 420px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.25s var(--ease-expo);
+}
+
+.eq-modal--open .eq-modal {
+  transform: scale(1) translateY(0);
+}
+
+.eq-modal--closing .eq-modal {
+  transform: scale(0.96) translateY(8px);
+}
+
+/* ── Header ── */
+.eq-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.eq-modal-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  letter-spacing: -0.018em;
+}
+
+.eq-modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--fill-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.eq-modal-close:hover {
+  background: var(--fill-secondary);
+  color: var(--text-primary);
+}
+
+/* ── Presets ── */
+.eq-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.eq-preset-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  letter-spacing: -0.004em;
+}
+
+.eq-preset-btn:hover {
+  background: var(--fill-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.eq-preset-btn.active {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  border-color: var(--accent-primary);
+}
+
+/* ── Bands ── */
+.eq-bands {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 16px 0;
+}
+
+.eq-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.eq-band-value {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--accent-primary);
+  min-width: 48px;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.eq-band-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 4px;
+  height: 120px;
+  background: var(--fill-tertiary);
+  border-radius: var(--radius-full);
+  outline: none;
+  cursor: pointer;
+}
+
+.eq-band-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  border: 2px solid var(--bg-secondary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.eq-band-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.eq-band-slider::-webkit-slider-runnable-track {
+  width: 4px;
+  border-radius: var(--radius-full);
+}
+
+.eq-band-label {
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+/* ── Reset button ── */
+.eq-reset-btn {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--fill-quaternary);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.eq-reset-btn:hover {
+  background: var(--fill-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}

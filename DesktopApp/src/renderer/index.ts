@@ -108,11 +108,23 @@ class App {
   private async loadSettings(): Promise<void> {
     const result = await this.bridge.settings.get()
     if (result.success) {
-      const { theme, volume, bufferSize, accentColor } = result.data
+      const { theme, volume, bufferSize, accentColor, equalizerPreset, equalizerBands, crossfadeDuration } = result.data
       document.documentElement.setAttribute('data-theme', theme)
       document.documentElement.setAttribute('data-accent', accentColor ?? 'blue')
       this.playerStore.setVolume(volume)
       this.audioService.setBufferSize(bufferSize)
+
+      // Restore equalizer settings
+      if (equalizerPreset && equalizerBands) {
+        const { EqualizerService } = await import('./services/EqualizerService')
+        EqualizerService.getInstance().setBands(equalizerBands, equalizerPreset)
+      }
+
+      // Restore crossfade duration
+      if (crossfadeDuration !== undefined) {
+        const { CrossfadeService } = await import('./services/CrossfadeService')
+        CrossfadeService.getInstance().setDuration(crossfadeDuration)
+      }
     }
   }
 

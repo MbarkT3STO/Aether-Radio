@@ -10,6 +10,10 @@ export type EventMap = {
   'player:error': { message: string }
   'player:loading': { loading: boolean }
   'player:sleep-timer': { minutesLeft: number | null; active: boolean }
+  'player:buffer-health': { percent: number }
+  'player:recording': { active: boolean; duration: number }
+  'player:equalizer-changed': { preset: string; bands: number[] }
+  'player:crossfade-changed': { duration: number }
   'stations:loaded': { stations: RadioStation[]; total: number }
   'favorites:changed': { favorites: Favorite[] }
   'history:changed': { history: PlayHistory[] }

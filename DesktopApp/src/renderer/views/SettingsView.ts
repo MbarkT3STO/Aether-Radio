@@ -144,6 +144,18 @@ export class SettingsView extends BaseComponent {
               <button class="stg-toggle-btn ${s.bufferSize === 'high' ? 'active' : ''}" data-buffer="high">High</button>
             </div>
           </div>
+          <div class="stg-row">
+            <div class="stg-row-info">
+              <div class="stg-row-label">Crossfade</div>
+              <div class="stg-row-desc">Smooth transition when switching stations</div>
+            </div>
+            <div class="stg-toggle-group">
+              <button class="stg-toggle-btn ${(s.crossfadeDuration ?? 0) === 0 ? 'active' : ''}" data-crossfade="0">Off</button>
+              <button class="stg-toggle-btn ${(s.crossfadeDuration ?? 0) === 2 ? 'active' : ''}" data-crossfade="2">2s</button>
+              <button class="stg-toggle-btn ${(s.crossfadeDuration ?? 0) === 4 ? 'active' : ''}" data-crossfade="4">4s</button>
+              <button class="stg-toggle-btn ${(s.crossfadeDuration ?? 0) === 6 ? 'active' : ''}" data-crossfade="6">6s</button>
+            </div>
+          </div>
         </div>
 
         <!-- ── Keyboard Shortcuts ── -->
@@ -433,6 +445,19 @@ export class SettingsView extends BaseComponent {
         if (this.settings?.bufferSize === bufferSize) return
         await this.applyUpdate({ bufferSize })
         this.eventBus.emit('settings:buffer-changed', { bufferSize })
+      })
+    })
+
+    // Crossfade buttons
+    this.querySelectorAll('.stg-toggle-btn[data-crossfade]').forEach(btn => {
+      this.on(btn, 'click', async () => {
+        const duration = parseInt(btn.getAttribute('data-crossfade') || '0', 10)
+        if (this.settings?.crossfadeDuration === duration) return
+        await this.applyUpdate({ crossfadeDuration: duration })
+        // Apply immediately
+        import('../services/CrossfadeService').then(({ CrossfadeService }) => {
+          CrossfadeService.getInstance().setDuration(duration)
+        })
       })
     })
 

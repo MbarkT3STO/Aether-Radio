@@ -1,4 +1,7 @@
 import { EventBus } from '../store/EventBus'
+import { EqualizerService } from './EqualizerService'
+import { CrossfadeService } from './CrossfadeService'
+import { RecordingService } from './RecordingService'
 
 export class VisualizerService {
   private audioContext: AudioContext | null = null
@@ -31,8 +34,27 @@ export class VisualizerService {
     this.dataArray = new Uint8Array(bufferLength)
 
     this.source = this.audioContext.createMediaElementSource(audioElement)
-    this.source.connect(this.analyser)
+
+    // Build the audio chain:
+    // source → EQ filters → crossfade gain → analyser → destination
+    //                                      ↘ recording destination (tap)
+    const eqService = EqualizerService.getInstance()
+    const crossfadeService = CrossfadeService.getInstance()
+    const recordingService = RecordingService.getInstance()
+
+    // Initialize crossfade gain node
+    const gainNode = crossfadeService.initialize(this.audioContext)
+
+    // Initialize EQ: source → EQ → gainNode
+    eqService.initialize(this.audioContext, this.source, gainNode)
+
+    // gainNode → analyser → destination
+    gainNode.connect(this.analyser)
     this.analyser.connect(this.audioContext.destination)
+
+    // Recording tap: gainNode → recording stream destination
+    const recordDest = recordingService.initialize(this.audioContext)
+    gainNode.connect(recordDest)
 
     // Listen for theme changes and re-draw the gradient with the new accent color
     const eventBus = EventBus.getInstance()
