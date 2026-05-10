@@ -312,6 +312,18 @@ export class PlayerBar extends BaseComponent {
       recognizeBtn.toggleAttribute('disabled', !isPlaying)
     }
 
+    // Sync record button enabled state
+    const recordBtn = this.querySelector<HTMLElement>('#player-record-btn')
+    if (recordBtn) {
+      recordBtn.classList.toggle('player-btn-disabled', !isPlaying)
+      recordBtn.toggleAttribute('disabled', !isPlaying)
+      // Stop recording if playback stopped/paused
+      if (!isPlaying && this.recordingService.isRecording) {
+        this.recordingService.stop()
+        this.updateRecordingUI()
+      }
+    }
+
     // Visualizer
     this.syncVisualizer(isPlaying)
   }
@@ -963,6 +975,25 @@ export class PlayerBar extends BaseComponent {
       }
     } else {
       this._ambientVisualizer.stopVisualization()
+    }
+
+    // Sync recognize and record buttons enabled state
+    const recognizeBtn = q<HTMLElement>('#pex-recognize')
+    if (recognizeBtn) {
+      recognizeBtn.toggleAttribute('disabled', !isPlaying)
+      recognizeBtn.style.opacity = isPlaying ? '' : '0.35'
+      recognizeBtn.style.pointerEvents = isPlaying ? '' : 'none'
+    }
+
+    const recordBtn = q<HTMLElement>('#pex-record')
+    if (recordBtn) {
+      recordBtn.toggleAttribute('disabled', !isPlaying)
+      recordBtn.style.opacity = isPlaying ? '' : '0.35'
+      recordBtn.style.pointerEvents = isPlaying ? '' : 'none'
+      // Stop recording if playback paused
+      if (!isPlaying && this.recordingService.isRecording) {
+        this.recordingService.stop()
+      }
     }
   }
 

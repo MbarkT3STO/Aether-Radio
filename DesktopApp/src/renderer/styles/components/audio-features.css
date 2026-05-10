@@ -19,6 +19,13 @@
   width: auto;
 }
 
+.player-record-btn.player-btn-disabled,
+.player-record-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .record-indicator {
   width: 8px;
   height: 8px;
