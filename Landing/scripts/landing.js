@@ -150,7 +150,7 @@
 
     // ══════════════ SCROLL REVEAL
     const toReveal = document.querySelectorAll(
-      '.feature-card, .platform-card, .design-card, .value, .faq-item, .stat, .cta-banner, .section-head'
+      '.feature-card, .platform-card, .design-card, .value, .faq-item, .stat, .cta-banner, .section-head, .donate-card'
     )
     toReveal.forEach(el => el.classList.add('reveal'))
 
