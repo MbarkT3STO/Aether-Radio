@@ -87,3 +87,74 @@
 .player-eq-btn.eq-active {
   color: var(--accent-primary);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPANDED PLAYER — EQ, Record, Buffer
+   ═══════════════════════════════════════════════════════════════ */
+
+/* EQ button in expanded player */
+.pex-btn-eq {
+  color: var(--text-tertiary);
+}
+
+.pex-btn-eq:hover {
+  color: var(--accent-primary);
+  background: var(--accent-soft);
+}
+
+.pex-btn-eq.eq-active {
+  color: var(--accent-primary);
+}
+
+/* Record button in expanded player */
+.pex-btn-record {
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pex-btn-record:hover {
+  color: var(--sys-red);
+  background: rgba(255, 59, 48, 0.10);
+}
+
+.pex-btn-record.recording {
+  color: var(--sys-red);
+  background: rgba(255, 59, 48, 0.12);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  width: auto;
+}
+
+/* Buffer row in expanded player */
+.pex-buffer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 340px;
+}
+
+.pex-buffer-indicator {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: var(--fill-tertiary);
+  overflow: hidden;
+}
+
+.pex-buffer-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--sys-green);
+  transition: width 0.4s ease, background 0.3s ease;
+}
+
+.pex-buffer-label {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
+  min-width: 28px;
+  font-variant-numeric: tabular-nums;
+}

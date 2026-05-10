@@ -687,6 +687,26 @@ export class PlayerBar extends BaseComponent {
                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                   </svg>
                 </button>
+                <button class="pex-btn pex-btn-eq ${this.isEqActive() ? 'eq-active' : ''}" id="pex-eq"
+                  title="Equalizer" aria-label="Equalizer">
+                  ${this.eqIcon()}
+                </button>
+                <button class="pex-btn pex-btn-record ${this.recordingService.isRecording ? 'recording' : ''}" id="pex-record"
+                  title="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
+                  aria-label="${this.recordingService.isRecording ? 'Stop recording' : 'Record'}"
+                  ${isPlaying ? '' : 'disabled'}>
+                  ${this.recordingService.isRecording
+                    ? `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
+                    : this.recordIcon()
+                  }
+                </button>
+              </div>
+
+              <div class="pex-buffer-row">
+                <div class="pex-buffer-indicator" id="pex-buffer-indicator">
+                  <div class="pex-buffer-fill" id="pex-buffer-fill" style="width:${this.bufferHealth.percent}%"></div>
+                </div>
+                <span class="pex-buffer-label" id="pex-buffer-label">${this.bufferHealth.percent}%</span>
               </div>
 
               <div class="pex-volume">
@@ -816,8 +836,41 @@ export class PlayerBar extends BaseComponent {
       }),
       this.eventBus.on('player:volume',     ({ volume }) => this.syncPexVolumeUI(overlay, volume)),
       this.eventBus.on('favorites:changed', () => this.syncPexFavState(overlay)),
-      this.eventBus.on('player:loading',    ({ loading }) => this.syncPexLoadingUI(overlay, loading))
+      this.eventBus.on('player:loading',    ({ loading }) => this.syncPexLoadingUI(overlay, loading)),
+      this.eventBus.on('player:buffer-health', ({ percent }) => {
+        const fill = overlay.querySelector<HTMLElement>('#pex-buffer-fill')
+        const label = overlay.querySelector<HTMLElement>('#pex-buffer-label')
+        if (fill) fill.style.width = `${percent}%`
+        if (label) label.textContent = `${percent}%`
+      }),
+      this.eventBus.on('player:recording', () => {
+        const btn = overlay.querySelector<HTMLElement>('#pex-record')
+        if (!btn) return
+        if (this.recordingService.isRecording) {
+          btn.classList.add('recording')
+          btn.title = 'Stop recording'
+          btn.innerHTML = `<span class="record-indicator"></span><span class="record-time">${RecordingService.formatDuration(this.recordingService.duration)}</span>`
+        } else {
+          btn.classList.remove('recording')
+          btn.title = 'Record'
+          btn.innerHTML = this.recordIcon()
+        }
+      })
     )
+
+    // EQ button in expanded player
+    q<HTMLElement>('#pex-eq')?.addEventListener('click', () => {
+      import('./Equalizer').then(({ Equalizer }) => Equalizer.show())
+    })
+
+    // Record button in expanded player
+    q<HTMLElement>('#pex-record')?.addEventListener('click', () => {
+      if (this.recordingService.isRecording) {
+        this.recordingService.stop()
+      } else {
+        this.recordingService.start(this.playerStore.currentStation?.name)
+      }
+    })
   }
 
   private syncPexPlayState(overlay: HTMLElement): void {
