@@ -349,7 +349,6 @@
 .player-expand-btn {
   background: transparent;
   border: none;
-  color: var(--text-tertiary);
   border-radius: 50%;
   transition:
     color var(--transition-fast),
@@ -360,6 +359,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.player-recognize-btn {
+  color: var(--text-secondary);
+}
+
+.player-expand-btn {
+  color: var(--text-tertiary);
 }
 
 .player-recognize-btn:focus-visible,
