@@ -183,6 +183,9 @@ export class Sidebar extends BaseComponent {
         const route = item.getAttribute('data-route')
         if (!route) return
         this.router.navigate(route)
+
+        // Close mobile sidebar drawer on navigation
+        this.closeMobileSidebar()
       })
 
       // Set --tooltip-y so the fixed-position tooltip aligns with the item
@@ -242,5 +245,23 @@ export class Sidebar extends BaseComponent {
     this.querySelectorAll('.sidebar-nav-item').forEach(item => {
       item.classList.toggle('active', item.getAttribute('data-route') === this.currentRoute)
     })
+  }
+
+  private closeMobileSidebar(): void {
+    const sidebar = document.querySelector<HTMLElement>('.app-sidebar')
+    const backdrop = document.querySelector<HTMLElement>('.mobile-sidebar-backdrop')
+
+    if (sidebar) {
+      sidebar.classList.remove('mobile-open')
+
+      // Restore collapsed state if it was forced expanded
+      const innerSidebar = sidebar.querySelector<HTMLElement>('.sidebar')
+      if (innerSidebar && innerSidebar.classList.contains('mobile-force-expanded')) {
+        innerSidebar.classList.remove('mobile-force-expanded')
+        innerSidebar.classList.add('collapsed')
+      }
+    }
+
+    if (backdrop) backdrop.classList.remove('visible')
   }
 }

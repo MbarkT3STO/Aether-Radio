@@ -1,0 +1,564 @@
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Full mobile compatibility
+   ---------------------------------------------------------------
+   Transforms the desktop-first layout into a mobile-friendly
+   experience with:
+   · Off-canvas drawer sidebar (slide-in from left)
+   · Compact player bar with touch-friendly targets
+   · Responsive grids that work down to 320px
+   · Touch-optimized spacing and hit areas
+   · Safe area insets for notched devices
+   · Hamburger menu toggle in the top bar
+   ═══════════════════════════════════════════════════════════════ */
+
+
+/* ═══ MOBILE BREAKPOINT (≤ 768px) ═══════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* ── App shell — stack vertically ── */
+  #app {
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh; /* dynamic viewport height for mobile browsers */
+  }
+
+  /* ── Sidebar — off-canvas drawer ── */
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 80vw;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    border-right: 1px solid var(--border-subtle);
+    z-index: 9000;
+    transform: translateX(-100%);
+    transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: none;
+  }
+
+  .app-sidebar.sidebar-collapsed {
+    width: 280px;
+    max-width: 80vw;
+  }
+
+  .app-sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-2xl);
+  }
+
+  /* ── Sidebar backdrop overlay ── */
+  .mobile-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 8999;
+    opacity: 0;
+    transition: opacity 320ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-sidebar-backdrop.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  /* ── Main area — full width ── */
+  .platform-web .app-main {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ── Top bar — add hamburger space ── */
+  .app-topbar {
+    height: 56px;
+    padding: 0 var(--space-3);
+    border-radius: 0;
+    gap: var(--space-2);
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* ── Hamburger button ── */
+  .mobile-menu-btn {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: var(--fill-tertiary);
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background var(--transition-fast),
+      transform var(--transition-spring);
+  }
+
+  .mobile-menu-btn:active {
+    transform: scale(0.92);
+    background: var(--fill-secondary);
+  }
+
+  /* ── Content area ── */
+  .app-content {
+    padding: var(--space-4) var(--space-4) var(--space-4);
+  }
+
+  .platform-web .app-content {
+    padding: var(--space-4) var(--space-4);
+  }
+
+  /* ── Player bar — compact for mobile ── */
+  .app-player-bar {
+    height: auto;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0));
+  }
+
+  .platform-web .app-player-bar {
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0));
+  }
+
+  .player-bar {
+    height: auto;
+    min-height: 64px;
+    padding: 8px 12px;
+    margin: 0;
+    border-radius: var(--radius-xl);
+    gap: 8px;
+  }
+
+  .platform-web .player-bar {
+    margin: 0;
+    border-radius: var(--radius-xl);
+  }
+
+  /* Station info — smaller logo */
+  .player-station-logo-wrap {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+
+  .player-empty-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+
+  .player-station-info {
+    gap: 10px;
+  }
+
+  .player-station-name {
+    font-size: var(--text-sm);
+  }
+
+  .player-station-meta {
+    font-size: var(--text-2xs);
+  }
+
+  /* Controls — compact */
+  .player-controls {
+    padding: 0 8px;
+  }
+
+  .player-controls-pill {
+    padding: 3px 4px;
+    gap: 2px;
+  }
+
+  .player-btn-play {
+    width: 42px;
+    height: 42px;
+  }
+
+  .player-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .player-btn-stop {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Extras — hide volume slider, keep essential buttons */
+  .player-extras {
+    gap: 4px;
+  }
+
+  .player-extras .player-volume {
+    display: none;
+  }
+
+  .player-recognize-btn,
+  .player-expand-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* ── Grids — smaller cards ── */
+  .grid-cols-auto {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .grid-cols-country {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--space-2);
+  }
+
+  /* ── Station cards — tighter padding ── */
+  .station-card {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-xl);
+  }
+
+  .station-card-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .station-card-name {
+    font-size: var(--text-sm);
+  }
+
+  .station-card-tags {
+    display: none; /* Hide tags on mobile to save space */
+  }
+
+  /* ── View headers ── */
+  .view-header h1 {
+    font-size: var(--text-xl);
+  }
+
+  .view-header--split {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* ── Home view ── */
+  .home-greeting h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .home-now-playing-card {
+    padding: 14px 16px;
+    gap: 14px;
+  }
+
+  .home-np-artwork {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+
+  .home-np-name {
+    font-size: var(--text-base);
+  }
+
+  .home-stats-row {
+    gap: var(--space-2);
+  }
+
+  .home-stat-pill {
+    padding: 6px 12px;
+    font-size: var(--text-sm);
+  }
+
+  /* ── Modals — full width on mobile ── */
+  .rcm-dialog {
+    width: 100%;
+    max-width: calc(100vw - 24px);
+    border-radius: var(--radius-2xl);
+  }
+
+  .rcm-hero {
+    height: 180px;
+  }
+
+  .rcm-hero-cover {
+    width: 120px;
+    height: 120px;
+  }
+
+  .rcm-body {
+    padding: 20px 16px 24px;
+  }
+
+  .rcm-title {
+    font-size: var(--text-xl);
+  }
+
+  .rcm-artist {
+    font-size: var(--text-base);
+  }
+
+  .rcm-streams-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .rcm-stream-btn {
+    min-height: 44px;
+  }
+
+  /* ── Search bar ── */
+  .search-bar {
+    max-width: 100%;
+  }
+
+  .search-bar-input {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  /* ── Accent picker menu ── */
+  .app-accent-menu {
+    right: -8px;
+    min-width: 200px;
+  }
+
+  /* ── Section titles ── */
+  .section-title {
+    font-size: var(--text-xs);
+  }
+
+  /* ── Empty states ── */
+  .home-empty-section {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  /* ── Hide sidebar collapse button on mobile ── */
+  .sidebar-collapse-btn {
+    display: none;
+  }
+
+  /* ── Topbar CTA — hide on mobile ── */
+  .app-topbar-cta {
+    display: none !important;
+  }
+
+  /* ── Explore view — genre grid ── */
+  .genre-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  /* ── Settings — full width inputs ── */
+  .stg-content-wrap {
+    max-width: 100%;
+  }
+}
+
+
+/* ═══ EXTRA SMALL (≤ 480px) ═════════════════════════════════════ */
+
+@media (max-width: 480px) {
+
+  .app-content {
+    padding: var(--space-3) var(--space-3) var(--space-3);
+  }
+
+  .platform-web .app-content {
+    padding: var(--space-3) var(--space-3);
+  }
+
+  /* Single column grid for very small screens */
+  .grid-cols-auto {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .grid-cols-country {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  /* Player bar — even more compact */
+  .player-controls {
+    padding: 0 4px;
+  }
+
+  .player-btn-play {
+    width: 38px;
+    height: 38px;
+  }
+
+  .player-station-logo-wrap {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+
+  .player-empty-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+
+  /* Home greeting */
+  .home-greeting h1 {
+    font-size: var(--text-xl);
+  }
+
+  .home-stats-row {
+    flex-direction: column;
+  }
+
+  .home-stat-pill {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* View header */
+  .view-header h1 {
+    font-size: var(--text-lg);
+  }
+
+  .view-header-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Topbar */
+  .app-topbar {
+    height: 52px;
+    gap: var(--space-2);
+  }
+
+  .app-topbar-icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .app-accent-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+
+/* ═══ DESKTOP — hide mobile-only elements ═══════════════════════ */
+
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+
+  .mobile-sidebar-backdrop {
+    display: none !important;
+  }
+}
+
+
+/* ═══ TOUCH DEVICE OPTIMIZATIONS ════════════════════════════════ */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  .sidebar-nav-item {
+    padding: 10px 10px;
+    min-height: 44px;
+  }
+
+  .station-card-favorite {
+    width: 36px;
+    height: 36px;
+  }
+
+  .player-btn {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  /* Disable hover effects on touch */
+  .station-card:hover {
+    transform: none;
+    box-shadow: var(--shadow-xs);
+    border-color: var(--border-subtle);
+  }
+
+  .station-card:active {
+    transform: scale(0.98);
+    transition-duration: 60ms;
+  }
+
+  .home-now-playing-card:hover {
+    transform: none;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .home-stat-pill:hover {
+    transform: none;
+    border-color: var(--border-subtle);
+    background: var(--bg-secondary);
+  }
+
+  /* Remove hover-only scrollbar behavior */
+  .app-content::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    background-clip: padding-box;
+  }
+}
+
+
+/* ═══ SAFE AREA INSETS (notched devices) ════════════════════════ */
+
+@supports (padding: env(safe-area-inset-top)) {
+  @media (max-width: 768px) {
+    .app-topbar {
+      padding-top: env(safe-area-inset-top, 0);
+    }
+
+    .app-sidebar {
+      padding-top: env(safe-area-inset-top, 0);
+    }
+
+    .app-player-bar {
+      padding-bottom: calc(6px + env(safe-area-inset-bottom, 0));
+    }
+  }
+}
+
+
+/* ═══ LANDSCAPE MOBILE ══════════════════════════════════════════ */
+
+@media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
+  .app-topbar {
+    height: 44px;
+  }
+
+  .player-bar {
+    min-height: 56px;
+    padding: 6px 12px;
+  }
+
+  .player-station-logo-wrap {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .player-btn-play {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rcm-dialog {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .rcm-hero {
+    height: 140px;
+  }
+}

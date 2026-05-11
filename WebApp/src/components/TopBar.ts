@@ -47,6 +47,14 @@ export class TopBar extends BaseComponent {
   render(): string {
     return `
       <header class="app-topbar" id="app-topbar" role="banner">
+        <button type="button"
+                class="mobile-menu-btn"
+                id="mobile-menu-btn"
+                aria-label="Open navigation menu"
+                title="Menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+
         <button class="app-topbar-brand" id="topbar-brand" aria-label="About Aether Radio">
           <img class="app-topbar-brand-mark" src="${LOGO_URL}" alt="" width="30" height="30">
           <span class="app-topbar-brand-text">
@@ -138,6 +146,10 @@ export class TopBar extends BaseComponent {
       e.stopPropagation()
       this.toggleAccentMenu()
     })
+
+    // Mobile hamburger menu
+    const menuBtn = this.querySelector('#mobile-menu-btn')
+    if (menuBtn) this.on(menuBtn, 'click', () => this.toggleMobileSidebar())
 
     // Accent menu items
     this.querySelectorAll<HTMLElement>('.app-accent-menu button[data-accent]').forEach(btn => {
@@ -247,5 +259,73 @@ export class TopBar extends BaseComponent {
       document.removeEventListener('click', this.outsideClickHandler)
       this.outsideClickHandler = null
     }
+  }
+
+  // ── Mobile sidebar drawer ──────────────────────────────────────────────
+
+  private toggleMobileSidebar(): void {
+    const sidebar = document.querySelector<HTMLElement>('.app-sidebar')
+    if (!sidebar) return
+
+    const isOpen = sidebar.classList.contains('mobile-open')
+
+    if (isOpen) {
+      this.closeMobileSidebar()
+    } else {
+      this.openMobileSidebar()
+    }
+  }
+
+  private openMobileSidebar(): void {
+    const sidebar = document.querySelector<HTMLElement>('.app-sidebar')
+    if (!sidebar) return
+
+    sidebar.classList.add('mobile-open')
+
+    // Force expanded state on the inner sidebar for proper touch targets
+    const innerSidebar = sidebar.querySelector<HTMLElement>('.sidebar')
+    if (innerSidebar && innerSidebar.classList.contains('collapsed')) {
+      innerSidebar.classList.add('mobile-force-expanded')
+      innerSidebar.classList.remove('collapsed')
+    }
+
+    // Create backdrop if it doesn't exist
+    // IMPORTANT: Append inside #app (not body) so the backdrop shares the
+    // sidebar's stacking context. Otherwise #app's z-index:1 would trap
+    // the sidebar below a body-level backdrop, blocking all clicks.
+    const appEl = document.getElementById('app')
+    let backdrop = document.querySelector<HTMLElement>('.mobile-sidebar-backdrop')
+    if (!backdrop) {
+      backdrop = document.createElement('div')
+      backdrop.className = 'mobile-sidebar-backdrop'
+      if (appEl) appEl.appendChild(backdrop)
+      else document.body.appendChild(backdrop)
+    }
+
+    // Show backdrop with a slight delay for animation
+    requestAnimationFrame(() => {
+      backdrop!.classList.add('visible')
+    })
+
+    // Close on backdrop tap
+    backdrop.addEventListener('click', () => this.closeMobileSidebar(), { once: true })
+  }
+
+  private closeMobileSidebar(): void {
+    const sidebar = document.querySelector<HTMLElement>('.app-sidebar')
+    const backdrop = document.querySelector<HTMLElement>('.mobile-sidebar-backdrop')
+
+    if (sidebar) {
+      sidebar.classList.remove('mobile-open')
+
+      // Restore collapsed state if it was forced expanded
+      const innerSidebar = sidebar.querySelector<HTMLElement>('.sidebar')
+      if (innerSidebar && innerSidebar.classList.contains('mobile-force-expanded')) {
+        innerSidebar.classList.remove('mobile-force-expanded')
+        innerSidebar.classList.add('collapsed')
+      }
+    }
+
+    if (backdrop) backdrop.classList.remove('visible')
   }
 }
